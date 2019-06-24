@@ -1,0 +1,8 @@
+*tar.gz
+*.pyc
+*log
+.vscode/settings.json
+.env
+Pipfile.lock
+.idea
+.build_output/
