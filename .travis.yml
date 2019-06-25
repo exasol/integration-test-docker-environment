@@ -1,0 +1,10 @@
+language: python
+python: '3.6'
+dist: xenial
+sudo: required
+services:
+- docker
+install:
+- sudo pip install pipenv
+script:
+  - ./start-test-env.sh --environment-name test --database-port-forward 8888 --bucketfs-port-forward 6666
