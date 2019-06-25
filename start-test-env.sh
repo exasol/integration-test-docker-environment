@@ -24,7 +24,7 @@ run () {
         $PIPENV_BIN install
     fi
     cd "$SCRIPT_DIR"
-    export PYTHONPATH="$SCRIPT_DIR"
+    export PYTHONPATH="$PYTHONPATH:."
     $PIPENV_BIN run python3 docker_db_starter_src/docker_db_starter.py $COMMAND_LINE_ARGS
 }
 
