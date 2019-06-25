@@ -1,4 +1,4 @@
-from click._unicodefun import click
+import click
 
 from docker_db_starter_src.cli.common import set_build_config, run_tasks, add_options
 from docker_db_starter_src.cli.options \
