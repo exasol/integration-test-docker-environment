@@ -79,8 +79,8 @@ class SpawnTestContainer(DockerBaseTask):
         # A later task which uses the test_container needs the exported container,
         # but to access exported container from inside the test_container,
         # we need to mount the release directory into the test_container.
-        exports_host_path = pathlib.Path(self._get_export_directory()).absolute()
-        tests_host_path = pathlib.Path("./tests").absolute()
+        exports_host_path = pathlib.Path(self._get_export_directory()).resolve()
+        tests_host_path = pathlib.Path("./tests").resolve()
         volumes = {
             exports_host_path: {
                 "bind": "/exports",
@@ -98,6 +98,7 @@ class SpawnTestContainer(DockerBaseTask):
                 "bind": "/var/run/docker.sock",
                 "mode": "rw"
             }
+        self.logger.info("Mounted Volumnes %s",volumes)
         test_container = \
             self._client.containers.create(
                 image=test_container_image_info.get_target_complete_name(),
