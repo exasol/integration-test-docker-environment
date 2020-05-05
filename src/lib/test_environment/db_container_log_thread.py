@@ -35,7 +35,7 @@ class DBContainerLogThread(Thread):
                 log = self.container.logs(since=self.previous_timestamp, until=self.current_timestamp)
                 if len(log) != 0:
                     still_running_logger.log()
-                    log_handler.handle_log_line(log)
+                    log_handler.handle_log_lines(log)
                 log_line = log.decode("utf-8").lower()
                 if ("error" in log_line and not "sshd was not started") \
                         or "exception" in log_line \

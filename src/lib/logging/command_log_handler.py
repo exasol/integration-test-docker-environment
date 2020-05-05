@@ -11,7 +11,6 @@ class CommandLogHandler(AbstractLogHandler):
         self._description = description
 
     def handle_log_line(self, log_line, error: bool = False):
-        log_line = log_line.decode("utf-8")
         self._log_file.write(log_line)
         self._complete_log.append(log_line)
         if error:
