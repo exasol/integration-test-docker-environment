@@ -11,7 +11,6 @@ class ContainerLogHandler(AbstractLogHandler):
         self.db_container_name = description
 
     def handle_log_line(self, log_line, error: bool = False):
-        log_line = log_line.decode("utf-8")
         self._log_file.write(log_line)
         self._complete_log.append(log_line)
 

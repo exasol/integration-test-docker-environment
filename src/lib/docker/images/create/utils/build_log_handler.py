@@ -15,8 +15,6 @@ class BuildLogHandler(AbstractLogHandler):
         self._image_info = image_info
 
     def handle_log_line(self, log_line, error: bool = False):
-        log_line = log_line.decode("utf-8")
-        log_line = log_line.strip('\r\n')
         json_output = json.loads(log_line)
         if "stream" in json_output:
             self._complete_log.append(json_output["stream"])

@@ -44,4 +44,4 @@ class DockerPushImageBaseTask(DockerBaseTask):
                 self.logger, "push image %s" % image_info.get_target_complete_name())
             for log_line in output_generator:
                 still_running_logger.log()
-                log_hanlder.handle_log_line(log_line)
+                log_hanlder.handle_log_lines(log_line)

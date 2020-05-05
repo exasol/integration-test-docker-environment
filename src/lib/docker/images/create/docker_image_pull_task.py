@@ -54,4 +54,4 @@ class DockerPullImageTask(DockerImageCreatorBaseTask):
                 self.logger, "pull image %s" % image_info.get_source_complete_name())
             for log_line in output_generator:
                 still_running_logger.log()
-                log_handler.handle_log_line(log_line)
+                log_handler.handle_log_lines(log_line)
