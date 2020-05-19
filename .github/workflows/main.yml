@@ -24,4 +24,4 @@ jobs:
     - name: Spawn environemnt
       run: ./start-test-env spawn-test-environment --environment-name test --database-port-forward 8888 --bucketfs-port-forward 6666
     - name: Test database
-      run: python3 -c "import pyexasol as p; C=p.connect(dsn='localhost:8888', user='sys', password='exasol'); s = C.execute("SELECT * FROM EXA_ALL_USERS"); print(s.fetchone())"
+      run: python3 -c "import pyexasol as p; C=p.connect(dsn='localhost:8888', user='sys', password='exasol'); s = C.execute('SELECT * FROM EXA_ALL_USERS'); print(s.fetchone())"
