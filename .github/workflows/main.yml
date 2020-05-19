@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ "*" ]
+    branches: [ "master" ]
   pull_request:
-    branches: [ "*" ]
+    branches: [ "master" ]
 
 jobs:
   build:
@@ -22,4 +22,3 @@ jobs:
     
     - name: Start environment
       run: ./start-test-env spawn-test-environment --environment-name test --database-port-forward 8888 --bucketfs-port-forward 6666
-    
