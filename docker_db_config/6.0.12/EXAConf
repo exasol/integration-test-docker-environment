@@ -137,6 +137,6 @@
         # WritePasswd is "write" (without quotes)
         WritePasswd = d3JpdGU=
         Public = True
-        Name = jdbc-adapter
+        Name = jdbc_adapter
 
 
