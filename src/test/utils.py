@@ -136,9 +136,14 @@ class ExaslctTestEnvironment():
             bucketfs_password="write",
             database_port=find_free_port(),
             bucketfs_port=find_free_port())
+        docker_db_version_parameter = ""
+        if "EXASOL_VERSION" in os.environ:
+            docker_db_version_parameter = f'--docker-db-image-version "{os.environ["EXASOL_VERSION"]}"'
         arguments = " ".join([f"--environment-name {on_host_parameter.name}",
                               f"--database-port-forward {on_host_parameter.database_port}",
-                              f"--bucketfs-port-forward {on_host_parameter.bucketfs_port}"])
+                              f"--bucketfs-port-forward {on_host_parameter.bucketfs_port}",
+                              docker_db_version_parameter])
+
         command = f"{self.executable} spawn-test-environment {arguments}"
         self.run_command(command, use_flavor_path=False, use_docker_repository=False)
         if "GOOGLE_CLOUD_BUILD" in os.environ:
