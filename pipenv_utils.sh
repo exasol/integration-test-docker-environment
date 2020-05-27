@@ -1,17 +1,17 @@
 init_pipenv () {
     PIPENV_BIN="$1"
     echo "Using following pipenv executable: $PIPENV_BIN"
-    if $PIPENV_BIN --venv &> /dev/null
+    if $PIPENV_BIN --python python3 --venv &> /dev/null
     then
         echo "Using existing virtual environment"
     else
         echo "Creating new virtual environment and installing dependencies"
-        $PIPENV_BIN install
+        $PIPENV_BIN --python python3 install
     fi
     if [ ! -f Pipfile.lock ]
     then
         echo "Installing dependencies"
-        $PIPENV_BIN install
+        $PIPENV_BIN --python python3 install
     fi
 }
 
