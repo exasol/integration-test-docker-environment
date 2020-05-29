@@ -3,12 +3,6 @@ name: CI
 on: [push, pull_request]
 
 jobs:
-  test-docker-runner:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Run tests
-      run: "./start-test-env spawn-test-environment --environment-name test --database-port-forward 8877 --bucketfs-port-forward 6655"
   test:
     strategy:
       fail-fast: false
