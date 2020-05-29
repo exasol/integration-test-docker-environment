@@ -4,6 +4,12 @@ SCRIPT_DIR="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 
 pushd "$SCRIPT_DIR" &> /dev/null
 
-docker run --rm -it -v $PWD:$PWD -v /var/run/docker.sock:/var/run/docker.sock -w $PWD exatk/script-languages:test_environment_docker_runner bash -c "source /venv/bin/activate && ./start-test-env-without-docker-runner $*; chown -R $(id -u):$(id -g) .build_output &> /dev/null"
+if [[ -t 1 ]]
+then
+  terminal_parameter=-it
+else
+  terminal_parameter=""
+fi
+docker run --rm $terminal_parameter -v $PWD:$PWD -v /var/run/docker.sock:/var/run/docker.sock -w $PWD exatk/script-languages:test_environment_docker_runner bash -c "source /venv/bin/activate && ./start-test-env-without-docker-runner $*; chown -R $(id -u):$(id -g) .build_output &> /dev/null"
 
 popd &> /dev/null 
