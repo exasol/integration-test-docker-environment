@@ -10,7 +10,7 @@ class DockerTestEnvironmentTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         print(f"SetUp {cls.__name__}")
-        cls.test_environment = utils.ExaslctTestEnvironment(cls, "./start-test-env",
+        cls.test_environment = utils.ExaslctTestEnvironment(cls, "./start-test-env-without-docker-runner",
                                                             clean_images_at_close=False)
         # TODO cls.test_environment.clean_images()
         cls.docker_environment_name = cls.__name__
