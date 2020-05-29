@@ -1,8 +1,8 @@
-# Docker-DB Test Environment Starter
+# Integration Test Docker Environment
 
 ## About
 
-This project provides a command line interface to start a test environment with an (Exasol Docker DB)[https://hub.docker.com/r/exasol/docker-db]. It starts an Exasol Docker-DB container and an associated test container where exaplus and odbc is already installed. Both containers exist in the same Docker network. This allows you to connect from the test container to the Docker-DB container. Further more, the database gets populated with some test data. You can find the test data under `tests/test/enginedb_small/import.sql`. Besides the test container, you can also access the Exasol database and the Bucket-FS from the host via port forwards. 
+This project provides a command line interface to start a test environment with an [Exasol Docker DB](https://hub.docker.com/r/exasol/docker-db). It starts an Exasol Docker-DB container and an associated test container where Exaplus and ODBC is already installed. Both containers exist in the same Docker network. This allows you to connect from the test container to the Docker-DB container. Further more, the database gets populated with some test data. You can find the test data under `tests/test/enginedb_small/import.sql`. Besides the test container, you can also access the Exasol database and the Bucket-FS from the host via port forwards. 
 
 ### Comparison to Docker-DB and the Exasol Testcontainers
 
