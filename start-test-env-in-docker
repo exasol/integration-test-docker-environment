@@ -1,0 +1,1 @@
+docker run -it -v $PWD:$PWD -v /var/run/docker.sock:/var/run/docker.sock -w $PWD exatk/script-languages:test_environment_docker_runner bash -c "source /venv/bin/activate && ./start-test-env $*; chown -R $(id -u):$(id -g) .build_output &> /dev/null"
