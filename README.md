@@ -48,6 +48,8 @@ The default credentials for the database are
 and for the Bucket-FS:
   * User: w
   * Password: write
+  
 or
+
   * User: r
   * Password: read
