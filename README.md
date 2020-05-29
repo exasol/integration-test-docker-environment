@@ -45,7 +45,9 @@ Shutdown of the test environment is currently done manual.
 The default credentials for the database are
   * User: sys
   * Password: exasol
+  
 and for the Bucket-FS:
+
   * User: w
   * Password: write
   
