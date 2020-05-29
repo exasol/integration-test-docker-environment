@@ -13,8 +13,8 @@ This project provides a command line interface to start a test environment with 
 
 In order to start a Docker-DB Test Environment, you need:
 
-* Linux (MaxOS X is )
-* Docker 
+* Linux (MaxOS X and Windows is currently not supported, because the Exasol Docker-DB requires privileged mode)
+* Docker with privileged mode
 * We recommend at least 15 GB free disk space on the partition 
   where Docker stores its images and containers, on Linux Docker typically stores 
   the images at /var/lib/docker.
