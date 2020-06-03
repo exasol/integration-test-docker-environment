@@ -2,22 +2,26 @@
 
 ## About
 
-This project provides a command line interface to start a test environment with an [Exasol Docker DB](https://hub.docker.com/r/exasol/docker-db). It starts an Exasol Docker-DB container and an associated test container where Exaplus and ODBC is already installed. Both containers exist in the same Docker network. This allows you to connect from the test container to the Docker-DB container. Further more, the database gets populated with some test data. You can find the test data under `tests/test/enginedb_small/import.sql`. Besides the test container, you can also access the Exasol database and the Bucket-FS from the host via port forwards. 
+This project provides a command line interface to start a test environment with an [Exasol Docker DB](https://hub.docker.com/r/exasol/docker-db). It starts an Exasol Docker-DB container and an associated test container where [EXAPlus CLI](https://docs.exasol.com/connect_exasol/sql_clients/exaplus_cli/exaplus_cli.htm) and  the [Exasol ODBC driver](https://docs.exasol.com/connect_exasol/drivers/odbc.htm) are already installed.
+
+Both containers exist in the same Docker network. This allows you to connect from the test container to the Docker-DB container. Furthermore, the database gets populated with some test data. You can find the test data under `tests/test/enginedb_small/import.sql`. Besides the test container, you can also access the Exasol database and the Bucket-FS from the host via forwarded ports.
 
 ### Comparison to Docker-DB and the Exasol Testcontainers
 
-* This project uses the [Docker-DB](https://hub.docker.com/r/exasol/docker-db), but it does the configuration, setup and startup for you. For example, it waits until the Database and the Bucket-FS accept connections. It also populates it with test data and provides with the test container an environment to access the database.
-* The [Exasol Testcontainers](https://github.com/exasol/exasol-testcontainers/) provides similar features for Java JUnit integration tests, so if you have an Java project use the Exasol Testcontainer, because they are more integrated in the Java ecosystem then this project. However, if you have a project in any other language you can use this project to start a test Exasol database via a commandline interface.
+* This project uses the [Docker-DB](https://hub.docker.com/r/exasol/docker-db), but it does the configuration, setup and startup for you. For example, it waits until the Database and the Bucket-FS accept connections. It also populates the database with test data and provides with the test container as an environment to access the database.
+* The [Exasol Testcontainers](https://github.com/exasol/exasol-testcontainers/) provide similar features for Java integration tests, so if you have an Java project use the Exasol Testcontainer, because they are more integrated in the Java ecosystem then this project. Testcontainers are designed to integrate with popular unit testing frameworks like [JUnit4](https://www.testcontainers.org/test_framework_integration/junit_4/), [JUnit5](https://www.testcontainers.org/test_framework_integration/junit_5/) and [Spock](https://www.testcontainers.org/test_framework_integration/spock/). Most notably, lifecycle management of containers controlled by the tests lifecycle.
+
+However, if you have a project in any other language you can use this project to start a test Exasol database via a command line interface.
 
 ## Prerequisites
 
 In order to start a Docker-DB Test Environment, you need:
 
-* Linux (MaxOS X and Windows is currently not supported, because the Exasol Docker-DB requires privileged mode)
+* Linux (MaxOS X and Windows are currently not supported, because the Exasol Docker-DB requires [privileged mode](https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities))
 * Docker with privileged mode
 * We recommend at least 15 GB free disk space on the partition 
-  where Docker stores its images and containers, on Linux Docker typically stores 
-  the images at /var/lib/docker.
+  where Docker stores its images and containers. On Linux Docker typically stores 
+  the images under `/var/lib/docker`.
 
 ## Getting started
 
@@ -43,15 +47,16 @@ Shutdown of the test environment is currently done manual.
 ### Default Credentials
 
 The default credentials for the database are
-  * User: sys
-  * Password: exasol
+
+  * User: `sys`
+  * Password: `exasol`
   
 and for the Bucket-FS:
 
-  * User: w
-  * Password: write
+  * User: `w`
+  * Password: `write`
   
 or
 
-  * User: r
-  * Password: read
+  * User: `r`
+  * Password: `read`
