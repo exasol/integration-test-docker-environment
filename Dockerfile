@@ -22,7 +22,5 @@ ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
 RUN pip3 install pipenv
 RUN virtualenv --python=python3 /venv
-#RUN echo "source /venv/bin/activate" >> ~/.bashrc
-#RUN echo "source /venv/bin/activate" >> ~/.bash_profile
 COPY Pipfile /root/Pipfile
 RUN bash -c "source /venv/bin/activate && cd /root && pipenv --python python3 install"
