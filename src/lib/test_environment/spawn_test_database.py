@@ -29,9 +29,9 @@ DB_PORT = "8888"
 class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
     environment_name = luigi.Parameter()
     db_container_name = luigi.Parameter()
+    attempt = luigi.IntParameter(1)
     network_info = JsonPickleParameter(DockerNetworkInfo, significant=False)  # type: DockerNetworkInfo
     ip_address_index_in_subnet = luigi.IntParameter(significant=False)
-    attempt = luigi.IntParameter(1)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -219,7 +219,8 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         template = Template(template_str)
         rendered_template = template.render(private_network=db_private_network,
                                             db_version=self.db_version,
-                                            image_version=self.docker_db_image_version)
+                                            image_version=self.docker_db_image_version,
+                                            mem_size=self.mem_size)
         self._add_string_to_tarfile(tar, "EXAConf", rendered_template)
 
     def _add_string_to_tarfile(self, tar: tarfile.TarFile, name: str, string: str):
