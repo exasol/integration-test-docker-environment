@@ -112,7 +112,14 @@ def handle_failure(task: DependencyLoggerBaseTask, task_dependencies_dot_file: s
     generate_graph_from_task_dependencies(task, task_dependencies_dot_file)
     timedelta = datetime.now() - start_time
     print("The command failed after %s s with:" % timedelta.total_seconds())
+    print_task_failures(task)
 
+def print_task_failures(task: DependencyLoggerBaseTask):
+    print()
+    print("Task Failures:")
+    for failure in task.collect_failures():
+        print(failure)
+    print()
 
 def handle_success(task: DependencyLoggerBaseTask, task_dependencies_dot_file: str, start_time: datetime):
     generate_graph_from_task_dependencies(task, task_dependencies_dot_file)

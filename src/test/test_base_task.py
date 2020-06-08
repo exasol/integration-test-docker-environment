@@ -118,6 +118,22 @@ class TestTask10(TestBaseTask):
         time.sleep(1)
         print(self.parameter_1)
 
+class TestTask11(TestBaseTask):
+
+    def register_required(self):
+        task12_1 = self.create_child_task_with_common_params(TestTask12,p="1")
+        task12_2 = self.create_child_task_with_common_params(TestTask12,p="2")
+        self.task12_1_future = self.register_dependency(task12_1)
+        self.task12_2_future = self.register_dependency(task12_2)
+
+    def run_task(self):
+        pass
+
+class TestTask12(TestBaseTask):
+    p = Parameter()
+
+    def run_task(self):
+        raise Exception("%s"%self.task_id)
 
 class BaseTaskTest(unittest.TestCase):
 
@@ -158,6 +174,25 @@ class BaseTaskTest(unittest.TestCase):
             print(e)
         if task._get_tmp_path_for_job().exists():
             shutil.rmtree(str(task._get_tmp_path_for_job()))
+
+    def test_collect_failures(self):
+        self.set_job_id(TestTask11)
+        task = TestTask11()
+        try:
+            luigi.build([task], workers=3, local_scheduler=True, log_level="INFO")
+            failures = task.collect_failures()
+            print()
+            for failure in failures:
+                print(failure)
+                print()
+            print()
+            self.assertEquals(len(failures),2)
+        except Exception as e:
+            print(e)
+        if task._get_tmp_path_for_job().exists():
+            shutil.rmtree(str(task._get_tmp_path_for_job()))
+
+
 
 
 if __name__ == '__main__':
