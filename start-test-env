@@ -10,6 +10,14 @@ then
 else
   terminal_parameter=""
 fi
-docker run --rm $terminal_parameter -v "$PWD:$PWD" -v /var/run/docker.sock:/var/run/docker.sock -w "$PWD" exatk/script-languages:test_environment_docker_runner bash -c "source /venv/bin/activate && ./start-test-env-without-docker-runner $*; chown -R $(id -u):$(id -g) .build_output &> /dev/null"
+
+quoted_arguments=''
+for argument in "$@"
+do
+    argument="${argument//\\/\\\\}"
+    quoted_arguments="$quoted_arguments \"${argument//\"/\\\"}\""
+done
+
+docker run --rm $terminal_parameter -v "$PWD:$PWD" -v /var/run/docker.sock:/var/run/docker.sock -w "$PWD" exatk/script-languages:test_environment_docker_runner bash -c "source /venv/bin/activate && ./start-test-env-without-docker-runner $quoted_arguments; chown -R $(id -u):$(id -g) .build_output &> /dev/null"
 
 popd &> /dev/null 

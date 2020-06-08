@@ -116,7 +116,7 @@
     # Version nr. of this database.
     Version = {{db_version}}
     # Memory size over all nodes (e. g. '1 TiB').
-    MemSize = 4 GiB
+    MemSize = {{ mem_size }}
     Port = 8888
     # User and group IDs that own this database (e. g. '1000:1005').
     Owner = 500 : 500

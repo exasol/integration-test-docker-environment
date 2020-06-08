@@ -34,15 +34,51 @@ git clone https://github.com/exasol/integration-test-docker-environment
 Starting the test environment:
 
 ```
-./start-test-env spawn-test-environment --environment-name <NAME> --database-port-forward <PORT> --bucketfs-port-forward <PORT>
+./start-test-env spawn-test-environment --environment-name <NAME>
 ```
 or if you work on the code of the the Test Environment (requires Python >=3.6 with pip):
 
 ```
-./start-test-env-without-docker-runner spawn-test-environment --environment-name <NAME> --database-port-forward <PORT> --bucketfs-port-forward <PORT>
+./start-test-env-without-docker-runner spawn-test-environment --environment-name <NAME>
 ```
 
 Shutdown of the test environment is currently done manual.
+
+### Options
+
+The following options are available to customize the test environment. 
+
+```
+  --environment-name TEXT         Name of the docker environment. This name
+                                  gets used as suffix for the container
+                                  db_container_<name> and
+                                  test_container_<name>  [required]
+
+  --database-port-forward INTEGER
+                                  Host port to which the database port gets
+                                  forwarded  [default: 8888]
+
+  --bucketfs-port-forward INTEGER
+                                  Host port to which the bucketfs port gets
+                                  forwarded  [default: 6666]
+
+  --db-mem-size TEXT              The main memory used by the database. Format
+                                  <number> <unit>, e.g. 1 GiB. The minimum
+                                  size is 1 GB, below that the database will
+                                  not start.  [default: 2 GiB]
+
+  --docker-db-image-version TEXT  Docker DB Image Version against which the
+                                  tests should run.  [default: 6.2.6-d1]
+
+  --docker-db-image-name TEXT     Docker DB Image Name against which the tests
+                                  should run.  [default: exasol/docker-db]
+```
+
+You can look at them on the commandline with:
+
+```
+./start-test-env spawn-test-environment --help 
+```
 
 ### Default Credentials
 

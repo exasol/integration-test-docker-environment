@@ -9,3 +9,4 @@ class DockerDBTestEnvironmentParameter(Config):
     no_database_cleanup_after_end = luigi.BoolParameter(False, significant=False)
     database_port_forward = luigi.OptionalParameter(None, significant=False)
     bucketfs_port_forward = luigi.OptionalParameter(None, significant=False)
+    mem_size = luigi.OptionalParameter("2 GiB",significant=False)

@@ -12,7 +12,7 @@ from pathlib import Path
 import docker
 import requests
 import inspect
-
+from typing import List
 
 class ExaslctDockerTestEnvironment():
     def __init__(self, name: str, database_host: str,
@@ -126,7 +126,7 @@ class ExaslctTestEnvironment():
         except Exception as e:
             print(e)
 
-    def spawn_docker_test_environment(self, name) -> ExaslctDockerTestEnvironment:
+    def spawn_docker_test_environment(self, name, additional_parameter:List[str]=None) -> ExaslctDockerTestEnvironment:
         on_host_parameter = ExaslctDockerTestEnvironment(
             name=self.name + "_" + name,
             database_host="localhost",
@@ -139,10 +139,12 @@ class ExaslctTestEnvironment():
         docker_db_version_parameter = ""
         if "EXASOL_VERSION" in os.environ:
             docker_db_version_parameter = f'--docker-db-image-version "{os.environ["EXASOL_VERSION"]}"'
+        if additional_parameter is None:
+            additional_parameter = []
         arguments = " ".join([f"--environment-name {on_host_parameter.name}",
                               f"--database-port-forward {on_host_parameter.database_port}",
                               f"--bucketfs-port-forward {on_host_parameter.bucketfs_port}",
-                              docker_db_version_parameter])
+                              docker_db_version_parameter] + additional_parameter)
 
         command = f"{self.executable} spawn-test-environment {arguments}"
         self.run_command(command, use_flavor_path=False, use_docker_repository=False)
