@@ -35,7 +35,6 @@ def spawn_test_environment(
     The test-container is reachable by the database for output redirects of udfs.
     """
     humanfriendly_db_mem_size = humanfriendly.parse_size(db_mem_size)
-    print("AAAAAA",humanfriendly_db_mem_size)
     if humanfriendly_db_mem_size<1000000000: # db_mem_size needs to be larger than 1000 MB
         print("The --db-mem-size needs to be at least 1 GiB.")
         exit(1)
