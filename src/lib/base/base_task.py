@@ -306,6 +306,17 @@ class BaseTask(Task):
         params.update(kwargs)
         return task_class(**params)
 
+    def cleanup(self):
+        self.logger.debug("Cleaning up")
+        if self._task_state != TaskState.CLEANUP and self._task_state != TaskState.CLEANED:
+            self._task_state = TaskState.CLEANUP
+            self.cleanup_child_task()
+            self.cleanup_task()
+            if self._get_tmp_path_for_task().exists():
+                shutil.rmtree(self._get_tmp_path_for_task())
+            self._task_state = TaskState.CLEANED
+        self.logger.debug("Cleanup finished")
+
     def cleanup_child_task(self):
         if self._run_dependencies_target.exists():
             _run_dependencies_tasks_from_target = self._run_dependencies_target.read()
@@ -325,13 +336,3 @@ class BaseTask(Task):
     def cleanup_task(self):
         pass
 
-    def cleanup(self):
-        self.logger.info("Cleaning up")
-        if self._task_state != TaskState.CLEANUP and self._task_state != TaskState.CLEANED:
-            self._task_state = TaskState.CLEANUP
-            self.cleanup_child_task()
-            self.cleanup_task()
-            if self._get_tmp_path_for_task().exists():
-                shutil.rmtree(self._get_tmp_path_for_task())
-            self._task_state = TaskState.CLEANED
-        self.logger.info("Cleanup finished")
