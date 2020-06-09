@@ -117,19 +117,20 @@ class AbstractSpawnTestEnvironment(DependencyLoggerBaseTask,
 
     def _setup_test_database(self, test_environment_info: EnvironmentInfo):
         # TODO check if database is setup
-        self.logger.info("Setup database")
-        upload_tasks = [
-            self.create_child_task_with_common_params(
-                UploadExaJDBC,
-                test_environment_info=test_environment_info,
-                reuse_uploaded=self.reuse_database_setup),
-            self.create_child_task_with_common_params(
-                UploadVirtualSchemaJDBCAdapter,
-                test_environment_info=test_environment_info,
-                reuse_uploaded=self.reuse_database_setup),
-            self.create_child_task_with_common_params(
-                PopulateEngineSmallTestDataToDatabase,
-                test_environment_info=test_environment_info,
-                reuse_data=self.reuse_database_setup
-            )]
-        yield from self.run_dependencies(upload_tasks)
+        if self.is_setup_database_activated:
+            self.logger.info("Setup database")
+            upload_tasks = [
+                self.create_child_task_with_common_params(
+                    UploadExaJDBC,
+                    test_environment_info=test_environment_info,
+                    reuse_uploaded=self.reuse_database_setup),
+                self.create_child_task_with_common_params(
+                    UploadVirtualSchemaJDBCAdapter,
+                    test_environment_info=test_environment_info,
+                    reuse_uploaded=self.reuse_database_setup),
+                self.create_child_task_with_common_params(
+                    PopulateEngineSmallTestDataToDatabase,
+                    test_environment_info=test_environment_info,
+                    reuse_data=self.reuse_database_setup
+                )]
+            yield from self.run_dependencies(upload_tasks)
