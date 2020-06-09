@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
+DEVICE_SIZE_IN_MEGABYTES=$1
+
 # Setup directory "exa" with pre-configured EXAConf to attach it to the exasoldb docker container
 mkdir -p /exa/{etc,data/storage}
 cp EXAConf /exa/etc/EXAConf
-dd if=/dev/zero of=/exa/data/storage/dev.1.data bs=1 count=1 seek=4294967296
+dd if=/dev/zero of=/exa/data/storage/dev.1.data bs=1M count=1 seek=$DEVICE_SIZE_IN_MEGABYTES
 touch /exa/data/storage/dev.1.meta

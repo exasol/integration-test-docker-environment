@@ -13,6 +13,7 @@ source "$SCRIPT_DIR/pipenv_utils.sh"
 run () {
     export PYTHONPATH="$SCRIPT_DIR"
     $PIPENV_BIN run python3 "$SCRIPT_DIR/src/main.py" "$@" # We use "$@" to pass the commandline arguments to the run function to preserve arguments with spaces as a single argument
+    exit $?
 
 }
 

@@ -3,6 +3,8 @@ import tarfile
 import time
 from pathlib import Path
 from typing import Tuple
+import humanfriendly
+import math
 
 import docker
 import luigi
@@ -220,7 +222,8 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         rendered_template = template.render(private_network=db_private_network,
                                             db_version=self.db_version,
                                             image_version=self.docker_db_image_version,
-                                            mem_size=self.mem_size)
+                                            mem_size=self.mem_size,
+                                            disk_size=self.disk_size)
         self._add_string_to_tarfile(tar, "EXAConf", rendered_template)
 
     def _add_string_to_tarfile(self, tar: tarfile.TarFile, name: str, string: str):
@@ -232,7 +235,13 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         tar.addfile(tarinfo=tar_info, fileobj=bytes_io)
 
     def _execute_init_db(self, db_volume: Volume, volume_preperation_container: Container):
-        (exit_code, output) = volume_preperation_container.exec_run(cmd="bash /init_db.sh")
+        disk_size_in_bytes = humanfriendly.parse_size(self.disk_size)
+        min_overhead_in_gigabyte = 2 # Exasol needs at least a 2 GB larger device than the configured disk size
+        overhead_factor = max(0.01,(min_overhead_in_gigabyte*1024*1024*1024)/disk_size_in_bytes) # and in general 1% larger
+        device_size_in_bytes = disk_size_in_bytes*(1+overhead_factor)
+        device_size_in_megabytes = math.ceil(device_size_in_bytes/(1024*1024)) # The init_db.sh script works with MB, because its faster
+        self.logger.info(f"Creating database volume of size {device_size_in_megabytes/1024} GB using and overhead factor of {overhead_factor}")
+        (exit_code, output) = volume_preperation_container.exec_run(cmd=f"bash /init_db.sh {device_size_in_megabytes}")
         if exit_code != 0:
             raise Exception(
                 "Error during preperation of docker-db volume %s got following output %s" % (db_volume.name, output))
