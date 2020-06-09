@@ -37,7 +37,7 @@ class DockerTestEnvironmentDBDiskSizeTest(unittest.TestCase):
     def assert_disk_size(self, size:str):
         containers = [c.name for c in self.client.containers.list() if self.docker_environment_name in c.name]
         db_container = [c for c in containers if "db_container" in c]
-        exit_result = self.client.containers.get(db_container[0]).exec_run("cat /exa/etc/EXAConf | grep MemSize")
+        exit_result = self.client.containers.get(db_container[0]).exec_run("cat /exa/etc/EXAConf | grep Size")
         output = exit_result[1].decode("UTF-8")
         self.assertIn(" Size = %s"%size,output)
 
