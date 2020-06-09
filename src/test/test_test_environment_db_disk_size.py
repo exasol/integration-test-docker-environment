@@ -40,6 +40,10 @@ class DockerTestEnvironmentDBDiskSizeTest(unittest.TestCase):
         exit_result = self.client.containers.get(db_container[0]).exec_run("cat /exa/etc/EXAConf")
         output = exit_result[1].decode("UTF-8")
         return_code = exit_result[0]
+        if output == '':
+            exit_result = self.client.containers.get(db_container[0]).exec_run("cat /exa/etc/EXAConf")
+            output = exit_result[1].decode("UTF-8")
+            return_code = exit_result[0]
         self.assertEquals(return_code,0)
         self.assertIn(" Size = %s"%size,output)
 
