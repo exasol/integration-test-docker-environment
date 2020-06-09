@@ -51,14 +51,14 @@ class DockerTestEnvironmentDBMemSizeTest(unittest.TestCase):
     def test_smallest_valid_db_mem_size(self):
         self.docker_environment_name = "test_smallest_valid_db_mem_size"
         self.on_host_docker_environment, self.google_cloud_docker_environment = \
-            self.test_environment.spawn_docker_test_environment(self.docker_environment_name, ["--db-mem-size","'1 GB'"])
-        self.assert_mem_size("1 GB")
+            self.test_environment.spawn_docker_test_environment(self.docker_environment_name, ["--db-mem-size","'1 GiB'"])
+        self.assert_mem_size("1 GiB")
     
     def test_invalid_db_mem_size(self):
         self.docker_environment_name = "test_invalid_db_mem_size"
         with self.assertRaises(Exception) as context:
             self.on_host_docker_environment, self.google_cloud_docker_environment = \
-                self.test_environment.spawn_docker_test_environment(self.docker_environment_name, ["--db-mem-size","'999 MB'"])
+                self.test_environment.spawn_docker_test_environment(self.docker_environment_name, ["--db-mem-size","'999 MiB'"])
 
 if __name__ == '__main__':
     unittest.main()
