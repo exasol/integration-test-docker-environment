@@ -18,6 +18,8 @@ from ...lib.test_environment.spawn_test_environment_with_docker_db import \
         help="Host port to which the bucketfs port gets forwarded")
 @click.option('--db-mem-size', type=str, default="2 GiB", show_default=True,
         help="The main memory used by the database. Format <number> <unit>, e.g. 1 GiB. The minimum size is 1 GB, below that the database will not start.")
+@click.option('--db-disk-size', type=str, default="2 GiB", show_default=True,
+        help="The disk size available for the database. Format <number> <unit>, e.g. 1 GiB. The minimum size is 100 MiB. However, the setup creates volume files with at least 2 GB larger size, because the database needs at least so much more disk.")
 @add_options(docker_db_options)
 @add_options([output_directory_option])
 @add_options([tempory_base_directory_option])
@@ -27,6 +29,7 @@ def spawn_test_environment(
         database_port_forward: int,
         bucketfs_port_forward: int,
         db_mem_size:str,
+        db_disk_size:str,
         docker_db_image_version: str,
         docker_db_image_name: str,
         output_directory: str,
@@ -37,9 +40,13 @@ def spawn_test_environment(
     This command spawn a test environment with a docker-db container and a conected test-container.
     The test-container is reachable by the database for output redirects of udfs.
     """
-    humanfriendly_db_mem_size = humanfriendly.parse_size(db_mem_size)
-    if humanfriendly_db_mem_size<1000000000: # db_mem_size needs to be larger than 1000 MB
+    parsed_db_mem_size = humanfriendly.parse_size(db_mem_size)
+    if parsed_db_mem_size<humanfriendly.parse_size("1 GiB"):
         print("The --db-mem-size needs to be at least 1 GiB.")
+        exit(1)
+    parsed_db_disk_size = humanfriendly.parse_size(db_disk_size)
+    if parsed_db_disk_size<humanfriendly.parse_size("100 MiB"):
+        print("The --db-disk-size needs to be at least 100 MiB.")
         exit(1)
     set_build_config(False,
                      tuple(),
@@ -54,6 +61,7 @@ def spawn_test_environment(
         database_port_forward=str(database_port_forward),
         bucketfs_port_forward=str(bucketfs_port_forward),
         mem_size=db_mem_size,
+        disk_size=db_disk_size,
         docker_db_image_version=docker_db_image_version,
         docker_db_image_name=docker_db_image_name,
         db_user="sys",

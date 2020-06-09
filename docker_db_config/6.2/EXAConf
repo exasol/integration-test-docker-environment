@@ -91,7 +91,7 @@
     # Type of volume: 'data' | 'archive'
     Type = data
     # Volume size (e. g. '1 TiB')
-    Size = 2.0 GiB
+    Size = {{ disk_size }}
     # Name of the disk to be used for this volume.
     # This disk must exist on all volume nodes.
     Disk = disk1

@@ -147,7 +147,8 @@ class ExaslctTestEnvironment():
                               docker_db_version_parameter] + additional_parameter)
 
         command = f"{self.executable} spawn-test-environment {arguments}"
-        self.run_command(command, use_flavor_path=False, use_docker_repository=False)
+        completed_process = self.run_command(command, use_flavor_path=False, use_docker_repository=False)
+
         if "GOOGLE_CLOUD_BUILD" in os.environ:
             google_cloud_parameter = ExaslctDockerTestEnvironment(
                 name=on_host_parameter.name,

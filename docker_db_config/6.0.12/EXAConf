@@ -59,7 +59,7 @@
     # This disk must exist on all volume nodes.
     Disk = default
     # Volume size (e. g. '1 TiB')
-    Size = 2.0 GiB
+    Size = {{ disk_size }}
     # Desired redundancy for this volume
     Redundancy = 1
     # Volume owner (user and group ID)
