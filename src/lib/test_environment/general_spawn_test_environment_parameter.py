@@ -8,3 +8,4 @@ class GeneralSpawnTestEnvironmentParameter(Config):
     reuse_test_container = luigi.BoolParameter(False, significant=False)
     no_test_container_cleanup_after_end = luigi.BoolParameter(False, significant=False)
     max_start_attempts = luigi.IntParameter(2, significant=False)
+    is_setup_database_activated = luigi.BoolParameter(True, significant=False)

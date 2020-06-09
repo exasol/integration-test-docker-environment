@@ -67,11 +67,21 @@ The following options are available to customize the test environment.
                                   size is 1 GB, below that the database will
                                   not start.  [default: 2 GiB]
 
-  --docker-db-image-version TEXT  Docker DB Image Version against which the
-                                  tests should run.  [default: 6.2.6-d1]
+  --db-disk-size TEXT             The disk size available for the database.
+                                  Format <number> <unit>, e.g. 1 GiB. The
+                                  minimum size is 100 MiB. However, the setup
+                                  creates volume files with at least 2 GB
+                                  larger size, because the database needs at
+                                  least so much more disk.  [default: 2 GiB]
 
-  --docker-db-image-name TEXT     Docker DB Image Name against which the tests
-                                  should run.  [default: exasol/docker-db]
+  --deactivate-database-setup BOOLEAN
+                                  Deactivates the setup of the spawned
+                                  database, this means no data get populated
+                                  and no jdbc drivers get uploaded. This can
+                                  be used either to save time or as a
+                                  workaround for MacOSX where the
+                                  test_container seems not to be able to
+                                  access the tests directory  [default: False]
 ```
 
 You can look at them on the commandline with:

@@ -20,6 +20,8 @@ from ...lib.test_environment.spawn_test_environment_with_docker_db import \
         help="The main memory used by the database. Format <number> <unit>, e.g. 1 GiB. The minimum size is 1 GB, below that the database will not start.")
 @click.option('--db-disk-size', type=str, default="2 GiB", show_default=True,
         help="The disk size available for the database. Format <number> <unit>, e.g. 1 GiB. The minimum size is 100 MiB. However, the setup creates volume files with at least 2 GB larger size, because the database needs at least so much more disk.")
+@click.option('--deactivate-database-setup/--no-deactivate-database-setup', type=bool, default=False, show_default=True,
+        help="Deactivates the setup of the spawned database, this means no data get populated and no jdbc drivers get uploaded. This can be used either to save time or as a workaround for MacOSX where the test_container seems not to be able to access the tests directory")
 @add_options(docker_db_options)
 @add_options([output_directory_option])
 @add_options([tempory_base_directory_option])
@@ -30,6 +32,7 @@ def spawn_test_environment(
         bucketfs_port_forward: int,
         db_mem_size:str,
         db_disk_size:str,
+        deactivate_database_setup:bool,
         docker_db_image_version: str,
         docker_db_image_name: str,
         output_directory: str,
@@ -68,7 +71,8 @@ def spawn_test_environment(
         db_password="exasol",
         bucketfs_write_password="write",
         no_test_container_cleanup_after_end=True,
-        no_database_cleanup_after_end=True
+        no_database_cleanup_after_end=True,
+        is_setup_database_activated=not deactivate_database_setup 
     )
     set_job_id(SpawnTestEnvironmentWithDockerDB.__name__)
     success, task = run_task(task_creator, workers, task_dependencies_dot_file)
