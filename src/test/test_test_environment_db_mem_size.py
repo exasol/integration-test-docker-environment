@@ -39,6 +39,8 @@ class DockerTestEnvironmentDBMemSizeTest(unittest.TestCase):
         db_container = [c for c in containers if "db_container" in c]
         exit_result = self.client.containers.get(db_container[0]).exec_run("cat /exa/etc/EXAConf")
         output = exit_result[1].decode("UTF-8")
+        return_code = exit_result[0]
+        self.assertEquals(return_code,0)
         self.assertIn("MemSize = %s"%size,output)
 
 
