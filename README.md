@@ -2,7 +2,7 @@
 
 ## About
 
-This project provides a command line interface to start a test environment with an [Exasol Docker DB](https://hub.docker.com/r/exasol/docker-db). It starts an Exasol Docker-DB container and an associated test container where [EXAPlus CLI](https://docs.exasol.com/connect_exasol/sql_clients/exaplus_cli/exaplus_cli.htm) and  the [Exasol ODBC driver](https://docs.exasol.com/connect_exasol/drivers/odbc.htm) are already installed.
+This project provides a command line interface to start a test environment with an [Exasol Docker-DB](https://hub.docker.com/r/exasol/docker-db). It starts an Exasol Docker-DB container and an associated test container where [EXAPlus CLI](https://docs.exasol.com/connect_exasol/sql_clients/exaplus_cli/exaplus_cli.htm) and  the [Exasol ODBC driver](https://docs.exasol.com/connect_exasol/drivers/odbc.htm) are already installed.
 
 Both containers exist in the same Docker network. This allows you to connect from the test container to the Docker-DB container. Furthermore, the database gets populated with some test data. You can find the test data under `tests/test/enginedb_small/import.sql`. Besides the test container, you can also access the Exasol database and the Bucket-FS from the host via forwarded ports.
 
@@ -17,8 +17,12 @@ However, if you have a project in any other language you can use this project to
 
 In order to start a Docker-DB Test Environment, you need:
 
-* Linux (MaxOS X and Windows are currently not supported, because the Exasol Docker-DB requires [privileged mode](https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities))
+* Tests Operating System:
+  * Linux 
+  * MaxOS X with [Docker Desktop on Mac](https://docs.docker.com/docker-for-mac/install/) works with some limitations, for more details, see [here](#macos-x-support).
+  * Windows is currently **not supported**, because the Exasol Docker-DB requires [privileged mode](https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities). Please use a Linux virtual machine.
 * Docker with privileged mode
+* At least 2 GiB RAM
 * We recommend at least 15 GB free disk space on the partition 
   where Docker stores its images and containers. On Linux Docker typically stores 
   the images under `/var/lib/docker`.
@@ -106,3 +110,15 @@ or
 
   * User: `r`
   * Password: `read`
+  
+## MacOS X Support
+
+MacOS X with Docker Desktop for Mac uses a lightwight Virtual machine in which the container run. This makes [networking](https://docs.docker.com/docker-for-mac/networking/) and [shared directories](https://docs.docker.com/docker-for-mac/osxfs/) more complicated then on Linux.
+
+We start the python setup script for the test environment in its own Docker container, because the the library [Luigi](https://luigi.readthedocs.io/en/stable/) can have problems with MacOS X and to avoid the installation of further dependencies. This Docker container has the Docker socket mounted and uses this to start the [Docker-DB](https://hub.docker.com/r/exasol/docker-db) container and the associate test container. This currently breaks mounting directories to the test container for populating the database.
+
+Kudos to [@nndo1991](https://github.com/nndo1991) for helping to figure out, how we can use the test environment on Mac OS X.
+
+### What do I need to do to start the Test Environment with MacOS X
+1. Increase the RAM of the Docker VM to at least 4,25 GB or reduce the the DB Mem Size to less than 2 GB with `--db-mem-size 1 GiB`
+2. Start the test environment with `--deactivate-database-setup`
