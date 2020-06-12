@@ -2,7 +2,7 @@ import luigi
 from luigi import Config
 
 
-class GeneralSpawnTestEnvironmentParameter(Config):
+class GeneralSpawnTestEnvironmentParameter(Config, HostWorkingDirectoryParameter):
 
     reuse_database_setup = luigi.BoolParameter(False, significant=False)
     reuse_test_container = luigi.BoolParameter(False, significant=False)

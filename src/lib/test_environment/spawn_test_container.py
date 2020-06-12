@@ -1,3 +1,4 @@
+import os
 import pathlib
 from typing import List
 
@@ -11,9 +12,10 @@ from ...lib.data.container_info import ContainerInfo
 from ...lib.data.docker_network_info import DockerNetworkInfo
 from ...lib.test_environment.analyze_test_container import DockerTestContainerBuild
 from ...lib.test_environment.create_export_directory import CreateExportDirectory
+from ...lib.test_environment.host_working_directory_parameter import HostWorkingDirectoryParameter
 
 
-class SpawnTestContainer(DockerBaseTask):
+class SpawnTestContainer(DockerBaseTask, HostWorkingDirectoryParameter):
     environment_name = luigi.Parameter()
     test_container_name = luigi.Parameter()
     network_info = JsonPickleParameter(
@@ -79,8 +81,17 @@ class SpawnTestContainer(DockerBaseTask):
         # A later task which uses the test_container needs the exported container,
         # but to access exported container from inside the test_container,
         # we need to mount the release directory into the test_container.
-        exports_host_path = pathlib.Path(self._get_export_directory()).absolute()
-        tests_host_path = pathlib.Path("./tests").absolute()
+        if self.host_working_directory is None:
+            working_directory = pathlib.Path(self.host_working_directory)
+            self.logger.info(f"Using host_working_directory '{working_directory}' as base path for mounts")
+        else:
+            working_directory = pathlib.Path(os.getcwd())
+            self.logger.info(f"Using currend working directory '{working_directory}' as base path for mounts")
+
+        exports_host_path = pathlib.Path(working_directory, self._get_export_directory())
+        tests_host_path = pathlib.Path(working_directory, "tests")
+        self.logger.info(f"Host path for 'tests' directory: {tests_host_path}")
+        self.logger.info(f"Host path for 'exports' directory: {exports_host_path}")
         volumes = {
             exports_host_path: {
                 "bind": "/exports",
@@ -91,9 +102,11 @@ class SpawnTestContainer(DockerBaseTask):
                 "mode": "rw"
             }
         }
+        
         docker_unix_sockets = [i for i in self._client.api.adapters.values() if isinstance(i, unixconn.UnixHTTPAdapter)]
         if len(docker_unix_sockets) > 0:
             host_docker_socker_path = docker_unix_sockets[0].socket_path
+            self.logger.info(f"Found docker unix socket at '{host_docker_socker_path}'")
             volumes[host_docker_socker_path] = {
                 "bind": "/var/run/docker.sock",
                 "mode": "rw"
