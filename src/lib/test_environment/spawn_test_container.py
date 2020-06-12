@@ -87,8 +87,11 @@ class SpawnTestContainer(DockerBaseTask, HostWorkingDirectoryParameter):
         else:
             working_directory = pathlib.Path(os.getcwd())
             self.logger.info(f"Using current working directory '{working_directory}' as base path for mounts")
-
-        exports_host_path = pathlib.Path(working_directory, self._get_export_directory())
+        export_path = pathlib.Path(self._get_export_directory())
+        if export_path.is_absolute():
+            exports_host_path = pathlib.Path(self._get_export_directory())
+        else:
+            exports_host_path = pathlib.Path(working_directory, self._get_export_directory())
         tests_host_path = pathlib.Path(working_directory, "tests")
         self.logger.info(f"Host path for 'tests' directory: {tests_host_path}")
         self.logger.info(f"Host path for 'exports' directory: {exports_host_path}")
