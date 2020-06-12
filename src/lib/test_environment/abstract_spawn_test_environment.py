@@ -77,7 +77,8 @@ class AbstractSpawnTestEnvironment(DependencyLoggerBaseTask,
                                            attempt: int):
         database_and_test_container_info_future = \
             yield from self.run_dependencies({
-                TEST_CONTAINER: SpawnTestContainer(
+                TEST_CONTAINER: self.create_child_task_with_common_params(
+                    SpawnTestContainer,
                     environment_name=self.environment_name,
                     test_container_name=self.test_container_name,
                     network_info=network_info,

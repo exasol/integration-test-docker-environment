@@ -81,12 +81,12 @@ class SpawnTestContainer(DockerBaseTask, HostWorkingDirectoryParameter):
         # A later task which uses the test_container needs the exported container,
         # but to access exported container from inside the test_container,
         # we need to mount the release directory into the test_container.
-        if self.host_working_directory is None:
+        if self.host_working_directory is not None:
             working_directory = pathlib.Path(self.host_working_directory)
             self.logger.info(f"Using host_working_directory '{working_directory}' as base path for mounts")
         else:
             working_directory = pathlib.Path(os.getcwd())
-            self.logger.info(f"Using currend working directory '{working_directory}' as base path for mounts")
+            self.logger.info(f"Using current working directory '{working_directory}' as base path for mounts")
 
         exports_host_path = pathlib.Path(working_directory, self._get_export_directory())
         tests_host_path = pathlib.Path(working_directory, "tests")

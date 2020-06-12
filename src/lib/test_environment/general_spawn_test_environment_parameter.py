@@ -1,5 +1,6 @@
 import luigi
 from luigi import Config
+from ...lib.test_environment.host_working_directory_parameter import HostWorkingDirectoryParameter
 
 
 class GeneralSpawnTestEnvironmentParameter(Config, HostWorkingDirectoryParameter):
