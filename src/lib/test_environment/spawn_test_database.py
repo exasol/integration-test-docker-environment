@@ -1,5 +1,4 @@
 import io
-import tarfile
 import time
 from pathlib import Path
 from typing import Tuple
@@ -23,6 +22,7 @@ from ...lib.docker.images.create.utils.pull_log_handler import PullLogHandler
 from ...lib.docker.images.image_info import ImageInfo
 from ...lib.test_environment.docker_db_test_environment_parameter import \
     DockerDBTestEnvironmentParameter
+from ...lib.test_environment.docker_container_copy import DockerContainerCopy
 
 BUCKETFS_PORT = "6583"
 DB_PORT = "8888"
@@ -207,13 +207,13 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                               volume_preperation_container: Container,
                               db_private_network: str,
                               docker_db_image_info: ImageInfo):
-        file_like_object = io.BytesIO()
-        with tarfile.open(fileobj=file_like_object, mode="x") as tar:
-            tar.add(f"{self.docker_db_config_path}/init_db.sh", "init_db.sh")
-            self._add_exa_conf(tar, db_private_network, docker_db_image_info)
-        volume_preperation_container.put_archive("/", file_like_object.getbuffer().tobytes())
 
-    def _add_exa_conf(self, tar: tarfile.TarFile,
+        copy = DockerContainerCopy(volume_preperation_container)
+        copy.add_file(f"{self.docker_db_config_path}/init_db.sh", "init_db.sh")
+        self._add_exa_conf(copy, db_private_network, docker_db_image_info)
+        copy.copy("/")
+
+    def _add_exa_conf(self, copy: DockerContainerCopy,
                       db_private_network: str,
                       docker_db_image_info: ImageInfo):
         with open(f"{self.docker_db_config_path}/EXAConf") as file:
@@ -224,15 +224,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                                             image_version=self.docker_db_image_version,
                                             mem_size=self.mem_size,
                                             disk_size=self.disk_size)
-        self._add_string_to_tarfile(tar, "EXAConf", rendered_template)
-
-    def _add_string_to_tarfile(self, tar: tarfile.TarFile, name: str, string: str):
-        encoded = string.encode('utf-8')
-        bytes_io = io.BytesIO(encoded)
-        tar_info = tarfile.TarInfo(name=name)
-        tar_info.mtime = time.time()
-        tar_info.size = len(encoded)
-        tar.addfile(tarinfo=tar_info, fileobj=bytes_io)
+        copy.add_string_to_file("EXAConf", rendered_template)
 
     def _execute_init_db(self, db_volume: Volume, volume_preperation_container: Container):
         disk_size_in_bytes = humanfriendly.parse_size(self.disk_size)
