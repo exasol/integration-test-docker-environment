@@ -21,7 +21,8 @@ class SpawnTestContainer(DockerBaseTask):
     ip_address_index_in_subnet = luigi.IntParameter(significant=False)
     attempt = luigi.IntParameter(1)
     reuse_test_container = luigi.BoolParameter(False, significant=False)
-    no_test_container_cleanup_after_end = luigi.BoolParameter(False, significant=False)
+    no_test_container_cleanup_after_success = luigi.BoolParameter(False, significant=False)
+    no_test_container_cleanup_after_failure = luigi.BoolParameter(False, significant=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -140,6 +141,12 @@ class SpawnTestContainer(DockerBaseTask):
         except Exception as e:
             pass
 
-    def cleanup_task(self):
-        if not self.no_test_container_cleanup_after_end:
-            self._remove_container(self.test_container_name)
+    def cleanup_task(self, success):
+        if (success and not self.no_test_container_cleanup_after_success) or \
+            (not success and not self.no_test_container_cleanup_after_failure):
+            try:
+                self.logger.info(f"Cleaning up container %s",self.test_container_name)
+                self._remove_container(self.test_container_name)
+            except Exception as e:
+                self.logger.error(f"Error during removing container %s: %s",self.test_container_name,e)
+

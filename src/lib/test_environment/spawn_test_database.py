@@ -246,10 +246,25 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             raise Exception(
                 "Error during preperation of docker-db volume %s got following output %s" % (db_volume.name, output))
 
-    def cleanup_task(self):
-        if not self.no_database_cleanup_after_end:
+    def cleanup_task(self, success):
+        if (success and not self.no_database_cleanup_after_success) or \
+            (not success and not self.no_database_cleanup_after_failure):
             db_volume_preperation_container_name = self._get_db_volume_preperation_container_name()
-            self._remove_container(db_volume_preperation_container_name)
-            self._remove_container(self.db_container_name)
+            try:
+                self.logger.info(f"Cleaning up container %s",db_volume_preperation_container_name)
+                self._remove_container(db_volume_preperation_container_name)
+            except Exception as e:
+                self.logger.error(f"Error during removing container %s: %s",db_volume_preperation_container_name,e)
+
+            try:
+                self.logger.info(f"Cleaning up container %s",self.db_container_name)
+                self._remove_container(self.db_container_name)
+            except Exception as e:
+                self.logger.error(f"Error during removing container %s: %s",self.db_container_name,e)
+
             db_volume_name = self._get_db_volume_name()
-            self._remove_volume(db_volume_name)
+            try:
+                self.logger.info(f"Cleaning up docker volumne %s",db_volume_name)
+                self._remove_volume(db_volume_name)
+            except Exception as e:
+                self.logger.error(f"Error during removing docker volume %s: %s",db_volume_name,e)

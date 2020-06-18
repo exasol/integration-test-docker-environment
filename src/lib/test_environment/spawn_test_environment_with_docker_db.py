@@ -28,7 +28,8 @@ class SpawnTestEnvironmentWithDockerDB(
                 network_name=self.network_name,
                 db_container_name=self.db_container_name,
                 reuse=self.reuse_database or self.reuse_test_container,
-                no_cleanup_after_end=self.no_database_cleanup_after_end or self.no_test_container_cleanup_after_end,
+                no_cleanup_after_success=self.no_database_cleanup_after_success or self.no_test_container_cleanup_after_success,
+                no_cleanup_after_failure=self.no_database_cleanup_after_failure or self.no_test_container_cleanup_after_failure,
                 attempt=attempt
             )
 
