@@ -17,10 +17,10 @@ However, if you have a project in any other language you can use this project to
 
 In order to start a Docker-DB Test Environment, you need:
 
-* Tests Operating System:
+* Tested Operating System:
   * Linux 
-  * MaxOS X with [Docker Desktop on Mac](https://docs.docker.com/docker-for-mac/install/) works with some limitations, for more details, see [here](#macos-x-support).
-  * Windows is currently **not supported**, because the Exasol Docker-DB requires [privileged mode](https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities). Please use a Linux virtual machine.
+  * MaxOS X with [Docker Desktop on Mac](https://docs.docker.com/docker-for-mac/install/) and Intel Processor
+  * Windows is currently **not supported**
 * Docker with privileged mode
 * At least 2 GiB RAM
 * We recommend at least 15 GB free disk space on the partition 
@@ -40,7 +40,7 @@ Starting the test environment:
 ```
 ./start-test-env spawn-test-environment --environment-name <NAME>
 ```
-or if you work on the code of the the Test Environment (requires Python >=3.6 with pip):
+or if you work on the code of the Test Environment (requires Python >=3.6 with pip):
 
 ```
 ./start-test-env-without-docker-runner spawn-test-environment --environment-name <NAME>
@@ -113,12 +113,13 @@ or
   
 ## MacOS X Support
 
-MacOS X with Docker Desktop for Mac uses a lightwight Virtual machine in which the container run. This makes [networking](https://docs.docker.com/docker-for-mac/networking/) and [shared directories](https://docs.docker.com/docker-for-mac/osxfs/) more complicated then on Linux.
-
-We start the python setup script for the test environment in its own Docker container, because the the library [Luigi](https://luigi.readthedocs.io/en/stable/) can have problems with MacOS X and to avoid the installation of further dependencies. This Docker container has the Docker socket mounted and uses this to start the [Docker-DB](https://hub.docker.com/r/exasol/docker-db) container and the associate test container. This currently breaks mounting directories to the test container for populating the database.
-
-Kudos to [@nndo1991](https://github.com/nndo1991) for helping to figure out, how we can use the test environment on Mac OS X.
-
 ### What do I need to do to start the Test Environment with MacOS X
-1. Increase the RAM of the Docker VM to at least 4,25 GB or reduce the the DB Mem Size to less than 2 GB with `--db-mem-size 1 GiB`
-2. Start the test environment with `--deactivate-database-setup`
+
+The Exasol Docker-DB needs per default a bit morie than 2 GB of RAM, however the Docker VM on Mac OS X provides often not enough RAM to accomandate this. You should increase the RAM of the Docker VM to at least 4.25 GB or reduce the DB Mem Size for the Exasol Docker-DB to less than 2 GB with `--db-mem-size 1 GiB`.
+
+### What happens under the hood
+
+MacOS X with Docker Desktop for Mac uses a lightwight virtual machine with linux in which the docker daemon runs and the containers get started. This makes [networking](https://docs.docker.com/docker-for-mac/networking/) and [shared directories](https://docs.docker.com/docker-for-mac/osxfs/) more complicated then on Linux.
+
+We start the python setup script for the test environment in its own Docker container, lets call it `docker runner`, because the library [Luigi](https://luigi.readthedocs.io/en/stable/) can have problems with MacOS X and to avoid the installation of further dependencies. To support Mac OS X, the `start-test-env` script starts the `docker runner` container and mounts the docker socket at `/var/run/docker.sock` and the directory of the test environment from the Mac OS X host to the container. Then, it starts `start-test-env-without-docker` which then starts the python script. It is important, that the repository gets cloned to the MacOS X host and not to a docker container, because the python scripts tries to start further docker container which use host mounts to share the tests directory of the test environment with the docker container.
+
