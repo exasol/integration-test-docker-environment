@@ -136,7 +136,8 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
                     network_info=network_info,
                     ip_address_index_in_subnet=1,
                     reuse_test_container=self.reuse_test_container,
-                    no_test_container_cleanup_after_end=self.no_test_container_cleanup_after_end,
+                    no_test_container_cleanup_after_success=self.no_test_container_cleanup_after_success,
+                    no_test_container_cleanup_after_failure=self.no_test_container_cleanup_after_failure,
                     attempt=attempt),
                 DATABASE: self.create_spawn_database_task(network_info, attempt)
             })

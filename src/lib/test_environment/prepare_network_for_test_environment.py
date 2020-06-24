@@ -11,7 +11,8 @@ class PrepareDockerNetworkForTestEnvironment(DockerBaseTask):
     test_container_name = luigi.Parameter(significant=False)
     db_container_name = luigi.OptionalParameter(None, significant=False)
     reuse = luigi.BoolParameter(False, significant=False)
-    no_cleanup_after_end = luigi.BoolParameter(False, significant=False)
+    no_cleanup_after_success = luigi.BoolParameter(False, significant=False)
+    no_cleanup_after_failure = luigi.BoolParameter(False, significant=False)
     attempt = luigi.IntParameter(-1)
 
     def run_task(self):
@@ -75,9 +76,24 @@ class PrepareDockerNetworkForTestEnvironment(DockerBaseTask):
         except docker.errors.NotFound:
             pass
 
-    def cleanup_task(self):
-        if not self.no_cleanup_after_end:
-            self.remove_container(self.test_container_name)
+    def cleanup_task(self, success):
+        if (success and not self.no_cleanup_after_success) or \
+            (not success and not self.no_cleanup_after_failure):
+            try:
+                self.logger.info(f"Cleaning up container %s:",self.test_container_name)
+                self.remove_container(self.test_container_name)
+            except Exception as e:
+                self.logger.error(f"Error during removing container %s: %s:", self.test_container_name,e)
+
             if self.db_container_name is not None:
-                self.remove_container(self.db_container_name)
-            self.remove_network(self.network_name)
+                try:
+                    self.logger.info(f"Cleaning up container %s",self.db_container_name)
+                    self.remove_container(self.db_container_name)
+                except Exception as e:
+                    self.logger.error(f"Error during removing container %s: %s: ",self.db_container_name,e)
+
+            try:
+                self.logger.info(f"Cleaning up dpcker network %s", self.network_name)
+                self.remove_network(self.network_name)
+            except Exception as e:
+                self.logger.error(f"Error during removing container %s: %s",self.network_name,e)

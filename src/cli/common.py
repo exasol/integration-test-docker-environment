@@ -91,6 +91,7 @@ def run_task(task_creator: Callable[[], DependencyLoggerBaseTask],
     setup_worker()
     start_time = datetime.now()
     task = task_creator()
+    success = False
     try:
         no_scheduling_errors = luigi.build([task], workers=workers, local_scheduler=True, log_level="INFO")
         success = not task.failed_target.exists() and no_scheduling_errors
@@ -105,7 +106,7 @@ def run_task(task_creator: Callable[[], DependencyLoggerBaseTask],
         print("Going to abort the task %s" % task)
         return False, task  # TODO return exception
     finally:
-        task.cleanup()
+        task.cleanup(success)
 
 
 def handle_failure(task: DependencyLoggerBaseTask, task_dependencies_dot_file: str, start_time: datetime):

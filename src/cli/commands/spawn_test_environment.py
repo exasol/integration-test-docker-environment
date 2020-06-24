@@ -70,8 +70,10 @@ def spawn_test_environment(
         db_user="sys",
         db_password="exasol",
         bucketfs_write_password="write",
-        no_test_container_cleanup_after_end=True,
-        no_database_cleanup_after_end=True,
+        no_test_container_cleanup_after_success=True,
+        no_test_container_cleanup_after_failure=False,
+        no_database_cleanup_after_success=True,
+        no_database_cleanup_after_failure=False,
         is_setup_database_activated=not deactivate_database_setup 
     )
     set_job_id(SpawnTestEnvironmentWithDockerDB.__name__)
