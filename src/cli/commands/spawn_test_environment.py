@@ -12,9 +12,9 @@ from ...lib.test_environment.spawn_test_environment_with_docker_db import \
 
 @cli.command()
 @click.option('--environment-name', type=str, required=True, help="Name of the docker environment. This name gets used as suffix for the container db_container_<name> and test_container_<name>")
-@click.option('--database-port-forward', type=int, default=8888, show_default=True,
+@click.option('--database-port-forward', type=int, default=None, show_default=True,
         help="Host port to which the database port gets forwarded")
-@click.option('--bucketfs-port-forward', type=int, default=6666,  show_default=True,
+@click.option('--bucketfs-port-forward', type=int, default=None,  show_default=True,
         help="Host port to which the bucketfs port gets forwarded")
 @click.option('--db-mem-size', type=str, default="2 GiB", show_default=True,
         help="The main memory used by the database. Format <number> <unit>, e.g. 1 GiB. The minimum size is 1 GB, below that the database will not start.")
@@ -61,8 +61,8 @@ def spawn_test_environment(
                      None)
     task_creator = lambda: SpawnTestEnvironmentWithDockerDB(
         environment_name=environment_name,
-        database_port_forward=str(database_port_forward),
-        bucketfs_port_forward=str(bucketfs_port_forward),
+        database_port_forward=str(database_port_forward) if database_port_forward is not None else None,
+        bucketfs_port_forward=str(bucketfs_port_forward) if bucketfs_port_forward is not None else None,
         mem_size=db_mem_size,
         disk_size=db_disk_size,
         docker_db_image_version=docker_db_image_version,
