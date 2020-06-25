@@ -56,8 +56,8 @@ The following options are available to customize the test environment.
 Usage: main.py spawn-test-environment [OPTIONS]
 
   This command spawn a test environment with a docker-db container and a
-  conected test-container. The test-container is reachable by the database
-  for output redirects of udfs.
+  connected test-container. The test-container is reachable by the database
+  for output redirects of UDFs.
 
 Options:
   --environment-name TEXT         Name of the docker environment. This name
@@ -67,11 +67,11 @@ Options:
 
   --database-port-forward INTEGER
                                   Host port to which the database port gets
-                                  forwarded  [default: 8888]
+                                  forwarded
 
   --bucketfs-port-forward INTEGER
                                   Host port to which the bucketfs port gets
-                                  forwarded  [default: 6666]
+                                  forwarded
 
   --db-mem-size TEXT              The main memory used by the database. Format
                                   <number> <unit>, e.g. 1 GiB. The minimum
