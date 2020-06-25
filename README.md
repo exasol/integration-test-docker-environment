@@ -157,7 +157,7 @@ The following config files are available:
   ```
 - environment_info.json: Contains the EnvironmentInfo objects pickled with JsonPickle
   
-### Currently Supported Exasol Versions
+### Currently supported Exasol Versions
 
 * **6.0**: 6.0.12, 6.0.13, 6.0.16
 * **6.1**: 6.1.1, 6.1.6, 6.1.7, 6.1.8, 6.1.9

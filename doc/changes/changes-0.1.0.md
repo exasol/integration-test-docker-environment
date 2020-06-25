@@ -4,12 +4,12 @@
 
 In this first release we created an docker test environment for Exasol. The test environment consists of two docker containers with their own docker network which isolates them from the host. The first container is an Exasol Docker-DB container and the second container is the test container which can be used for the test execution. The setup script creates a new environment accordingly the given options, creates the Exasol configuration and waits for Exasol database and BucketFS to be available. Afterwards, it runs an initial setup for the database where it uploads the Exasol JDBC Driver and imports some test data.
 
-### Currently Supported Operating Systems
+### Currently supported Operating Systems
 
 * Linux
 * Mac OS X with Intel processors (please consult the [README](../../README.md) for more details )
 
-### Currently Supported Exasol Versions
+### Currently supported Exasol Versions
 
 * **6.0**: 6.0.12, 6.0.13, 6.0.16
 * **6.1**: 6.1.1, 6.1.6, 6.1.7, 6.1.8, 6.1.9
