@@ -15,13 +15,13 @@ from ...lib.test_environment.spawn_test_environment_with_docker_db import \
 @click.option('--database-port-forward', type=int, default=None, show_default=True,
         help="Host port to which the database port gets forwarded")
 @click.option('--bucketfs-port-forward', type=int, default=None,  show_default=True,
-        help="Host port to which the bucketfs port gets forwarded")
+        help="Host port to which the BucketFS port gets forwarded")
 @click.option('--db-mem-size', type=str, default="2 GiB", show_default=True,
         help="The main memory used by the database. Format <number> <unit>, e.g. 1 GiB. The minimum size is 1 GB, below that the database will not start.")
 @click.option('--db-disk-size', type=str, default="2 GiB", show_default=True,
         help="The disk size available for the database. Format <number> <unit>, e.g. 1 GiB. The minimum size is 100 MiB. However, the setup creates volume files with at least 2 GB larger size, because the database needs at least so much more disk.")
 @click.option('--deactivate-database-setup/--no-deactivate-database-setup', type=bool, default=False, show_default=True,
-        help="Deactivates the setup of the spawned database, this means no data get populated and no jdbc drivers get uploaded. This can be used either to save time or as a workaround for MacOSX where the test_container seems not to be able to access the tests directory")
+        help="Deactivates the setup of the spawned database, this means no data get populated and no JDBC drivers get uploaded. This can be used either to save time or as a workaround for MacOSX where the test_container seems not to be able to access the tests directory")
 @add_options(docker_db_options)
 @add_options([output_directory_option])
 @add_options([tempory_base_directory_option])
@@ -40,8 +40,8 @@ def spawn_test_environment(
         workers: int,
         task_dependencies_dot_file: str):
     """
-    This command spawn a test environment with a docker-db container and a conected test-container.
-    The test-container is reachable by the database for output redirects of udfs.
+    This command spawn a test environment with a docker-db container and a connected test-container.
+    The test-container is reachable by the database for output redirects of UDFs.
     """
     parsed_db_mem_size = humanfriendly.parse_size(db_mem_size)
     if parsed_db_mem_size<humanfriendly.parse_size("1 GiB"):
