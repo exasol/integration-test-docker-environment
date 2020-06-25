@@ -7,7 +7,7 @@ In this first release we created an docker test environment for Exasol. The test
 ### Currently supported Operating Systems
 
 * Linux
-* Mac OS X with Intel processors (please consult the [README](../../README.md) for more details )
+* Mac OS X with Intel processors (please consult the [README](../../README.md) for more details)
 
 ### Currently supported Exasol Versions
 
@@ -24,6 +24,4 @@ If you need further versions, please open an issue.
 * #15: Add command line flag to deactivate the database setup
 * #14: Make disk size adjustable
 * #13: Make the DB MemSize adjustable
-* #11: Start the Test-Environment in docker runner to avoid dependency installation
-* #2: Handle multiple lines at once in LogHandlers, because Docker on Mac OS X sometimes returns multiple lines
-* #1: Extract test environment from exaslct from the script-language-container (#1) 
+* #11: Start the Test-Environment in docker runner to avoid dependency installation 
