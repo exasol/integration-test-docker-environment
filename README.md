@@ -157,6 +157,14 @@ The following config files are available:
   ```
 - environment_info.json: Contains the EnvironmentInfo objects pickled with JsonPickle
   
+### Currently supported Exasol Versions
+
+* **6.0**: 6.0.12, 6.0.13, 6.0.16
+* **6.1**: 6.1.1, 6.1.6, 6.1.7, 6.1.8, 6.1.9
+* **6.2**: 6.2.4, 6.2.0, 6.2.1, 6.2.3, 6.2.5, 6.2.6
+
+If you need further versions, please open an issue.
+
 ## Mac OS X Support
 
 ### What do I need to do to start the Test Environment with Mac OS X
