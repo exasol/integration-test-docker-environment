@@ -4,16 +4,16 @@ from docker.models.containers import Container
 from pathlib import Path
 
 from ...abstract_method_exception import AbstractMethodException
-from ...lib.test_environment.populate_data import PopulateEngineSmallTestDataToDatabase
-from ...lib.test_environment.upload_exa_jdbc import UploadExaJDBC
-from ...lib.test_environment.upload_virtual_schema_jdbc_adapter import UploadVirtualSchemaJDBCAdapter
+from src.lib.test_environment.database_setup.populate_data import PopulateEngineSmallTestDataToDatabase
+from src.lib.test_environment.database_setup.upload_exa_jdbc import UploadExaJDBC
+from src.lib.test_environment.database_setup.upload_virtual_schema_jdbc_adapter import UploadVirtualSchemaJDBCAdapter
 from ...lib.base.docker_base_task import DockerBaseTask
 from ...lib.data.container_info import ContainerInfo
 from ...lib.data.database_credentials import DatabaseCredentialsParameter
 from ...lib.data.database_info import DatabaseInfo
 from ...lib.data.docker_network_info import DockerNetworkInfo
 from ...lib.data.environment_info import EnvironmentInfo
-from ...lib.test_environment.general_spawn_test_environment_parameter import \
+from src.lib.test_environment.parameter.general_spawn_test_environment_parameter import \
     GeneralSpawnTestEnvironmentParameter
 from ...lib.test_environment.spawn_test_container import SpawnTestContainer
 from ...lib.test_environment.docker_container_copy import DockerContainerCopy
@@ -130,15 +130,13 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
                                            attempt: int):
         database_and_test_container_info_future = \
             yield from self.run_dependencies({
-                TEST_CONTAINER: SpawnTestContainer(
-                    environment_name=self.environment_name,
-                    test_container_name=self.test_container_name,
-                    network_info=network_info,
-                    ip_address_index_in_subnet=1,
-                    reuse_test_container=self.reuse_test_container,
-                    no_test_container_cleanup_after_success=self.no_test_container_cleanup_after_success,
-                    no_test_container_cleanup_after_failure=self.no_test_container_cleanup_after_failure,
-                    attempt=attempt),
+                TEST_CONTAINER: \
+                    self.create_child_task_with_common_params(
+                        SpawnTestContainer,
+                        test_container_name=self.test_container_name,
+                        network_info=network_info,
+                        ip_address_index_in_subnet=1,
+                        attempt=attempt),
                 DATABASE: self.create_spawn_database_task(network_info, attempt)
             })
         database_and_test_container_info = \

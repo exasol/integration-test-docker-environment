@@ -3,14 +3,14 @@ from pathlib import Path
 import luigi
 from docker.models.containers import Container
 
-from ...abstract_method_exception import AbstractMethodException
-from ...lib.base.docker_base_task import DockerBaseTask
-from ...lib.base.json_pickle_parameter import JsonPickleParameter
-from ...lib.base.still_running_logger import StillRunningLogger, StillRunningLoggerThread
-from ...lib.data.environment_info import EnvironmentInfo
-from ...lib.test_environment.docker_db_log_based_bucket_sync_checker import \
+from src.abstract_method_exception import AbstractMethodException
+from src.lib.base.docker_base_task import DockerBaseTask
+from src.lib.base.json_pickle_parameter import JsonPickleParameter
+from src.lib.base.still_running_logger import StillRunningLogger, StillRunningLoggerThread
+from src.lib.data.environment_info import EnvironmentInfo
+from src.lib.test_environment.database_setup.docker_db_log_based_bucket_sync_checker import \
     DockerDBLogBasedBucketFSSyncChecker
-from ...lib.test_environment.time_based_bucketfs_sync_waiter import \
+from src.lib.test_environment.database_setup.time_based_bucketfs_sync_waiter import \
     TimeBasedBucketFSSyncWaiter
 
 

@@ -5,8 +5,8 @@ from threading import Thread
 
 from docker.models.containers import Container
 
-from ...lib.base.still_running_logger import StillRunningLogger
-from ...lib.logging.container_log_handler import ContainerLogHandler
+from src.lib.base.still_running_logger import StillRunningLogger
+from src.lib.logging.container_log_handler import ContainerLogHandler
 
 
 class DBContainerLogThread(Thread):

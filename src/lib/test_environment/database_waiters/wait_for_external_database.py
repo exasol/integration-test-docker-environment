@@ -4,12 +4,12 @@ from datetime import datetime, timedelta
 import luigi
 from docker.models.containers import Container
 
-from ...lib.base.docker_base_task import DockerBaseTask
-from ...lib.base.json_pickle_parameter import JsonPickleParameter
-from ...lib.data.container_info import ContainerInfo
-from ...lib.data.database_credentials import DatabaseCredentialsParameter
-from ...lib.data.database_info import DatabaseInfo
-from ...lib.test_environment.is_database_ready_thread import IsDatabaseReadyThread
+from src.lib.base.docker_base_task import DockerBaseTask
+from src.lib.base.json_pickle_parameter import JsonPickleParameter
+from src.lib.data.container_info import ContainerInfo
+from src.lib.data.database_credentials import DatabaseCredentialsParameter
+from src.lib.data.database_info import DatabaseInfo
+from src.lib.test_environment.database_waiters.is_database_ready_thread import IsDatabaseReadyThread
 
 
 class WaitForTestExternalDatabase(DockerBaseTask,
