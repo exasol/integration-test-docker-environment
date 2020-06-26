@@ -29,11 +29,12 @@ DB_PORT = "8888"
 
 
 class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
-    environment_name = luigi.Parameter()
-    db_container_name = luigi.Parameter()
-    attempt = luigi.IntParameter(1)
+    environment_name = luigi.Parameter() # type: str
+    db_container_name = luigi.Parameter() # type: str
+    attempt = luigi.IntParameter(1) # type: int
     network_info = JsonPickleParameter(DockerNetworkInfo, significant=False)  # type: DockerNetworkInfo
-    ip_address_index_in_subnet = luigi.IntParameter(significant=False)
+    ip_address_index_in_subnet = luigi.IntParameter(significant=False) # type: int
+    docker_runtime = luigi.OptionalParameter(None, significant=False) # type: str
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -97,7 +98,8 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                 privileged=True,
                 volumes={db_volume.name: {"bind": "/exa", "mode": "rw"}},
                 network_mode=None,
-                ports=ports
+                ports=ports,
+                runtime=self.docker_runtime
             )
         docker_network = self._client.networks.get(self.network_info.network_name)
         network_aliases = self._get_network_aliases()
