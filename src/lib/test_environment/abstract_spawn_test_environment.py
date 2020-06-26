@@ -133,6 +133,7 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
                 TEST_CONTAINER: \
                     self.create_child_task_with_common_params(
                         SpawnTestContainer,
+                        test_container_name=self.test_container_name,
                         network_info=network_info,
                         ip_address_index_in_subnet=1,
                         attempt=attempt),
