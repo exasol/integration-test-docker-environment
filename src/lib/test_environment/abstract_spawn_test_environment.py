@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Generator, Tuple
 
 import luigi
 
@@ -7,6 +8,7 @@ from src.lib.test_environment.database_setup.upload_exa_jdbc import UploadExaJDB
 from src.lib.test_environment.database_setup.upload_virtual_schema_jdbc_adapter import UploadVirtualSchemaJDBCAdapter
 from src.lib.test_environment.parameter.general_spawn_test_environment_parameter import \
     GeneralSpawnTestEnvironmentParameter
+from ..base.base_task import BaseTask
 from ...abstract_method_exception import AbstractMethodException
 from ...lib.base.docker_base_task import DockerBaseTask
 from ...lib.data.container_info import ContainerInfo
@@ -25,7 +27,7 @@ TEST_CONTAINER = "test_container"
 class AbstractSpawnTestEnvironment(DockerBaseTask,
                                    GeneralSpawnTestEnvironmentParameter,
                                    DatabaseCredentialsParameter):
-    environment_name = luigi.Parameter()
+    environment_name = luigi.Parameter()  # type: str
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -60,18 +62,22 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
         self.create_test_environment_info_in_test_container_and_on_host(test_environment_info)
         return test_environment_info
 
-    def create_test_environment_info_in_test_container_and_on_host(self, test_environment_info: EnvironmentInfo):
+    def create_test_environment_info_in_test_container_and_on_host(
+            self, test_environment_info: EnvironmentInfo):
         test_container_name = test_environment_info.test_container_info.container_name
         test_container = self._client.containers.get(test_container_name)
-        test_environment_info_base_host_path = Path(self.get_cache_path(), f"environments/{self.environment_name}")
+        test_environment_info_base_host_path = Path(self.get_cache_path(),
+                                                    f"environments/{self.environment_name}")
         test_environment_info_base_host_path.mkdir(exist_ok=True, parents=True)
         self.logger.info(
-            f"Create test environment info in test container '{test_container_name}' at '/' and on the host at '{test_environment_info_base_host_path}'")
+            f"Create test environment info in test container '{test_container_name}' at '/' "
+            f"and on the host at '{test_environment_info_base_host_path}'")
 
         copy = DockerContainerCopy(test_container)
         json = test_environment_info.to_json()
         copy.add_string_to_file("environment_info.json", json)
-        cache_environment_info_json_path = Path(test_environment_info_base_host_path, "environment_info.json")
+        cache_environment_info_json_path = Path(test_environment_info_base_host_path,
+                                                "environment_info.json")
         with cache_environment_info_json_path.open("w") as f:
             f.write(json)
 
@@ -79,7 +85,8 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
             self.collect_environment_info_variables(test_container_name,
                                                     test_environment_info)
         copy.add_string_to_file("environment_info.conf", environment_variables)
-        cache_environment_info_conf_path = Path(test_environment_info_base_host_path, "environment_info.conf")
+        cache_environment_info_conf_path = Path(test_environment_info_base_host_path,
+                                                "environment_info.conf")
         with cache_environment_info_conf_path.open("w") as f:
             f.write(environment_variables)
 
@@ -119,7 +126,8 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
             environment_variables += f"""ENVIRONMENT_TEST_CONTAINER_IP_ADDRESS={test_environment_info.test_container_info.ip_address}\n"""
         return environment_variables
 
-    def _start_database(self, attempt):
+    def _start_database(self, attempt) \
+            -> Generator[BaseTask, BaseTask, Tuple[DockerNetworkInfo, DatabaseInfo, bool, ContainerInfo]]:
         network_info = yield from self._create_network(attempt)
         database_info, test_container_info = \
             yield from self._spawn_database_and_test_container(network_info, attempt)

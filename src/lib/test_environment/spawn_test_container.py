@@ -23,6 +23,7 @@ class SpawnTestContainer(DockerBaseTask):
     reuse_test_container = luigi.BoolParameter(False, significant=False)
     no_test_container_cleanup_after_success = luigi.BoolParameter(False, significant=False)
     no_test_container_cleanup_after_failure = luigi.BoolParameter(False, significant=False)
+    docker_runtime = luigi.OptionalParameter(None, significant=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -107,7 +108,9 @@ class SpawnTestContainer(DockerBaseTask):
                 command="sleep infinity",
                 detach=True,
                 volumes=volumes,
-                labels={"test_environment_name": self.environment_name, "container_type": "test_container"})
+                labels={"test_environment_name": self.environment_name, "container_type": "test_container"},
+                runtime=self.docker_runtime
+            )
         docker_network = self._client.networks.get(network_info.network_name)
         network_aliases = self._get_network_aliases()
         docker_network.connect(test_container, ipv4_address=ip_address, aliases=network_aliases)
