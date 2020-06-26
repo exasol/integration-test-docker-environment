@@ -1,3 +1,4 @@
+import inspect
 import json
 import os
 import shlex
@@ -8,17 +9,21 @@ import tempfile
 import time
 from contextlib import closing
 from pathlib import Path
+from typing import List, Tuple
 
 import docker
 import requests
-import inspect
-from typing import List
+
+from src.lib.data.environment_info import EnvironmentInfo
+
 
 class ExaslctDockerTestEnvironment():
     def __init__(self, name: str, database_host: str,
                  db_username: str, db_password: str,
                  bucketfs_username: str, bucketfs_password: str,
-                 database_port: int, bucketfs_port: str):
+                 database_port: int, bucketfs_port: int,
+                 environment_info: EnvironmentInfo = None,
+                 completed_process: subprocess.CompletedProcess = None):
         self.db_password = db_password
         self.db_username = db_username
         self.database_port = database_port
@@ -27,6 +32,8 @@ class ExaslctDockerTestEnvironment():
         self.bucketfs_password = bucketfs_password
         self.database_host = database_host
         self.name = name
+        self.environment_info = environment_info
+        self.completed_process = completed_process
 
     def close(self):
         remove_docker_container([f"test_container_{self.name}",
@@ -126,7 +133,8 @@ class ExaslctTestEnvironment():
         except Exception as e:
             print(e)
 
-    def spawn_docker_test_environment(self, name, additional_parameter:List[str]=None) -> ExaslctDockerTestEnvironment:
+    def spawn_docker_test_environment(self, name, additional_parameter: List[str] = None) \
+            -> Tuple[ExaslctDockerTestEnvironment, ExaslctDockerTestEnvironment]:
         on_host_parameter = ExaslctDockerTestEnvironment(
             name=self.name + "_" + name,
             database_host="localhost",
@@ -147,8 +155,15 @@ class ExaslctTestEnvironment():
                               docker_db_version_parameter] + additional_parameter)
 
         command = f"{self.executable} spawn-test-environment {arguments}"
-        completed_process = self.run_command(command, use_flavor_path=False, use_docker_repository=False)
-
+        completed_process = self.run_command(command, use_flavor_path=False, use_docker_repository=False,
+                                             capture_output=True)
+        on_host_parameter.completed_process = completed_process
+        environment_info_json_path = Path(self.temp_dir,
+                                          f"cache/environments/{on_host_parameter.name}/environment_info.json")
+        if environment_info_json_path.exists():
+            with environment_info_json_path.open() as f:
+                environment_info = EnvironmentInfo.from_json(f.read())
+                on_host_parameter.environment_info = environment_info
         if "GOOGLE_CLOUD_BUILD" in os.environ:
             google_cloud_parameter = ExaslctDockerTestEnvironment(
                 name=on_host_parameter.name,
@@ -158,7 +173,10 @@ class ExaslctTestEnvironment():
                 bucketfs_username=on_host_parameter.bucketfs_username,
                 bucketfs_password=on_host_parameter.bucketfs_password,
                 database_port=8888,
-                bucketfs_port=6583)
+                bucketfs_port=6583,
+                environment_info=on_host_parameter.completed_process,
+                completed_process=on_host_parameter.completed_process
+            )
             docker_client = docker.from_env()
             try:
                 db_container = docker_client.containers.get(f"db_container_{google_cloud_parameter.name}")
