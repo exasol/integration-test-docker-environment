@@ -1,36 +1,37 @@
-# admin credentials
-root 
-Start123
 
 # Umgebung anlgegen:
 
-1. netwerk anlegen
-Das ist eine Besonderheit für Docker for MacOS hilft aber für alles andere auch.
-```shell
-docker network create my_gitlab_env
-```
+1. Gitlab Server aufsetzten
 
-2. start Gitlab Server
-(sollte das angelegte Netzwerk nutzen)
-```shell
-docker run --detach  \
-     --hostname gitlab  \
-     --publish 443:443 \
-     --publish 80:80 \
-     --publish 22:22   \
-     --name gitlab   \
-     --restart always   \
-     --volume $GITLAB_HOME/gitlab/config:/etc/gitlab   \
-     --volume $GITLAB_HOME/gitlab/logs:/var/log/gitlab   \
-     --volume $GITLAB_HOME/gitlab/data:/var/opt/gitlab  \
-     --network my_gitlab_env \
-     gitlab/gitlab-ce:latest
-```
+    1. https://docs.gitlab.com/omnibus/docker/
+
+    2. Für mac OS hat sich bewährt ein separates Netzwerk anzulegen
+    ```shell
+    docker network create my_gitlab_env
+    ```
+
+    3. Das erzeugte Netzwerk muss dann beim starten des Gitlab-Servers mit angegeben werden
+    (sollte das angelegte Netzwerk nutzen)
+    ```shell
+    docker run --detach  \
+         --hostname gitlab  \
+        --publish 443:443 \
+        --publish 80:80 \
+        --publish 22:22   \
+        --name gitlab   \
+        --restart always   \
+        --volume $GITLAB_HOME/gitlab/config:/etc/gitlab   \
+        --volume $GITLAB_HOME/gitlab/logs:/var/log/gitlab   \
+        --volume $GITLAB_HOME/gitlab/data:/var/opt/gitlab  \
+        --network my_gitlab_env \
+        gitlab/gitlab-ce:latest
+    ```
 
 
-3. gitlab runner
 
-    1.  volume anlgeben um Configuration abzulegen
+2. gitlab runner
+
+    1.  Volume anlgeben um Configuration abzulegen
     ```shell
     docker volume create gitlab-runner-config
     ```
@@ -61,7 +62,7 @@ docker run --detach  \
     Please enter the executor: custom, docker, parallels, virtualbox, docker-ssh+machine, kubernetes, docker-ssh, shell, ssh, docker+machine:
     **docker**
     Please enter the default Docker image (e.g. ruby:2.6):
-    e**xatk/script-languages:test_environment_docker_runner**
+    **exatk/script-languages:test_environment_docker_runner**
     Runner registered successfully. Feel free to start it, but if it's running already the config should be automatically reloaded! 
     ```
 
@@ -80,22 +81,3 @@ docker run --detach  \
     ```shell
     docker restart gitlab-runner
     ```
-
-
-
-# Variables:
-
-```shell
-export ENVIRONMENT_NAME=test
-export ENVIRONMENT_TYPE=EnvironmentType.docker_db
-export ENVIRONMENT_DATABASE_HOST=172.29.0.2
-export ENVIRONMENT_DATABASE_DB_PORT=8888
-export ENVIRONMENT_DATABASE_BUCKETFS_PORT=6583
-export ENVIRONMENT_DATABASE_CONTAINER_NAME=db_container_test
-export ENVIRONMENT_DATABASE_CONTAINER_NETWORK_ALIASES="exasol_test_database db_container_test"
-export ENVIRONMENT_DATABASE_CONTAINER_IP_ADDRESS=172.29.0.2
-export ENVIRONMENT_DATABASE_CONTAINER_DEFAULT_BRIDGE_IP_ADDRESS=172.17.0.3
-export ENVIRONMENT_TEST_CONTAINER_NAME=test_container_test
-export ENVIRONMENT_TEST_CONTAINER_NETWORK_ALIASES="test_container test_container_test"
-export ENVIRONMENT_TEST_CONTAINER_IP_ADDRESS=172.29.0.3
-```
