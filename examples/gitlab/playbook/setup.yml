@@ -1,0 +1,118 @@
+---
+- hosts: all
+  vars:
+    GITLAB_PERSONAL_ACCESS_TOKEN: "sjadnflqjdnfqjlkewfeldkfnqwlkas"
+    GITLAB_ENVIRONMENT_NAME: "test_gitlab"
+    GITLAB_NETWORK_NAME: "{{ GITLAB_ENVIRONMENT_NAME }}_network"
+    GITLAB_CONTAINER_NAME: "{{ GITLAB_ENVIRONMENT_NAME }}_gitlab_container"
+    GITLAB_RUNNER_CONTAINER_NAME: "{{ GITLAB_ENVIRONMENT_NAME }}_gitlab_runner_container"
+    GITLAB_DATA_VOLUME_NAME: "{{ GITLAB_ENVIRONMENT_NAME }}_data_volume"
+    GITLAB_CONFIG_VOLUME_NAME: "{{ GITLAB_ENVIRONMENT_NAME }}_config_volume"
+    GITLAB_LOG_VOLUME_NAME: "{{ GITLAB_ENVIRONMENT_NAME }}_log_volume"
+    GITLAB_RUNNER_VOLUME_NAME: "{{ GITLAB_ENVIRONMENT_NAME }}_runner_volume"
+  tasks:
+    - name: "Docker Container GITLAB_CONTAINER_NAME absent"
+      docker_container:
+        name: "{{ GITLAB_CONTAINER_NAME }}"
+        state: "absent"
+
+    - name: "Docker network GITLAB_NETWORK_NAME absent"
+      docker_network:
+        name: "{{ GITLAB_NETWORK_NAME }}"
+        state: "absent"
+
+    - name: "Docker volume {{ item }} absent"
+      docker_volume:
+        name: "{{ item }}"
+        state: absent
+      loop:
+        - "{{ GITLAB_DATA_VOLUME_NAME }}"
+        - "{{ GITLAB_CONFIG_VOLUME_NAME }}"
+        - "{{ GITLAB_LOG_VOLUME_NAME }}"
+        - "{{ GITLAB_RUNNER_VOLUME_NAME }}"
+
+    - name: "Docker volume {{ item }} present"
+      docker_volume:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - "{{ GITLAB_DATA_VOLUME_NAME }}"
+        - "{{ GITLAB_CONFIG_VOLUME_NAME }}"
+        - "{{ GITLAB_LOG_VOLUME_NAME }}"
+        - "{{ GITLAB_RUNNER_VOLUME_NAME }}"
+
+    - name: "Docker network GITLAB_NETWORK_NAME present"
+      docker_network:
+        name: "{{ GITLAB_NETWORK_NAME }}"
+        state: "present"
+
+    - name: "Docker Container GITLAB_CONTAINER_NAME present"
+      docker_container:
+        name: "{{ GITLAB_CONTAINER_NAME }}"
+        state: "started"
+        image: "gitlab/gitlab-ce:latest"
+        networks: 
+          - name: "{{ GITLAB_NETWORK_NAME }}"
+        purge_networks: yes
+
+    - name: "Add docker container GITLAB_CONTAINER_NAME to inventory"
+      add_host:
+        name: "{{ GITLAB_CONTAINER_NAME }}"
+        ansible_connection: docker
+      changed_when: false
+
+    - name: "Wait for Gitlab"
+      delegate_to: "{{ GITLAB_CONTAINER_NAME }}"
+      wait_for:
+        host: 0.0.0.0
+        port: 80
+
+    - name: "Set personal access token"
+      delegate_to: "{{ GITLAB_CONTAINER_NAME }}"
+      shell: |
+        echo "token = User.find_by_username('root').personal_access_tokens.create(scopes: [:read_user, :read_repository], name: 'Automation token'); token.set_token('{{ GITLAB_PERSONAL_ACCESS_TOKEN }}'); token.save!" |
+        gitlab-rails console
+
+    - name: "Get runners_registration_token"
+      delegate_to: "{{ GITLAB_CONTAINER_NAME }}"
+      shell: |
+        echo "Gitlab::CurrentSettings.current_application_settings.runners_registration_token" |
+        gitlab-rails console
+      register: gitlab_runner_registration_token_result
+
+    - name: Parse token from response
+      set_fact:
+        gitlab_runner_registration_token: "{{ gitlab_runner_registration_token_result.stdout | regex_search(regexp, '\\1') | list | first }}"
+      vars:
+        regexp: 'runners_registration_token\n\"([^\"]+)'
+
+
+    - name: "Docker Container GITLAB_RUNNER_CONTAINER_NAME present"
+      docker_container:
+        name: "{{ GITLAB_RUNNER_CONTAINER_NAME }}"
+        state: "started"
+        image: "gitlab/gitlab-runner"
+        networks: 
+          - name: "{{ GITLAB_NETWORK_NAME }}"
+        purge_networks: yes
+        auto_remove: yes
+        volumes:
+          - "{{GITLAB_RUNNER_VOLUME_NAME}}:/etc/gitlab-runner"
+          - "/var/run/docker.sock:/var/run/docker.sock"
+        command: 
+          - "register"
+          - "--non-interactive"
+          - "--executor"
+          - "docker"
+          - "--docker-image"
+          - "exatk/script-languages:test_environment_docker_runner"
+          - "--url"
+          - "http://{{ GITLAB_CONTAINER_NAME }}"
+          - "--registration-token"
+          - "{{ gitlab_runner_registration_token }}"
+          - "--description" 
+          - "docker-runner"
+          - "--run-untagged=true"
+          - "--locked=false"
+          - "--access-level=\"not_protected\""
+
