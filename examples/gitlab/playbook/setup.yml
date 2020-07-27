@@ -5,16 +5,21 @@
     GITLAB_ENVIRONMENT_NAME: "test_gitlab"
     GITLAB_NETWORK_NAME: "{{ GITLAB_ENVIRONMENT_NAME }}_network"
     GITLAB_CONTAINER_NAME: "{{ GITLAB_ENVIRONMENT_NAME }}_gitlab_container"
+    GITLAB_LAB_CONTAINER_NAME: "{{ GITLAB_ENVIRONMENT_NAME }}_gitlab_lab_container"
     GITLAB_RUNNER_CONTAINER_NAME: "{{ GITLAB_ENVIRONMENT_NAME }}_gitlab_runner_container"
     GITLAB_DATA_VOLUME_NAME: "{{ GITLAB_ENVIRONMENT_NAME }}_data_volume"
     GITLAB_CONFIG_VOLUME_NAME: "{{ GITLAB_ENVIRONMENT_NAME }}_config_volume"
     GITLAB_LOG_VOLUME_NAME: "{{ GITLAB_ENVIRONMENT_NAME }}_log_volume"
     GITLAB_RUNNER_VOLUME_NAME: "{{ GITLAB_ENVIRONMENT_NAME }}_runner_volume"
   tasks:
-    - name: "Docker Container GITLAB_CONTAINER_NAME absent"
+    - name: "Docker Container {{ item }} absent"
       docker_container:
-        name: "{{ GITLAB_CONTAINER_NAME }}"
+        name: "{{ item }}"
         state: "absent"
+      loop:
+        - "{{ GITLAB_LAB_CONTAINER_NAME  }}"
+        - "{{ GITLAB_RUNNER_CONTAINER_NAME  }}"
+        - "{{ GITLAB_CONTAINER_NAME  }}"
 
     - name: "Docker network GITLAB_NETWORK_NAME absent"
       docker_network:
@@ -70,7 +75,7 @@
     - name: "Set personal access token"
       delegate_to: "{{ GITLAB_CONTAINER_NAME }}"
       shell: |
-        echo "token = User.find_by_username('root').personal_access_tokens.create(scopes: [:read_user, :read_repository], name: 'Automation token'); token.set_token('{{ GITLAB_PERSONAL_ACCESS_TOKEN }}'); token.save!" |
+        echo "token = User.find_by_username('root').personal_access_tokens.create(scopes: [:read_user, :write_repository, :api, :sudo], name: 'Automation token'); token.set_token('{{ GITLAB_PERSONAL_ACCESS_TOKEN }}'); token.save!" |
         gitlab-rails console
 
     - name: "Get runners_registration_token"
@@ -95,7 +100,6 @@
         networks: 
           - name: "{{ GITLAB_NETWORK_NAME }}"
         purge_networks: yes
-        auto_remove: yes
         volumes:
           - "{{GITLAB_RUNNER_VOLUME_NAME}}:/etc/gitlab-runner"
           - "/var/run/docker.sock:/var/run/docker.sock"
@@ -116,3 +120,46 @@
           - "--locked=false"
           - "--access-level=\"not_protected\""
 
+    - name: "Docker Container GITLAB_LAB_CONTAINER_NAME present"
+      docker_container:
+        name: "{{ GITLAB_LAB_CONTAINER_NAME }}"
+        state: "started"
+        image: "ubuntu"
+        command: "sleep infinity"
+        env:
+          LAB_CORE_HOST: "{{ GITLAB_CONTAINER_NAME }}"
+          LAB_CORE_TOKEN: "{{ GITLAB_PERSONAL_ACCESS_TOKEN }}"
+        networks: 
+          - name: "{{ GITLAB_NETWORK_NAME }}"
+        purge_networks: yes
+    
+    - name: "Add docker container GITLAB_LAB_CONTAINER_NAME to inventory"
+      add_host:
+        name: "{{ GITLAB_LAB_CONTAINER_NAME }}"
+        ansible_connection: docker
+      changed_when: false
+
+    - name: "Install lab into GITLAB_LAB_CONTAINER_NAME"
+      delegate_to: "{{ GITLAB_CONTAINER_NAME }}"
+      shell: |
+        curl -s https://raw.githubusercontent.com/zaquestion/lab/master/install.sh | bash
+
+    - name: "Create Gitlab project via lab"
+      delegate_to: "{{ GITLAB_CONTAINER_NAME }}"
+      shell: |
+        export LAB_CORE_HOST=http://{{ GITLAB_CONTAINER_NAME }};
+        export LAB_CORE_TOKEN={{ GITLAB_PERSONAL_ACCESS_TOKEN }};
+        lab project create myproject --public 
+
+    - name: "Create Gitlab project via lab"
+      delegate_to: "{{ GITLAB_CONTAINER_NAME }}"
+      shell: |
+        curl -v -X GET -F "private_token={{ GITLAB_PERSONAL_ACCESS_TOKEN }}" "http://{{ GITLAB_CONTAINER_NAME }}/api/v4/user"
+
+    - name: "Clone Gitlab project via lab"
+      delegate_to: "{{ GITLAB_CONTAINER_NAME }}"
+      shell: |
+        export LAB_CORE_HOST=http://{{ GITLAB_CONTAINER_NAME }};
+        export LAB_CORE_TOKEN={{ GITLAB_PERSONAL_ACCESS_TOKEN }};
+        ssh -oStrictHostKeyChecking=no git@{{ GITLAB_CONTAINER_NAME }} uptime;
+        lab clone myproject
