@@ -42,7 +42,10 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             raise Exception(
                 "ip_address_index_in_subnet needs to be greater than 0 got %s"
                 % self.ip_address_index_in_subnet)
-        self.db_version = "-".join(self.docker_db_image_version.split("-")[0:-1])
+        if self.docker_db_image_version.endswith("-d1"):
+            self.db_version = "-".join(self.docker_db_image_version.split("-")[0:-1])
+        else:
+            self.db_version = self.docker_db_image_version
         self.docker_db_config_path = Path(Path(__file__).parent.parent.parent.parent.absolute(),
                                           f"docker_db_config/{self.db_version}")
 

@@ -37,9 +37,10 @@ class DBContainerLogThread(Thread):
                     still_running_logger.log()
                     log_handler.handle_log_lines(log)
                 log_line = log.decode("utf-8").lower()
-                if ("error" in log_line and not "sshd was not started") \
+                if ("error" in log_line and not "sshd was not started" in log_line) \
                         or "exception" in log_line \
-                        or "returned with state 1" in log_line:
+                        or ("returned with state 1" in log_line 
+                                and not "(membership) returned with state 1" in log_line): # exclude webui not found in 7.0.0 
                     self.logger.info("ContainerLogHandler error message, %s", log_line)
                     self.error_message = log_line
                     self.finish = True
