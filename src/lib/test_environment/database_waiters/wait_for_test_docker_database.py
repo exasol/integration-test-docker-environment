@@ -107,7 +107,7 @@ class WaitForTestDockerDatabase(DockerBaseTask, DatabaseCredentialsParameter):
         return datetime.now() - start_time > timeout
 
     def save_db_log_files_as_gzip_tar(self, path: pathlib.Path, database_container: Container):
-        stream, stat = database_container.get_archive("/exa/logs/db")
+        stream, stat = database_container.get_archive("/exa/logs")
         with gzip.open(path, "wb") as file:
             for chunk in stream:
                 file.write(chunk)

@@ -11,7 +11,7 @@ class ContainerLogHandler(AbstractLogHandler):
         self.db_container_name = description
 
     def handle_log_line(self, log_line, error: bool = False):
-        self._log_file.write(log_line)
+        self._log_file.write(log_line+"\n")
         self._complete_log.append(log_line)
 
     def get_complete_log(self) -> List[str]:
