@@ -14,7 +14,7 @@ from typing import List, Tuple
 import docker
 import requests
 
-from src.lib.data.environment_info import EnvironmentInfo
+from ..lib.data.environment_info import EnvironmentInfo
 
 
 class ExaslctDockerTestEnvironment():

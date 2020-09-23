@@ -1,6 +1,6 @@
 import time
 
-from src.lib.test_environment.database_setup.bucketfs_sync_checker import BucketFSSyncChecker
+from ....lib.test_environment.database_setup.bucketfs_sync_checker import BucketFSSyncChecker
 
 
 class TimeBasedBucketFSSyncWaiter(BucketFSSyncChecker):

@@ -1,4 +1,4 @@
-from src.lib.test_environment.database_setup.upload_file_to_db import UploadFileToBucketFS
+from ....lib.test_environment.database_setup.upload_file_to_db import UploadFileToBucketFS
 
 
 class UploadExaJDBC(UploadFileToBucketFS):

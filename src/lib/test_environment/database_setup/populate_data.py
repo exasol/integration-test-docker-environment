@@ -3,10 +3,10 @@ from pathlib import Path
 
 import luigi
 
-from src.lib.base.docker_base_task import DockerBaseTask
-from src.lib.base.json_pickle_parameter import JsonPickleParameter
-from src.lib.data.database_credentials import DatabaseCredentialsParameter
-from src.lib.data.environment_info import EnvironmentInfo
+from ....lib.base.docker_base_task import DockerBaseTask
+from ....lib.base.json_pickle_parameter import JsonPickleParameter
+from ....lib.data.database_credentials import DatabaseCredentialsParameter
+from ....lib.data.environment_info import EnvironmentInfo
 
 
 class PopulateEngineSmallTestDataToDatabase(DockerBaseTask, DatabaseCredentialsParameter):

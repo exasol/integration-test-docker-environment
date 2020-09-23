@@ -3,10 +3,10 @@ from ...lib.data.container_info import ContainerInfo
 from ...lib.data.database_info import DatabaseInfo
 from ...lib.data.docker_network_info import DockerNetworkInfo
 from ...lib.data.environment_type import EnvironmentType
-from src.lib.test_environment.parameter.docker_db_test_environment_parameter import DockerDBTestEnvironmentParameter
+from ...lib.test_environment.parameter.docker_db_test_environment_parameter import DockerDBTestEnvironmentParameter
 from ...lib.test_environment.prepare_network_for_test_environment import PrepareDockerNetworkForTestEnvironment
 from ...lib.test_environment.spawn_test_database import SpawnTestDockerDatabase
-from src.lib.test_environment.database_waiters.wait_for_test_docker_database import WaitForTestDockerDatabase
+from ...lib.test_environment.database_waiters.wait_for_test_docker_database import WaitForTestDockerDatabase
 
 
 class SpawnTestEnvironmentWithDockerDB(

@@ -6,13 +6,13 @@ from datetime import datetime, timedelta
 import luigi
 from docker.models.containers import Container
 
-from src.lib.base.docker_base_task import DockerBaseTask
-from src.lib.base.json_pickle_parameter import JsonPickleParameter
-from src.lib.data.container_info import ContainerInfo
-from src.lib.data.database_credentials import DatabaseCredentialsParameter
-from src.lib.data.database_info import DatabaseInfo
-from src.lib.test_environment.database_waiters.db_container_log_thread import DBContainerLogThread
-from src.lib.test_environment.database_waiters.is_database_ready_thread import IsDatabaseReadyThread
+from ....lib.base.docker_base_task import DockerBaseTask
+from ....lib.base.json_pickle_parameter import JsonPickleParameter
+from ....lib.data.container_info import ContainerInfo
+from ....lib.data.database_credentials import DatabaseCredentialsParameter
+from ....lib.data.database_info import DatabaseInfo
+from ....lib.test_environment.database_waiters.db_container_log_thread import DBContainerLogThread
+from ....lib.test_environment.database_waiters.is_database_ready_thread import IsDatabaseReadyThread
 
 
 class WaitForTestDockerDatabase(DockerBaseTask, DatabaseCredentialsParameter):

@@ -10,7 +10,7 @@ from ...lib.base.json_pickle_parameter import JsonPickleParameter
 from ...lib.data.database_credentials import DatabaseCredentialsParameter
 from ...lib.data.database_info import DatabaseInfo
 from ...lib.data.docker_network_info import DockerNetworkInfo
-from src.lib.test_environment.parameter.external_test_environment_parameter import ExternalDatabaseXMLRPCParameter, \
+from ....lib.test_environment.parameter.external_test_environment_parameter import ExternalDatabaseXMLRPCParameter, \
     ExternalDatabaseHostParameter
 
 
