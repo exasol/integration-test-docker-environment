@@ -20,7 +20,7 @@ from ...lib.data.database_info import DatabaseInfo
 from ...lib.data.docker_network_info import DockerNetworkInfo
 from ...lib.docker.images.create.utils.pull_log_handler import PullLogHandler
 from ...lib.docker.images.image_info import ImageInfo
-from src.lib.test_environment.parameter.docker_db_test_environment_parameter import \
+from ...lib.test_environment.parameter.docker_db_test_environment_parameter import \
     DockerDBTestEnvironmentParameter
 from ...lib.test_environment.docker_container_copy import DockerContainerCopy
 

@@ -3,11 +3,6 @@ from typing import Generator, Tuple
 
 import luigi
 
-from src.lib.test_environment.database_setup.populate_data import PopulateEngineSmallTestDataToDatabase
-from src.lib.test_environment.database_setup.upload_exa_jdbc import UploadExaJDBC
-from src.lib.test_environment.database_setup.upload_virtual_schema_jdbc_adapter import UploadVirtualSchemaJDBCAdapter
-from src.lib.test_environment.parameter.general_spawn_test_environment_parameter import \
-    GeneralSpawnTestEnvironmentParameter
 from ..base.base_task import BaseTask
 from ...abstract_method_exception import AbstractMethodException
 from ...lib.base.docker_base_task import DockerBaseTask
@@ -18,6 +13,11 @@ from ...lib.data.docker_network_info import DockerNetworkInfo
 from ...lib.data.environment_info import EnvironmentInfo
 from ...lib.test_environment.docker_container_copy import DockerContainerCopy
 from ...lib.test_environment.spawn_test_container import SpawnTestContainer
+from ...lib.test_environment.database_setup.populate_data import PopulateEngineSmallTestDataToDatabase
+from ...lib.test_environment.database_setup.upload_exa_jdbc import UploadExaJDBC
+from ...lib.test_environment.database_setup.upload_virtual_schema_jdbc_adapter import UploadVirtualSchemaJDBCAdapter
+from ...lib.test_environment.parameter.general_spawn_test_environment_parameter import \
+    GeneralSpawnTestEnvironmentParameter
 
 DATABASE = "database"
 

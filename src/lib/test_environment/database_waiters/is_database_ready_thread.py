@@ -3,8 +3,8 @@ from threading import Thread
 
 from docker.models.containers import Container
 
-from src.lib.data.database_credentials import DatabaseCredentials
-from src.lib.data.database_info import DatabaseInfo
+from ....lib.data.database_credentials import DatabaseCredentials
+from ....lib.data.database_info import DatabaseInfo
 
 
 class IsDatabaseReadyThread(Thread):
