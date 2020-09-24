@@ -145,7 +145,7 @@ class ExaslctTestEnvironment():
             database_port=find_free_port(),
             bucketfs_port=find_free_port())
         docker_db_version_parameter = ""
-        if "EXASOL_VERSION" in os.environ:
+        if "EXASOL_VERSION" in os.environ  and os.environ["EXASOL_VERSION"]!="default":
             docker_db_version_parameter = f'--docker-db-image-version "{os.environ["EXASOL_VERSION"]}"'
         if additional_parameter is None:
             additional_parameter = []

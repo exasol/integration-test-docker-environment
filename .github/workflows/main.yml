@@ -28,6 +28,7 @@ jobs:
         - 6.0.16-d1
         - 6.0.13-d1
         - 6.0.12-d1
+        - "default"
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -43,4 +44,4 @@ jobs:
     - name: Run tests
       run: ./run_all_tests.sh
       env:
-        EXASOL_VERSION: "${{ matrix.exasol_version }}"  
+        EXASOL_VERSION: "${{ matrix.exasol_version }}"
