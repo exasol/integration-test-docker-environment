@@ -94,6 +94,9 @@ Options:
                                   test_container seems not to be able to
                                   access the tests directory  [default: False]
 
+  --docker-runtime TEXT           The docker runtime used to start all
+                                  containers
+
   --docker-db-image-version TEXT  Docker DB Image Version against which the
                                   tests should run.  [default: 6.2.6-d1]
 
@@ -161,9 +164,15 @@ The following config files are available:
 
 * **6.0**: 6.0.12, 6.0.13, 6.0.16
 * **6.1**: 6.1.1, 6.1.6, 6.1.7, 6.1.8, 6.1.9
-* **6.2**: 6.2.4, 6.2.0, 6.2.1, 6.2.3, 6.2.5, 6.2.6
+* **6.2**: 6.2.4, 6.2.0, 6.2.1, 6.2.3, 6.2.5, 6.2.6, 6.2.7, 6.2.8, 6.2.9
+* **7.0**: 7.0.0
 
 If you need further versions, please open an issue.
+
+### Tested Docker Runtimes
+
+- Docker Default Runtime
+- [NVIDIA Container Runtime](https://github.com/NVIDIA/nvidia-container-runtime) for GPU accelerated UDFs
 
 ## Mac OS X Support
 
