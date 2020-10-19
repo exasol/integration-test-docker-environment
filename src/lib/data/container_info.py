@@ -1,7 +1,7 @@
 from typing import List
 
-from ...lib.base.info import Info
-from ...lib.data.docker_network_info import DockerNetworkInfo
+from ....src.lib.base.info import Info
+from ....src.lib.data.docker_network_info import DockerNetworkInfo
 
 
 class ContainerInfo(Info):

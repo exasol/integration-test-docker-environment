@@ -1,6 +1,6 @@
 from typing import Dict
 
-from ....lib.base.info import Info
+from .....src.lib.base.info import Info
 
 
 class RequiredTaskInfo(Info):

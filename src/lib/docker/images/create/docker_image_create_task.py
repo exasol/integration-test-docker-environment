@@ -3,13 +3,13 @@ import importlib
 
 import luigi
 
-from .....lib.base.docker_base_task import DockerBaseTask
-from .....lib.base.json_pickle_parameter import JsonPickleParameter
-from .....lib.docker.images.create.docker_image_build_task import DockerBuildImageTask
-from .....lib.docker.images.create.docker_image_load_task import DockerLoadImageTask
-from .....lib.docker.images.create.docker_image_pull_task import DockerPullImageTask
-from .....lib.docker.images.image_info import ImageState, ImageInfo
-from .....lib.docker.images.required_task_info import RequiredTaskInfoDict, RequiredTaskInfo
+from ......src.lib.base.docker_base_task import DockerBaseTask
+from ......src.lib.base.json_pickle_parameter import JsonPickleParameter
+from ......src.lib.docker.images.create.docker_image_build_task import DockerBuildImageTask
+from ......src.lib.docker.images.create.docker_image_load_task import DockerLoadImageTask
+from ......src.lib.docker.images.create.docker_image_pull_task import DockerPullImageTask
+from ......src.lib.docker.images.image_info import ImageState, ImageInfo
+from ......src.lib.docker.images.required_task_info import RequiredTaskInfoDict, RequiredTaskInfo
 
 
 class DockerCreateImageTask(DockerBaseTask):

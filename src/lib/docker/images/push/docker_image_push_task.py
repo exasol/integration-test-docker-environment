@@ -2,9 +2,9 @@ import importlib
 
 import luigi
 
-from .....lib.base.json_pickle_parameter import JsonPickleParameter
-from .....lib.docker.images.push.docker_image_push_base_task import DockerPushImageBaseTask
-from .....lib.docker.images.required_task_info import RequiredTaskInfo
+from ......src.lib.base.json_pickle_parameter import JsonPickleParameter
+from ......src.lib.docker.images.push.docker_image_push_base_task import DockerPushImageBaseTask
+from ......src.lib.docker.images.required_task_info import RequiredTaskInfo
 
 
 class DockerPushImageTask(DockerPushImageBaseTask):

@@ -6,9 +6,9 @@ from typing import Generator
 import luigi
 
 from .....abstract_method_exception import AbstractMethodException
-from .....lib.base.docker_base_task import DockerBaseTask
-from .....lib.base.still_running_logger import StillRunningLogger
-from .....lib.docker.images.image_info import ImageInfo, ImageState
+from ......src.lib.base.docker_base_task import DockerBaseTask
+from ......src.lib.base.still_running_logger import StillRunningLogger
+from ......src.lib.docker.images.image_info import ImageInfo, ImageState
 
 DOCKER_HUB_REGISTRY_URL_REGEX = r"^.*docker.io/"
 

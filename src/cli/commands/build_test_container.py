@@ -6,7 +6,7 @@ from ...cli.common import set_build_config, set_docker_repository_config, run_ta
 from ...cli.options.build_options import build_options
 from ...cli.options.docker_repository_options import docker_repository_options
 from ...cli.options.system_options import system_options
-from ...lib.test_environment.analyze_test_container import AnalyzeTestContainer, DockerTestContainerBuild
+from ....src.lib.test_environment.analyze_test_container import AnalyzeTestContainer, DockerTestContainerBuild
 
 
 @cli.command()

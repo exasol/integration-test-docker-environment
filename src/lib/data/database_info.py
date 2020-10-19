@@ -1,5 +1,5 @@
-from ...lib.base.info import Info
-from ...lib.data.container_info import ContainerInfo
+from ....src.lib.base.info import Info
+from ....src.lib.data.container_info import ContainerInfo
 
 
 class DatabaseInfo(Info):

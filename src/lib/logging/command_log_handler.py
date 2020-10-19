@@ -1,7 +1,7 @@
 import pathlib
 
-from ...lib.config.log_config import WriteLogFilesToConsole
-from ...lib.logging.abstract_log_handler import AbstractLogHandler
+from ....src.lib.config.log_config import WriteLogFilesToConsole
+from ....src.lib.logging.abstract_log_handler import AbstractLogHandler
 
 
 class CommandLogHandler(AbstractLogHandler):

@@ -1,5 +1,5 @@
 from .dependency_logger_base_task import DependencyLoggerBaseTask
-from ...lib.config.docker_config import docker_client_config
+from ....src.lib.config.docker_config import docker_client_config
 
 
 class DockerBaseTask(DependencyLoggerBaseTask):

@@ -2,13 +2,13 @@ import copy
 from typing import Dict, Set
 
 from .....abstract_method_exception import AbstractMethodException
-from .....lib.base.dependency_logger_base_task import DependencyLoggerBaseTask
-from .....lib.config.build_config import build_config
-from .....lib.docker.images.create.docker_image_analyze_task import DockerAnalyzeImageTask
-from .....lib.docker.images.create.docker_image_create_task import DockerCreateImageTask, \
+from ......src.lib.base.dependency_logger_base_task import DependencyLoggerBaseTask
+from ......src.lib.config.build_config import build_config
+from ......src.lib.docker.images.create.docker_image_analyze_task import DockerAnalyzeImageTask
+from ......src.lib.docker.images.create.docker_image_create_task import DockerCreateImageTask, \
     DockerCreateImageTaskWithDeps
-from .....lib.docker.images.image_info import ImageInfo, ImageState
-from .....lib.docker.images.required_task_info import RequiredTaskInfoDict, RequiredTaskInfo
+from ......src.lib.docker.images.image_info import ImageInfo, ImageState
+from ......src.lib.docker.images.required_task_info import RequiredTaskInfoDict, RequiredTaskInfo
 
 
 class DockerBuildBase(DependencyLoggerBaseTask):

@@ -1,4 +1,4 @@
-from ...lib.base.info import Info
+from ....src.lib.base.info import Info
 
 
 class DockerNetworkInfo(Info):

@@ -10,8 +10,8 @@ import luigi
 import networkx
 from networkx import DiGraph
 
-from ..lib.base.dependency_logger_base_task import DependencyLoggerBaseTask
-from ..lib.base.task_dependency import TaskDependency, DependencyState
+from ...src.lib.base.dependency_logger_base_task import DependencyLoggerBaseTask
+from ...src.lib.base.task_dependency import TaskDependency, DependencyState
 
 
 def set_build_config(force_rebuild: bool,

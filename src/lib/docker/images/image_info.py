@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Dict, Any
 
-from ....lib.base.info import Info
+from .....src.lib.base.info import Info
 
 
 class ImageState(Enum):

@@ -5,9 +5,9 @@ import docker
 
 import json
 
-from ......lib.config.log_config import WriteLogFilesToConsole
-from ......lib.docker.images.image_info import ImageInfo
-from ......lib.logging.abstract_log_handler import AbstractLogHandler
+from .......src.lib.config.log_config import WriteLogFilesToConsole
+from .......src.lib.docker.images.image_info import ImageInfo
+from .......src.lib.logging.abstract_log_handler import AbstractLogHandler
 
 
 class DockerRegistryImageCheckerPullLogHandler(AbstractLogHandler):

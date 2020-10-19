@@ -2,10 +2,10 @@ import itertools
 from typing import Dict, List
 
 from ....abstract_method_exception import AbstractMethodException
-from ....lib.base.base_task import BaseTask
-from ....lib.docker.images.create.docker_image_create_task import DockerCreateImageTask, \
+from .....src.lib.base.base_task import BaseTask
+from .....src.lib.docker.images.create.docker_image_create_task import DockerCreateImageTask, \
     DockerCreateImageTaskWithDeps
-from ....lib.docker.images.required_task_info import RequiredTaskInfo
+from .....src.lib.docker.images.required_task_info import RequiredTaskInfo
 
 
 class TaskCreatorFromBuildTasks:

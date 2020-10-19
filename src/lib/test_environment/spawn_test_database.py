@@ -12,17 +12,17 @@ from docker.models.containers import Container
 from docker.models.volumes import Volume
 from jinja2 import Template
 
-from ...lib.base.docker_base_task import DockerBaseTask
-from ...lib.base.json_pickle_parameter import JsonPickleParameter
-from ...lib.base.still_running_logger import StillRunningLogger
-from ...lib.data.container_info import ContainerInfo
-from ...lib.data.database_info import DatabaseInfo
-from ...lib.data.docker_network_info import DockerNetworkInfo
-from ...lib.docker.images.create.utils.pull_log_handler import PullLogHandler
-from ...lib.docker.images.image_info import ImageInfo
-from ...lib.test_environment.parameter.docker_db_test_environment_parameter import \
+from ....src.lib.base.docker_base_task import DockerBaseTask
+from ....src.lib.base.json_pickle_parameter import JsonPickleParameter
+from ....src.lib.base.still_running_logger import StillRunningLogger
+from ....src.lib.data.container_info import ContainerInfo
+from ....src.lib.data.database_info import DatabaseInfo
+from ....src.lib.data.docker_network_info import DockerNetworkInfo
+from ....src.lib.docker.images.create.utils.pull_log_handler import PullLogHandler
+from ....src.lib.docker.images.image_info import ImageInfo
+from ....src.lib.test_environment.parameter.docker_db_test_environment_parameter import \
     DockerDBTestEnvironmentParameter
-from ...lib.test_environment.docker_container_copy import DockerContainerCopy
+from ....src.lib.test_environment.docker_container_copy import DockerContainerCopy
 
 BUCKETFS_PORT = "6583"
 DB_PORT = "8888"

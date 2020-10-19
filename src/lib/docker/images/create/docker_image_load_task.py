@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from .....lib.config.build_config import build_config
-from .....lib.docker.images.create.docker_image_creator_base_task import \
+from ......src.lib.config.build_config import build_config
+from ......src.lib.docker.images.create.docker_image_creator_base_task import \
     DockerImageCreatorBaseTask
 
 

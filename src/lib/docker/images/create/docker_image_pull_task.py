@@ -1,11 +1,11 @@
 import time
 
-from .....lib.base.still_running_logger import StillRunningLogger
-from .....lib.config.docker_config import source_docker_repository_config
-from .....lib.docker.images.create.docker_image_creator_base_task import \
+from ......src.lib.base.still_running_logger import StillRunningLogger
+from ......src.lib.config.docker_config import source_docker_repository_config
+from ......src.lib.docker.images.create.docker_image_creator_base_task import \
     DockerImageCreatorBaseTask
-from .....lib.docker.images.create.utils.docker_image_target import DockerImageTarget
-from .....lib.docker.images.create.utils.pull_log_handler import PullLogHandler
+from ......src.lib.docker.images.create.utils.docker_image_target import DockerImageTarget
+from ......src.lib.docker.images.create.utils.pull_log_handler import PullLogHandler
 
 
 class DockerPullImageTask(DockerImageCreatorBaseTask):

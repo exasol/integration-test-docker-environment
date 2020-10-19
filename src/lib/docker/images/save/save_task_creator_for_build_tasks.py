@@ -1,7 +1,7 @@
-from .....lib.base.base_task import BaseTask
-from .....lib.docker.images.save.docker_image_save_task import DockerSaveImageTask
+from ......src.lib.base.base_task import BaseTask
+from ......src.lib.docker.images.save.docker_image_save_task import DockerSaveImageTask
 
-from .....lib.docker.images.task_creator_from_build_tasks import TaskCreatorFromBuildTasks
+from ......src.lib.docker.images.task_creator_from_build_tasks import TaskCreatorFromBuildTasks
 
 
 class SaveTaskCreatorFromBuildTasks(TaskCreatorFromBuildTasks):

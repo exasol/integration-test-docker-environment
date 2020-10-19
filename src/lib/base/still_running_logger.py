@@ -2,7 +2,7 @@ import threading
 import time
 from datetime import datetime, timedelta
 
-from ...lib.config.log_config import log_config
+from ....src.lib.config.log_config import log_config
 
 
 class StillRunningLoggerThread(threading.Thread):

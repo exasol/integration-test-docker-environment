@@ -7,7 +7,7 @@ from ...cli.options.build_options import build_options
 from ...cli.options.docker_repository_options import docker_repository_options
 from ...cli.options.push_options import push_options
 from ...cli.options.system_options import system_options
-from ...lib.test_environment.analyze_test_container import AnalyzeTestContainer, DockerTestContainerPush
+from ....src.lib.test_environment.analyze_test_container import AnalyzeTestContainer, DockerTestContainerPush
 
 
 @cli.command()

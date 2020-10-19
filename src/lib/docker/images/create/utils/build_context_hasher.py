@@ -2,8 +2,8 @@ import base64
 import hashlib
 from typing import Dict
 
-from ......lib.docker.images.create.utils.file_directory_list_hasher import FileDirectoryListHasher
-from ......lib.docker.images.image_info import ImageInfo, ImageDescription
+from .......src.lib.docker.images.create.utils.file_directory_list_hasher import FileDirectoryListHasher
+from .......src.lib.docker.images.image_info import ImageInfo, ImageDescription
 
 
 # TODO add hash config to the hash

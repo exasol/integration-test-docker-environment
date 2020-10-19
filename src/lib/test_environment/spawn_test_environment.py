@@ -1,10 +1,10 @@
 import luigi
 
-from ...lib.base.dependency_logger_base_task import DependencyLoggerBaseTask
-from ...lib.data.environment_type import EnvironmentType
-from ....lib.test_environment.parameter.spawn_test_environment_parameter import SpawnTestEnvironmentParameter
-from ...lib.test_environment.spawn_test_environment_with_docker_db import SpawnTestEnvironmentWithDockerDB
-from ...lib.test_environment.spawn_test_environment_with_external_db import SpawnTestEnvironmentWithExternalDB
+from ....src.lib.base.dependency_logger_base_task import DependencyLoggerBaseTask
+from ....src.lib.data.environment_type import EnvironmentType
+from ....src.lib.test_environment.parameter.spawn_test_environment_parameter import SpawnTestEnvironmentParameter
+from ....src.lib.test_environment.spawn_test_environment_with_docker_db import SpawnTestEnvironmentWithDockerDB
+from ....src.lib.test_environment.spawn_test_environment_with_external_db import SpawnTestEnvironmentWithExternalDB
 
 
 class SpawnTestEnvironment(DependencyLoggerBaseTask, SpawnTestEnvironmentParameter):

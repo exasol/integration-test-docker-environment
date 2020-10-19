@@ -2,7 +2,7 @@ import json
 
 import jsonpickle
 
-from ...lib.base.frozendict_to_dict import FrozenDictToDict
+from ....src.lib.base.frozendict_to_dict import FrozenDictToDict
 
 
 class Info:

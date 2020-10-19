@@ -1,7 +1,7 @@
-from .....lib.base.base_task import BaseTask
-from .....lib.docker.images.push.docker_image_push_task import DockerPushImageTask
+from ......src.lib.base.base_task import BaseTask
+from ......src.lib.docker.images.push.docker_image_push_task import DockerPushImageTask
 
-from .....lib.docker.images.task_creator_from_build_tasks import TaskCreatorFromBuildTasks
+from ......src.lib.docker.images.task_creator_from_build_tasks import TaskCreatorFromBuildTasks
 
 
 class PushTaskCreatorFromBuildTasks(TaskCreatorFromBuildTasks):

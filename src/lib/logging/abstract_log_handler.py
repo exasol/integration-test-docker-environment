@@ -1,4 +1,4 @@
-from ...lib.config.log_config import log_config
+from ....src.lib.config.log_config import log_config
 
 
 class AbstractLogHandler:

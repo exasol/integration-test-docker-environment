@@ -2,9 +2,9 @@ import importlib
 
 import luigi
 
-from .....lib.base.json_pickle_parameter import JsonPickleParameter
-from .....lib.docker.images.required_task_info import RequiredTaskInfo
-from .....lib.docker.images.save.docker_image_save_base_task import DockerSaveImageBaseTask
+from ......src.lib.base.json_pickle_parameter import JsonPickleParameter
+from ......src.lib.docker.images.required_task_info import RequiredTaskInfo
+from ......src.lib.docker.images.save.docker_image_save_base_task import DockerSaveImageBaseTask
 
 
 class DockerSaveImageTask(DockerSaveImageBaseTask):

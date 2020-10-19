@@ -1,11 +1,11 @@
 from typing import Set, Dict
 
-from ...lib.config.docker_config import target_docker_repository_config, \
+from ....src.lib.config.docker_config import target_docker_repository_config, \
     source_docker_repository_config
-from ...lib.docker.images.create.docker_build_base import DockerBuildBase
-from ...lib.docker.images.create.docker_image_analyze_task import DockerAnalyzeImageTask
-from ...lib.docker.images.push.docker_push_parameter import DockerPushParameter
-from ...lib.docker.images.push.push_task_creator_for_build_tasks import \
+from ....src.lib.docker.images.create.docker_build_base import DockerBuildBase
+from ....src.lib.docker.images.create.docker_image_analyze_task import DockerAnalyzeImageTask
+from ....src.lib.docker.images.push.docker_push_parameter import DockerPushParameter
+from ....src.lib.docker.images.push.push_task_creator_for_build_tasks import \
     PushTaskCreatorFromBuildTasks
 
 

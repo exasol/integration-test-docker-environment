@@ -5,12 +5,12 @@ import luigi
 import netaddr
 from docker.transport import unixconn
 
-from ...lib.base.docker_base_task import DockerBaseTask
-from ...lib.base.json_pickle_parameter import JsonPickleParameter
-from ...lib.data.container_info import ContainerInfo
-from ...lib.data.docker_network_info import DockerNetworkInfo
-from ...lib.test_environment.analyze_test_container import DockerTestContainerBuild
-from ...lib.test_environment.create_export_directory import CreateExportDirectory
+from ....src.lib.base.docker_base_task import DockerBaseTask
+from ....src.lib.base.json_pickle_parameter import JsonPickleParameter
+from ....src.lib.data.container_info import ContainerInfo
+from ....src.lib.data.docker_network_info import DockerNetworkInfo
+from ....src.lib.test_environment.analyze_test_container import DockerTestContainerBuild
+from ....src.lib.test_environment.create_export_directory import CreateExportDirectory
 
 
 class SpawnTestContainer(DockerBaseTask):

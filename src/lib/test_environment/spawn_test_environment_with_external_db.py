@@ -1,13 +1,13 @@
-from ...lib.test_environment.abstract_spawn_test_environment import AbstractSpawnTestEnvironment
-from ...lib.data.container_info import ContainerInfo
-from ...lib.data.database_info import DatabaseInfo
-from ...lib.data.docker_network_info import DockerNetworkInfo
-from ...lib.data.environment_type import EnvironmentType
-from ....lib.test_environment.parameter.external_test_environment_parameter import ExternalDatabaseXMLRPCParameter, \
+from ....src.lib.test_environment.abstract_spawn_test_environment import AbstractSpawnTestEnvironment
+from ....src.lib.data.container_info import ContainerInfo
+from ....src.lib.data.database_info import DatabaseInfo
+from ....src.lib.data.docker_network_info import DockerNetworkInfo
+from ....src.lib.data.environment_type import EnvironmentType
+from ....src.lib.test_environment.parameter.external_test_environment_parameter import ExternalDatabaseXMLRPCParameter, \
     ExternalDatabaseHostParameter
-from ...lib.test_environment.prepare_network_for_test_environment import PrepareDockerNetworkForTestEnvironment
-from ...lib.test_environment.setup_external_database_host import SetupExternalDatabaseHost
-from ....lib.test_environment.database_waiters.wait_for_external_database import WaitForTestExternalDatabase
+from ....src.lib.test_environment.prepare_network_for_test_environment import PrepareDockerNetworkForTestEnvironment
+from ....src.lib.test_environment.setup_external_database_host import SetupExternalDatabaseHost
+from ....src.lib.test_environment.database_waiters.wait_for_external_database import WaitForTestExternalDatabase
 
 
 class SpawnTestEnvironmentWithExternalDB(AbstractSpawnTestEnvironment,

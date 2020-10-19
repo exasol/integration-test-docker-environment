@@ -1,8 +1,8 @@
 import docker
 import luigi
 
-from ...lib.base.docker_base_task import DockerBaseTask
-from ...lib.data.docker_network_info import DockerNetworkInfo
+from ....src.lib.base.docker_base_task import DockerBaseTask
+from ....src.lib.data.docker_network_info import DockerNetworkInfo
 
 
 class PrepareDockerNetworkForTestEnvironment(DockerBaseTask):

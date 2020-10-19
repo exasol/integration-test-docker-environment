@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from ...lib.base.dependency_logger_base_task import DependencyLoggerBaseTask
+from ....src.lib.base.dependency_logger_base_task import DependencyLoggerBaseTask
 
 
 class CreateExportDirectory(DependencyLoggerBaseTask):

@@ -6,8 +6,8 @@ from pathlib import Path
 
 from jinja2 import Template
 
-from ......lib.config.build_config import build_config
-from ......lib.docker.images.image_info import ImageInfo, ImageState
+from .......src.lib.config.build_config import build_config
+from .......src.lib.docker.images.image_info import ImageInfo, ImageState
 
 
 class BuildContextCreator:

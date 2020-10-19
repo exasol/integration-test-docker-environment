@@ -2,14 +2,14 @@ import shutil
 import tempfile
 from pathlib import Path
 
-from .....lib.base.still_running_logger import StillRunningLogger
-from .....lib.config.build_config import build_config
-from .....lib.config.docker_config import docker_client_config, docker_build_arguments
-from .....lib.docker.images.create.docker_image_creator_base_task import \
+from ......src.lib.base.still_running_logger import StillRunningLogger
+from ......src.lib.config.build_config import build_config
+from ......src.lib.config.docker_config import docker_client_config, docker_build_arguments
+from ......src.lib.docker.images.create.docker_image_creator_base_task import \
     DockerImageCreatorBaseTask
-from .....lib.docker.images.create.utils.build_context_creator import BuildContextCreator
-from .....lib.docker.images.create.utils.build_log_handler import BuildLogHandler
-from .....lib.docker.images.image_info import ImageInfo
+from ......src.lib.docker.images.create.utils.build_context_creator import BuildContextCreator
+from ......src.lib.docker.images.create.utils.build_log_handler import BuildLogHandler
+from ......src.lib.docker.images.image_info import ImageInfo
 
 
 class DockerBuildImageTask(DockerImageCreatorBaseTask):

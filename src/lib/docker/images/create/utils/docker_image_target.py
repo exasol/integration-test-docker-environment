@@ -1,7 +1,7 @@
 import docker
 import luigi
 
-from ......lib.config.docker_config import docker_client_config
+from .......src.lib.config.docker_config import docker_client_config
 
 
 class DockerImageTarget(luigi.Target):

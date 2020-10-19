@@ -5,18 +5,18 @@ import luigi
 
 from ..base.base_task import BaseTask
 from ...abstract_method_exception import AbstractMethodException
-from ...lib.base.docker_base_task import DockerBaseTask
-from ...lib.data.container_info import ContainerInfo
-from ...lib.data.database_credentials import DatabaseCredentialsParameter
-from ...lib.data.database_info import DatabaseInfo
-from ...lib.data.docker_network_info import DockerNetworkInfo
-from ...lib.data.environment_info import EnvironmentInfo
-from ...lib.test_environment.docker_container_copy import DockerContainerCopy
-from ...lib.test_environment.spawn_test_container import SpawnTestContainer
-from ...lib.test_environment.database_setup.populate_data import PopulateEngineSmallTestDataToDatabase
-from ...lib.test_environment.database_setup.upload_exa_jdbc import UploadExaJDBC
-from ...lib.test_environment.database_setup.upload_virtual_schema_jdbc_adapter import UploadVirtualSchemaJDBCAdapter
-from ...lib.test_environment.parameter.general_spawn_test_environment_parameter import \
+from ....src.lib.base.docker_base_task import DockerBaseTask
+from ....src.lib.data.container_info import ContainerInfo
+from ....src.lib.data.database_credentials import DatabaseCredentialsParameter
+from ....src.lib.data.database_info import DatabaseInfo
+from ....src.lib.data.docker_network_info import DockerNetworkInfo
+from ....src.lib.data.environment_info import EnvironmentInfo
+from ....src.lib.test_environment.docker_container_copy import DockerContainerCopy
+from ....src.lib.test_environment.spawn_test_container import SpawnTestContainer
+from ....src.lib.test_environment.database_setup.populate_data import PopulateEngineSmallTestDataToDatabase
+from ....src.lib.test_environment.database_setup.upload_exa_jdbc import UploadExaJDBC
+from ....src.lib.test_environment.database_setup.upload_virtual_schema_jdbc_adapter import UploadVirtualSchemaJDBCAdapter
+from ....src.lib.test_environment.parameter.general_spawn_test_environment_parameter import \
     GeneralSpawnTestEnvironmentParameter
 
 DATABASE = "database"
