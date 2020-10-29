@@ -1,0 +1,39 @@
+[tool.poetry]
+name = "exasol-integration-test-docker-environment"
+version = "0.1.0"
+description = "Integration Test Docker Environment for Exasol"
+
+license = "MIT"
+
+authors = [
+    "Torsten Kilias <torsten.kilias@exasol.com>"
+]
+
+readme = 'README.md'  # Markdown files are supported
+
+repository = "https://github.com/exasol/integration-test-docker-environment"
+homepage = "https://github.com/exasol/integration-test-docker-environment"
+
+keywords = ['exasol', 'docker', 'testing']
+include = ["docker_db_config","ext"]
+
+[tool.poetry.dependencies]
+python = ">=3.6"
+click = ">=7.0"
+docker = ">=4.0.0"
+gitpython = ">=2.1.0"
+humanfriendly = ">=4.18"
+jinja2 = ">=2.10.1"
+jsonpickle = ">=1.1"
+luigi = ">=2.8.4"
+netaddr = ">=0.7.19"
+networkx = ">=2.3"
+pydot = ">=1.4.0"
+requests = ">=2.21.0"
+simplejson = ">=3.16.0"
+"stopwatch.py" = ">=1.0.0"
+
+[tool.dephell.main]
+from = {format = "poetry", path = "pyproject.toml"}
+to = {format = "pipfile", path = "Pipfile"}
+
