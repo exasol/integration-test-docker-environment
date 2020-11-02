@@ -29,6 +29,6 @@ rm -r "$extracted_dir"
 popd
 dephell deps convert
 sed -i 's/python_version = "3.6"//g' Pipfile
-git add Pipfile setup.py
+git add Pipfile setup.py exasol_integration_test_docker_environment/docker_db_config
 
 popd > /dev/null
