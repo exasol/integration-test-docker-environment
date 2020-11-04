@@ -11,7 +11,7 @@
     # List of networks for this cluster: 'private' is mandatory, 'public' is optional.
     Networks = private
     # Comma-separated list of nameservers for this cluster.
-    NameServers = 8.8.8.8 
+    NameServers = 
     Timezone = Europe/Berlin
     # Nr. of hugepages ('0' = disabled, 'host' = manually configured on the host, 'auto' = set automatically based on DB config)
     Hugepages = 0
@@ -163,7 +163,7 @@
         WritePasswd = d3JpdGU=
         Public = True
         Name = default
-        AdditionalFiles = EXAClusterOS:/usr/opt/EXASuite-6/EXAClusterOS-{{db_version}}/var/clients/packages/ScriptLanguages-*, EXASolution-{{db_version}}:/usr/opt/EXASuite-6/EXASolution-{{db_version}}/bin/udf/*
+        AdditionalFiles = EXAClusterOS:/usr/opt/EXASuite-7/EXAClusterOS-{{db_version}}/var/clients/packages/ScriptLanguages-*, EXASolution-{{db_version}}:/usr/opt/EXASuite-7/EXASolution-{{db_version}}/bin/udf/*
 
     [[Bucket : myudfs]]
         # ReadPasswd is "read" (without quotes)
