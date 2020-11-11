@@ -1,0 +1,31 @@
+name: Check packaging is up to date
+
+on:
+  push:
+    branches-ignore:
+      - '**'
+
+jobs:
+  check_setup_py:
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.6, 3.7, 3.8]
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dephell
+      run: curl -L dephell.org/install | python3
+    - name: Run packaging update
+      run: bash githooks/update_packaging.sh
+    - name: Show changes on working copy
+      run: git status --porcelain=v1 -uno
+    - name: Show diff on working copy
+      run: git diff
+    - name: Check if something changed after running the update script
+      run: |
+        [ -z "$(git status --porcelain=v1 -uno 2>/dev/null)" ] 
