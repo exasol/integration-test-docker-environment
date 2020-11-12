@@ -71,15 +71,15 @@ jobs:
       run: ./run_test.sh exasol_integration_test_docker_environment/test/test_test_environment.py
       env:
         EXASOL_VERSION: "${{ matrix.exasol_version }}"
-      if: github.ref != 'refs/heads/master' && !contains(github.event.head_commit.message, '[run all tests]')
+      if: github.ref != 'refs/heads/master' && !contains(github.event.head_commit.message, '[run all tests]') && github.event_name == 'push'
     - name: Run all tests
       run: ./run_all_tests.sh
       env:
         EXASOL_VERSION: "${{ matrix.exasol_version }}"
-      if: github.ref == 'refs/heads/master' || contains(github.event.head_commit.message, '[run all tests]')
+      if: github.ref == 'refs/heads/master' || contains(github.event.head_commit.message, '[run all tests]') || github.event_name != 'push'
   check-run-all-tests:
     runs-on: ubuntu-latest
     steps:
     - name: Job failed because not all tests run
       run: echo "Not all tests ran. To run all tests commit with [run all tests]"; exit 1
-      if: github.ref != 'refs/heads/master' && !contains(github.event.head_commit.message, '[run all tests]')
+      if: github.ref != 'refs/heads/master' && !contains(github.event.head_commit.message, '[run all tests]') && github.event_name == 'push' 
