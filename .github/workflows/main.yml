@@ -3,7 +3,32 @@ name: CI
 on: [push, pull_request]
 
 jobs:
-  test:
+  test-starter:
+    strategy:
+      fail-fast: false
+      matrix:
+        exasol_version:
+        - "default"
+        python_version:
+        - 3.6
+        - 3.7
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup Python 3.6 for integration-test-docker-environment
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.6
+
+    - name: Install pipenv
+      uses: dschep/install-pipenv-action@v1
+
+    - name: Run all tests
+      run: ./run_all_tests.sh
+      env:
+        EXASOL_VERSION: "${{ matrix.exasol_version }}"
+  test-db-versions:
     strategy:
       fail-fast: false
       matrix:
@@ -43,6 +68,12 @@ jobs:
       uses: dschep/install-pipenv-action@v1
 
     - name: Run tests
+      run: ./run_test.sh exasol_integration_test_docker_environment/test/test_test_environment.py
+      env:
+        EXASOL_VERSION: "${{ matrix.exasol_version }}"
+      if: github.ref != 'refs/heads/master' && !contains(github.event.head_commit.message, '[run all tests]') && github.event_name == 'push'
+    - name: Run all tests
       run: ./run_all_tests.sh
       env:
         EXASOL_VERSION: "${{ matrix.exasol_version }}"
+      if: github.ref == 'refs/heads/master' || contains(github.event.head_commit.message, '[run all tests]') || github.event_name != 'push'
