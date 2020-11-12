@@ -14,7 +14,10 @@ ROOT_DIR=$(git rev-parse --show-cdup)
 
 pushd "$ROOT_DIR" > /dev/null
 echo -e "Copy docker_db_config_template into package ${grey}(pre-commit hook)${no_color}"
-rm -r exasol_integration_test_docker_environment/docker_db_config 
+if [ -d "exasol_integration_test_docker_environment/docker_db_config" ]
+then
+  rm -r "exasol_integration_test_docker_environment/docker_db_config" 
+fi
 cp -rL docker_db_config_template exasol_integration_test_docker_environment/docker_db_config
 echo -e "Generate setup.py ${grey}(pre-commit hook)${no_color}"
 if [ -d "dist" ]
