@@ -77,6 +77,9 @@ jobs:
       env:
         EXASOL_VERSION: "${{ matrix.exasol_version }}"
       if: github.ref == 'refs/heads/master' || contains(github.event.head_commit.message, '[run all tests]')
+  check-run-all-tests:
+    runs-on: ubuntu-latest
+    steps:
     - name: Job failed because not all tests run
       run: exit 1
       if: github.ref != 'refs/heads/master' && !contains(github.event.head_commit.message, '[run all tests]')
