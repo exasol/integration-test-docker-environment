@@ -17,7 +17,10 @@ echo -e "Copy docker_db_config_template into package ${grey}(pre-commit hook)${n
 rm -r exasol_integration_test_docker_environment/docker_db_config 
 cp -rL docker_db_config_template exasol_integration_test_docker_environment/docker_db_config
 echo -e "Generate setup.py ${grey}(pre-commit hook)${no_color}"
-rm -r dist
+if [ -d "dist" ]
+then
+  rm -r "dist"
+fi
 poetry build > /dev/null
 pushd dist > /dev/null
 tar_file=$(ls *.tar.gz)
