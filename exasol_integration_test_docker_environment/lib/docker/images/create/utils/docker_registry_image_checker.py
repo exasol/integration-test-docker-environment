@@ -14,7 +14,6 @@ class DockerRegistryImageCheckerPullLogHandler(AbstractLogHandler):
 
     def handle_log_line(self, log_line, error: bool = False):
         json_output = json.loads(log_line)
-        print(json_output)
         # TODO logging
         if "status" in json_output and json_output["status"].startswith("Pulling"):
             return True

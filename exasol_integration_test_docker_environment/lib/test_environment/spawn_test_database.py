@@ -208,7 +208,6 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                               volume_preperation_container: Container,
                               db_private_network: str):
         copy = DockerContainerCopy(volume_preperation_container)
-        print("AAAAAA", pkg_resources.resource_listdir("exasol_integration_test_docker_environment", ""))
         init_db_script_str = pkg_resources.resource_string(
             "exasol_integration_test_docker_environment",
             f"{self.docker_db_config_resource_name}/init_db.sh") # type: bytes

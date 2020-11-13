@@ -86,13 +86,13 @@ class SetupExternalDatabaseHost(DependencyLoggerBaseTask,
             else:
                 raise Exception('Not able startup EXAStorage!\n')
         elif storage.serviceIsOnline():
-            print('EXAStorage already online; continuing startup process')
+            self.logger.info('EXAStorage already online; continuing startup process')
 
         # triggering database startup
         for databaseName in cluster.getDatabaseList():
             database = self.get_xml_rpc_object('/db_' + quote_plus(databaseName))
             if not database.runningDatabase():
-                print('Starting database instance %s' % databaseName)
+                self.logger.info('Starting database instance %s' % databaseName)
                 database.startDatabase()
             else:
-                print('Database instance %s already running' % databaseName)
+                self.logger.info('Database instance %s already running' % databaseName)

@@ -115,9 +115,6 @@ class DockerAnalyzeImageTask(DockerBaseTask):
             if not isinstance(task_classes, dict) or \
                     not self.keys_are_string(task_classes) or \
                     not self.values_are_subclass_of_baseclass(task_classes):
-                print(isinstance(task_classes, dict),
-                      self.keys_are_string(task_classes),
-                      self.values_are_subclass_of_baseclass(task_classes))
                 raise TypeError(f"Expected Dict[str,DockerAnalyzeImageTask] got {task_classes}")
             tasks = {key: self.create_child_task_with_common_params(value)
                      for key, value in task_classes.items()}
