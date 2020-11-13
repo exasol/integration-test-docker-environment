@@ -7,7 +7,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.6, 3.7, 3.8]
+        python-version: [3.6]
     runs-on: ubuntu-latest
 
     steps:
@@ -15,6 +15,7 @@ jobs:
     - uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+    - uses: abatilo/actions-poetry@v2.0.0
     - name: Install dephell
       run: curl -L dephell.org/install | python3
     - name: Run packaging update
