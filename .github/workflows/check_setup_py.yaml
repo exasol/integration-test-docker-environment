@@ -1,9 +1,6 @@
 name: Check packaging is up to date
 
-on:
-  push:
-    branches-ignore:
-      - '**'
+on: [push, pull_request]
 
 jobs:
   check_setup_py:
