@@ -1,6 +1,6 @@
 # Integration-Test-Docker-Environment 0.2.0, released 2020-11-17
 
-In this release, we add support for new Exasol Docker-DB versions and Docker runtimes to the integration-test-docker-environment. For example, you can run the Docker-DB with the nvidia-container-runtime to add support for GPUs to the UDFs of the Exasol Version. This allows you to test your GPU-accelerated UDFs in your CI environment, before deploying them on your production cluster. Furthermore, we converted the project from pipenv project to a poetry project to improve packaging and reusebility, in the future.
+In this release, we add support for new Exasol Docker-DB versions and Docker runtimes to the integration-test-docker-environment. For example, you can run the Docker-DB with the nvidia-container-runtime to add support for GPUs to the UDFs of the Exasol Version. This allows you to test your GPU-accelerated UDFs in your CI environment, before deploying them on your production cluster. Furthermore, we converted the project from pipenv project to a poetry project to improve packaging and reusability, in the future.
 
 ### New supported Exasol Versions
 
