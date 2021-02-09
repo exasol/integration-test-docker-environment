@@ -118,7 +118,7 @@ def handle_failure(task: DependencyLoggerBaseTask, task_dependencies_dot_file: s
 def print_task_failures(task: DependencyLoggerBaseTask):
     print()
     print("Task Failures:")
-    for failure in task.collect_failures():
+    for failure in task.collect_failures().keys():
         print(failure)
     print()
 

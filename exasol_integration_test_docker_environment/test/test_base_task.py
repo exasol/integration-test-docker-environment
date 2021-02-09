@@ -97,18 +97,18 @@ class Data1:
     pass
 
 
-class TestTask9(TestBaseTask):
+class TestTask9_Success(TestBaseTask):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     def register_required(self):
-        inputs = [Data(i, f"{i}") for i in range(10)]
+        inputs = [Data(i, f"{i}") for i in range(2)]
         tasks = [TestTask10(parameter_1=input) for input in inputs]
         self.register_dependencies(tasks)
 
     def run_task(self):
-        yield from self.run_dependencies(TestTask10(parameter_1=Data1()))
+        yield from self.run_dependencies(TestTask10(parameter_1=Data(3,"3")))
 
 
 class TestTask10(TestBaseTask):
@@ -118,6 +118,16 @@ class TestTask10(TestBaseTask):
         time.sleep(1)
         print(self.parameter_1)
 
+class TestTask9_Fail(TestBaseTask):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def register_required(self):
+        pass
+
+    def run_task(self):
+        yield from self.run_dependencies(TestTask10(parameter_1=Data1()))
 
 class TestTask11(TestBaseTask):
 
@@ -134,6 +144,32 @@ class TestTask11(TestBaseTask):
 class TestTask12(TestBaseTask):
     p = Parameter()
 
+    def run_task(self):
+        raise Exception("%s" % self.task_id)
+
+
+class TestTask13(TestBaseTask):
+
+    def register_required(self):
+        task14_1 = self.create_child_task_with_common_params(TestTask14, p="1")
+        task14_2 = self.create_child_task_with_common_params(TestTask14, p="2")
+        self.task14_1_future = self.register_dependency(task14_1)
+        self.task14_2_future = self.register_dependency(task14_2)
+
+    def run_task(self):
+        pass
+
+
+class TestTask14(TestBaseTask):
+    p = Parameter()
+
+    def register_required(self):
+        self.register_dependency(TestTask15())
+
+    def run_task(self):
+        pass
+
+class TestTask15(TestBaseTask):
     def run_task(self):
         raise Exception("%s" % self.task_id)
 
@@ -168,33 +204,59 @@ class BaseTaskTest(unittest.TestCase):
         if task._get_tmp_path_for_job().exists():
             shutil.rmtree(str(task._get_tmp_path_for_job()))
 
-    def test_json_pickle_parameter(self):
-        self.set_job_id(TestTask9)
-        task = TestTask9()
+    def test_json_pickle_parameter_success(self):
+        self.set_job_id(TestTask9_Success)
+        task = TestTask9_Success()
         try:
             luigi.build([task], workers=3, local_scheduler=True, log_level="INFO")
-        except Exception as e:
-            print(e)
-        if task._get_tmp_path_for_job().exists():
-            shutil.rmtree(str(task._get_tmp_path_for_job()))
+        finally:
+            if task._get_tmp_path_for_job().exists():
+                shutil.rmtree(str(task._get_tmp_path_for_job()))
+    
+    def test_json_pickle_parameter_fail(self):
+        self.set_job_id(TestTask9_Fail)
+        task = TestTask9_Fail()
+        try:
+            with self.assertRaises(Exception) as context:
+                luigi.build([task], workers=3, local_scheduler=True, log_level="INFO")
+            print(context.exception)
+        finally:
+            if task._get_tmp_path_for_job().exists():
+                shutil.rmtree(str(task._get_tmp_path_for_job()))
 
-    def test_collect_failures(self):
+    def test_collect_failures_diffrent_task_fail(self):
         self.set_job_id(TestTask11)
         task = TestTask11()
         try:
             luigi.build([task], workers=3, local_scheduler=True, log_level="INFO")
             failures = task.collect_failures()
             print()
+            print("Collected Failures:")
             for failure in failures:
                 print(failure)
                 print()
             print()
             self.assertEquals(len(failures), 2)
-        except Exception as e:
-            print(e)
-        if task._get_tmp_path_for_job().exists():
-            shutil.rmtree(str(task._get_tmp_path_for_job()))
+        finally:
+            if task._get_tmp_path_for_job().exists():
+                shutil.rmtree(str(task._get_tmp_path_for_job()))
 
+    def test_collect_failures_one_task_fails_but_is_dependency_of_multiple(self):
+        self.set_job_id(TestTask13)
+        task = TestTask13()
+        try:
+            luigi.build([task], workers=3, local_scheduler=True, log_level="INFO")
+            failures = task.collect_failures()
+            print()
+            print("Collected Failures:")
+            for failure in failures:
+                print(failure)
+                print()
+            print()
+            self.assertEquals(len(failures), 1)
+        finally:
+            if task._get_tmp_path_for_job().exists():
+                shutil.rmtree(str(task._get_tmp_path_for_job()))
 
 if __name__ == '__main__':
     unittest.main()
