@@ -131,30 +131,28 @@ class TestTask9_Fail(TestBaseTask):
 
 class TestTask11(TestBaseTask):
 
-    def register_required(self):
-        task12_1 = self.create_child_task_with_common_params(TestTask12, p="1")
-        task12_2 = self.create_child_task_with_common_params(TestTask12, p="2")
-        self.task12_1_future = self.register_dependency(task12_1)
-        self.task12_2_future = self.register_dependency(task12_2)
-
     def run_task(self):
-        pass
+        tasks = [TestTask12(p=f"{i}") for i in range(10)]
+        self.logger.info(tasks)
+        yield from self.run_dependencies(tasks)
 
 
 class TestTask12(TestBaseTask):
     p = Parameter()
 
     def run_task(self):
+        self.logger.info("Start and wait")
+        import time
+        time.sleep(5)
+        self.logger.info("Finished wait and fail")
         raise Exception("%s" % self.task_id)
 
 
 class TestTask13(TestBaseTask):
 
     def register_required(self):
-        task14_1 = self.create_child_task_with_common_params(TestTask14, p="1")
-        task14_2 = self.create_child_task_with_common_params(TestTask14, p="2")
-        self.task14_1_future = self.register_dependency(task14_1)
-        self.task14_2_future = self.register_dependency(task14_2)
+        tasks = [TestTask14(p=f"{i}") for i in range(10)]
+        self.register_dependencies(tasks)
 
     def run_task(self):
         pass
@@ -228,7 +226,7 @@ class BaseTaskTest(unittest.TestCase):
         self.set_job_id(TestTask11)
         task = TestTask11()
         try:
-            luigi.build([task], workers=3, local_scheduler=True, log_level="INFO")
+            luigi.build([task], workers=5, local_scheduler=True, log_level="INFO")
             failures = task.collect_failures()
             print()
             print("Collected Failures:")
@@ -236,7 +234,7 @@ class BaseTaskTest(unittest.TestCase):
                 print(failure)
                 print()
             print()
-            self.assertEquals(len(failures), 2)
+            self.assertGreater(len(failures), 1)
         finally:
             if task._get_tmp_path_for_job().exists():
                 shutil.rmtree(str(task._get_tmp_path_for_job()))
