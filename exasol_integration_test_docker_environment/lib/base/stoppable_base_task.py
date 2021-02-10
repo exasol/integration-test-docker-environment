@@ -48,7 +48,7 @@ class StoppableBaseTask(TimeableBaseTask):
 
     def collect_failures(self)->Dict[str,None]:
         failures = OrderedDict()
-        failures.extend(self.collect_failures_of_child_tasks())
+        failures.update(self.collect_failures_of_child_tasks())
         if self.get_failure_log_path().exists():
             with self.get_failure_log_path().open("r") as f:
                 exception = f.read()
