@@ -1,7 +1,7 @@
 import traceback
 from pathlib import Path
-from typing import List
-
+from typing import List, Dict
+from collections import OrderedDict
 from exasol_integration_test_docker_environment.lib.base.timeable_base_task import TimeableBaseTask
 
 
@@ -46,19 +46,21 @@ class StoppableBaseTask(TimeableBaseTask):
                 with self.failed_target.open("w") as f:
                     f.write("%s" % self.task_id)
 
-    def collect_failures(self):
-        failures = []
-        failures.extend(self.collect_failures_of_child_tasks())
+    def collect_failures(self)->Dict[str,None]:
+        failures = OrderedDict()
+        failures.update(self.collect_failures_of_child_tasks())
         if self.get_failure_log_path().exists():
             with self.get_failure_log_path().open("r") as f:
                 exception = f.read()
                 prefix = '    '
                 formated_exception = prefix + prefix.join(exception.splitlines(True))
-                failures.append("- %s:\n%s" % (self.task_id, formated_exception))
+                failure_message = "- %s:\n%s" % (self.task_id, formated_exception)
+                failures[failure_message] = None
+
         return failures
 
-    def collect_failures_of_child_tasks(self) -> List[str]:
-        failures_of_child_tasks = []
+    def collect_failures_of_child_tasks(self) -> Dict[str,None]:
+        failures_of_child_tasks = OrderedDict()
         if self._run_dependencies_target.exists():
             _run_dependencies_tasks_from_target = self._run_dependencies_target.read()
         else:
@@ -68,11 +70,11 @@ class StoppableBaseTask(TimeableBaseTask):
         reversed_run_dependencies_task_list.reverse()
         for task in reversed_run_dependencies_task_list:
             if isinstance(task, StoppableBaseTask):
-                failures_of_child_tasks.extend(task.collect_failures())
+                failures_of_child_tasks.update(task.collect_failures())
 
         reversed_registered_task_list = list(self._registered_tasks)
         reversed_registered_task_list.reverse()
         for task in reversed_registered_task_list:
             if isinstance(task, StoppableBaseTask):
-                failures_of_child_tasks.extend(task.collect_failures())
+                failures_of_child_tasks.update(task.collect_failures())
         return failures_of_child_tasks
