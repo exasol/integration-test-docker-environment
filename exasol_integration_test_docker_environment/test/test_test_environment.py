@@ -16,7 +16,7 @@ class DockerTestEnvironmentTest(unittest.TestCase):
         cls.test_environment = \
             utils.ExaslctTestEnvironment(
                 cls,
-                "./start-test-env-without-docker-runner",
+                utils.INTEGRATION_TEST_DOCKER_ENVIRONMENT_DEFAULT_BIN,
                 clean_images_at_close=False)
         # TODO cls.test_environment.clean_images()
         cls.docker_environment_name = cls.__name__

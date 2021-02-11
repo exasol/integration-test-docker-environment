@@ -16,8 +16,6 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - uses: abatilo/actions-poetry@v2.0.0
-    - name: Install dephell
-      run: curl -L dephell.org/install | python3
     - name: Run packaging update
       run: bash githooks/update_packaging.sh
     - name: Show changes on working copy

@@ -3,7 +3,20 @@ name: CI
 on: [push, pull_request]
 
 jobs:
-  test-starter:
+  test-docker-starter:
+    strategy:
+      fail-fast: false
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Build new Docker image
+      run: bash build_test_environment_docker_runner.sh 
+
+    - name: Test ./start-test-env 
+      run: ./start-test-env --help
+
+  test-all:
     strategy:
       fail-fast: false
       matrix:
@@ -20,14 +33,17 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: 3.6
-
-    - name: Install pipenv
-      uses: dschep/install-pipenv-action@v1
+    - name: Install Poetry
+      uses: abatilo/actions-poetry@v2.0.0
 
     - name: Run all tests
       run: ./run_all_tests.sh
       env:
         EXASOL_VERSION: "${{ matrix.exasol_version }}"
+
+    - name: Test ./start-test-env-with-poetry 
+      run: ./start-test-env-with-poetry --help
+
   test-db-versions:
     strategy:
       fail-fast: false
@@ -69,9 +85,8 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: 3.6
-
-    - name: Install pipenv
-      uses: dschep/install-pipenv-action@v1
+    - name: Install Poetry
+      uses: abatilo/actions-poetry@v2.0.0
 
     - name: Run tests
       run: ./run_test.sh exasol_integration_test_docker_environment/test/test_test_environment.py
@@ -83,3 +98,23 @@ jobs:
       env:
         EXASOL_VERSION: "${{ matrix.exasol_version }}"
       if: github.ref == 'refs/heads/master' || contains(github.event.head_commit.message, '[run all tests]') || github.event_name != 'push'
+  publish:
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    environment: publish
+    # needs:
+    # - test-db-versions
+    # - test-all
+    # - test-docker-starter
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build new Docker image
+      run: bash build_test_environment_docker_runner.sh 
+    - name: Docker login
+      run: echo "$SECRET_DOCKER_TOKEN" | docker login --username "$SECRET_DOCKER_USER_NAME" --password-stdin 
+      env: # Set the secret as an input
+        SECRET_DOCKER_USER_NAME: ${{ secrets.DOCKER_USER_NAME }}
+        SECRET_DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+    - name: Push new Docker image
+      run: bash push_test_environment_docker_runner.sh 
+

@@ -32,8 +32,3 @@ pydot = ">=1.4.0"
 requests = ">=2.21.0"
 simplejson = ">=3.16.0"
 "stopwatch.py" = ">=1.0.0"
-
-[tool.dephell.main]
-from = {format = "poetry", path = "pyproject.toml"}
-to = {format = "pipfile", path = "Pipfile"}
-

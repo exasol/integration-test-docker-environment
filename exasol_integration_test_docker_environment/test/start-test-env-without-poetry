@@ -1,5 +1,5 @@
 #!/bin/bash
 set -euo pipefail
 pushd ../..
-./start-test-env-without-docker-runner $*
+./start-test-env-without-poetry "${@}"
 popd

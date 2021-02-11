@@ -20,7 +20,6 @@ RUN apt-get -y update && \
 
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
-RUN pip3 install pipenv
-RUN virtualenv --python=python3 /venv
-COPY Pipfile /root/Pipfile
-RUN bash -c "source /venv/bin/activate && cd /root && pipenv --python python3 install"
+COPY . /integration-test-docker-environment
+WORKDIR /integration-test-docker-environment
+RUN pip3 install .
