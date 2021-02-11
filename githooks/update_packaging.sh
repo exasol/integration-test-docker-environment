@@ -10,9 +10,17 @@ grey='\033[0;90m'
 
 # Jump to the current project's root directory (the one containing
 # .git/)
-ROOT_DIR=$(git rev-parse --show-cdup)
+ROOT_DIR=$(git rev-parse --show-cdup || echo)
+NO_GIT=FALSE
+if [ -z "$ROOT_DIR" ]
+then
+  echo "Did not found git repository, using '$PWD' as ROOT_DIR"
+  NO_GIT=TRUE
+  ROOT_DIR=$PWD
+fi
 
-pushd "$ROOT_DIR" > /dev/null
+#pushd "$ROOT_DIR" > /dev/null
+pushd "$ROOT_DIR"
 echo -e "Copy docker_db_config_template into package ${grey}(pre-commit hook)${no_color}"
 if [ -d "exasol_integration_test_docker_environment/docker_db_config" ]
 then
@@ -32,10 +40,11 @@ tar -xf $tar_file
 cp "$extracted_dir/setup.py" ../setup.py
 rm -r "$extracted_dir"
 popd > /dev/null
-echo -e "Generate Pipfile ${grey}(pre-commit hook)${no_color}"
-dephell deps convert > /dev/null
-sed -i 's/python_version = "3.6"//g' Pipfile
-echo -e "Add generated files ${grey}(pre-commit hook)${no_color}"
-git add Pipfile setup.py exasol_integration_test_docker_environment/docker_db_config
+
+if [ "$NO_GIT" == "FALSE" ]
+then
+  echo -e "Add generated files ${grey}(pre-commit hook)${no_color}"
+  git add setup.py exasol_integration_test_docker_environment/docker_db_config
+fi
 
 popd > /dev/null

@@ -38,7 +38,7 @@ class DockerTestEnvironmentDockerRuntimeNoRuntimeGivenTest(unittest.TestCase):
         cls.test_environment = \
             utils.ExaslctTestEnvironment(
                 cls,
-                "./start-test-env-without-docker-runner",
+                utils.INTEGRATION_TEST_DOCKER_ENVIRONMENT_DEFAULT_BIN,
                 clean_images_at_close=False)
         cls.docker_environment_name = "test_no_runtime_given"
         cls.on_host_docker_environment, cls.google_cloud_docker_environment = \
@@ -93,7 +93,7 @@ class DockerTestEnvironmentDockerRuntimeDefaultRuntimeGivenTest(unittest.TestCas
         cls.test_environment = \
             utils.ExaslctTestEnvironment(
                 cls,
-                "./start-test-env-without-docker-runner",
+                utils.INTEGRATION_TEST_DOCKER_ENVIRONMENT_DEFAULT_BIN,
                 clean_images_at_close=False)
         cls.client = docker.from_env()
         cls.default_docker_runtime = get_default_docker_runtime(cls)
@@ -150,7 +150,7 @@ class DockerTestEnvironmentDockerRuntimeInvalidRuntimeGivenTest(unittest.TestCas
         cls.test_environment = \
             utils.ExaslctTestEnvironment(
                 cls,
-                "./start-test-env-without-docker-runner",
+                utils.INTEGRATION_TEST_DOCKER_ENVIRONMENT_DEFAULT_BIN,
                 clean_images_at_close=False)
         cls.client = docker.from_env()
         cls.default_docker_runtime = get_default_docker_runtime(cls)

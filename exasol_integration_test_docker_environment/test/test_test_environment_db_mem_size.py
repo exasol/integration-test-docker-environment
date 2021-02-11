@@ -15,7 +15,7 @@ class DockerTestEnvironmentDBMemSizeTest(unittest.TestCase):
         cls.test_environment = \
             utils.ExaslctTestEnvironment(
                 cls,
-                "./start-test-env-without-docker-runner",
+                utils.INTEGRATION_TEST_DOCKER_ENVIRONMENT_DEFAULT_BIN,
                 clean_images_at_close=False)
 
     def setUp(self):

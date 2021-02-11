@@ -1,5 +1,8 @@
+#!/usr/bin/env bash
+
 init_poetry () {
   echo "Initializing poetry:"
+  export LC_ALL=C.UTF-8
   "$POETRY_BIN" env use "$PYTHON_BIN"
   "$POETRY_BIN" install
 }

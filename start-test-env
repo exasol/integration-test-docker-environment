@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -euo pipefail
 
@@ -14,12 +14,12 @@ else
 fi
 
 quoted_arguments=''
-for argument in "$@"
+for argument in "${@}"
 do
     argument="${argument//\\/\\\\}"
     quoted_arguments="$quoted_arguments \"${argument//\"/\\\"}\""
 done
 
-docker run --rm $terminal_parameter -v "$PWD:$PWD" -v /var/run/docker.sock:/var/run/docker.sock -w "$PWD" exatk/script-languages:test_environment_docker_runner bash -c "source /venv/bin/activate && ./start-test-env-without-docker-runner $quoted_arguments; RETURN_CODE=\$?; chown -R $(id -u):$(id -g) .build_output &> /dev/null; exit \$RETURN_CODE"
+docker run --rm $terminal_parameter -v "$PWD:$PWD" -v /var/run/docker.sock:/var/run/docker.sock -w "$PWD" exatk/script-languages:test_environment_docker_runner bash -c "python3 -m pip install .; ./start-test-env-without-poetry $quoted_arguments; RETURN_CODE=\$?; chown -R $(id -u):$(id -g) .build_output &> /dev/null; exit \$RETURN_CODE"
 
 popd &> /dev/null

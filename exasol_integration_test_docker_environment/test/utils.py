@@ -17,6 +17,8 @@ import requests
 from exasol_integration_test_docker_environment.lib.data.environment_info import EnvironmentInfo
 
 
+INTEGRATION_TEST_DOCKER_ENVIRONMENT_DEFAULT_BIN="./start-test-env-without-poetry"
+
 class ExaslctDockerTestEnvironment():
     def __init__(self, name: str, database_host: str,
                  db_username: str, db_password: str,
