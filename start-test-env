@@ -20,6 +20,10 @@ do
     quoted_arguments="$quoted_arguments \"${argument//\"/\\\"}\""
 done
 
-docker run --rm $terminal_parameter -v "$PWD:$PWD" -v /var/run/docker.sock:/var/run/docker.sock -w "$PWD" exatk/script-languages:test_environment_docker_runner bash -c "python3 -m pip install .; ./start-test-env-without-poetry $quoted_arguments; RETURN_CODE=\$?; chown -R $(id -u):$(id -g) .build_output &> /dev/null; exit \$RETURN_CODE"
+IMAGE_NAME="$($SCRIPT_DIR/construct_docker_runner_image_name.sh)"
+
+docker pull $IMAGE_NAME || bash build_test_environment_docker_runner.sh 
+
+docker run --rm $terminal_parameter -v "$PWD:$PWD" -v /var/run/docker.sock:/var/run/docker.sock -w "$PWD" $IMAGE_NAME bash -c "python3 -m pip install .; ./start-test-env-without-poetry $quoted_arguments; RETURN_CODE=\$?; chown -R $(id -u):$(id -g) .build_output &> /dev/null; exit \$RETURN_CODE"
 
 popd &> /dev/null
