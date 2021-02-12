@@ -40,10 +40,10 @@ Starting the test environment:
 ```
 ./start-test-env spawn-test-environment --environment-name <NAME>
 ```
-or if you work on the code of the Test Environment (requires Python >=3.6 with pip):
+or if you work on the code of the Test Environment (requires Python >=3.6 with [poetry](https://python-poetry.org/)):
 
 ```
-./start-test-env-without-docker-runner spawn-test-environment --environment-name <NAME>
+./start-test-env-with-poetry spawn-test-environment --environment-name <NAME>
 ```
 
 Shutdown of the test environment is currently done manual.
