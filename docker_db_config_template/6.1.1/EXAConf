@@ -10,7 +10,7 @@
     # List of networks for this cluster: 'private' is mandatory, 'public' is optional.
     Networks = private
     # Comma-separated list of nameservers for this cluster.
-    NameServers = 
+    NameServers = {{ name_servers }} 
     ConfVersion = {{ db_version }}
     OSVersion = {{ db_version }}
     DBVersion = {{ db_version }}
