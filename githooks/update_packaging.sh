@@ -10,7 +10,7 @@ grey='\033[0;90m'
 
 # Jump to the current project's root directory (the one containing
 # .git/)
-ROOT_DIR=$(git rev-parse --show-cdup || echo)
+ROOT_DIR=$(git rev-parse --show-toplevel || echo)
 NO_GIT=FALSE
 if [ -z "$ROOT_DIR" ]
 then
