@@ -1,3 +1,4 @@
+from typing import List
 import click
 import humanfriendly
 
@@ -22,6 +23,8 @@ from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_
               help="The main memory used by the database. Format <number> <unit>, e.g. 1 GiB. The minimum size is 1 GB, below that the database will not start.")
 @click.option('--db-disk-size', type=str, default="2 GiB", show_default=True,
               help="The disk size available for the database. Format <number> <unit>, e.g. 1 GiB. The minimum size is 100 MiB. However, the setup creates volume files with at least 2 GB larger size, because the database needs at least so much more disk.")
+@click.option('--nameserver', type=str, default=[], multiple=True,
+              help="Add a nameserver to the list of DNS nameservers which the docker-db should use for resolving domain names. You can repeat this option to add further nameservers.")
 @click.option('--deactivate-database-setup/--no-deactivate-database-setup', type=bool, default=False, show_default=True,
               help="Deactivates the setup of the spawned database, this means no data get populated and no JDBC drivers get uploaded. This can be used either to save time or as a workaround for MacOSX where the test_container seems not to be able to access the tests directory")
 @click.option('--docker-runtime', type=str, default=None, show_default=True,
@@ -36,6 +39,7 @@ def spawn_test_environment(
         bucketfs_port_forward: int,
         db_mem_size: str,
         db_disk_size: str,
+        nameserver:List[str],
         deactivate_database_setup: bool,
         docker_runtime: str,
         docker_db_image_version: str,
@@ -70,6 +74,7 @@ def spawn_test_environment(
         bucketfs_port_forward=str(bucketfs_port_forward) if bucketfs_port_forward is not None else None,
         mem_size=db_mem_size,
         disk_size=db_disk_size,
+        nameservers=nameserver,
         docker_runtime=docker_runtime,
         docker_db_image_version=docker_db_image_version,
         docker_db_image_name=docker_db_image_name,

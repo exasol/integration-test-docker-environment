@@ -226,7 +226,8 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                                             db_version=self.db_version,
                                             image_version=self.docker_db_image_version,
                                             mem_size=self.mem_size,
-                                            disk_size=self.disk_size)
+                                            disk_size=self.disk_size,
+                                            name_servers=",".join(self.nameservers))
         copy.add_string_to_file("EXAConf", rendered_template)
 
     def _execute_init_db(self, db_volume: Volume, volume_preperation_container: Container):

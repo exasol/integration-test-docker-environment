@@ -11,7 +11,7 @@
     # List of networks for this cluster: 'private' is mandatory, 'public' is optional.
     Networks = private
     # Comma-separated list of nameservers for this cluster.
-    NameServers = 8.8.8.8 
+    NameServers = {{ name_servers }} 
     Timezone = Europe/Berlin
     # Nr. of hugepages ('0' = disabled, 'host' = manually configured on the host, 'auto' = set automatically based on DB config)
     Hugepages = 0

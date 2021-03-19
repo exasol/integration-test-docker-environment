@@ -70,7 +70,7 @@ Options:
                                   forwarded
 
   --bucketfs-port-forward INTEGER
-                                  Host port to which the bucketfs port gets
+                                  Host port to which the BucketFS port gets
                                   forwarded
 
   --db-mem-size TEXT              The main memory used by the database. Format
@@ -85,10 +85,15 @@ Options:
                                   larger size, because the database needs at
                                   least so much more disk.  [default: 2 GiB]
 
+  --nameserver TEXT               Add a nameserver to the list of DNS
+                                  nameservers which the docker-db should use
+                                  for resolving domain names. You can repeat
+                                  this option to add further nameservers.
+
   --deactivate-database-setup / --no-deactivate-database-setup
                                   Deactivates the setup of the spawned
                                   database, this means no data get populated
-                                  and no jdbc drivers get uploaded. This can
+                                  and no JDBC drivers get uploaded. This can
                                   be used either to save time or as a
                                   workaround for MacOSX where the
                                   test_container seems not to be able to
@@ -98,10 +103,18 @@ Options:
                                   containers
 
   --docker-db-image-version TEXT  Docker DB Image Version against which the
-                                  tests should run.  [default: 6.2.6-d1]
+                                  tests should run.  [default: 7.0.3]
 
   --docker-db-image-name TEXT     Docker DB Image Name against which the tests
                                   should run.  [default: exasol/docker-db]
+
+  --output-directory DIRECTORY    Output directory where the system stores all
+                                  output and log files.  [default:
+                                  .build_output]
+
+  --temporary-base-directory DIRECTORY
+                                  Directory where the system creates temporary
+                                  directories.  [default: /tmp]
 ```
 
 You can look at them on the commandline with:
