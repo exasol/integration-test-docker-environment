@@ -16,6 +16,7 @@ homepage = "https://github.com/exasol/integration-test-docker-environment"
 
 keywords = ['exasol', 'docker', 'testing']
 include = ["docker_db_config","ext"]
+exclude = ["exasol_integration_test_docker_environment/test"]
 
 [tool.poetry.dependencies]
 python = ">=3.6"

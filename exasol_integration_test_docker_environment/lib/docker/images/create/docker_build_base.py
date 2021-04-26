@@ -33,7 +33,7 @@ class DockerBuildBase(DependencyLoggerBaseTask):
         self.analyze_tasks_futures = self.register_dependencies(self.create_analyze_tasks())
 
     def create_analyze_tasks(self) -> Dict[str, DockerAnalyzeImageTask]:
-        goals = self.get_goals()
+        goals = set(self.get_goals())
         self.goal_class_map = self.get_goal_class_map()
         self.available_goals = set(self.goal_class_map.keys())
         self._check_if_build_steps_to_rebuild_are_valid_goals()

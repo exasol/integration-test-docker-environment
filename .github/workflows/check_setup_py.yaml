@@ -16,12 +16,14 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - uses: abatilo/actions-poetry@v2.0.0
+      with:
+        poetry-version: 1.1.6
     - name: Run packaging update
       run: bash githooks/update_packaging.sh
     - name: Show changes on working copy
       run: git status --porcelain=v1 -uno
     - name: Show diff on working copy
-      run: git diff
+      run: git diff --cached
     - name: Check if something changed after running the update script
       run: |
         [ -z "$(git status --porcelain=v1 -uno 2>/dev/null)" ] 

@@ -12,6 +12,7 @@ packages = \
  'exasol_integration_test_docker_environment.lib.data',
  'exasol_integration_test_docker_environment.lib.docker',
  'exasol_integration_test_docker_environment.lib.docker.images',
+ 'exasol_integration_test_docker_environment.lib.docker.images.clean',
  'exasol_integration_test_docker_environment.lib.docker.images.create',
  'exasol_integration_test_docker_environment.lib.docker.images.create.utils',
  'exasol_integration_test_docker_environment.lib.docker.images.push',
@@ -20,8 +21,7 @@ packages = \
  'exasol_integration_test_docker_environment.lib.test_environment',
  'exasol_integration_test_docker_environment.lib.test_environment.database_setup',
  'exasol_integration_test_docker_environment.lib.test_environment.database_waiters',
- 'exasol_integration_test_docker_environment.lib.test_environment.parameter',
- 'exasol_integration_test_docker_environment.test']
+ 'exasol_integration_test_docker_environment.lib.test_environment.parameter']
 
 package_data = \
 {'': ['*'],
