@@ -5,6 +5,7 @@ from exasol_integration_test_docker_environment.lib.docker.images.utils import f
 
 
 class CleanImageTask(DockerBaseTask):
+    jobid = luigi.Parameter("")
     image_id = luigi.Parameter()
 
     def __init__(self, *args, **kwargs):
@@ -38,6 +39,8 @@ class CleanImageTask(DockerBaseTask):
 
 
 class CleanImagesStartingWith(DockerBaseTask):
+
+    jobid = luigi.Parameter("")
     starts_with_pattern = luigi.Parameter()
 
     def register_required(self):
