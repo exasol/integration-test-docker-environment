@@ -21,8 +21,7 @@ packages = \
  'exasol_integration_test_docker_environment.lib.test_environment',
  'exasol_integration_test_docker_environment.lib.test_environment.database_setup',
  'exasol_integration_test_docker_environment.lib.test_environment.database_waiters',
- 'exasol_integration_test_docker_environment.lib.test_environment.parameter',
- 'exasol_integration_test_docker_environment.test']
+ 'exasol_integration_test_docker_environment.lib.test_environment.parameter']
 
 package_data = \
 {'': ['*'],
@@ -62,8 +61,7 @@ package_data = \
                                                 'docker_db_config/7.0.5/*',
                                                 'docker_db_config/7.0.6/*',
                                                 'docker_db_config/7.0.7/*',
-                                                'docker_db_config/7.0.8/*'],
- 'exasol_integration_test_docker_environment.test': ['resources/test_docker_build_base/test_analyze_image/*']}
+                                                'docker_db_config/7.0.8/*']}
 
 install_requires = \
 ['click>=7.0',
