@@ -3,6 +3,7 @@ import unittest
 import docker
 
 from exasol_integration_test_docker_environment.test import utils
+from exasol_integration_test_docker_environment.testing import utils
 
 
 def assertContainerRuntime(self, container_name, expected_runtime):
