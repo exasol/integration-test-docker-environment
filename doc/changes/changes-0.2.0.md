@@ -4,7 +4,6 @@ In this release, we add support for new Exasol Docker-DB versions and Docker run
 
 ### New supported Exasol Versions
 
-* **6.1**: 6.1.10, 6.1.11, 6.1.12, 6.1.13
 * **6.2**: 6.2.7, 6.2.8, 6.2.9, 6.2.10, 6.2.11
 * **7.0**: 7.0.0, 7.0.1, 7.0.2, 7.0.3
 
@@ -21,10 +20,12 @@ If you need further versions, please open an issue.
 
 ## Features / Enhancements:
 
-  - #58: Add support for Docker-DB versions 6.1.12, 6.1.13, 6.2.10, 6.2.11, 7.0.2, 7.0.3 and set default to 7.0.3
+  - #79: Remove support for Exasol 6.0 and 6.1
+  - #72: Add support for new docker-db versions 6.2.14 and 7.0.9
+  - #58: Add support for Docker-DB versions 6.2.10, 6.2.11, 7.0.2, 7.0.3 and set default to 7.0.3
   - #48: Package with poetry
   - #46: Add support for Exasol Docker-DB 7.0.1
-  - #36: Add support for Exasol Docker-DB versions 7.0.0, 6.2.9, 6.2.8, 6.2.7, 6.1.11 and 6.1.10
+  - #36: Add support for Exasol Docker-DB versions 7.0.0, 6.2.9, 6.2.8, 6.2.7
   - #27: Add support for different docker-runtimes
 
 ## Refactoring:
