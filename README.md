@@ -175,10 +175,8 @@ The following config files are available:
   
 ### Currently supported Exasol Versions
 
-* **6.0**: 6.0.12, 6.0.13, 6.0.16
-* **6.1**: 6.1.1, 6.1.6, 6.1.7, 6.1.8, 6.1.9, 6.1.10, 6.1.11, 6.1.12, 6.1.13, 6.1.14
-* **6.2**: up to 6.2.13
-* **7.0**: up to 7.0.8
+* **6.2**: up to 6.2.14
+* **7.0**: up to 7.0.9
 
 If you need further versions, please open an issue.
 

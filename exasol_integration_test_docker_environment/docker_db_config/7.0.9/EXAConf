@@ -1,5 +1,5 @@
 [Global]
-    Revision = 10
+    Revision = 14
     Checksum = COMMIT
     ClusterName = cl4
     Platform = Docker
@@ -7,6 +7,7 @@
     CoredPort = 10001
     SSHPort = 22
     XMLRPCPort = 443
+    AuthenticationToken = WG9JQkZYb0R5T1pIcWZPWTpyUHFsR3V6QUFkV1FQbHZmdm91cXJDYmNQTFl4eE1vRlZ6VnhxamdxYnpxUGRkZEhtR2NJaVVGbEpsb2NnbnRZ
     # List of networks for this cluster: 'private' is mandatory, 'public' is optional.
     Networks = private
     # Comma-separated list of nameservers for this cluster.
@@ -23,9 +24,9 @@
 # SSL options
 [SSL]
     # The SSL certificate, private key and CA for all EXASOL services
-    Cert = /path/to/ssl.crt
-    CertKey = /path/to/ssl.key
-    CertAuth = /path/to/ssl.ca
+    Cert = /exa/etc/ssl/ssl.crt
+    CertKey = /exa/etc/ssl/ssl.key
+    CertAuth = /exa/etc/ssl/ssl.ca
 
 # Docker related options
 [Docker]
@@ -75,7 +76,9 @@
     # Ports to be exposed (container : host)
     ExposedPorts = 8888:8899, 6583:6594
     [[Disk : disk1]]
-        Devices = dev.1    #'dev.1' must be located in '/exa/data/storage'
+        Component = exastorage
+        Devices = dev.1
+        Mapping = dev.1:/exa/data/storage
 
 # Global EXAStorage options
 [EXAStorage]
@@ -150,7 +153,7 @@
     HttpPort = 6583
     # HTTPS port number (0 = disabled)
     HttpsPort = 0
-    SyncKey = SGxkcElJWW5YTDhWV2dJazdRU05zeFJDelFEM29sV1c=
+    SyncKey = OGhvcmxrTnluTlFrZTV3RVBTWG5Idlc4bkVMQUNxcWs=
     SyncPeriod = 30000
     # The default bucket (auto-generated)
     [[Bucket : default]]
@@ -160,7 +163,7 @@
         WritePasswd = d3JpdGU=
         Public = True
         Name = default
-        AdditionalFiles = EXAClusterOS:/usr/opt/EXASuite-6/EXAClusterOS-{{db_version}}/var/clients/packages/ScriptLanguages-*, EXASolution-{{db_version}}:/usr/opt/EXASuite-6/EXASolution-{{db_version}}/bin/udf/*
+        AdditionalFiles = EXAClusterOS:/usr/opt/EXASuite-7/EXAClusterOS-{{db_version}}/var/clients/packages/ScriptLanguages-*, EXASolution-{{db_version}}:/usr/opt/EXASuite-7/EXASolution-{{db_version}}/bin/udf/*
 
     [[Bucket : myudfs]]
         # ReadPasswd is "read" (without quotes)
