@@ -1,10 +1,10 @@
 # Integration-Test-Docker-Environment 0.3.0, released 2021-06-09
 
-Code name: New docker-db versions, bugfixes and minor improvement.
+Code name: New docker-db versions, drop support for docker-db 6.0 and 6.1, bugfixes and minor improvement.
 
 ## Summary
 
-This release contains support for new docker-db versions, several bugfixes and a minor improvement which allows a new option for indicating the name server. Also, support for legacy Exasol versions (6.0 and 6.1) was removed. 
+This release contains support for new docker-db versions, several bugfixes and a minor improvement which allows a new option for indicating the name server which the docker-db should use. Also, support for legacy Exasol versions (6.0 and 6.1) was removed. 
 
 ### New supported Exasol Versions
 
