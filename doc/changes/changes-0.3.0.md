@@ -1,6 +1,6 @@
 # Integration-Test-Docker-Environment 0.3.0, released 2021-06-09
 
-Code name: New docker-db versions, drop support for docker-db 6.0 and 6.1, bugfixes and minor improvement.
+Code name: New docker-db versions, drop support for docker-db 6.0 and 6.1, bugfixes and one minor improvement.
 
 ## Summary
 
