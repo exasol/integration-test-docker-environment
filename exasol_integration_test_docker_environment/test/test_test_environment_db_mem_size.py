@@ -62,8 +62,8 @@ class DockerTestEnvironmentDBMemSizeTest(unittest.TestCase):
         self.docker_environment_name = "test_smallest_valid_db_mem_size"
         self.on_host_docker_environment, self.google_cloud_docker_environment = \
             self.test_environment.spawn_docker_test_environment(self.docker_environment_name,
-                                                                ["--db-mem-size", "'1 GiB'"])
-        self.assert_mem_size("1 GiB")
+                                                                ["--db-mem-size", "'1500 MiB'"])
+        self.assert_mem_size("1500 MiB")
 
     def test_invalid_db_mem_size(self):
         self.docker_environment_name = "test_invalid_db_mem_size"
