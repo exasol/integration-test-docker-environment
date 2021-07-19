@@ -1,0 +1,98 @@
+name: Release Droid - Prepare Original Checksum
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+  test-docker-starter:
+    strategy:
+      fail-fast: false
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Build new Docker image
+      run: bash build_test_environment_docker_runner.sh
+
+    - name: Test ./start-test-env
+      run: ./start-test-env --help
+
+  test-all:
+    strategy:
+      fail-fast: false
+      matrix:
+        exasol_version:
+        - "default"
+        python_version:
+        - 3.6
+        - 3.7
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup Python 3.6 for integration-test-docker-environment
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.6
+    - name: Install Poetry
+      uses: abatilo/actions-poetry@v2.0.0
+
+    - name: Run all tests
+      run: ./run_all_tests.sh
+      env:
+        EXASOL_VERSION: "${{ matrix.exasol_version }}"
+
+    - name: Test ./start-test-env-with-poetry
+      run: ./start-test-env-with-poetry --help
+
+  test-db-versions:
+    strategy:
+      fail-fast: false
+      matrix:
+        exasol_version:
+        - 7.0.11
+        - 7.0.10
+        - 7.0.9
+        - 7.0.8
+        - 7.0.7
+        - 7.0.6
+        - 7.0.5
+        - 7.0.4
+        - 7.0.3
+        - 7.0.2
+        - 7.0.1
+        - 7.0.0
+        - 6.2.15-d1
+        - 6.2.14-d1
+        - 6.2.13-d1
+        - 6.2.12-d1
+        - 6.2.11-d1
+        - 6.2.10-d1
+        - 6.2.9-d1
+        - 6.2.8-d1
+        - 6.2.7-d1
+        - 6.2.6-d1
+        - 6.2.5-d1
+        - 6.2.4-d1
+        - 6.2.3-d1
+        - 6.2.1-d1
+        - 6.2.0-d1
+        - "default"
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup Python 3.6 for integration-test-docker-environment
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.6
+    - name: Install Poetry
+      uses: abatilo/actions-poetry@v2.0.0
+
+    - name: Run all tests
+      run: ./run_all_tests.sh
+      env:
+        EXASOL_VERSION: "${{ matrix.exasol_version }}"
+
