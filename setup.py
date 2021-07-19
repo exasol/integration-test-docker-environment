@@ -45,6 +45,7 @@ package_data = \
                                                 'docker_db_config/7.0.0/*',
                                                 'docker_db_config/7.0.1/*',
                                                 'docker_db_config/7.0.10/*',
+                                                'docker_db_config/7.0.11/*',
                                                 'docker_db_config/7.0.2/*',
                                                 'docker_db_config/7.0.3/*',
                                                 'docker_db_config/7.0.4/*',
