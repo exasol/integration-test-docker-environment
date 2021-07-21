@@ -30,7 +30,7 @@ class FileDirectoryListHasher:
                  blocksize: str = "64kb",
                  workers: int = 4
                  ):
-
+        self.MAX_DIR_ITERATIONS = 10000
         self.use_relative_paths = use_relative_paths
         self.workers = workers
         self.excluded_files = excluded_files
@@ -119,10 +119,14 @@ class FileDirectoryListHasher:
         if self.hash_directory_names:
             tmp_collected_directories.append((directory, directory))
         inodes = set()
+        numIterations = 0
         for root, dirs, files in os.walk(directory, topdown=True, followlinks=self.followlinks):
             stat = os.stat(root)
             if stat.st_ino in inodes:
-                raise OSError(f"Directoy: {directory} contains symlink loops (Symlinks pointing to a parent directory). Please fix!")
+                raise OSError(f"Directory: {directory} contains symlink loops (Symlinks pointing to a parent directory). Please fix!")
+            numIterations += 1
+            if numIterations > self.MAX_DIR_ITERATIONS:
+                raise OSError(f"Walking through too many directories. Aborting. Please verify: {directory}")
             inodes.add(stat.st_ino)
             if self.hash_directory_names:
                 tmp_collected_directories.extend(
