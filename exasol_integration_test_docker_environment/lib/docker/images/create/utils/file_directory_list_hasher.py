@@ -118,7 +118,12 @@ class FileDirectoryListHasher:
         tmp_collected_files = []
         if self.hash_directory_names:
             tmp_collected_directories.append((directory, directory))
+        inodes = set()
         for root, dirs, files in os.walk(directory, topdown=True, followlinks=self.followlinks):
+            stat = os.stat(root)
+            if stat.st_ino in inodes:
+                raise OSError(f"Directoy: {directory} contains symlink loops (Symlinks pointing to a parent directory). Please fix!")
+            inodes.add(stat.st_ino)
             if self.hash_directory_names:
                 tmp_collected_directories.extend(
                     [(directory, os.path.join(root, f)) for f in dirs
