@@ -24,7 +24,7 @@ n/a
 ## Features / Enhancements:
     
    - #93: Add docker-db versions 7.0.11 and prepare release
-
+   - #95: Changed changelog file names (#96)
 ## Refactoring:
 n/a  
 
