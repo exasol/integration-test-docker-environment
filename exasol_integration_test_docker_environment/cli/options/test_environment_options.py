@@ -22,9 +22,9 @@ docker_db_options = [
 external_db_options = [
     click.option('--external-exasol-db-host', type=str,
                  help="""Host name or IP of external Exasol DB, needs to be set if --environment-type=external_db"""),
-    click.option('--external-exasol-db-port', type=str,
+    click.option('--external-exasol-db-port', type=int, default=8563,
                  help="""Database port of external Exasol DB, needs to be set if --environment-type=external_db"""),
-    click.option('--external-exasol-bucketfs-port', type=str,
+    click.option('--external-exasol-bucketfs-port', type=int, default=6583,
                  help="""Bucketfs port of external Exasol DB, needs to be set if --environment-type=external_db"""),
     click.option('--external-exasol-db-user', type=str,
                  help="""User for external Exasol DB, needs to be set if --environment-type=external_db"""),
