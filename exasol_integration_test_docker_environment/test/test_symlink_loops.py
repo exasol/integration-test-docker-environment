@@ -66,7 +66,7 @@ class TestSymlinkLoops(unittest.TestCase):
                                          hash_directory_names=True,
                                          hash_file_names=True,
                                          followlinks=True,
-                                         max_characters_paths=1000)
+                                         max_characters_paths=100)
         exception_thrown = False
         try:
             hash = hasher.hash([self.temp_dir])
