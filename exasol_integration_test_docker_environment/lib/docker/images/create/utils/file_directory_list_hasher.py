@@ -28,9 +28,10 @@ class FileDirectoryListHasher:
                  excluded_files=None,
                  excluded_extensions=None,
                  blocksize: str = "64kb",
-                 workers: int = 4
+                 workers: int = 4,
+                 max_characters_paths: int = 500000000
                  ):
-        self.MAX_DIR_ITERATIONS = 10000
+        self.MAX_CHARACTERS_PATHS = max_characters_paths
         self.use_relative_paths = use_relative_paths
         self.workers = workers
         self.excluded_files = excluded_files
@@ -119,22 +120,29 @@ class FileDirectoryListHasher:
         if self.hash_directory_names:
             tmp_collected_directories.append((directory, directory))
         inodes = set()
-        numIterations = 0
+        numCharacters = 0
+
         for root, dirs, files in os.walk(directory, topdown=True, followlinks=self.followlinks):
             stat = os.stat(root)
             if stat.st_ino in inodes:
-                raise OSError(f"Directory: {directory} contains symlink loops (Symlinks pointing to a parent directory). Please fix!")
-            numIterations += 1
-            if numIterations > self.MAX_DIR_ITERATIONS:
-                raise OSError(f"Walking through too many directories. Aborting. Please verify: {directory}")
+                raise OSError(
+                    f"Directory: {directory} contains symlink loops (Symlinks pointing to a parent directory). Please fix!")
             inodes.add(stat.st_ino)
+
             if self.hash_directory_names:
-                tmp_collected_directories.extend(
-                    [(directory, os.path.join(root, f)) for f in dirs
-                     if not self.is_excluded_directory(f)])
-            tmp_collected_files.extend(
-                [(directory, os.path.join(root, f)) for f in files
-                 if not self.is_excluded_file(f) and not self.has_excluded_extension(f)])
+                new_directories = [(directory, os.path.join(root, f)) for f in dirs
+                                   if not self.is_excluded_directory(f)]
+                tmp_collected_directories.extend(new_directories)
+                numCharacters += sum([len(d[1]) for d in new_directories])
+
+            new_files = [(directory, os.path.join(root, f)) for f in files
+                         if not self.is_excluded_file(f) and not self.has_excluded_extension(f)]
+            tmp_collected_files.extend(new_files)
+            numCharacters += sum([len(f[1]) for f in new_files])
+
+            if numCharacters > self.MAX_CHARACTERS_PATHS:
+                raise OSError(f"Walking through too many directories. Aborting. Please verify: {directory}")
+
         collected_directories.extend(sorted(tmp_collected_directories, key=lambda x: x[1]))
         collected_files.extend(sorted(tmp_collected_files, key=lambda x: x[1]))
 

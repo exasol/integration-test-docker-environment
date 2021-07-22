@@ -54,8 +54,25 @@ class TestSymlinkLoops(unittest.TestCase):
         exception_thrown = False
         try:
             hash = hasher.hash([self.temp_dir])
-        except OSError:
-            exception_thrown = True
+        except OSError as e:
+            if "contains symlink loops" in str(e):
+                exception_thrown = True
+        assert exception_thrown
+
+    def test_symlink_detection_size(self):
+        self.generate_test_dir(True)
+        hasher = FileDirectoryListHasher(hashfunc="sha256",
+                                         use_relative_paths=False,
+                                         hash_directory_names=True,
+                                         hash_file_names=True,
+                                         followlinks=True,
+                                         max_characters_paths=1000)
+        exception_thrown = False
+        try:
+            hash = hasher.hash([self.temp_dir])
+        except OSError as e:
+            if "Walking through too many directories." in str(e):
+                exception_thrown = True
         assert exception_thrown
 
     def test_symlink_no_loop(self):
