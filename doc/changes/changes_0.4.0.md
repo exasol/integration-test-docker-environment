@@ -19,12 +19,13 @@ If you need further versions, please open an issue.
 - [NVIDIA Container Runtime](https://github.com/NVIDIA/nvidia-container-runtime) for GPU accelerated UDFs
 
 ## Bug Fixes:
-n/a
+   - #99: Fixed click parameters for external-exasol-db-port and external-exasol-bucketfs-port
 
 ## Features / Enhancements:
     
    - #93: Add docker-db versions 7.0.11 and prepare release
    - #95: Changed changelog file names (#96)
+
 ## Refactoring:
 n/a  
 
