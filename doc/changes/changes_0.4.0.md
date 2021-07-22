@@ -20,6 +20,7 @@ If you need further versions, please open an issue.
 
 ## Bug Fixes:
    - #99: Fixed click parameters for external-exasol-db-port and external-exasol-bucketfs-port
+   - #97: Fixed computation of hash in exaslct if path contains symlink loops
 
 ## Features / Enhancements:
     
