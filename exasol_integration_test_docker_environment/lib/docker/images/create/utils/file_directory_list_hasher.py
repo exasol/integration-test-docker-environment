@@ -124,7 +124,7 @@ class FileDirectoryListHasher:
 
         for root, dirs, files in os.walk(directory, topdown=True, followlinks=self.followlinks):
             stat = os.stat(root)
-            if stat.st_ino in inodes:
+            if stat.st_ino > 0 and stat.st_ino in inodes:
                 raise OSError(
                     f"Directory: {directory} contains symlink loops (Symlinks pointing to a parent directory). Please fix!")
             inodes.add(stat.st_ino)
