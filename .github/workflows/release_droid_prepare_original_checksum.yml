@@ -4,8 +4,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
   test-docker-starter:
     strategy:
       fail-fast: false
