@@ -1,0 +1,12 @@
+community-tags:
+  - CI
+  - continuous integration
+  - docker
+  - docker-db
+  - integration
+  - integration testing
+  - tests
+community-project-name: Integration Test Docker Environment
+community-project-description: |
+  The Integration Test Docker Environment is a docker-based environment for integration tests with the EXASOL DB.
+  [Integration Test Docker Environment](https://github.com/exasol/integration-test-docker-environment).

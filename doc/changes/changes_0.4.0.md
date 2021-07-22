@@ -26,6 +26,8 @@ If you need further versions, please open an issue.
     
    - #93: Add docker-db versions 7.0.11 and prepare release
    - #95: Changed changelog file names (#96)
+   - #101: Added config for publishing release on community portal
+
 
 ## Refactoring:
 n/a  
