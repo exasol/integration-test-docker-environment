@@ -6,10 +6,10 @@ Code name: Fix index out-of-range in FileDirectoryListHasher
 
 This release fixes an index-out-of-range bug in the FileDirectoryListHasher which occurs for single character file or directory names.
 
-### New supported Exasol Versions
+### Supported Exasol Versions
 
-* **6.2**: 6.2.14, 6.2.15,
-* **7.0**: 7.0.4, 7.0.5, 7.0.6, 7.0.7, 7.0.8, 7.0.9, 7.0.10, 7.0.11
+* **6.2**: up to 6.2.15
+* **7.0**: up to 7.0.11
 
 If you need further versions, please open an issue.
 
