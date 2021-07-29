@@ -11,15 +11,23 @@ TEST_FILE = "/tmp/SEFQWEFWQEHDUWEFDGZWGDZWEFDUWESGRFUDWEGFUDWAFGWAZESGFDWZA"
 
 
 class HashTempDirTest(unittest.TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpClass(self):
         self.temp_dir = tempfile.mkdtemp() + "/" + self.__class__.__name__
         self.test_dir1 = self.temp_dir + "/test1"
         self.generate_test_dir(self.test_dir1)
         self.test_dir2 = self.temp_dir + "/test2"
         self.generate_test_dir(self.test_dir2)
+        
+        self.test_dir3 = self.temp_dir + "/test3"
+        os.makedirs(self.test_dir3+"/d") 
+        with open(self.test_dir3+"/f", "wt") as f:
+            f.write("test")
+        
         with open(TEST_FILE, "wt") as f:
             f.write("test")
 
+    @classmethod
     def generate_test_dir(self, test_dir):
         level1 = 5
         level2 = 5
@@ -39,9 +47,22 @@ class HashTempDirTest(unittest.TestCase):
                             with open(test_dir + file, mode="wt") as f:
                                 f.write(file)
 
-    def tearDown(self):
+    @classmethod
+    def tearDownClass(self):
         os.remove(TEST_FILE)
         shutil.rmtree(self.temp_dir)
+
+    def test_single_character_directory_name(self):
+        hasher = FileDirectoryListHasher(hashfunc="sha256",
+                                         use_relative_paths=False,
+                                         hash_directory_names=True,
+                                         hash_file_names=True)
+        old_pwd = os.getcwd()
+        os.chdir(self.test_dir3)
+        hash = hasher.hash(["."])
+        ascii_hash = base64.b32encode(hash).decode("ASCII")
+        self.assertEqual("W5VNU3LMI7OM2ZM7CNBW52YQ7FWZRCW5Z7PHTEUP3KSNOF3OPZXQ====", ascii_hash)
+        os.chdir(old_pwd)
 
     def test_file_content_only_fixed_hash(self):
         hasher = FileDirectoryListHasher(hashfunc="sha256",
