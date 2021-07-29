@@ -132,12 +132,12 @@ class FileDirectoryListHasher:
             if self.hash_directory_names:
                 new_directories = [d for d in dirs if not self.is_excluded_directory(d)]
                 tmp_collected_directories.extend([(directory, os.path.join(root, d)) for d in new_directories])
-                numCharacters += sum([len(d[1]) for d in new_directories])
+                numCharacters += sum([len(d) for d in new_directories])
 
             new_files = [f for f in files
                          if not self.is_excluded_file(f) and not self.has_excluded_extension(f)]
             tmp_collected_files.extend([(directory, os.path.join(root, f)) for f in new_files])
-            numCharacters += sum([len(f[1]) for f in new_files])
+            numCharacters += sum([len(f) for f in new_files])
 
             if numCharacters > self.MAX_CHARACTERS_PATHS:
                 raise OSError(f"Walking through too many directories. Aborting. Please verify: {directory}")
