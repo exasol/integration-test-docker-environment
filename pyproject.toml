@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "exasol-integration-test-docker-environment"
-version = "0.4.1"
+version = "0.5.0"
 description = "Integration Test Docker Environment for Exasol"
 
 license = "MIT"
