@@ -1,10 +1,10 @@
 # Integration-Test-Docker-Environment 0.5.0, released t.b.d.
 
-Code name: Fix index out-of-range in FileDirectoryListHasher
+Code name: Add support for new docker-db versions
 
 ## Summary
 
-This release fixes an index-out-of-range bug in the FileDirectoryListHasher which occurs for single character file or directory names.
+This release adds support for new docker-db versions.
 
 ### Supported Exasol Versions
 
