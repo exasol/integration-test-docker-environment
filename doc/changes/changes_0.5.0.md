@@ -1,4 +1,4 @@
-# Integration-Test-Docker-Environment 0.4.1, released 2021-07-29
+# Integration-Test-Docker-Environment 0.5.0, released t.b.d.
 
 Code name: Fix index out-of-range in FileDirectoryListHasher
 
