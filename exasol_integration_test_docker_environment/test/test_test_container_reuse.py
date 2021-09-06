@@ -3,12 +3,16 @@ import shutil
 import tempfile
 import unittest
 from datetime import datetime
+from multiprocessing import Process, Queue
+from pathlib import Path
+from typing import Callable
 
 import docker
 import luigi
 
 from exasol_integration_test_docker_environment.cli.common import set_build_config, set_docker_repository_config
 from exasol_integration_test_docker_environment.lib.base.docker_base_task import DockerBaseTask
+from exasol_integration_test_docker_environment.lib.data.container_info import ContainerInfo
 from exasol_integration_test_docker_environment.lib.docker.images.clean.clean_images import CleanImagesStartingWith
 from exasol_integration_test_docker_environment.lib.test_environment.prepare_network_for_test_environment import \
     PrepareDockerNetworkForTestEnvironment
@@ -16,34 +20,38 @@ from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_
 
 
 class TestTask(DockerBaseTask):
+    reuse = luigi.BoolParameter()
+    attempt = luigi.IntParameter()
 
-    def register_required(self):
-        docker_network_task = PrepareDockerNetworkForTestEnvironment(
+    def run_task(self):
+        docker_network_task_1 = PrepareDockerNetworkForTestEnvironment(
             environment_name="test_environment_TestContainerReuseTest",
             network_name="docker_network_TestContainerReuseTest",
             test_container_name="test_container_TestContainerReuseTest",
             db_container_name="db_container_TestContainerReuseTest",
-            reuse=False,
+            reuse=self.reuse,
             no_cleanup_after_success=True,
             no_cleanup_after_failure=False,
-            attempt=1
+            attempt=self.attempt
         )
-        self.docker_network_future = self.register_dependency(docker_network_task)
+        self.docker_network_future_1 = yield from self.run_dependencies(docker_network_task_1)
 
-    def run_task(self):
-        test_container_task = \
+        test_container_task_1 = \
             SpawnTestContainer(
                 environment_name="test_environment_TestContainerReuseTest",
                 test_container_name="test_container_TestContainerReuseTest",
-                network_info=self.docker_network_future.get_output(),
+                network_info=self.docker_network_future_1.get_output(),
                 ip_address_index_in_subnet=2,
-                attempt=1,
-                reuse_test_container=True,
+                attempt=self.attempt,
+                reuse_test_container=self.reuse,
                 no_test_container_cleanup_after_success=True,
                 no_test_container_cleanup_after_failure=False
             )
-        print("CWD",os.getcwd())
-        test_container_future = yield from self.run_dependencies(test_container_task)
+        test_container_future_1 = yield from self.run_dependencies(test_container_task_1)
+        container_info = test_container_future_1.get_output()  # type: ContainerInfo
+        container = self._client.containers.get(container_info.container_name)
+
+        self.return_object({"container_id": container.image.id, "image_id": container.image.id})
 
 
 class TestContainerReuseTest(unittest.TestCase):
@@ -65,6 +73,10 @@ class TestContainerReuseTest(unittest.TestCase):
     def setUp(self):
         self.client = docker.from_env()
         self.temp_directory = tempfile.mkdtemp()
+        resource_directory = Path(Path(__file__).parent, "resources/test_test_container_reuse")
+        self.working_directory = shutil.copytree(resource_directory,
+                                                 Path(self.temp_directory, "test_test_container_reuse"))
+        os.chdir(self.working_directory)
         set_build_config(force_rebuild=False,
                          force_pull=False,
                          force_rebuild_from=tuple(),
@@ -88,14 +100,69 @@ class TestContainerReuseTest(unittest.TestCase):
         shutil.rmtree(self.temp_directory)
         self.client.close()
 
-    def test_test_container_reuse(self):
-        self.set_job_id(SpawnTestContainer)
+    def run1(self):
         try:
-            task = TestTask()
-            luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
+            self.set_job_id(SpawnTestContainer)
+            task = TestTask(reuse=False, attempt=1)
+            success = luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
+            if success:
+                result = task.get_return_object()
+                return result
+            else:
+                Exception("Task failed")
         finally:
             if task._get_tmp_path_for_job().exists():
                 shutil.rmtree(str(task._get_tmp_path_for_job()))
+
+    def run2(self):
+        try:
+            self.set_job_id(SpawnTestContainer)
+            task = TestTask(reuse=True, attempt=2)
+            success = luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
+
+            if success:
+                result = task.get_return_object()
+                return result
+            else:
+                raise Exception("Task failed")
+        finally:
+            if task._get_tmp_path_for_job().exists():
+                shutil.rmtree(str(task._get_tmp_path_for_job()))
+
+    def process_main(self, queue: Queue, func: Callable):
+        try:
+            result = func()
+            queue.put(("result",result))
+        except Exception as e:
+            queue.put(("exception",e))
+
+    def run_in_process(self, func):
+        queue = Queue()
+        p1 = Process(target=self.process_main, args=(queue, func))
+        p1.start()
+        p1.join()
+        result = queue.get()
+        if result[0] == "result":
+            return result[1]
+        else:
+            raise result[1]
+
+    def test_test_container_no_reuse_after_change(self):
+        p1 = self.run_in_process(self.run1)
+        dockerfile = Path(self.working_directory, "tests/Dockerfile")
+        with dockerfile.open("a") as f:
+            f.write("\n#Test\n")
+        p2 = self.run_in_process(self.run2)
+        print(p1)
+        print(p2)
+        assert p1 != p2
+
+    def test_test_container_reuse(self):
+        p1 = self.run_in_process(self.run1)
+        p2 = self.run_in_process(self.run2)
+        print(p1)
+        print(p2)
+        assert p1 == p2
 
 
 if __name__ == '__main__':
