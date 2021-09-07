@@ -77,6 +77,7 @@ class TestContainerReuseTest(unittest.TestCase):
                                                  Path(self.temp_directory, "test_test_container_reuse"))
         self.old_working_directory = os.getcwd()
         os.chdir(self.working_directory)
+        print("working_directory content",list(Path(self.working_directory).iterdir()))
         self.docker_repository_name = self.__class__.__name__.lower()
         print("docker_repository_name",self.docker_repository_name)
         self.clean()
