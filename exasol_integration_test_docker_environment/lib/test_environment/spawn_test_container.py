@@ -163,7 +163,7 @@ class SpawnTestContainer(DockerBaseTask):
         except Exception as e:
             pass
 
-    def cleanup_task(self, success):
+    def cleanup_task(self, success:bool):
         if (success and not self.no_test_container_cleanup_after_success) or \
                 (not success and not self.no_test_container_cleanup_after_failure):
             try:

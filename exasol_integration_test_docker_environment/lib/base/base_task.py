@@ -315,7 +315,7 @@ class BaseTask(Task):
         params.update(kwargs)
         return task_class(**params)
 
-    def cleanup(self, success):
+    def cleanup(self, success:bool):
         self.logger.debug("Cleaning up")
         if self._task_state != TaskState.CLEANUP and self._task_state != TaskState.CLEANED:
             self._task_state = TaskState.CLEANUP
@@ -332,7 +332,7 @@ class BaseTask(Task):
             self._task_state = TaskState.CLEANED
         self.logger.debug("Cleanup finished")
 
-    def cleanup_child_task(self, success):
+    def cleanup_child_task(self, success:bool):
         if self._run_dependencies_target.exists():
             _run_dependencies_tasks_from_target = self._run_dependencies_target.read()
         else:
@@ -348,5 +348,5 @@ class BaseTask(Task):
         for task in reversed_registered_task_list:
             task.cleanup(success)
 
-    def cleanup_task(self, success):
+    def cleanup_task(self, success:bool):
         pass

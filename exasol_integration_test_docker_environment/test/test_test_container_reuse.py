@@ -53,7 +53,6 @@ class TestTask(DockerBaseTask):
 
         self.return_object({"container_id": container.image.id, "image_id": container.image.id})
 
-
 class TestContainerReuseTest(unittest.TestCase):
 
     def set_job_id(self, task_cls):
@@ -65,7 +64,7 @@ class TestContainerReuseTest(unittest.TestCase):
 
     def clean(self):
         jobid = self.set_job_id(CleanImagesStartingWith)
-        task = CleanImagesStartingWith(starts_with_pattern="", jobid=jobid)
+        task = CleanImagesStartingWith(starts_with_pattern=self.docker_repository_name, jobid=jobid)
         luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
         if task._get_tmp_path_for_job().exists():
             shutil.rmtree(str(task._get_tmp_path_for_job()))
@@ -77,6 +76,16 @@ class TestContainerReuseTest(unittest.TestCase):
         self.working_directory = shutil.copytree(resource_directory,
                                                  Path(self.temp_directory, "test_test_container_reuse"))
         os.chdir(self.working_directory)
+        self.docker_repository_name = self.__class__.__name__.lower()
+        print("docker_repository_name",self.docker_repository_name)
+        self.clean()
+
+    def tearDown(self):
+        self.clean()
+        shutil.rmtree(self.temp_directory)
+        self.client.close()
+
+    def setup_luigi_config(self):
         set_build_config(force_rebuild=False,
                          force_pull=False,
                          force_rebuild_from=tuple(),
@@ -88,36 +97,33 @@ class TestContainerReuseTest(unittest.TestCase):
                          )
         set_docker_repository_config(
             docker_password=None,
-            docker_repository_name=self.__class__.__name__,
+            docker_repository_name=self.docker_repository_name,
             docker_username=None,
             tag_prefix="",
-            kind="source"
+            kind="target"
         )
-        self.clean()
-
-    def tearDown(self):
-        self.clean()
-        shutil.rmtree(self.temp_directory)
-        self.client.close()
 
     def run1(self):
+        self.setup_luigi_config()
+        self.set_job_id(SpawnTestContainer)
+        task = TestTask(reuse=False, attempt=1)
         try:
-            self.set_job_id(SpawnTestContainer)
-            task = TestTask(reuse=False, attempt=1)
             success = luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
             if success:
                 result = task.get_return_object()
+                task.cleanup(True)
                 return result
             else:
+                task.cleanup(False)
                 Exception("Task failed")
-        finally:
-            if task._get_tmp_path_for_job().exists():
-                shutil.rmtree(str(task._get_tmp_path_for_job()))
+        except Exception as e:
+            task.cleanup(False)
 
     def run2(self):
+        self.setup_luigi_config()
+        self.set_job_id(SpawnTestContainer)
+        task = TestTask(reuse=True, attempt=2)
         try:
-            self.set_job_id(SpawnTestContainer)
-            task = TestTask(reuse=True, attempt=2)
             success = luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
 
             if success:
@@ -126,8 +132,7 @@ class TestContainerReuseTest(unittest.TestCase):
             else:
                 raise Exception("Task failed")
         finally:
-            if task._get_tmp_path_for_job().exists():
-                shutil.rmtree(str(task._get_tmp_path_for_job()))
+            task.cleanup(False)
 
     def process_main(self, queue: Queue, func: Callable):
         try:
