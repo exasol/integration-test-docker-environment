@@ -75,12 +75,14 @@ class TestContainerReuseTest(unittest.TestCase):
         resource_directory = Path(Path(__file__).parent, "resources/test_test_container_reuse")
         self.working_directory = shutil.copytree(resource_directory,
                                                  Path(self.temp_directory, "test_test_container_reuse"))
+        self.old_working_directory = os.getcwd()
         os.chdir(self.working_directory)
         self.docker_repository_name = self.__class__.__name__.lower()
         print("docker_repository_name",self.docker_repository_name)
         self.clean()
 
     def tearDown(self):
+        os.chdir(self.old_working_directory)
         self.clean()
         shutil.rmtree(self.temp_directory)
         self.client.close()
