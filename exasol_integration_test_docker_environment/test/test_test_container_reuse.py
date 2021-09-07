@@ -73,8 +73,10 @@ class TestContainerReuseTest(unittest.TestCase):
         self.client = docker.from_env()
         self.temp_directory = tempfile.mkdtemp()
         resource_directory = Path(Path(__file__).parent, "resources/test_test_container_reuse")
+        print("working_directory content", list(Path(resource_directory).iterdir()))
         self.working_directory = shutil.copytree(resource_directory,
                                                  Path(self.temp_directory, "test_test_container_reuse"))
+        print("working_directory",self.working_directory)
         self.old_working_directory = os.getcwd()
         os.chdir(self.working_directory)
         print("working_directory content",list(Path(self.working_directory).iterdir()))
