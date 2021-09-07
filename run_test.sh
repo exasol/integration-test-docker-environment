@@ -12,7 +12,7 @@ init_poetry
 
 if [ -n "$POETRY_BIN" ]
 then
-  PYTHONPATH=. $POETRY_BIN run python3 "${@}"
+  PYTHONPATH=. $POETRY_BIN run python3 -u "${@}"
 else
   echo "Could not find poetry!"
   exit 1

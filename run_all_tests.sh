@@ -13,7 +13,7 @@ init_poetry
 
 if [ -n "$POETRY_BIN" ]
 then
-  PYTHONPATH=. $POETRY_BIN run python3 -m unittest discover exasol_integration_test_docker_environment/test
+  PYTHONPATH=. $POETRY_BIN run python3 -u -m unittest discover exasol_integration_test_docker_environment/test
 else
   echo "Could not find poetry!"
   exit 1
