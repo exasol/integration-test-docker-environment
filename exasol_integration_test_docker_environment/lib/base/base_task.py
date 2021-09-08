@@ -240,7 +240,7 @@ class BaseTask(Task):
             self._register_run_dependencies(tasks)
             self._run_dependencies_target.write(self._run_dependencies_tasks)
             completion_targets = yield tasks
-            task_futures = self._generate_run_task_furtures(completion_targets)
+            task_futures = self._generate_run_task_futures(completion_targets)
             return task_futures
         else:
             raise WrongTaskStateException(self._task_state, "run_dependency")
@@ -255,12 +255,12 @@ class BaseTask(Task):
         elif isinstance(tasks, BaseTask):
             self._run_dependencies_tasks.append(tasks)
 
-    def _generate_run_task_furtures(self, completion_targets: Union[Any]) -> Union[
+    def _generate_run_task_futures(self, completion_targets: Union[Any]) -> Union[
         List[Any], Dict[Any, Any], RunTaskFuture, Any]:
         if isinstance(completion_targets, dict):
-            return {key: self._generate_run_task_furtures(task) for key, task in completion_targets.items()}
+            return {key: self._generate_run_task_futures(task) for key, task in completion_targets.items()}
         elif isinstance(completion_targets, list):
-            return [self._generate_run_task_furtures(task) for task in completion_targets]
+            return [self._generate_run_task_futures(task) for task in completion_targets]
         elif isinstance(completion_targets, PickleTarget):
             return RunTaskFuture(completion_targets)
         else:
