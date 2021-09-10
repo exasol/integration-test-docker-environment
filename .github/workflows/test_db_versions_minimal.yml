@@ -1,6 +1,11 @@
 name: Test DB Versions with minimal tests
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
 
 jobs:
   test-db-versions-minimal:

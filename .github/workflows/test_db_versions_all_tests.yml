@@ -1,6 +1,10 @@
 name: Test DB Versions with all tests
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
 
 jobs:
   test-db-versions-all-tests:
