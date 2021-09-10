@@ -45,7 +45,13 @@ jobs:
       uses: abatilo/actions-poetry@v2.0.0
 
     - name: Fail, because not all tests activated
-      run: exit 1
+      run: |
+        echo "github.event_name:" ${{ github.event_name }}
+        echo "github.event.head_commit.message:" ${{ github.event.head_commit.message }}
+        echo "github.event_name != 'push':" ${{ github.event_name != 'push' }}
+        echo "!contains(github.event.head_commit.message, '[run all tests]'):" ${{ !contains(github.event.head_commit.message, '[run all tests]') }}
+        echo "github.event_name != 'push' && !contains(github.event.head_commit.message, '[run all tests]')": ${{ github.event_name != 'push' && !contains(github.event.head_commit.message, '[run all tests]') }}
+        exit 1
       env:
         EXASOL_VERSION: "${{ matrix.exasol_version }}"
       # push only can happen on master, because branch selection in trigger
