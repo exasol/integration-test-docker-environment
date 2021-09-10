@@ -46,11 +46,13 @@ jobs:
 
     - name: Fail, because not all tests are activated
       run: |
-        GIT_LOG="$(git log --pretty=oneline --abbrev-commit) | head -n 2"
+        git fetch
+        GIT_LOG="$(git log --pretty=oneline --abbrev-commit | head -n 2)"
         echo "$GIT_LOG"
         if [[ "$GIT_LOG" == *"[run all tests]"* ]]; then
           echo "All tests activated"
           exit 0
+        else
         else
           echo "Fail, because not all tests are deactivated"
           exit 1
