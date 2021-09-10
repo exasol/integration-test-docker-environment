@@ -47,7 +47,7 @@ jobs:
     - name: Fail, because not all tests are activated
       run: |
         git fetch
-        GIT_LOG="$(git log --pretty=oneline --abbrev-commit ${{ github.event.after }} | head -n 2)"
+        GIT_LOG="$(git log --pretty=oneline --abbrev-commit ${{ github.event.after }} | head -n 1)"
         echo "$GIT_LOG"
         if [[ "$GIT_LOG" == *"[run all tests]"* ]]; then
           echo "All tests activated"
@@ -58,8 +58,8 @@ jobs:
         fi
       env:
         EXASOL_VERSION: "${{ matrix.exasol_version }}"
-      # push only can happen on master, because branch selection in trigger
-      if: ${{ github.event_name != 'push' }}
+      # We want to deactivate running all tests only for pull_requests
+      if: ${{ github.event_name == 'pull_request' }}
 
     - name: Run all tests
       run: ./run_all_tests.sh
