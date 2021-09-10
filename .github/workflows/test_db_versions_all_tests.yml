@@ -44,14 +44,16 @@ jobs:
     - name: Install Poetry
       uses: abatilo/actions-poetry@v2.0.0
 
-    - name: Fail, because all tests not activated
+    - name: Fail, because not all tests activated
       run: exit 1
       env:
         EXASOL_VERSION: "${{ matrix.exasol_version }}"
-      if: ${{ github.ref != 'refs/heads/master' && !contains(github.event.head_commit.message, '[run all tests]') }}
+      # push only can happen on master, because branch selection in trigger
+      if: ${{ github.event_name != "push" && !contains(github.event.head_commit.message, '[run all tests]') }}
       
     - name: Run all tests
       run: ./run_all_tests.sh
       env:
         EXASOL_VERSION: "${{ matrix.exasol_version }}"
-      if: ${{ github.ref == 'refs/heads/master' || contains(github.event.head_commit.message, '[run all tests]') }}
+      # push only can happen on master, because branch selection in trigger
+      if: ${{ github.event_name == "push" || contains(github.event.head_commit.message, '[run all tests]') }}
