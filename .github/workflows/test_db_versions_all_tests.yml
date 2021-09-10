@@ -3,7 +3,7 @@ name: CI
 on: [push, pull_request]
 
 jobs:
-  test-db-versions:
+  test-db-versions-all-tests:
     strategy:
       fail-fast: false
       matrix:
@@ -41,10 +41,10 @@ jobs:
       run: exit 1
       env:
         EXASOL_VERSION: "${{ matrix.exasol_version }}"
-      if: !(github.ref == 'refs/heads/master' || contains(github.event.head_commit.message, '[run all tests]'))
+      if: ${{ ! ( github.ref == 'refs/heads/master' || contains(github.event.head_commit.message, '[run all tests]') ) }}
       
     - name: Run all tests
       run: ./run_all_tests.sh
       env:
         EXASOL_VERSION: "${{ matrix.exasol_version }}"
-      if: github.ref == 'refs/heads/master' || contains(github.event.head_commit.message, '[run all tests]')
+      if: ${{ github.ref == 'refs/heads/master' || contains(github.event.head_commit.message, '[run all tests]') }}

@@ -3,46 +3,7 @@ name: CI
 on: [push, pull_request]
 
 jobs:
-  test-docker-starter:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Build new Docker image
-      run: bash build_test_environment_docker_runner.sh 
-
-    - name: Test ./start-test-env 
-      run: ./start-test-env --help
-
-  test-python-version:
-    strategy:
-      fail-fast: false
-      matrix:
-        exasol_version:
-        - "default"
-        python_version:
-        - 3.6
-        - 3.7
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Setup Python 3.6 for integration-test-docker-environment
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.6
-    - name: Install Poetry
-      uses: abatilo/actions-poetry@v2.0.0
-
-    - name: Run all tests
-      run: ./run_all_tests.sh
-      env:
-        EXASOL_VERSION: "${{ matrix.exasol_version }}"
-
-    - name: Test ./start-test-env-with-poetry 
-      run: ./start-test-env-with-poetry --help
-
-  test-db-versions:
+  test-db-versions-minimal:
     strategy:
       fail-fast: false
       matrix:

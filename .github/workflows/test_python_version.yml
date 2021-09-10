@@ -3,7 +3,7 @@ name: CI
 on: [push, pull_request]
 
 jobs:
-  test-python-version:
+  test-python-version-all-tests:
     strategy:
       fail-fast: false
       matrix:
