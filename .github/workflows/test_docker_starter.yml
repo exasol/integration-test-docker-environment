@@ -1,4 +1,4 @@
-name: CI
+name: Test Docker Starter
 
 on: [push, pull_request]
 

@@ -1,4 +1,4 @@
-name: CI
+name: Test DB Versions with minimal tests
 
 on: [push, pull_request]
 

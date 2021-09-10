@@ -1,4 +1,4 @@
-name: CI
+name: Test Python Versions with all tests
 
 on: [push, pull_request]
 
