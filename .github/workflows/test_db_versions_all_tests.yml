@@ -46,6 +46,7 @@ jobs:
 
     - name: Fail, because not all tests activated
       run: |
+        echo "github.event:" ${{ github.event }}
         echo "github.event_name:" ${{ github.event_name }}
         echo "github.event.head_commit.message:" ${{ github.event.head_commit.message }}
         echo "github.event_name != 'push':" ${{ github.event_name != 'push' }}
