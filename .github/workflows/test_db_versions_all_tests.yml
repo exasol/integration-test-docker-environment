@@ -46,21 +46,18 @@ jobs:
 
     - name: Fail, because not all tests activated
       run: |
-        echo "github.event:" ${{ toJSON(github.event) }}
-        echo "github.event_name:" ${{ github.event_name }}
-        echo "github.event.head_commit.message:" ${{ github.event.head_commit.message }}
-        echo "github.event_name != 'push':" ${{ github.event_name != 'push' }}
-        echo "!contains(github.event.head_commit.message, '[run all tests]'):" ${{ !contains(github.event.head_commit.message, '[run all tests]') }}
-        echo "github.event_name != 'push' && !contains(github.event.head_commit.message, '[run all tests]')": ${{ github.event_name != 'push' && !contains(github.event.head_commit.message, '[run all tests]') }}
-        exit 1
+        GIT_LOG="$(git log --pretty=oneline --abbrev-commit)"
+        if [[ "$GIT_LOG" == *"[run all tests]"* ]]; then
+          exit 0
+        else
+          exit 1
+        fi
       env:
         EXASOL_VERSION: "${{ matrix.exasol_version }}"
       # push only can happen on master, because branch selection in trigger
-      if: ${{ github.event_name != 'push' && !contains(github.event.head_commit.message, '[run all tests]') }}
-      
+      if: ${{ github.event_name != 'push'
+
     - name: Run all tests
       run: ./run_all_tests.sh
       env:
         EXASOL_VERSION: "${{ matrix.exasol_version }}"
-      # push only can happen on master, because branch selection in trigger
-      if: ${{ github.event_name == 'push' || contains(github.event.head_commit.message, '[run all tests]') }}
