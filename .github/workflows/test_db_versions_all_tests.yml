@@ -55,7 +55,7 @@ jobs:
       env:
         EXASOL_VERSION: "${{ matrix.exasol_version }}"
       # push only can happen on master, because branch selection in trigger
-      if: ${{ github.event_name != 'push'
+      if: ${{ github.event_name != 'push' }}
 
     - name: Run all tests
       run: ./run_all_tests.sh
