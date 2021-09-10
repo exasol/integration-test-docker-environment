@@ -47,7 +47,7 @@ jobs:
     - name: Fail, because not all tests are activated
       run: |
         git fetch
-        GIT_LOG="$(git log --pretty=oneline --abbrev-commit ${{ github.ref }} | head -n 2)"
+        GIT_LOG="$(git log --pretty=oneline --abbrev-commit ${{ github.sha }} | head -n 2)"
         echo "$GIT_LOG"
         if [[ "$GIT_LOG" == *"[run all tests]"* ]]; then
           echo "All tests activated"
