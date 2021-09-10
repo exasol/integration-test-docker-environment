@@ -1,0 +1,50 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test-db-versions:
+    strategy:
+      fail-fast: false
+      matrix:
+        exasol_version:
+        - 7.0.11
+        - 7.0.10
+        - 7.0.9
+        - 7.0.8
+        - 7.0.7
+        - 7.0.6
+        - 7.0.5
+        - 7.0.4
+        - 7.0.3
+        - 7.0.2
+        - 7.0.1
+        - 7.0.0
+        - 6.2.15-d1
+        - 6.2.14-d1
+        - 6.2.13-d1
+        - 6.2.12-d1
+        - 6.2.11-d1
+        - "default"
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup Python 3.6 for integration-test-docker-environment
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.6
+    - name: Install Poetry
+      uses: abatilo/actions-poetry@v2.0.0
+
+    - name: Fail, because all tests not activated
+      run: exit 1
+      env:
+        EXASOL_VERSION: "${{ matrix.exasol_version }}"
+      if: !(github.ref == 'refs/heads/master' || contains(github.event.head_commit.message, '[run all tests]'))
+      
+    - name: Run all tests
+      run: ./run_all_tests.sh
+      env:
+        EXASOL_VERSION: "${{ matrix.exasol_version }}"
+      if: github.ref == 'refs/heads/master' || contains(github.event.head_commit.message, '[run all tests]')

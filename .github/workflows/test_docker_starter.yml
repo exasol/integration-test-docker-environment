@@ -1,0 +1,15 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test-docker-starter:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Build new Docker image
+      run: bash build_test_environment_docker_runner.sh 
+
+    - name: Test ./start-test-env 
+      run: ./start-test-env --help
