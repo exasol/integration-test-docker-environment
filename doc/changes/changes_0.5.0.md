@@ -21,7 +21,7 @@ If you need further versions, please open an issue.
 
 ## Bug Fixes:
 
-n/a
+- #34 :Test container does not get restarted if it gets rebuild and reuse is activated
 
 ## Features / Enhancements:
 
