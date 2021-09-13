@@ -1,0 +1,67 @@
+name: Test DB Versions with all tests
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  test-db-versions-all-tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        exasol_version:
+        - 7.1.0-d1
+        - 7.0.12
+        - 7.0.11
+        - 7.0.10
+        - 7.0.9
+        - 7.0.8
+        - 7.0.7
+        - 7.0.6
+        - 7.0.5
+        - 7.0.4
+        - 7.0.3
+        - 7.0.2
+        - 7.0.1
+        - 7.0.0
+        - 6.2.16-d1
+        - 6.2.15-d1
+        - 6.2.14-d1
+        - 6.2.13-d1
+        - 6.2.12-d1
+        - 6.2.11-d1
+        - "default"
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup Python 3.6 for integration-test-docker-environment
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.6
+    - name: Install Poetry
+      uses: abatilo/actions-poetry@v2.0.0
+
+    - name: Fail, because not all tests are activated
+      run: |
+        git fetch
+        GIT_LOG="$(git log --pretty=oneline --abbrev-commit ${{ github.event.after }} | head -n 1)"
+        echo "$GIT_LOG"
+        if [[ "$GIT_LOG" == *"[run all tests]"* ]]; then
+          echo "All tests activated"
+          exit 0
+        else
+          echo "Fail, because not all tests are deactivated"
+          exit 1
+        fi
+      env:
+        EXASOL_VERSION: "${{ matrix.exasol_version }}"
+      # We want to deactivate running all tests only for pull_requests
+      if: ${{ github.event_name == 'pull_request' }}
+
+    - name: Run all tests
+      run: ./run_all_tests.sh
+      env:
+        EXASOL_VERSION: "${{ matrix.exasol_version }}"

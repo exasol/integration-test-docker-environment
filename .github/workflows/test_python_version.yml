@@ -1,0 +1,36 @@
+name: Test Python Versions with all tests
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  test-python-version-all-tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        exasol_version:
+        - "default"
+        python_version:
+        - 3.6
+        - 3.7
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup Python 3.6 for integration-test-docker-environment
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.6
+    - name: Install Poetry
+      uses: abatilo/actions-poetry@v2.0.0
+
+    - name: Run all tests
+      run: ./run_all_tests.sh
+      env:
+        EXASOL_VERSION: "${{ matrix.exasol_version }}"
+
+    - name: Test ./start-test-env-with-poetry 
+      run: ./start-test-env-with-poetry --help

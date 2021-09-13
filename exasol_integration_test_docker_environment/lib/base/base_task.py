@@ -83,7 +83,7 @@ class BaseTask(Task):
         self.__hash = hash(self.task_id)
         self._init_non_pickle_attributes()
         self.register_required()
-        self._task_state = TaskState.NONE
+        self._task_state = TaskState.AFTER_INIT
 
     def _init_non_pickle_attributes(self):
         logger = logging.getLogger(f'luigi-interface.{self.__class__.__name__}')
@@ -224,10 +224,11 @@ class BaseTask(Task):
             task_generator = self.run_task()
             if task_generator is not None:
                 yield from task_generator
-            self._task_state = TaskState.NONE
+            self._task_state = TaskState.FINISHED
             self.logger.info("Write complete_target")
             self._complete_target.write(self._registered_return_targets)
         except Exception as e:
+            self._task_state = TaskState.ERROR
             self.logger.exception("Exception in run: %s", e)
             raise e
 
@@ -239,7 +240,7 @@ class BaseTask(Task):
             self._register_run_dependencies(tasks)
             self._run_dependencies_target.write(self._run_dependencies_tasks)
             completion_targets = yield tasks
-            task_futures = self._generate_run_task_furtures(completion_targets)
+            task_futures = self._generate_run_task_futures(completion_targets)
             return task_futures
         else:
             raise WrongTaskStateException(self._task_state, "run_dependency")
@@ -254,11 +255,12 @@ class BaseTask(Task):
         elif isinstance(tasks, BaseTask):
             self._run_dependencies_tasks.append(tasks)
 
-    def _generate_run_task_furtures(self, completion_targets):
+    def _generate_run_task_futures(self, completion_targets: Union[Any]) -> Union[
+        List[Any], Dict[Any, Any], RunTaskFuture, Any]:
         if isinstance(completion_targets, dict):
-            return {key: self._generate_run_task_furtures(task) for key, task in completion_targets.items()}
+            return {key: self._generate_run_task_futures(task) for key, task in completion_targets.items()}
         elif isinstance(completion_targets, list):
-            return [self._generate_run_task_furtures(task) for task in completion_targets]
+            return [self._generate_run_task_futures(task) for task in completion_targets]
         elif isinstance(completion_targets, PickleTarget):
             return RunTaskFuture(completion_targets)
         else:
@@ -275,6 +277,12 @@ class BaseTask(Task):
                 raise Exception(f"return target {name} already used")
         else:
             raise WrongTaskStateException(self._task_state, "return_target")
+
+    def get_return_object(self, name: str = DEFAULT_RETURN_OBJECT_NAME) -> Any:
+        if self._task_state == TaskState.FINISHED:
+            return self._registered_return_targets.get(name).read()
+        else:
+            raise WrongTaskStateException(self._task_state, "get_return_object")
 
     def __repr__(self):
         """
@@ -307,7 +315,7 @@ class BaseTask(Task):
         params.update(kwargs)
         return task_class(**params)
 
-    def cleanup(self, success):
+    def cleanup(self, success:bool):
         self.logger.debug("Cleaning up")
         if self._task_state != TaskState.CLEANUP and self._task_state != TaskState.CLEANED:
             self._task_state = TaskState.CLEANUP
@@ -324,7 +332,7 @@ class BaseTask(Task):
             self._task_state = TaskState.CLEANED
         self.logger.debug("Cleanup finished")
 
-    def cleanup_child_task(self, success):
+    def cleanup_child_task(self, success:bool):
         if self._run_dependencies_target.exists():
             _run_dependencies_tasks_from_target = self._run_dependencies_target.read()
         else:
@@ -340,5 +348,5 @@ class BaseTask(Task):
         for task in reversed_registered_task_list:
             task.cleanup(success)
 
-    def cleanup_task(self, success):
+    def cleanup_task(self, success:bool):
         pass

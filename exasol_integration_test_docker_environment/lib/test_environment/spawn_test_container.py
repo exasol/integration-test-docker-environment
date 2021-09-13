@@ -9,6 +9,7 @@ from exasol_integration_test_docker_environment.lib.base.docker_base_task import
 from exasol_integration_test_docker_environment.lib.base.json_pickle_parameter import JsonPickleParameter
 from exasol_integration_test_docker_environment.lib.data.container_info import ContainerInfo
 from exasol_integration_test_docker_environment.lib.data.docker_network_info import DockerNetworkInfo
+from exasol_integration_test_docker_environment.lib.docker.images.image_info import ImageState, ImageInfo
 from exasol_integration_test_docker_environment.lib.test_environment.analyze_test_container import \
     DockerTestContainerBuild
 from exasol_integration_test_docker_environment.lib.test_environment.create_export_directory import \
@@ -38,11 +39,26 @@ class SpawnTestContainer(DockerBaseTask):
         self.test_container_image_future = self.register_dependency(DockerTestContainerBuild())
         self.export_directory_future = self.register_dependency(CreateExportDirectory())
 
+    def is_reuse_possible(self) -> bool:
+        test_container_image_info = \
+            self.get_values_from_futures(self.test_container_image_future)["test-container"]  # type: ImageInfo
+        test_container = None
+        try:
+            test_container = \
+                self._client.containers.get(self.test_container_name)
+        except Exception as e:
+            pass
+        return self.network_info.reused and self.reuse_test_container and \
+               test_container is not None and \
+               test_container.image == test_container_image_info.get_target_complete_name() and \
+               test_container_image_info.image_state == ImageState.USED_LOCAL
+
     def run_task(self):
         subnet = netaddr.IPNetwork(self.network_info.subnet)
         ip_address = str(subnet[2 + self.ip_address_index_in_subnet])
         container_info = None
-        if self.network_info.reused and self.reuse_test_container:
+
+        if self.is_reuse_possible():
             container_info = self._try_to_reuse_test_container(ip_address, self.network_info)
         if container_info is None:
             container_info = self._create_test_container(ip_address, self.network_info)
@@ -77,6 +93,7 @@ class SpawnTestContainer(DockerBaseTask):
     def _create_test_container(self, ip_address,
                                network_info: DockerNetworkInfo) -> ContainerInfo:
         self._remove_container(self.test_container_name)
+        self.logger.info(f"Creating new test container {self.test_container_name}")
         test_container_image_info = \
             self.get_values_from_futures(self.test_container_image_future)["test-container"]
 
@@ -146,12 +163,11 @@ class SpawnTestContainer(DockerBaseTask):
         except Exception as e:
             pass
 
-    def cleanup_task(self, success):
+    def cleanup_task(self, success:bool):
         if (success and not self.no_test_container_cleanup_after_success) or \
-            (not success and not self.no_test_container_cleanup_after_failure):
+                (not success and not self.no_test_container_cleanup_after_failure):
             try:
-                self.logger.info(f"Cleaning up container %s",self.test_container_name)
+                self.logger.info(f"Cleaning up container %s", self.test_container_name)
                 self._remove_container(self.test_container_name)
             except Exception as e:
-                self.logger.error(f"Error during removing container %s: %s",self.test_container_name,e)
-
+                self.logger.error(f"Error during removing container %s: %s", self.test_container_name, e)
