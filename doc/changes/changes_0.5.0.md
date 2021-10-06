@@ -8,8 +8,8 @@ This release adds support for new docker-db versions 6.2.16, 7.0.12 and 7.1.0-d1
 
 ### Supported Exasol Versions
 
-* **6.2**: up to 6.2.16
-* **7.0**: up to 7.0.12
+* **6.2**: up to 6.2.17
+* **7.0**: up to 7.0.13
 * **7.1**: 7.1.0-d1
 
 If you need further versions, please open an issue.
