@@ -27,6 +27,7 @@ If you need further versions, please open an issue.
 
 - #106: Add support for docker-db 7.1.0-d1
 - #111: Add docker-db version 6.2.16 and 7.0.12
+- #116: Add docker-db 7.0.13 and 6.2.17-d1
 
 ## Refactoring:
 
