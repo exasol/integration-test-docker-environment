@@ -177,7 +177,7 @@ The following config files are available:
 
 * **6.2**: up to 6.2.17
 * **7.0**: up to 7.0.13
-* **7.1**: 7.1.0-d1
+* **7.1**: up to 7.1.1
 
 
 If you need further versions, please open an issue.

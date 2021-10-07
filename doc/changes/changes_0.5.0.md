@@ -4,13 +4,13 @@ Code name: Add support for new docker-db versions
 
 ## Summary
 
-This release adds support for new docker-db versions 6.2.16, 7.0.12 and 7.1.0-d1
+This release adds support for new docker-db versions 6.2.17, 7.0.13 and 7.1.1
 
 ### Supported Exasol Versions
 
 * **6.2**: up to 6.2.17
 * **7.0**: up to 7.0.13
-* **7.1**: 7.1.0-d1
+* **7.1**: up to 7.1.1
 
 If you need further versions, please open an issue.
 
@@ -27,7 +27,7 @@ If you need further versions, please open an issue.
 
 - #106: Add support for docker-db 7.1.0-d1
 - #111: Add docker-db version 6.2.16 and 7.0.12
-- #116: Add docker-db 7.0.13 and 6.2.17-d1
+- #116: Add docker-db 7.0.13, 6.2.17-d1 and 7.1.1 
 
 ## Refactoring:
 
