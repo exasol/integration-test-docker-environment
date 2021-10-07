@@ -1,4 +1,4 @@
-# Integration-Test-Docker-Environment 0.5.0, released t.b.d.
+# Integration-Test-Docker-Environment 0.5.0, released 2021-10-07
 
 Code name: Add support for new docker-db versions
 
@@ -31,5 +31,4 @@ If you need further versions, please open an issue.
 
 ## Refactoring:
 
-n/a  
-
+n/a
