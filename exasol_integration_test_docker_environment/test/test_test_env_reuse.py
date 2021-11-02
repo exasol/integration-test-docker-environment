@@ -1,3 +1,4 @@
+import os
 import unittest
 
 import docker
@@ -8,6 +9,7 @@ from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_
 from exasol_integration_test_docker_environment.test.utils import process_spawn_utils
 from exasol_integration_test_docker_environment.cli.common import set_docker_repository_config
 from exasol_integration_test_docker_environment.test.utils import luigi_utils
+from exasol_integration_test_docker_environment.cli.options import test_environment_options
 
 
 class TestContainerReuseTest(unittest.TestCase):
@@ -27,6 +29,10 @@ class TestContainerReuseTest(unittest.TestCase):
         self._docker_repository_name = self.env_name()
         print("docker_repository_name", self._docker_repository_name)
         luigi_utils.clean(self._docker_repository_name)
+
+        self.docker_db_version_parameter = test_environment_options.LATEST_DB_VERSION
+        if "EXASOL_VERSION" in os.environ and os.environ["EXASOL_VERSION"] != "default":
+            self.docker_db_version_parameter = os.environ["EXASOL_VERSION"]
 
     def tearDown(self):
         luigi_utils.clean(self._docker_repository_name)
@@ -60,7 +66,7 @@ class TestContainerReuseTest(unittest.TestCase):
                                     external_exasol_bucketfs_write_password="",
                                     environment_type=EnvironmentType.docker_db,
                                     environment_name=self.env_name(),
-                                    docker_db_image_version="7.1.1",
+                                    docker_db_image_version=self.docker_db_version_parameter,
                                     docker_db_image_name="exasol/docker-db"
                                     )
         try:
