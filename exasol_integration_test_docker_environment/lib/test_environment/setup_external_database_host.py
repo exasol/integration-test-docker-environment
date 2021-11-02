@@ -30,7 +30,8 @@ class SetupExternalDatabaseHost(DependencyLoggerBaseTask,
         self.setup_database()
         database_info = DatabaseInfo(database_host,
                                      self.external_exasol_db_port,
-                                     self.external_exasol_bucketfs_port)
+                                     self.external_exasol_bucketfs_port,
+                                     False)
         self.return_object(database_info)
 
     def setup_database(self):

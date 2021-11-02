@@ -16,10 +16,10 @@ import requests
 
 from exasol_integration_test_docker_environment.lib.data.environment_info import EnvironmentInfo
 
+INTEGRATION_TEST_DOCKER_ENVIRONMENT_DEFAULT_BIN = "./start-test-env-without-poetry"
 
-INTEGRATION_TEST_DOCKER_ENVIRONMENT_DEFAULT_BIN="./start-test-env-without-poetry"
 
-class ExaslctDockerTestEnvironment():
+class ExaslctDockerTestEnvironment:
     def __init__(self, name: str, database_host: str,
                  db_username: str, db_password: str,
                  bucketfs_username: str, bucketfs_password: str,
@@ -43,7 +43,7 @@ class ExaslctDockerTestEnvironment():
         remove_docker_volumes([f"db_container_{self.name}_volume"])
 
 
-class ExaslctTestEnvironment():
+class ExaslctTestEnvironment:
 
     def __init__(self, test_object, executable="./exaslct", clean_images_at_close=True):
         self.clean_images_at_close = clean_images_at_close
@@ -84,9 +84,11 @@ class ExaslctTestEnvironment():
         self._update_attributes()
 
     def _update_attributes(self):
-        self.repository_name = f"{self._repository_prefix.lower()}/{self.name.lower()}"  # docker repository names must be lowercase
+        # docker repository names must be lowercase
+        self.repository_name = f"{self._repository_prefix.lower()}/{self.name.lower()}"
         self.flavor_path_argument = f"--flavor-path {self.get_test_flavor()}"
-        self.docker_repository_arguments = f"--source-docker-repository-name {self.repository_name} --target-docker-repository-name {self.repository_name}"
+        self.docker_repository_arguments = f"--source-docker-repository-name {self.repository_name} " \
+                                           f"--target-docker-repository-name {self.repository_name}"
         self.clean_docker_repository_arguments = f"--docker-repository-name {self.repository_name}"
         self.output_directory_arguments = f"--output-directory {self.temp_dir}"
         self.task_dependencies_argument = " ".join([f"--task-dependencies-dot-file {self.name}.dot", ])

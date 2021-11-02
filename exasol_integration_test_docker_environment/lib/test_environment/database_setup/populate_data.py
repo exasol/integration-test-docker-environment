@@ -23,11 +23,11 @@ class PopulateEngineSmallTestDataToDatabase(DockerBaseTask, DatabaseCredentialsP
         self._database_info = self.test_environment_info.database_info
 
     def run_task(self):
-        if not self.reuse_data:
-            self.populate_data()
-        else:
+        if self.reuse_data and self._database_info.reused:
             self.logger.warning("Reusing data")
             self.write_logs("Reused")
+        else:
+            self.populate_data()
 
     def populate_data(self):
         self.logger.warning("Uploading data")

@@ -62,7 +62,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                          self.db_container_name)
         database_info = None
         try:
-            database_info = self._create_database_info(db_ip_address)
+            database_info = self._create_database_info(db_ip_address, True)
         except Exception as e:
             self.logger.warning("Tried to reuse database container %s, but got Exeception %s. "
                                 "Fallback to create new database.", self.db_container_name, e)
@@ -105,14 +105,14 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         network_aliases = self._get_network_aliases()
         docker_network.connect(db_container, ipv4_address=db_ip_address, aliases=network_aliases)
         db_container.start()
-        database_info = self._create_database_info(db_ip_address)
+        database_info = self._create_database_info(db_ip_address, False)
         return database_info
 
     def _get_network_aliases(self):
         network_aliases = ["exasol_test_database", self.db_container_name]
         return network_aliases
 
-    def _create_database_info(self, db_ip_address: str) -> DatabaseInfo:
+    def _create_database_info(self, db_ip_address: str, reused: bool) -> DatabaseInfo:
         db_container = self._client.containers.get(self.db_container_name)
         if db_container.status != "running":
             raise Exception(f"Container {self.db_container_name} not running")
@@ -125,7 +125,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                           volume_name=self._get_db_volume_name())
         database_info = \
             DatabaseInfo(host=db_ip_address, db_port=DB_PORT, bucketfs_port=BUCKETFS_PORT,
-                         container_info=container_info)
+                         reused=reused, container_info=container_info)
         return database_info
 
     def _pull_docker_db_images_if_necassary(self):
