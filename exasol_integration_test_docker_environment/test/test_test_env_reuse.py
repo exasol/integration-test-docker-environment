@@ -11,6 +11,13 @@ from exasol_integration_test_docker_environment.test.utils import luigi_utils
 
 
 class TestContainerReuseTest(unittest.TestCase):
+    '''
+    This test spawns a new test environment and, with parameters:
+    * reuse_database_setup=True,
+    * reuse_database=True,
+    * reuse_test_container=True
+    and verifies if the test data was populated to the docker db.
+    '''
 
     def env_name(self):
         return self.__class__.__name__.lower()
@@ -72,7 +79,6 @@ class TestContainerReuseTest(unittest.TestCase):
         username = SpawnTestEnvironment.DEFAULT_DB_USER
         password = SpawnTestEnvironment.DEFAULT_DATABASE_PASSWORD
         test_environment_info = process_spawn_utils.run_in_process(self.run_spawn_test_env)
-
         test_container = self._client.containers.get(test_environment_info.test_container_info.container_name)
         database_host = test_environment_info.database_info.host
         database_port = test_environment_info.database_info.db_port
@@ -81,13 +87,15 @@ class TestContainerReuseTest(unittest.TestCase):
         bash_cmd = f"""bash -c "{cmd}" """
         exit_code, output = test_container.exec_run(cmd=bash_cmd)
         output_str = output.decode('utf-8')
+
         # TODO read /tests/test/import.sql and apply a regular expression to
         # get all table names and compare then one-by-one
         self.assertIn("ENGINETABLE", [output_entry.strip() for output_entry in output_str.split(sep='\n')])
         test_container.remove(force=True)
         self._client.containers\
             .get(test_environment_info.database_info.container_info.container_name).remove(force=True)
-
+        self._client.networks.get(test_environment_info.network_info.network_name).remove()
+        self._client.volumes.get(test_environment_info.database_info.container_info.volume_name).remove()
 
 if __name__ == '__main__':
     unittest.main()
