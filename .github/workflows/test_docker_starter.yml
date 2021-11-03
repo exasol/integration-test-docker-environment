@@ -13,7 +13,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Build new Docker image
-      run: bash build_test_environment_docker_runner.sh 
+      run: bash ./scripts/docker/build_test_environment_docker_runner.sh
 
     - name: Test ./start-test-env 
       run: ./start-test-env --help
