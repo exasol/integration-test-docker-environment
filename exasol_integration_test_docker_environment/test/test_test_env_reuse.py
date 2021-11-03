@@ -47,13 +47,21 @@ class TestContainerReuseTest(unittest.TestCase):
             kind="target"
         )
 
-    def run_spawn_test_env(self):
+    def run_spawn_test_env_with_cleanup(self):
+        return self.run_spawn_test_env(cleanup=True)
+
+    def run_spawn_test_env_without_cleanup(self):
+        return self.run_spawn_test_env(cleanup=False)
+
+    def run_spawn_test_env(self, cleanup: bool):
         result = None
         self.setup_luigi_config()
         luigi_utils.set_job_id(SpawnTestEnvironment)
         task = SpawnTestEnvironment(reuse_database_setup=True,
                                     reuse_database=True,
                                     reuse_test_container=True,
+                                    no_test_container_cleanup_after_success=not cleanup,
+                                    no_database_cleanup_after_success=not cleanup,
                                     external_exasol_xmlrpc_host="",
                                     external_exasol_db_host="",
                                     external_exasol_xmlrpc_port=0,
@@ -79,23 +87,54 @@ class TestContainerReuseTest(unittest.TestCase):
             task.cleanup(False)
         return result
 
-    def test_initial_reuse_database_setup_populates_data(self):
+    def _create_exaplus_check_cmd(self, test_environment_info):
         username = SpawnTestEnvironment.DEFAULT_DB_USER
         password = SpawnTestEnvironment.DEFAULT_DATABASE_PASSWORD
-        task = process_spawn_utils.run_in_process(self.run_spawn_test_env)
-        test_environment_info = task.get_return_object()
-        test_container = self._client.containers.get(test_environment_info.test_container_info.container_name)
         database_host = test_environment_info.database_info.host
         database_port = test_environment_info.database_info.db_port
         q = "SELECT TABLE_NAME FROM SYS.EXA_ALL_TABLES WHERE TABLE_SCHEMA='TEST';"
-        cmd = f"""$EXAPLUS -c '{database_host}:{database_port}' -u '{username}' -p '{password}' -sql \\\"{q}\\\""""
+        return f"""$EXAPLUS -c '{database_host}:{database_port}' -u '{username}' -p '{password}' -sql \\\"{q}\\\""""
+
+    def _exec_cmd_in_test_container(self, test_environment_info, cmd):
         bash_cmd = f"""bash -c "{cmd}" """
+        test_container = self._client.containers.get(test_environment_info.test_container_info.container_name)
+
         exit_code, output = test_container.exec_run(cmd=bash_cmd)
-        output_str = output.decode('utf-8')
+        self.assertEquals(exit_code, 0)
+        return output.decode('utf-8')
+
+    def _verify_test_data(self, test_environment_info):
+        cmd = self._create_exaplus_check_cmd(test_environment_info)
+        output_str = self._exec_cmd_in_test_container(test_environment_info, cmd)
 
         # TODO read /tests/test/import.sql and apply a regular expression to
         # get all table names and compare then one-by-one
         self.assertIn("ENGINETABLE", [output_entry.strip() for output_entry in output_str.split(sep='\n')])
+
+    def test_initial_reuse_database_setup_populates_data(self):
+        task = process_spawn_utils.run_in_process(self.run_spawn_test_env_with_cleanup)
+        self._verify_test_data(task.get_return_object())
+        task.cleanup(True)
+
+    def get_instance_ids(self, test_environment_info):
+        test_container = self._client.containers.get(test_environment_info.test_container_info.container_name)
+        db_container = self._client.containers.get(test_environment_info.database_info.container_info.container_name)
+        network = self._client.networks.get(test_environment_info.network_info.network_name)
+        return test_container.id, db_container.id, network.id
+
+    def test_reuse_env_same_instances(self):
+        task = process_spawn_utils.run_in_process(self.run_spawn_test_env_without_cleanup)
+        test_environment_info = task.get_return_object()
+        old_instance_ids = self.get_instance_ids(test_environment_info)
+        # This clean is supposed to not remove docker instances
+        task.cleanup(True)
+
+        task = process_spawn_utils.run_in_process(self.run_spawn_test_env_with_cleanup)
+        test_environment_info = task.get_return_object()
+        new_instance_ids = self.get_instance_ids(test_environment_info)
+        self.assertEquals(old_instance_ids, new_instance_ids)
+        self._verify_test_data(test_environment_info)
+
         task.cleanup(True)
 
 

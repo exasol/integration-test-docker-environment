@@ -62,7 +62,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                          self.db_container_name)
         database_info = None
         try:
-            database_info = self._create_database_info(db_ip_address, True)
+            database_info = self._create_database_info(db_ip_address=db_ip_address, reused=True)
         except Exception as e:
             self.logger.warning("Tried to reuse database container %s, but got Exeception %s. "
                                 "Fallback to create new database.", self.db_container_name, e)
@@ -105,7 +105,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         network_aliases = self._get_network_aliases()
         docker_network.connect(db_container, ipv4_address=db_ip_address, aliases=network_aliases)
         db_container.start()
-        database_info = self._create_database_info(db_ip_address, False)
+        database_info = self._create_database_info(db_ip_address=db_ip_address, reused=False)
         return database_info
 
     def _get_network_aliases(self):
