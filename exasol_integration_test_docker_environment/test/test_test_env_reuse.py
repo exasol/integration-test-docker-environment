@@ -48,6 +48,7 @@ class TestContainerReuseTest(unittest.TestCase):
         )
 
     def run_spawn_test_env(self):
+        result = None
         self.setup_luigi_config()
         luigi_utils.set_job_id(SpawnTestEnvironment)
         task = SpawnTestEnvironment(reuse_database_setup=True,
@@ -57,8 +58,6 @@ class TestContainerReuseTest(unittest.TestCase):
                                     external_exasol_db_host="",
                                     external_exasol_xmlrpc_port=0,
                                     external_exasol_db_user="",
-                                    no_test_container_cleanup_after_success=True,
-                                    no_database_cleanup_after_success=True,
                                     external_exasol_db_password="",
                                     external_exasol_xmlrpc_user="",
                                     external_exasol_xmlrpc_password="",
@@ -72,19 +71,19 @@ class TestContainerReuseTest(unittest.TestCase):
         try:
             success = luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
             if success:
-                result = task.get_return_object()
-                task.cleanup(True)
-                return result
+                result = task
             else:
                 task.cleanup(False)
                 Exception("Task failed")
         except Exception as e:
             task.cleanup(False)
+        return result
 
     def test_initial_reuse_database_setup_populates_data(self):
         username = SpawnTestEnvironment.DEFAULT_DB_USER
         password = SpawnTestEnvironment.DEFAULT_DATABASE_PASSWORD
-        test_environment_info = process_spawn_utils.run_in_process(self.run_spawn_test_env)
+        task = process_spawn_utils.run_in_process(self.run_spawn_test_env)
+        test_environment_info = task.get_return_object()
         test_container = self._client.containers.get(test_environment_info.test_container_info.container_name)
         database_host = test_environment_info.database_info.host
         database_port = test_environment_info.database_info.db_port
@@ -97,11 +96,8 @@ class TestContainerReuseTest(unittest.TestCase):
         # TODO read /tests/test/import.sql and apply a regular expression to
         # get all table names and compare then one-by-one
         self.assertIn("ENGINETABLE", [output_entry.strip() for output_entry in output_str.split(sep='\n')])
-        test_container.remove(force=True)
-        self._client.containers\
-            .get(test_environment_info.database_info.container_info.container_name).remove(force=True)
-        self._client.networks.get(test_environment_info.network_info.network_name).remove()
-        self._client.volumes.get(test_environment_info.database_info.container_info.volume_name).remove()
+        task.cleanup(True)
+
 
 if __name__ == '__main__':
     unittest.main()
