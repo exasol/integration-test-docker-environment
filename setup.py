@@ -74,7 +74,8 @@ install_requires = \
  'pydot>=1.4.0',
  'requests>=2.21.0',
  'simplejson>=3.16.0',
- 'stopwatch.py>=1.0.0']
+ 'stopwatch.py>=1.0.0',
+ 'toml>=0.10.2']
 
 setup_kwargs = {
     'name': 'exasol-integration-test-docker-environment',
