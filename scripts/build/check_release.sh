@@ -15,7 +15,7 @@ init_poetry
 
 if [ -n "$POETRY_BIN" ]
 then
-  PYTHONPATH=$SCRIPT_DIR/../.. $POETRY_BIN run python3 -u $SCRIPT_DIR/../../check_release.py
+  PYTHONPATH=$SCRIPT_DIR/../.. $POETRY_BIN run python3 -u $SCRIPT_DIR/check_release.py
 else
   echo "Could not find poetry!"
   exit 1
