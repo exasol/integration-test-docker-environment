@@ -9,12 +9,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Setup Python 3.6 for integration-test-docker-environment
+      - name: Setup Python 3.6
         uses: actions/setup-python@v2
         with:
           python-version: 3.6
       - name: Install Poetry
         uses: abatilo/actions-poetry@v2.0.0
       - name: Check Release
-        run: |
-          bash ./scripts/build/check_release.sh
+        run: ./scripts/build/check_release.sh
