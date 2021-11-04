@@ -10,8 +10,10 @@ test_environment_options = [
 
 ]
 
+LATEST_DB_VERSION = """7.1.1"""
+
 docker_db_options = [
-    click.option('--docker-db-image-version', type=str, default="""7.1.1""",
+    click.option('--docker-db-image-version', type=str, default=LATEST_DB_VERSION,
                  show_default=True,
                  help="""Docker DB Image Version against which the tests should run."""),
     click.option('--docker-db-image-name', type=str, default="""exasol/docker-db""",

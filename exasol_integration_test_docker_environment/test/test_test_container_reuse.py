@@ -2,21 +2,19 @@ import os
 import shutil
 import tempfile
 import unittest
-from datetime import datetime
-from multiprocessing import Process, Queue
 from pathlib import Path
-from typing import Callable
 
 import docker
 import luigi
 
+from exasol_integration_test_docker_environment.test.utils import process_spawn_utils
 from exasol_integration_test_docker_environment.cli.common import set_build_config, set_docker_repository_config
 from exasol_integration_test_docker_environment.lib.base.docker_base_task import DockerBaseTask
 from exasol_integration_test_docker_environment.lib.data.container_info import ContainerInfo
-from exasol_integration_test_docker_environment.lib.docker.images.clean.clean_images import CleanImagesStartingWith
 from exasol_integration_test_docker_environment.lib.test_environment.prepare_network_for_test_environment import \
     PrepareDockerNetworkForTestEnvironment
 from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_container import SpawnTestContainer
+from exasol_integration_test_docker_environment.test.utils import luigi_utils
 
 
 class TestTask(DockerBaseTask):
@@ -53,27 +51,14 @@ class TestTask(DockerBaseTask):
 
         self.return_object({"container_id": container.image.id, "image_id": container.image.id})
 
+
 class TestContainerReuseTest(unittest.TestCase):
-
-    def set_job_id(self, task_cls):
-        strftime = datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
-        job_id = f"{strftime}_{task_cls.__name__}"
-        config = luigi.configuration.get_config()
-        config.set('job_config', 'job_id', job_id)
-        return job_id
-
-    def clean(self):
-        jobid = self.set_job_id(CleanImagesStartingWith)
-        task = CleanImagesStartingWith(starts_with_pattern=self.docker_repository_name, jobid=jobid)
-        luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
-        if task._get_tmp_path_for_job().exists():
-            shutil.rmtree(str(task._get_tmp_path_for_job()))
 
     def setUp(self):
         self.client = docker.from_env()
-        self.temp_directory = tempfile.mkdtemp()
         resource_directory = Path(Path(__file__).parent, "resources/test_test_container_reuse")
         print("resource_directory content", list(Path(resource_directory).iterdir()))
+        self.temp_directory = tempfile.mkdtemp()
         self.working_directory = shutil.copytree(resource_directory,
                                                  Path(self.temp_directory, "test_test_container_reuse"))
         print("working_directory",self.working_directory)
@@ -82,11 +67,11 @@ class TestContainerReuseTest(unittest.TestCase):
         print("working_directory content",list(Path(self.working_directory).iterdir()))
         self.docker_repository_name = self.__class__.__name__.lower()
         print("docker_repository_name",self.docker_repository_name)
-        self.clean()
+        luigi_utils.clean(self.docker_repository_name)
 
     def tearDown(self):
         os.chdir(self.old_working_directory)
-        self.clean()
+        luigi_utils.clean(self.docker_repository_name)
         shutil.rmtree(self.temp_directory)
         self.client.close()
 
@@ -110,7 +95,7 @@ class TestContainerReuseTest(unittest.TestCase):
 
     def run1(self):
         self.setup_luigi_config()
-        self.set_job_id(SpawnTestContainer)
+        luigi_utils.set_job_id(SpawnTestContainer)
         task = TestTask(reuse=False, attempt=1)
         try:
             success = luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
@@ -126,7 +111,7 @@ class TestContainerReuseTest(unittest.TestCase):
 
     def run2(self):
         self.setup_luigi_config()
-        self.set_job_id(SpawnTestContainer)
+        luigi_utils.set_job_id(SpawnTestContainer)
         task = TestTask(reuse=True, attempt=2)
         try:
             success = luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
@@ -139,37 +124,19 @@ class TestContainerReuseTest(unittest.TestCase):
         finally:
             task.cleanup(False)
 
-    def process_main(self, queue: Queue, func: Callable):
-        try:
-            result = func()
-            queue.put(("result",result))
-        except Exception as e:
-            queue.put(("exception",e))
-
-    def run_in_process(self, func):
-        queue = Queue()
-        p1 = Process(target=self.process_main, args=(queue, func))
-        p1.start()
-        p1.join()
-        result = queue.get()
-        if result[0] == "result":
-            return result[1]
-        else:
-            raise result[1]
-
     def test_test_container_no_reuse_after_change(self):
-        p1 = self.run_in_process(self.run1)
+        p1 = process_spawn_utils.run_in_process(self.run1)
         dockerfile = Path(self.working_directory, "tests/Dockerfile")
         with dockerfile.open("a") as f:
             f.write("\n#Test\n")
-        p2 = self.run_in_process(self.run2)
+        p2 = process_spawn_utils.run_in_process(self.run2)
         print(p1)
         print(p2)
         assert p1 != p2
 
     def test_test_container_reuse(self):
-        p1 = self.run_in_process(self.run1)
-        p2 = self.run_in_process(self.run2)
+        p1 = process_spawn_utils.run_in_process(self.run1)
+        p2 = process_spawn_utils.run_in_process(self.run2)
         print(p1)
         print(p2)
         assert p1 == p2

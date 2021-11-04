@@ -48,10 +48,12 @@ class SpawnTestContainer(DockerBaseTask):
                 self._client.containers.get(self.test_container_name)
         except Exception as e:
             pass
-        return self.network_info.reused and self.reuse_test_container and \
+        ret_val = self.network_info.reused and self.reuse_test_container and \
                test_container is not None and \
-               test_container.image == test_container_image_info.get_target_complete_name() and \
-               test_container_image_info.image_state == ImageState.USED_LOCAL
+               test_container_image_info.get_target_complete_name() in test_container.image.tags and \
+               test_container_image_info.image_state == ImageState.USED_LOCAL.name
+
+        return ret_val
 
     def run_task(self):
         subnet = netaddr.IPNetwork(self.network_info.subnet)
@@ -159,14 +161,16 @@ class SpawnTestContainer(DockerBaseTask):
         try:
             container = self._client.containers.get(container_name)
             container.remove(force=True)
-            self.logger.info("Removed container %s", container_name)
+            self.logger.info(f"Removed container: name: '{container_name}', id: '{container.short_id}'")
         except Exception as e:
             pass
 
     def cleanup_task(self, success:bool):
+        self.logger.info(f"___________cleanup_task")
         if (success and not self.no_test_container_cleanup_after_success) or \
                 (not success and not self.no_test_container_cleanup_after_failure):
             try:
+                print(f"Cleaning up container %s", self.test_container_name)
                 self.logger.info(f"Cleaning up container %s", self.test_container_name)
                 self._remove_container(self.test_container_name)
             except Exception as e:
