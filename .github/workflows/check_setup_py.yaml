@@ -26,4 +26,4 @@ jobs:
       run: git diff --cached
     - name: Check if something changed after running the update script
       run: |
-        [ -z "$(git status --porcelain=v1 -uno 2>/dev/null)" ] 
+        [ -z "$(git status --porcelain=v1 -uno 2>/dev/null)" ]

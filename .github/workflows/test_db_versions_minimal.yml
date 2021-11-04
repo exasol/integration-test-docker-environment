@@ -49,6 +49,6 @@ jobs:
       uses: abatilo/actions-poetry@v2.0.0
 
     - name: Run minimal tests
-      run: ./run_test.sh exasol_integration_test_docker_environment/test/test_test_environment.py
+      run: ./scripts/test/run_test.sh exasol_integration_test_docker_environment/test/test_test_environment.py
       env:
         EXASOL_VERSION: "${{ matrix.exasol_version }}"

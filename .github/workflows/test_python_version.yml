@@ -28,7 +28,7 @@ jobs:
       uses: abatilo/actions-poetry@v2.0.0
 
     - name: Run all tests
-      run: ./run_all_tests.sh
+      run: ./scripts/test/run_all_tests.sh
       env:
         EXASOL_VERSION: "${{ matrix.exasol_version }}"
 

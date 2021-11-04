@@ -65,6 +65,6 @@ jobs:
       if: ${{ github.event_name == 'pull_request' }}
 
     - name: Run all tests
-      run: ./run_all_tests.sh
+      run: ./scripts/test/run_all_tests.sh
       env:
         EXASOL_VERSION: "${{ matrix.exasol_version }}"

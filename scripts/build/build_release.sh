@@ -1,6 +1,6 @@
 #!/bin/bash 
    
-COMMAND_LINE_ARGS=("${@}") 
+
 SCRIPT_DIR="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" 
  
 source "$SCRIPT_DIR/poetry_utils.sh"
@@ -13,7 +13,7 @@ init_poetry
 
 if [ -n "$POETRY_BIN" ]
 then
-  PYTHONPATH=. $POETRY_BIN run python3 -u -m unittest discover exasol_integration_test_docker_environment/test
+  PYTHONPATH=. $POETRY_BIN build
 else
   echo "Could not find poetry!"
   exit 1
