@@ -20,9 +20,9 @@ jobs:
           python-version: 3.6
       - name: Install Poetry
         uses: abatilo/actions-poetry@v2.0.0
-        - name: Check Release
-      run: |
-        bash ./scripts/build/check_release.sh
+      - name: Check Release
+        run: |
+           bash ./scripts/build/check_release.sh
   test-docker-starter:
     strategy:
       fail-fast: false
