@@ -21,11 +21,11 @@ If you need further versions, please open an issue.
 
 ## Bug Fixes:
 
-- #120: Test data not populated if reuse_database_setup is set to true, but database not setup
+ - #120: Test data not populated if reuse_database_setup is set to true, but database not setup
 
 ## Features / Enhancements:
 
-n/a
+ - #118: Check release consistency
 
 ## Refactoring:
 
