@@ -384,7 +384,7 @@ doc = ["reno", "sphinx", "tornado (>=4.5)"]
 name = "toml"
 version = "0.10.2"
 description = "Python Library for Tom's Obvious, Minimal Language"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
 
@@ -443,7 +443,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6"
-content-hash = "9ef5bd21135c16fa436905cf5afe28ed22cf36c72b08fd3bf59d44b526bdbb2a"
+content-hash = "516a16c8f55a0057c3e908d28fd2d46cd3862587d1470131724b2b111b5841d5"
 
 [metadata.files]
 certifi = [
