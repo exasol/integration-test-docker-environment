@@ -1,11 +1,11 @@
 import shutil
 import time
 import unittest
-from datetime import datetime
 
 import luigi
 from luigi import Parameter, Config
 
+from exasol_integration_test_docker_environment.cli.common import generate_root_task
 from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import DependencyLoggerBaseTask
 from exasol_integration_test_docker_environment.lib.base.json_pickle_parameter import JsonPickleParameter
 
@@ -14,7 +14,7 @@ TestBaseTask = DependencyLoggerBaseTask
 
 class TestTask1(TestBaseTask):
     def register_required(self):
-        self.task2 = self.register_dependency(TestTask2())
+        self.task2 = self.register_dependency(self.create_child_task(task_class=TestTask2))
 
     def run_task(self):
         self.logger.info("RUN")
@@ -70,7 +70,7 @@ class TestParameter(Config):
 class TestTask7(TestBaseTask, TestParameter):
 
     def register_required(self):
-        task8 = self.create_child_task_with_common_params(TestTask8, new_parameter="new")
+        task8 = self.create_child_task_with_common_params(task_class=TestTask8, new_parameter="new")
         self.task8_future = self.register_dependency(task8)
 
     def run_task(self):
@@ -104,11 +104,11 @@ class TestTask9_Success(TestBaseTask):
 
     def register_required(self):
         inputs = [Data(i, f"{i}") for i in range(2)]
-        tasks = [TestTask10(parameter_1=input) for input in inputs]
+        tasks = [self.create_child_task(task_class=TestTask10, parameter_1=input) for input in inputs]
         self.register_dependencies(tasks)
 
     def run_task(self):
-        yield from self.run_dependencies(TestTask10(parameter_1=Data(3,"3")))
+        yield from self.run_dependencies(self.create_child_task(task_class=TestTask10, parameter_1=Data(3, "3")))
 
 
 class TestTask10(TestBaseTask):
@@ -117,6 +117,7 @@ class TestTask10(TestBaseTask):
     def run_task(self):
         time.sleep(1)
         print(self.parameter_1)
+
 
 class TestTask9_Fail(TestBaseTask):
 
@@ -127,12 +128,13 @@ class TestTask9_Fail(TestBaseTask):
         pass
 
     def run_task(self):
-        yield from self.run_dependencies(TestTask10(parameter_1=Data1()))
+        yield from self.run_dependencies(self.create_child_task(task_class=TestTask10, parameter_1=Data1()))
+
 
 class TestTask11(TestBaseTask):
 
     def run_task(self):
-        tasks = [TestTask12(p=f"{i}") for i in range(10)]
+        tasks = [self.create_child_task(task_class=TestTask12, p=f"{i}") for i in range(10)]
         self.logger.info(tasks)
         yield from self.run_dependencies(tasks)
 
@@ -151,7 +153,7 @@ class TestTask12(TestBaseTask):
 class TestTask13(TestBaseTask):
 
     def register_required(self):
-        tasks = [TestTask14(p=f"{i}") for i in range(10)]
+        tasks = [self.create_child_task(task_class=TestTask14, p=f"{i}") for i in range(10)]
         self.register_dependencies(tasks)
 
     def run_task(self):
@@ -162,10 +164,11 @@ class TestTask14(TestBaseTask):
     p = Parameter()
 
     def register_required(self):
-        self.register_dependency(TestTask15())
+        self.register_dependency(self.create_child_task(task_class=TestTask15))
 
     def run_task(self):
         pass
+
 
 class TestTask15(TestBaseTask):
     def run_task(self):
@@ -174,37 +177,26 @@ class TestTask15(TestBaseTask):
 
 class BaseTaskTest(unittest.TestCase):
 
-    def set_job_id(self, task_cls):
-        strftime = datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
-        job_id = f"{strftime}_{task_cls.__name__}"
-        config = luigi.configuration.get_config()
-        config.set('job_config', 'job_id', job_id)
-        # config.reload()
-
     def test_dependency_creation(self):
-        self.set_job_id(TestTask1)
-        task = TestTask1()
+        task = generate_root_task(task_class=TestTask1)
         luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
         if task._get_tmp_path_for_job().exists():
             shutil.rmtree(str(task._get_tmp_path_for_job()))
 
     def test_failing_task(self):
-        self.set_job_id(TestTask4)
-        task = TestTask4()
+        task = generate_root_task(task_class=TestTask4)
         luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
         if task._get_tmp_path_for_job().exists():
             shutil.rmtree(str(task._get_tmp_path_for_job()))
 
     def test_common_parameter(self):
-        self.set_job_id(TestTask7)
-        task = TestTask7(test_parameter="input")
+        task = generate_root_task(task_class=TestTask7, test_parameter="input")
         luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
         if task._get_tmp_path_for_job().exists():
             shutil.rmtree(str(task._get_tmp_path_for_job()))
 
     def test_json_pickle_parameter_success(self):
-        self.set_job_id(TestTask9_Success)
-        task = TestTask9_Success()
+        task = generate_root_task(task_class=TestTask9_Success)
         try:
             luigi.build([task], workers=3, local_scheduler=True, log_level="INFO")
         finally:
@@ -212,8 +204,7 @@ class BaseTaskTest(unittest.TestCase):
                 shutil.rmtree(str(task._get_tmp_path_for_job()))
     
     def test_json_pickle_parameter_fail(self):
-        self.set_job_id(TestTask9_Fail)
-        task = TestTask9_Fail()
+        task = generate_root_task(task_class=TestTask9_Fail)
         try:
             with self.assertRaises(Exception) as context:
                 luigi.build([task], workers=3, local_scheduler=True, log_level="INFO")
@@ -223,8 +214,7 @@ class BaseTaskTest(unittest.TestCase):
                 shutil.rmtree(str(task._get_tmp_path_for_job()))
 
     def test_collect_failures_diffrent_task_fail(self):
-        self.set_job_id(TestTask11)
-        task = TestTask11()
+        task = generate_root_task(task_class=TestTask11)
         try:
             luigi.build([task], workers=5, local_scheduler=True, log_level="INFO")
             failures = task.collect_failures()
@@ -240,8 +230,7 @@ class BaseTaskTest(unittest.TestCase):
                 shutil.rmtree(str(task._get_tmp_path_for_job()))
 
     def test_collect_failures_one_task_fails_but_is_dependency_of_multiple(self):
-        self.set_job_id(TestTask13)
-        task = TestTask13()
+        task = generate_root_task(task_class=TestTask13)
         try:
             luigi.build([task], workers=3, local_scheduler=True, log_level="INFO")
             failures = task.collect_failures()
@@ -255,6 +244,7 @@ class BaseTaskTest(unittest.TestCase):
         finally:
             if task._get_tmp_path_for_job().exists():
                 shutil.rmtree(str(task._get_tmp_path_for_job()))
+
 
 if __name__ == '__main__':
     unittest.main()

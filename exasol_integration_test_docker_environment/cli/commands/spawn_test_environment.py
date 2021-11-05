@@ -3,8 +3,8 @@ import click
 import humanfriendly
 
 from exasol_integration_test_docker_environment.cli.cli import cli
-from exasol_integration_test_docker_environment.cli.common import add_options, set_build_config, \
-    set_job_id, run_task
+from exasol_integration_test_docker_environment.cli.common import add_options, set_build_config, run_task, \
+    generate_root_task
 from exasol_integration_test_docker_environment.cli.options.system_options import system_options, \
     output_directory_option, tempory_base_directory_option
 from exasol_integration_test_docker_environment.cli.options.test_environment_options import docker_db_options
@@ -68,7 +68,7 @@ def spawn_test_environment(
                      temporary_base_directory,
                      None,
                      None)
-    task_creator = lambda: SpawnTestEnvironmentWithDockerDB(
+    task_creator = lambda: generate_root_task(task_class=SpawnTestEnvironmentWithDockerDB,
         environment_name=environment_name,
         database_port_forward=str(database_port_forward) if database_port_forward is not None else None,
         bucketfs_port_forward=str(bucketfs_port_forward) if bucketfs_port_forward is not None else None,
@@ -87,7 +87,6 @@ def spawn_test_environment(
         no_database_cleanup_after_failure=False,
         is_setup_database_activated=not deactivate_database_setup
     )
-    set_job_id(SpawnTestEnvironmentWithDockerDB.__name__)
     success, task = run_task(task_creator, workers, task_dependencies_dot_file)
     if not success:
         exit(1)

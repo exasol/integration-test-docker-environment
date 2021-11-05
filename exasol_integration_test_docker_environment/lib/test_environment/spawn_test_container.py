@@ -36,8 +36,10 @@ class SpawnTestContainer(DockerBaseTask):
                 % self.ip_address_index_in_subnet)
 
     def register_required(self):
-        self.test_container_image_future = self.register_dependency(DockerTestContainerBuild())
-        self.export_directory_future = self.register_dependency(CreateExportDirectory())
+        self.test_container_image_future = \
+            self.register_dependency(self.create_child_task(task_class=DockerTestContainerBuild))
+        self.export_directory_future =\
+            self.register_dependency(self.create_child_task(task_class=CreateExportDirectory))
 
     def is_reuse_possible(self) -> bool:
         test_container_image_info = \
