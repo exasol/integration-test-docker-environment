@@ -30,3 +30,6 @@ If you need further versions, please open an issue.
 ## Refactoring:
 
 n/a
+
+## Security:
+ -#126: Update urllib3 package

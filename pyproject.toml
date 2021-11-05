@@ -19,7 +19,7 @@ include = ["docker_db_config","ext"]
 exclude = ["exasol_integration_test_docker_environment/test"]
 
 [tool.poetry.dependencies]
-python = ">=3.6"
+python = ">=3.6,<4"
 click = ">=7.0"
 docker = ">=4.0.0"
 gitpython = ">=2.1.0"
