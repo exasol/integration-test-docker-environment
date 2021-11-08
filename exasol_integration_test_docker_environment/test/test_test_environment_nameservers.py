@@ -1,7 +1,8 @@
 import unittest
 
-import docker
 
+from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
+from exasol_integration_test_docker_environment.test.utils.utils import close_environments
 from exasol_integration_test_docker_environment.testing import utils
 
 
@@ -18,39 +19,26 @@ class DockerTestEnvironmentDBMemSizeTest(unittest.TestCase):
                 utils.INTEGRATION_TEST_DOCKER_ENVIRONMENT_DEFAULT_BIN,
                 clean_images_at_close=False)
 
-    def setUp(self):
-        self.client = docker.from_env()
-
     @classmethod
     def tearDownClass(cls):
-        try:
-            cls.test_environment.close()
-        except Exception as e:
-            print(e)
+        close_environments(cls.test_environment)
 
     def tearDown(self):
-        try:
-            self.on_host_docker_environment.close()
-        except Exception as e:
-            print(e)
-        try:
-            self.google_cloud_docker_environment.close()
-        except Exception as e:
-            print(e)
-        self.client.close()
+        close_environments(self.on_host_docker_environment, self.google_cloud_docker_environment)
 
     def assert_nameserver(self, nameservers: str):
-        containers = [c.name for c in self.client.containers.list() if self.docker_environment_name in c.name]
-        db_container = [c for c in containers if "db_container" in c]
-        exit_result = self.client.containers.get(db_container[0]).exec_run("cat /exa/etc/EXAConf")
-        output = exit_result[1].decode("UTF-8")
-        if output == '':
-            exit_result = self.client.containers.get(db_container[0]).exec_run("cat /exa/etc/EXAConf")
+        with ContextDockerClient() as docker_client:
+            containers = [c.name for c in docker_client.containers.list() if self.docker_environment_name in c.name]
+            db_container = [c for c in containers if "db_container" in c]
+            exit_result = docker_client.containers.get(db_container[0]).exec_run("cat /exa/etc/EXAConf")
             output = exit_result[1].decode("UTF-8")
+            if output == '':
+                exit_result = docker_client.containers.get(db_container[0]).exec_run("cat /exa/etc/EXAConf")
+                output = exit_result[1].decode("UTF-8")
+                return_code = exit_result[0]
             return_code = exit_result[0]
-        return_code = exit_result[0]
-        self.assertEquals(return_code, 0)
-        self.assertIn("NameServers = %s" % nameservers, output)
+            self.assertEquals(return_code, 0)
+            self.assertIn("NameServers = %s" % nameservers, output)
 
     def test_no_nameserver(self):
         self.docker_environment_name = "test_no_nameserver"

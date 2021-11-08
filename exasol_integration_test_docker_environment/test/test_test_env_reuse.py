@@ -1,10 +1,10 @@
 import os
 import unittest
 
-import docker
 import luigi
 
 from exasol_integration_test_docker_environment.lib.data.environment_type import EnvironmentType
+from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_environment import SpawnTestEnvironment
 from exasol_integration_test_docker_environment.cli.common import set_docker_repository_config, generate_root_task
 from exasol_integration_test_docker_environment.test.utils import luigi_utils
@@ -24,7 +24,6 @@ class TestContainerReuseTest(unittest.TestCase):
         return self.__class__.__name__.lower()
 
     def setUp(self):
-        self._client = docker.from_env()
         self._docker_repository_name = self.env_name()
         print("docker_repository_name", self._docker_repository_name)
         luigi_utils.clean(self._docker_repository_name)
@@ -37,7 +36,6 @@ class TestContainerReuseTest(unittest.TestCase):
 
     def tearDown(self):
         luigi_utils.clean(self._docker_repository_name)
-        self._client.close()
 
     def setup_luigi_config(self):
         set_docker_repository_config(
@@ -91,12 +89,13 @@ class TestContainerReuseTest(unittest.TestCase):
         return f"""$EXAPLUS -c '{database_host}:{database_port}' -u '{username}' -p '{password}' -sql \\\"{q}\\\""""
 
     def _exec_cmd_in_test_container(self, test_environment_info, cmd):
-        bash_cmd = f"""bash -c "{cmd}" """
-        test_container = self._client.containers.get(test_environment_info.test_container_info.container_name)
+        with ContextDockerClient() as docker_client:
+            bash_cmd = f"""bash -c "{cmd}" """
+            test_container = docker_client.containers.get(test_environment_info.test_container_info.container_name)
 
-        exit_code, output = test_container.exec_run(cmd=bash_cmd)
-        self.assertEquals(exit_code, 0)
-        return output.decode('utf-8')
+            exit_code, output = test_container.exec_run(cmd=bash_cmd)
+            self.assertEquals(exit_code, 0)
+            return output.decode('utf-8')
 
     def _verify_test_data(self, test_environment_info):
         cmd = self._create_exaplus_check_cmd(test_environment_info)
@@ -112,10 +111,12 @@ class TestContainerReuseTest(unittest.TestCase):
         task.cleanup(True)
 
     def get_instance_ids(self, test_environment_info):
-        test_container = self._client.containers.get(test_environment_info.test_container_info.container_name)
-        db_container = self._client.containers.get(test_environment_info.database_info.container_info.container_name)
-        network = self._client.networks.get(test_environment_info.network_info.network_name)
-        return test_container.id, db_container.id, network.id
+        with ContextDockerClient() as docker_client:
+            test_container = docker_client.containers.get(test_environment_info.test_container_info.container_name)
+            db_container = \
+                docker_client.containers.get(test_environment_info.database_info.container_info.container_name)
+            network = docker_client.networks.get(test_environment_info.network_info.network_name)
+            return test_container.id, db_container.id, network.id
 
     def test_reuse_env_same_instances(self):
         task = self.run_spawn_test_env(cleanup=False)

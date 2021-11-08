@@ -9,6 +9,7 @@ from luigi import Parameter
 from typing import Set, Dict
 
 from exasol_integration_test_docker_environment.cli.common import generate_root_task
+from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.lib.docker.images.create.docker_build_base import DockerBuildBase
 from exasol_integration_test_docker_environment.lib.docker.images.create.docker_image_analyze_task import \
     DockerAnalyzeImageTask
@@ -81,16 +82,15 @@ class DockerBuildBaseTest(unittest.TestCase):
             shutil.rmtree(str(task._get_tmp_path_for_job()))
 
     def setUp(self):
-        self.client = docker.from_env()
         self.clean()
 
     def tearDown(self):
         self.clean()
-        self.client.close()
 
     def assert_image_exists(self, prefix):
-        image_list = find_images_by_tag(self.client, lambda x: x.startswith(prefix))
-        self.assertEquals(len(image_list), 1, f"Image with prefix {prefix} not found")
+        with ContextDockerClient() as docker_client:
+            image_list = find_images_by_tag(docker_client, lambda x: x.startswith(prefix))
+            self.assertEquals(len(image_list), 1, f"Image with prefix {prefix} not found")
 
     def test_default_parameter(self):
         task = generate_root_task(task_class=TestDockerBuildBase)

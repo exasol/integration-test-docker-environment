@@ -4,13 +4,13 @@ import tempfile
 import unittest
 from pathlib import Path
 
-import docker
 import luigi
 
 from exasol_integration_test_docker_environment.cli.common import set_build_config, set_docker_repository_config, \
     generate_root_task
 from exasol_integration_test_docker_environment.lib.base.docker_base_task import DockerBaseTask
 from exasol_integration_test_docker_environment.lib.data.container_info import ContainerInfo
+from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.lib.test_environment.prepare_network_for_test_environment import \
     PrepareDockerNetworkForTestEnvironment
 from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_container import SpawnTestContainer
@@ -47,15 +47,14 @@ class TestTask(DockerBaseTask):
                                    )
         test_container_future_1 = yield from self.run_dependencies(test_container_task_1)
         container_info = test_container_future_1.get_output()  # type: ContainerInfo
-        container = self._client.containers.get(container_info.container_name)
-
-        self.return_object({"container_id": container.image.id, "image_id": container.image.id})
+        with ContextDockerClient() as docker_client:
+            container = docker_client.containers.get(container_info.container_name)
+            self.return_object({"container_id": container.image.id, "image_id": container.image.id})
 
 
 class TestContainerReuseTest(unittest.TestCase):
 
     def setUp(self):
-        self.client = docker.from_env()
         resource_directory = Path(Path(__file__).parent, "resources/test_test_container_reuse")
         print("resource_directory content", list(Path(resource_directory).iterdir()))
         self.temp_directory = tempfile.mkdtemp()
@@ -74,7 +73,6 @@ class TestContainerReuseTest(unittest.TestCase):
         os.chdir(self.old_working_directory)
         luigi_utils.clean(self.docker_repository_name)
         shutil.rmtree(self.temp_directory)
-        self.client.close()
 
     def setup_luigi_config(self):
         set_build_config(force_rebuild=False,

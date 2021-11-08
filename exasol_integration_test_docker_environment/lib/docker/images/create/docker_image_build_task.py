@@ -4,8 +4,7 @@ from pathlib import Path
 
 from exasol_integration_test_docker_environment.lib.base.still_running_logger import StillRunningLogger
 from exasol_integration_test_docker_environment.lib.config.build_config import build_config
-from exasol_integration_test_docker_environment.lib.config.docker_config import docker_client_config, \
-    docker_build_arguments
+from exasol_integration_test_docker_environment.lib.config.docker_config import docker_build_arguments
 from exasol_integration_test_docker_environment.lib.docker.images.create.docker_image_creator_base_task import \
     DockerImageCreatorBaseTask
 from exasol_integration_test_docker_environment.lib.docker.images.create.utils.build_context_creator import \
@@ -27,15 +26,16 @@ class DockerBuildImageTask(DockerImageCreatorBaseTask):
                                                         self.image_info,
                                                         self.get_log_path())
             build_context_creator.prepare_build_context_to_temp_dir()
-            output_generator = \
-                self._low_level_client.build(path=temp_directory,
-                                             nocache=docker_client_config.no_cache,
-                                             tag=self.image_info.get_target_complete_name(),
-                                             rm=True,
-                                             buildargs=dict(**image_description.transparent_build_arguments,
-                                                            **image_description.image_changing_build_arguments,
-                                                            **docker_build_arguments().secret))
-            self._handle_output(output_generator, self.image_info)
+            with self._get_docker_client() as docker_client:
+                output_generator = \
+                    docker_client.api.build(path=temp_directory,
+                                            nocache=self.no_cache,
+                                            tag=self.image_info.get_target_complete_name(),
+                                            rm=True,
+                                            buildargs=dict(**image_description.transparent_build_arguments,
+                                                           **image_description.image_changing_build_arguments,
+                                                           **docker_build_arguments().secret))
+                self._handle_output(output_generator, self.image_info)
         finally:
             shutil.rmtree(temp_directory)
 

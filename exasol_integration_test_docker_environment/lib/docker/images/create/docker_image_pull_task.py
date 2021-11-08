@@ -35,17 +35,19 @@ class DockerPullImageTask(DockerImageCreatorBaseTask):
                 else:
                     raise e
 
-        self._client.images.get(self.image_info.get_source_complete_name()).tag(
-            repository=self.image_info.target_repository_name,
-            tag=self.image_info.get_target_complete_tag()
-        )
+        with self._get_docker_client() as docker_client:
+            docker_client.images.get(self.image_info.get_source_complete_name()).tag(
+                repository=self.image_info.target_repository_name,
+                tag=self.image_info.get_target_complete_tag()
+            )
 
     def pull(self, image_target, auth_config):
         self.logger.info("Try to pull docker image %s", image_target.get_complete_name())
-        output_generator = self._low_level_client.pull(
-            repository=image_target.image_name, tag=image_target.image_tag,
-            auth_config=auth_config,
-            stream=True)
+        with self._get_docker_client() as docker_client:
+            output_generator = docker_client.api.pull(
+                repository=image_target.image_name, tag=image_target.image_tag,
+                auth_config=auth_config,
+                stream=True)
         self._handle_output(output_generator, self.image_info)
 
     def _handle_output(self, output_generator, image_info):

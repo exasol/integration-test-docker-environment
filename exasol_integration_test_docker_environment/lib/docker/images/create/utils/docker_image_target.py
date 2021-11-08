@@ -1,7 +1,7 @@
 import docker
 import luigi
 
-from exasol_integration_test_docker_environment.lib.config.docker_config import docker_client_config
+from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 
 
 class DockerImageTarget(luigi.Target):
@@ -13,11 +13,9 @@ class DockerImageTarget(luigi.Target):
         return f"{self.image_name}:{self.image_tag}"
 
     def exists(self) -> bool:
-        client = docker_client_config().get_client()
-        try:
-            image = client.images.get(self.get_complete_name())
-            return True
-        except docker.errors.DockerException as e:
-            return False
-        finally:
-            client.close()
+        with ContextDockerClient() as docker_client:
+            try:
+                image = docker_client.images.get(self.get_complete_name())
+                return True
+            except docker.errors.DockerException as e:
+                return False

@@ -22,7 +22,8 @@ class WaitForTestExternalDatabase(DockerBaseTask,
     attempt = luigi.IntParameter(1)
 
     def run_task(self):
-        test_container = self._client.containers.get(self.test_container_info.container_name)
+        with self._get_docker_client() as docker_client:
+            test_container = docker_client.containers.get(self.test_container_info.container_name)
         is_database_ready = self.wait_for_database_startup(test_container)
         self.return_object(is_database_ready)
 

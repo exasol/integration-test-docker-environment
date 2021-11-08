@@ -37,8 +37,9 @@ class UploadFileToBucketFS(DockerBaseTask):
         sync_time_estimation = self.get_sync_time_estimation()
 
         if self._database_info.container_info is not None:
-            database_container = self._client.containers.get(
-                self._database_info.container_info.container_name)
+            with self._get_docker_client() as docker_client:
+                database_container = docker_client.containers.get(
+                    self._database_info.container_info.container_name)
         else:
             database_container = None
         if not self.should_be_reused(upload_target):
@@ -132,7 +133,8 @@ class UploadFileToBucketFS(DockerBaseTask):
         return cmd
 
     def run_command(self, command_type, cmd):
-        test_container = self._client.containers.get(self._test_container_info.container_name)
+        with self._get_docker_client() as docker_client:
+            test_container = docker_client.containers.get(self._test_container_info.container_name)
         self.logger.info("start %s command %s", command_type, cmd)
         exit_code, output = test_container.exec_run(cmd=cmd)
         self.logger.info("finish %s command %s", command_type, cmd)

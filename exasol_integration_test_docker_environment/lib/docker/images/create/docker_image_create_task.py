@@ -61,10 +61,11 @@ class DockerCreateImageTask(DockerBaseTask):
                             self.task_id, image_info.image_state, image_info.get_target_complete_name())
 
     def rename_source_image_to_target_image(self, image_info):
-        self._client.images.get(image_info.get_source_complete_name()).tag(
-            repository=image_info.target_repository_name,
-            tag=image_info.get_target_complete_tag()
-        )
+        with self._get_docker_client() as docker_client:
+            docker_client.images.get(image_info.get_source_complete_name()).tag(
+                repository=image_info.target_repository_name,
+                tag=image_info.get_target_complete_tag()
+            )
 
 
 class DockerCreateImageTaskWithDeps(DockerCreateImageTask):

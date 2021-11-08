@@ -46,8 +46,8 @@ class SpawnTestContainer(DockerBaseTask):
             self.get_values_from_futures(self.test_container_image_future)["test-container"]  # type: ImageInfo
         test_container = None
         try:
-            test_container = \
-                self._client.containers.get(self.test_container_name)
+            with self._get_docker_client() as docker_client:
+                test_container = docker_client.containers.get(self.test_container_name)
         except Exception as e:
             pass
         ret_val = self.network_info.reused and self.reuse_test_container and \
@@ -66,15 +66,15 @@ class SpawnTestContainer(DockerBaseTask):
             container_info = self._try_to_reuse_test_container(ip_address, self.network_info)
         if container_info is None:
             container_info = self._create_test_container(ip_address, self.network_info)
-        test_container = \
-            self._client.containers.get(self.test_container_name)
+        with self._get_docker_client() as docker_client:
+            docker_client.containers.get(self.test_container_name)
         self._copy_tests()
         self.return_object(container_info)
 
     def _copy_tests(self):
         self.logger.warning("Copy tests in test container %s.", self.test_container_name)
-        test_container = \
-            self._client.containers.get(self.test_container_name)
+        with self._get_docker_client() as docker_client:
+            test_container = docker_client.containers.get(self.test_container_name)
         try:
             test_container.exec_run(cmd="rm -r /tests")
         except:
@@ -116,30 +116,32 @@ class SpawnTestContainer(DockerBaseTask):
                 "mode": "rw"
             }
         }
-        docker_unix_sockets = [i for i in self._client.api.adapters.values() if isinstance(i, unixconn.UnixHTTPAdapter)]
-        if len(docker_unix_sockets) > 0:
-            host_docker_socker_path = docker_unix_sockets[0].socket_path
-            volumes[host_docker_socker_path] = {
-                "bind": "/var/run/docker.sock",
-                "mode": "rw"
-            }
-        test_container = \
-            self._client.containers.create(
-                image=test_container_image_info.get_target_complete_name(),
-                name=self.test_container_name,
-                network_mode=None,
-                command="sleep infinity",
-                detach=True,
-                volumes=volumes,
-                labels={"test_environment_name": self.environment_name, "container_type": "test_container"},
-                runtime=self.docker_runtime
-            )
-        docker_network = self._client.networks.get(network_info.network_name)
-        network_aliases = self._get_network_aliases()
-        docker_network.connect(test_container, ipv4_address=ip_address, aliases=network_aliases)
-        test_container.start()
-        container_info = self.create_container_info(ip_address, network_aliases, network_info)
-        return container_info
+        with self._get_docker_client() as docker_client:
+            docker_unix_sockets = [i for i in docker_client.api.adapters.values()
+                                   if isinstance(i, unixconn.UnixHTTPAdapter)]
+            if len(docker_unix_sockets) > 0:
+                host_docker_socker_path = docker_unix_sockets[0].socket_path
+                volumes[host_docker_socker_path] = {
+                    "bind": "/var/run/docker.sock",
+                    "mode": "rw"
+                }
+            test_container = \
+                docker_client.containers.create(
+                    image=test_container_image_info.get_target_complete_name(),
+                    name=self.test_container_name,
+                    network_mode=None,
+                    command="sleep infinity",
+                    detach=True,
+                    volumes=volumes,
+                    labels={"test_environment_name": self.environment_name, "container_type": "test_container"},
+                    runtime=self.docker_runtime
+                )
+            docker_network = docker_client.networks.get(network_info.network_name)
+            network_aliases = self._get_network_aliases()
+            docker_network.connect(test_container, ipv4_address=ip_address, aliases=network_aliases)
+            test_container.start()
+            container_info = self.create_container_info(ip_address, network_aliases, network_info)
+            return container_info
 
     def _get_network_aliases(self):
         network_aliases = ["test_container", self.test_container_name]
@@ -147,13 +149,14 @@ class SpawnTestContainer(DockerBaseTask):
 
     def create_container_info(self, ip_address: str, network_aliases: List[str],
                               network_info: DockerNetworkInfo) -> ContainerInfo:
-        test_container = self._client.containers.get(self.test_container_name)
-        if test_container.status != "running":
-            raise Exception(f"Container {self.test_container_name} not running")
-        container_info = ContainerInfo(container_name=self.test_container_name,
-                                       ip_address=ip_address,
-                                       network_aliases=network_aliases,
-                                       network_info=network_info)
+        with self._get_docker_client() as docker_client:
+            test_container = docker_client.containers.get(self.test_container_name)
+            if test_container.status != "running":
+                raise Exception(f"Container {self.test_container_name} not running")
+            container_info = ContainerInfo(container_name=self.test_container_name,
+                                           ip_address=ip_address,
+                                           network_aliases=network_aliases,
+                                           network_info=network_info)
         return container_info
 
     def _get_export_directory(self):
@@ -161,9 +164,10 @@ class SpawnTestContainer(DockerBaseTask):
 
     def _remove_container(self, container_name: str):
         try:
-            container = self._client.containers.get(container_name)
-            container.remove(force=True)
-            self.logger.info(f"Removed container: name: '{container_name}', id: '{container.short_id}'")
+            with self._get_docker_client() as docker_client:
+                container = docker_client.containers.get(container_name)
+                container.remove(force=True)
+                self.logger.info(f"Removed container: name: '{container_name}', id: '{container.short_id}'")
         except Exception as e:
             pass
 

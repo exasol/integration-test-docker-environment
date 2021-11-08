@@ -29,50 +29,54 @@ class PrepareDockerNetworkForTestEnvironment(DockerBaseTask):
         self.return_object(self.network_info)
 
     def get_network_info(self, reused: bool):
-        network_properties = self._low_level_client.inspect_network(self.network_name)
-        network_config = network_properties["IPAM"]["Config"][0]
-        return DockerNetworkInfo(network_name=self.network_name, subnet=network_config["Subnet"],
-                                 gateway=network_config["Gateway"], reused=reused)
+        with self._get_docker_client() as docker_client:
+            network_properties = docker_client.api.inspect_network(self.network_name)
+            network_config = network_properties["IPAM"]["Config"][0]
+            return DockerNetworkInfo(network_name=self.network_name, subnet=network_config["Subnet"],
+                                     gateway=network_config["Gateway"], reused=reused)
 
     def create_docker_network(self) -> DockerNetworkInfo:
         self.remove_container(self.test_container_name)
         if self.db_container_name is not None:
             self.remove_container(self.db_container_name)
         self.remove_network(self.network_name)
-        network = self._client.networks.create(
-            name=self.network_name,
-            driver="bridge",
-        )
-        network_info = self.get_network_info(reused=False)
-        subnet = network_info.subnet
-        gateway = network_info.gateway
-        ipam_pool = docker.types.IPAMPool(
-            subnet=subnet,
-            gateway=gateway
-        )
-        ipam_config = docker.types.IPAMConfig(
-            pool_configs=[ipam_pool]
-        )
-        self.remove_network(self.network_name)  # TODO race condition possible, add retry
-        network = self._client.networks.create(
-            name=self.network_name,
-            driver="bridge",
-            ipam=ipam_config
-        )
+        with self._get_docker_client() as docker_client:
+            network = docker_client.networks.create(
+                name=self.network_name,
+                driver="bridge",
+            )
+            network_info = self.get_network_info(reused=False)
+            subnet = network_info.subnet
+            gateway = network_info.gateway
+            ipam_pool = docker.types.IPAMPool(
+                subnet=subnet,
+                gateway=gateway
+            )
+            ipam_config = docker.types.IPAMConfig(
+                pool_configs=[ipam_pool]
+            )
+            self.remove_network(self.network_name)  # TODO race condition possible, add retry
+            network = docker_client.networks.create(
+                name=self.network_name,
+                driver="bridge",
+                ipam=ipam_config
+            )
         return network_info
 
     def remove_network(self, network_name):
         try:
-            self._client.networks.get(network_name).remove()
-            self.logger.info("Removed network %s", network_name)
+            with self._get_docker_client() as docker_client:
+                docker_client.networks.get(network_name).remove()
+                self.logger.info("Removed network %s", network_name)
         except docker.errors.NotFound:
             pass
 
     def remove_container(self, container_name: str):
         try:
-            container = self._client.containers.get(container_name)
-            container.remove(force=True)
-            self.logger.info("Removed container %s", container_name)
+            with self._get_docker_client() as docker_client:
+                container = docker_client.containers.get(container_name)
+                container.remove(force=True)
+                self.logger.info("Removed container %s", container_name)
         except docker.errors.NotFound:
             pass
 

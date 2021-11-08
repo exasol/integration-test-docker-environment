@@ -67,7 +67,8 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
     def create_test_environment_info_in_test_container_and_on_host(
             self, test_environment_info: EnvironmentInfo):
         test_container_name = test_environment_info.test_container_info.container_name
-        test_container = self._client.containers.get(test_container_name)
+        with self._get_docker_client() as docker_client:
+            test_container = docker_client.containers.get(test_container_name)
         test_environment_info_base_host_path = Path(self.get_cache_path(),
                                                     f"environments/{self.environment_name}")
         test_environment_info_base_host_path.mkdir(exist_ok=True, parents=True)
@@ -116,8 +117,9 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
             environment_variables += f"""ENVIRONMENT_DATABASE_CONTAINER_NETWORK_ALIASES="{database_container_network_aliases}"\n"""
             environment_variables += f"""ENVIRONMENT_DATABASE_CONTAINER_IP_ADDRESS={test_environment_info.database_info.container_info.ip_address}\n"""
             environment_variables += f"""ENVIRONMENT_DATABASE_CONTAINER_VOLUMNE_NAME={test_environment_info.database_info.container_info.volume_name}\n"""
-            db_container = self._client.containers.get(
-                test_environment_info.database_info.container_info.container_name)
+            with self._get_docker_client() as docker_client:
+                db_container = docker_client.containers.get(
+                    test_environment_info.database_info.container_info.container_name)
             db_container.reload()
             default_bridge_ip_address = db_container.attrs["NetworkSettings"]["Networks"]["bridge"]["IPAddress"]
             environment_variables += f"""ENVIRONMENT_DATABASE_CONTAINER_DEFAULT_BRIDGE_IP_ADDRESS={default_bridge_ip_address}\n"""

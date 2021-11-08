@@ -15,6 +15,7 @@ import docker
 import requests
 
 from exasol_integration_test_docker_environment.lib.data.environment_info import EnvironmentInfo
+from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 
 INTEGRATION_TEST_DOCKER_ENVIRONMENT_DEFAULT_BIN = "./start-test-env-without-poetry"
 
@@ -181,8 +182,7 @@ class ExaslctTestEnvironment:
                 environment_info=on_host_parameter.completed_process,
                 completed_process=on_host_parameter.completed_process
             )
-            docker_client = docker.from_env()
-            try:
+            with ContextDockerClient() as docker_client:
                 db_container = docker_client.containers.get(f"db_container_{google_cloud_parameter.name}")
                 cloudbuild_network = docker_client.networks.get("cloudbuild")
                 cloudbuild_network.connect(db_container)
@@ -190,16 +190,13 @@ class ExaslctTestEnvironment:
                 google_cloud_parameter.database_host = \
                     db_container.attrs["NetworkSettings"]["Networks"][cloudbuild_network.name]["IPAddress"]
                 return on_host_parameter, google_cloud_parameter
-            finally:
-                docker_client.close()
         else:
             return on_host_parameter, None
 
     def create_registry(self):
         registry_port = find_free_port()
         registry_container_name = self.name.replace("/", "_") + "_registry"
-        docker_client = docker.from_env()
-        try:
+        with ContextDockerClient() as docker_client:
             print("Start pull of registry:2")
             docker_client.images.pull(repository="registry", tag="2")
             print(f"Start container of {registry_container_name}")
@@ -226,8 +223,6 @@ class ExaslctTestEnvironment:
             else:
                 self.repository_prefix = f"localhost:{registry_port}"
                 return registry_container, "localhost", registry_port
-        finally:
-            docker_client.close()
 
 
 def find_free_port():
@@ -242,27 +237,21 @@ def find_free_port():
 
 
 def remove_docker_container(containers):
-    docker_client = docker.from_env()
-    try:
+    with ContextDockerClient() as docker_client:
         for container in containers:
             try:
                 docker_client.containers.get(container).remove(force=True)
             except Exception as e:
                 print(e)
-    finally:
-        docker_client.close()
 
 
 def remove_docker_volumes(volumes):
-    docker_client = docker.from_env()
-    try:
+    with ContextDockerClient() as docker_client:
         for volume in volumes:
             try:
                 docker_client.volumes.get(volume).remove(force=True)
             except Exception as e:
                 print(e)
-    finally:
-        docker_client.close()
 
 
 def request_registry_images(registry_host, registry_port, repo_name):
@@ -276,3 +265,12 @@ def request_registry_repositories(registry_host, registry_port):
     result = requests.request("GET", f"http://{registry_host}:{registry_port}/v2/_catalog/")
     repositories_ = json.loads(result.content.decode("UTF-8"))["repositories"]
     return repositories_
+
+
+def close_environments(*args):
+    for env in args:
+        try:
+            if env is not None:
+                env.close()
+        except Exception as e:
+            print(e)
