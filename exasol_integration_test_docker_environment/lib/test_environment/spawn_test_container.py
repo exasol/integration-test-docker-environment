@@ -38,22 +38,22 @@ class SpawnTestContainer(DockerBaseTask):
     def register_required(self):
         self.test_container_image_future = \
             self.register_dependency(self.create_child_task(task_class=DockerTestContainerBuild))
-        self.export_directory_future =\
+        self.export_directory_future = \
             self.register_dependency(self.create_child_task(task_class=CreateExportDirectory))
 
     def is_reuse_possible(self) -> bool:
         test_container_image_info = \
             self.get_values_from_futures(self.test_container_image_future)["test-container"]  # type: ImageInfo
         test_container = None
-        try:
-            with self._get_docker_client() as docker_client:
+        with self._get_docker_client() as docker_client:
+            try:
                 test_container = docker_client.containers.get(self.test_container_name)
-        except Exception as e:
-            pass
-        ret_val = self.network_info.reused and self.reuse_test_container and \
-               test_container is not None and \
-               test_container_image_info.get_target_complete_name() in test_container.image.tags and \
-               test_container_image_info.image_state == ImageState.USED_LOCAL.name
+            except Exception as e:
+                pass
+            ret_val = self.network_info.reused and self.reuse_test_container and \
+                      test_container is not None and \
+                      test_container_image_info.get_target_complete_name() in test_container.image.tags and \
+                      test_container_image_info.image_state == ImageState.USED_LOCAL.name
 
         return ret_val
 
@@ -75,11 +75,11 @@ class SpawnTestContainer(DockerBaseTask):
         self.logger.warning("Copy tests in test container %s.", self.test_container_name)
         with self._get_docker_client() as docker_client:
             test_container = docker_client.containers.get(self.test_container_name)
-        try:
-            test_container.exec_run(cmd="rm -r /tests")
-        except:
-            pass
-        test_container.exec_run(cmd="cp -r /tests_src /tests")
+            try:
+                test_container.exec_run(cmd="rm -r /tests")
+            except:
+                pass
+            test_container.exec_run(cmd="cp -r /tests_src /tests")
 
     def _try_to_reuse_test_container(self, ip_address: str,
                                      network_info: DockerNetworkInfo) -> ContainerInfo:
@@ -171,7 +171,7 @@ class SpawnTestContainer(DockerBaseTask):
         except Exception as e:
             pass
 
-    def cleanup_task(self, success:bool):
+    def cleanup_task(self, success: bool):
         self.logger.info(f"___________cleanup_task")
         if (success and not self.no_test_container_cleanup_after_success) or \
                 (not success and not self.no_test_container_cleanup_after_failure):

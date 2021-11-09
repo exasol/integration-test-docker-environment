@@ -85,7 +85,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             except:
                 pass
             docker_db_image_info = self._pull_docker_db_images_if_necassary()
-            db_volume = self._prepare_db_volume(db_private_network, docker_db_image_info)
+            db_volume = self._prepare_db_volume(docker_client, db_private_network, docker_db_image_info)
             ports = {}
             if self.database_port_forward is not None:
                 ports[f"{DB_PORT}/tcp"] = ('0.0.0.0', int(self.database_port_forward))
@@ -116,19 +116,19 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
     def _create_database_info(self, db_ip_address: str, reused: bool) -> DatabaseInfo:
         with self._get_docker_client() as docker_client:
             db_container = docker_client.containers.get(self.db_container_name)
-        if db_container.status != "running":
-            raise Exception(f"Container {self.db_container_name} not running")
-        network_aliases = self._get_network_aliases()
-        container_info = \
-            ContainerInfo(container_name=self.db_container_name,
-                          ip_address=db_ip_address,
-                          network_aliases=network_aliases,
-                          network_info=self.network_info,
-                          volume_name=self._get_db_volume_name())
-        database_info = \
-            DatabaseInfo(host=db_ip_address, db_port=DB_PORT, bucketfs_port=BUCKETFS_PORT,
-                         reused=reused, container_info=container_info)
-        return database_info
+            if db_container.status != "running":
+                raise Exception(f"Container {self.db_container_name} not running")
+            network_aliases = self._get_network_aliases()
+            container_info = \
+                ContainerInfo(container_name=self.db_container_name,
+                              ip_address=db_ip_address,
+                              network_aliases=network_aliases,
+                              network_info=self.network_info,
+                              volume_name=self._get_db_volume_name())
+            database_info = \
+                DatabaseInfo(host=db_ip_address, db_port=DB_PORT, bucketfs_port=BUCKETFS_PORT,
+                             reused=reused, container_info=container_info)
+            return database_info
 
     def _pull_docker_db_images_if_necassary(self):
         image_name = "exasol/docker-db"
@@ -152,7 +152,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                 self._handle_output(output_generator, docker_db_image_info)
         return docker_db_image_info
 
-    def _prepare_db_volume(self, db_private_network: str,
+    def _prepare_db_volume(self, docker_client, db_private_network: str,
                            docker_db_image_info: ImageInfo) -> Volume:
         db_volume_name = self._get_db_volume_name()
         db_volume_preperation_container_name = self._get_db_volume_preperation_container_name()
@@ -160,7 +160,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         self._remove_volume(db_volume_name)
         db_volume, volume_preparation_container = \
             volume_preparation_container, volume_preparation_container = \
-            self._create_volume_and_container(db_volume_name,
+            self._create_volume_and_container(docker_client, db_volume_name,
                                               db_volume_preperation_container_name)
         try:
             self._upload_init_db_files(volume_preparation_container,
@@ -194,21 +194,20 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         except docker.errors.NotFound:
             pass
 
-    def _create_volume_and_container(self, db_volume_name, db_volume_preperation_container_name) \
+    def _create_volume_and_container(self, docker_client, db_volume_name, db_volume_preperation_container_name) \
             -> Tuple[Volume, Container]:
-        with self._get_docker_client() as docker_client:
-            db_volume = docker_client.volumes.create(db_volume_name)
-            volume_preparation_container = \
-                docker_client.containers.run(
-                    image="ubuntu:18.04",
-                    name=db_volume_preperation_container_name,
-                    auto_remove=True,
-                    command="sleep infinity",
-                    detach=True,
-                    volumes={
-                        db_volume.name: {"bind": "/exa", "mode": "rw"}},
-                    labels={"test_environment_name": self.environment_name, "container_type": "db_container"})
-            return db_volume, volume_preparation_container
+        db_volume = docker_client.volumes.create(db_volume_name)
+        volume_preparation_container = \
+            docker_client.containers.run(
+                image="ubuntu:18.04",
+                name=db_volume_preperation_container_name,
+                auto_remove=True,
+                command="sleep infinity",
+                detach=True,
+                volumes={
+                    db_volume.name: {"bind": "/exa", "mode": "rw"}},
+                labels={"test_environment_name": self.environment_name, "container_type": "db_container"})
+        return db_volume, volume_preparation_container
 
     def _upload_init_db_files(self,
                               volume_preperation_container: Container,

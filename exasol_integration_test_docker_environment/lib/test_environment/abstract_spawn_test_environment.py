@@ -69,39 +69,39 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
         test_container_name = test_environment_info.test_container_info.container_name
         with self._get_docker_client() as docker_client:
             test_container = docker_client.containers.get(test_container_name)
-        test_environment_info_base_host_path = Path(self.get_cache_path(),
-                                                    f"environments/{self.environment_name}")
-        test_environment_info_base_host_path.mkdir(exist_ok=True, parents=True)
-        self.logger.info(
-            f"Create test environment info in test container '{test_container_name}' at '/' "
-            f"and on the host at '{test_environment_info_base_host_path}'")
+            test_environment_info_base_host_path = Path(self.get_cache_path(),
+                                                        f"environments/{self.environment_name}")
+            test_environment_info_base_host_path.mkdir(exist_ok=True, parents=True)
+            self.logger.info(
+                f"Create test environment info in test container '{test_container_name}' at '/' "
+                f"and on the host at '{test_environment_info_base_host_path}'")
 
-        copy = DockerContainerCopy(test_container)
-        json = test_environment_info.to_json()
-        copy.add_string_to_file("environment_info.json", json)
-        cache_environment_info_json_path = Path(test_environment_info_base_host_path,
-                                                "environment_info.json")
-        with cache_environment_info_json_path.open("w") as f:
-            f.write(json)
+            copy = DockerContainerCopy(test_container)
+            json = test_environment_info.to_json()
+            copy.add_string_to_file("environment_info.json", json)
+            cache_environment_info_json_path = Path(test_environment_info_base_host_path,
+                                                    "environment_info.json")
+            with cache_environment_info_json_path.open("w") as f:
+                f.write(json)
 
-        environment_variables = \
-            self.collect_environment_info_variables(test_container_name,
-                                                    test_environment_info)
-        copy.add_string_to_file("environment_info.conf", environment_variables)
-        cache_environment_info_conf_path = Path(test_environment_info_base_host_path,
-                                                "environment_info.conf")
-        with cache_environment_info_conf_path.open("w") as f:
-            f.write(environment_variables)
+            environment_variables = \
+                self.collect_environment_info_variables(test_container_name,
+                                                        test_environment_info)
+            copy.add_string_to_file("environment_info.conf", environment_variables)
+            cache_environment_info_conf_path = Path(test_environment_info_base_host_path,
+                                                    "environment_info.conf")
+            with cache_environment_info_conf_path.open("w") as f:
+                f.write(environment_variables)
 
-        environment_variables_with_export = ""
-        for line in environment_variables.splitlines():
-            environment_variables_with_export += f"export {line}\n"
-        copy.add_string_to_file("environment_info.sh", environment_variables_with_export)
-        cache_environment_info_sh_path = Path(test_environment_info_base_host_path, "environment_info.sh")
-        with cache_environment_info_sh_path.open("w") as f:
-            f.write(environment_variables_with_export)
+            environment_variables_with_export = ""
+            for line in environment_variables.splitlines():
+                environment_variables_with_export += f"export {line}\n"
+            copy.add_string_to_file("environment_info.sh", environment_variables_with_export)
+            cache_environment_info_sh_path = Path(test_environment_info_base_host_path, "environment_info.sh")
+            with cache_environment_info_sh_path.open("w") as f:
+                f.write(environment_variables_with_export)
 
-        copy.copy("/")
+            copy.copy("/")
 
     def collect_environment_info_variables(self, test_container_name, test_environment_info):
         environment_variables = ""
@@ -120,8 +120,8 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
             with self._get_docker_client() as docker_client:
                 db_container = docker_client.containers.get(
                     test_environment_info.database_info.container_info.container_name)
-            db_container.reload()
-            default_bridge_ip_address = db_container.attrs["NetworkSettings"]["Networks"]["bridge"]["IPAddress"]
+                db_container.reload()
+                default_bridge_ip_address = db_container.attrs["NetworkSettings"]["Networks"]["bridge"]["IPAddress"]
             environment_variables += f"""ENVIRONMENT_DATABASE_CONTAINER_DEFAULT_BRIDGE_IP_ADDRESS={default_bridge_ip_address}\n"""
         if test_environment_info.test_container_info is not None:
             environment_variables += f"""ENVIRONMENT_TEST_CONTAINER_NAME={test_container_name}\n"""

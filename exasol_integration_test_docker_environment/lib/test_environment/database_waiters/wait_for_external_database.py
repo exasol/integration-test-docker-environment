@@ -24,8 +24,8 @@ class WaitForTestExternalDatabase(DockerBaseTask,
     def run_task(self):
         with self._get_docker_client() as docker_client:
             test_container = docker_client.containers.get(self.test_container_info.container_name)
-        is_database_ready = self.wait_for_database_startup(test_container)
-        self.return_object(is_database_ready)
+            is_database_ready = self.wait_for_database_startup(test_container)
+            self.return_object(is_database_ready)
 
     def wait_for_database_startup(self, test_container: Container):
         is_database_ready_thread = self.start_wait_threads(test_container)

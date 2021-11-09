@@ -113,7 +113,7 @@ class BaseTask(Task):
         # task_id is a concatenation of task family, the first values of the first 3 parameters
         # sorted by parameter name and a md5hash of the family/parameters as a cananocalised json.
         param_str = json.dumps(params, separators=(',', ':'), sort_keys=True)
-        hash_input = self.job_id + param_str
+        hash_input = param_str
         param_hash = hashlib.sha3_256(hash_input.encode('utf-8')).hexdigest()
         return '{}_{}'.format(task_family, param_hash[:TASK_ID_TRUNCATE_HASH])
 
