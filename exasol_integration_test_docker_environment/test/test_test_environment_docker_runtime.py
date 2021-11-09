@@ -128,9 +128,9 @@ class DockerTestEnvironmentDockerRuntimeInvalidRuntimeGivenTest(unittest.TestCas
                 clean_images_at_close=False)
         cls.default_docker_runtime = get_default_docker_runtime()
         cls.docker_environment_name = "test_default_runtime_given"
+        cls.docker_environments = ()
         try:
-            cls.on_host_docker_environment, cls.google_cloud_docker_environment = \
-                cls.test_environment.spawn_docker_test_environment(
+            cls.docker_environments = cls.test_environment.spawn_docker_test_environment(
                     cls.docker_environment_name,
                     additional_parameter=["--docker-runtime", "AAAABBBBCCCC_INVALID_RUNTIME_111122223333"])
         except Exception as e:
@@ -138,7 +138,7 @@ class DockerTestEnvironmentDockerRuntimeInvalidRuntimeGivenTest(unittest.TestCas
 
     @classmethod
     def tearDownClass(cls):
-        close_environments(cls.test_environment, cls.on_host_docker_environment, cls.google_cloud_docker_environment)
+        close_environments(cls.test_environment, *cls.docker_environments)
 
     def test_docker_environment_not_available(self):
         self.assertFalse("on_host_docker_environment" in self.__dict__)
