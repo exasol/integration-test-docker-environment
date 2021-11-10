@@ -22,12 +22,6 @@ class DockerTestEnvironmentDBMemSizeTest(unittest.TestCase):
     def tearDownClass(cls):
         close_environments(cls.test_environment)
 
-    def setUp(self) -> None:
-        self.docker_envs = ()
-
-    def tearDown(self):
-        close_environments(*self.docker_envs)
-
     def assert_mem_size(self, size: str):
         with ContextDockerClient() as docker_client:
             containers = [c.name for c in docker_client.containers.list() if self.docker_environment_name in c.name]
@@ -44,22 +38,26 @@ class DockerTestEnvironmentDBMemSizeTest(unittest.TestCase):
 
     def test_default_db_mem_size(self):
         self.docker_environment_name = "test_default_db_mem_size"
-        self.docker_envs = self.test_environment.spawn_docker_test_environment(self.docker_environment_name)
+        docker_envs = self.test_environment.spawn_docker_test_environment(self.docker_environment_name)
         self.assert_mem_size("2 GiB")
+        close_environments(*docker_envs)
 
     def test_smallest_valid_db_mem_size(self):
         self.docker_environment_name = "test_smallest_valid_db_mem_size"
-        self.docker_envs = \
+        docker_envs = \
             self.test_environment.spawn_docker_test_environment(self.docker_environment_name,
                                                                 ["--db-mem-size", "'1 GiB'"])
         self.assert_mem_size("1 GiB")
+        close_environments(*docker_envs)
 
     def test_invalid_db_mem_size(self):
         self.docker_environment_name = "test_invalid_db_mem_size"
+        docker_envs = ()
         with self.assertRaises(Exception) as context:
-            self.docker_envs = \
+            docker_envs = \
                 self.test_environment.spawn_docker_test_environment(self.docker_environment_name,
                                                                     ["--db-mem-size", "'999 MiB'"])
+        close_environments(*docker_envs)
 
 
 if __name__ == '__main__':
