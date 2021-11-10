@@ -10,7 +10,7 @@ t.b.d
 
 * **6.2**: up to 6.2.17
 * **7.0**: up to 7.0.13
-* **7.1**: up to 7.1.1
+* **7.1**: up to 7.1.2
 
 If you need further versions, please open an issue.
 
@@ -26,6 +26,7 @@ If you need further versions, please open an issue.
 ## Features / Enhancements:
 
  - #118: Check release consistency
+ - #129: Added docker-db version 7.1.2
 
 ## Refactoring:
 
