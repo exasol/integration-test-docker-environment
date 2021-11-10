@@ -93,7 +93,7 @@ class DockerTestEnvironmentDockerRuntimeDefaultRuntimeGivenTest(unittest.TestCas
 
     @classmethod
     def tearDownClass(cls):
-        close_environments(cls.test_environment, cls.on_host_docker_environment, cls.google_cloud_docker_environment)
+        close_environments(cls.on_host_docker_environment, cls.test_environment, cls.google_cloud_docker_environment)
 
     def test_test_container_runtime(self):
         try:
@@ -138,7 +138,7 @@ class DockerTestEnvironmentDockerRuntimeInvalidRuntimeGivenTest(unittest.TestCas
 
     @classmethod
     def tearDownClass(cls):
-        close_environments(cls.test_environment, *cls.docker_environments)
+        close_environments(*cls.docker_environments, cls.test_environment)
 
     def test_docker_environment_not_available(self):
         self.assertFalse("on_host_docker_environment" in self.__dict__)
