@@ -26,6 +26,7 @@ If you need further versions, please open an issue.
 ## Features / Enhancements:
 
  - #118: Check release consistency
+ - #129: Added docker-db version 7.1.2
 
 ## Refactoring:
 
