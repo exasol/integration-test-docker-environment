@@ -1,8 +1,10 @@
 import unittest
 
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
-from exasol_integration_test_docker_environment.test.utils.utils import close_environments
 from exasol_integration_test_docker_environment.testing import utils
+from exasol_integration_test_docker_environment.testing.context_spawned_test_environment import \
+    ContextSpawnedTestEnvironment
+from exasol_integration_test_docker_environment.testing.exaslct_test_environment import ExaslctTestEnvironment
 
 
 class DockerTestEnvironmentDBMemSizeTest(unittest.TestCase):
@@ -13,14 +15,14 @@ class DockerTestEnvironmentDBMemSizeTest(unittest.TestCase):
         # We can't use start-test-env. because it only mounts ./ and
         # doesn't work with --build_ouput-directory
         cls.test_environment = \
-            utils.ExaslctTestEnvironment(
+            ExaslctTestEnvironment(
                 cls,
                 utils.INTEGRATION_TEST_DOCKER_ENVIRONMENT_DEFAULT_BIN,
                 clean_images_at_close=False)
 
     @classmethod
     def tearDownClass(cls):
-        close_environments(cls.test_environment)
+        utils.close_environments(cls.test_environment)
 
     def assert_mem_size(self, size: str):
         with ContextDockerClient() as docker_client:
@@ -39,16 +41,16 @@ class DockerTestEnvironmentDBMemSizeTest(unittest.TestCase):
     def test_default_db_mem_size(self):
         self.docker_environment_name = "test_default_db_mem_size"
         docker_envs = self.test_environment.spawn_docker_test_environment(self.docker_environment_name)
-        self.assert_mem_size("2 GiB")
-        close_environments(*docker_envs)
+        with ContextSpawnedTestEnvironment(*docker_envs):
+            self.assert_mem_size("2 GiB")
 
     def test_smallest_valid_db_mem_size(self):
         self.docker_environment_name = "test_smallest_valid_db_mem_size"
         docker_envs = \
             self.test_environment.spawn_docker_test_environment(self.docker_environment_name,
                                                                 ["--db-mem-size", "'1 GiB'"])
-        self.assert_mem_size("1 GiB")
-        close_environments(*docker_envs)
+        with ContextSpawnedTestEnvironment(*docker_envs):
+            self.assert_mem_size("1 GiB")
 
     def test_invalid_db_mem_size(self):
         self.docker_environment_name = "test_invalid_db_mem_size"
@@ -57,7 +59,7 @@ class DockerTestEnvironmentDBMemSizeTest(unittest.TestCase):
             docker_envs = \
                 self.test_environment.spawn_docker_test_environment(self.docker_environment_name,
                                                                     ["--db-mem-size", "'999 MiB'"])
-        close_environments(*docker_envs)
+            utils.close_environments(*docker_envs)
 
 
 if __name__ == '__main__':

@@ -1,13 +1,11 @@
 import unittest
 
-
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
-from exasol_integration_test_docker_environment.test import utils
-from exasol_integration_test_docker_environment.test.utils.utils import close_environments
 from exasol_integration_test_docker_environment.testing import utils
+from exasol_integration_test_docker_environment.testing.exaslct_test_environment import ExaslctTestEnvironment
 
 
-def assertContainerRuntime(self, container_name, expected_runtime):
+def assert_container_runtime(self, container_name, expected_runtime):
     with ContextDockerClient() as docker_client:
         try:
             container = docker_client.containers.get(container_name)
@@ -40,7 +38,7 @@ class DockerTestEnvironmentDockerRuntimeNoRuntimeGivenTest(unittest.TestCase):
         # We can't use start-test-env. because it only mounts ./ and
         # doesn't work with --build_ouput-directory
         cls.test_environment = \
-            utils.ExaslctTestEnvironment(
+            ExaslctTestEnvironment(
                 cls,
                 utils.INTEGRATION_TEST_DOCKER_ENVIRONMENT_DEFAULT_BIN,
                 clean_images_at_close=False)
@@ -51,7 +49,8 @@ class DockerTestEnvironmentDockerRuntimeNoRuntimeGivenTest(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        close_environments(cls.on_host_docker_environment, cls.google_cloud_docker_environment, cls.test_environment)
+        utils.close_environments(cls.on_host_docker_environment,
+                                 cls.google_cloud_docker_environment, cls.test_environment)
 
     def test_test_container_runtime(self):
         try:
@@ -60,7 +59,7 @@ class DockerTestEnvironmentDockerRuntimeNoRuntimeGivenTest(unittest.TestCase):
         except Exception as e:
             startup_log = self.on_host_docker_environment.completed_process.stdout.decode("utf8")
             raise Exception(f"Startup log: {startup_log}") from e
-        assertContainerRuntime(self, test_container_name, self.default_docker_runtime)
+        assert_container_runtime(self, test_container_name, self.default_docker_runtime)
 
     def test_database_container_runtime(self):
         try:
@@ -69,7 +68,7 @@ class DockerTestEnvironmentDockerRuntimeNoRuntimeGivenTest(unittest.TestCase):
         except Exception as e:
             startup_log = self.on_host_docker_environment.completed_process.stdout.decode("utf8")
             raise Exception(f"Startup log: {startup_log}") from e
-        assertContainerRuntime(self, database_container_name, self.default_docker_runtime)
+        assert_container_runtime(self, database_container_name, self.default_docker_runtime)
 
 
 class DockerTestEnvironmentDockerRuntimeDefaultRuntimeGivenTest(unittest.TestCase):
@@ -80,7 +79,7 @@ class DockerTestEnvironmentDockerRuntimeDefaultRuntimeGivenTest(unittest.TestCas
         # We can't use start-test-env. because it only mounts ./ and
         # doesn't work with --build_ouput-directory
         cls.test_environment = \
-            utils.ExaslctTestEnvironment(
+            ExaslctTestEnvironment(
                 cls,
                 utils.INTEGRATION_TEST_DOCKER_ENVIRONMENT_DEFAULT_BIN,
                 clean_images_at_close=False)
@@ -93,7 +92,8 @@ class DockerTestEnvironmentDockerRuntimeDefaultRuntimeGivenTest(unittest.TestCas
 
     @classmethod
     def tearDownClass(cls):
-        close_environments(cls.on_host_docker_environment, cls.test_environment, cls.google_cloud_docker_environment)
+        utils.close_environments(cls.on_host_docker_environment,
+                                 cls.test_environment, cls.google_cloud_docker_environment)
 
     def test_test_container_runtime(self):
         try:
@@ -102,7 +102,7 @@ class DockerTestEnvironmentDockerRuntimeDefaultRuntimeGivenTest(unittest.TestCas
         except Exception as e:
             startup_log = self.on_host_docker_environment.completed_process.stdout.decode("utf8")
             raise Exception(f"Startup log: {startup_log}") from e
-        assertContainerRuntime(self, test_container_name, self.default_docker_runtime)
+        assert_container_runtime(self, test_container_name, self.default_docker_runtime)
 
     def test_database_container_runtime(self):
         try:
@@ -111,7 +111,7 @@ class DockerTestEnvironmentDockerRuntimeDefaultRuntimeGivenTest(unittest.TestCas
         except Exception as e:
             startup_log = self.on_host_docker_environment.completed_process.stdout.decode("utf8")
             raise Exception(f"Startup log: {startup_log}") from e
-        assertContainerRuntime(self, database_container_name, self.default_docker_runtime)
+        assert_container_runtime(self, database_container_name, self.default_docker_runtime)
 
 
 class DockerTestEnvironmentDockerRuntimeInvalidRuntimeGivenTest(unittest.TestCase):
@@ -122,7 +122,7 @@ class DockerTestEnvironmentDockerRuntimeInvalidRuntimeGivenTest(unittest.TestCas
         # We can't use start-test-env. because it only mounts ./ and
         # doesn't work with --build_ouput-directory
         cls.test_environment = \
-            utils.ExaslctTestEnvironment(
+            ExaslctTestEnvironment(
                 cls,
                 utils.INTEGRATION_TEST_DOCKER_ENVIRONMENT_DEFAULT_BIN,
                 clean_images_at_close=False)
@@ -138,7 +138,7 @@ class DockerTestEnvironmentDockerRuntimeInvalidRuntimeGivenTest(unittest.TestCas
 
     @classmethod
     def tearDownClass(cls):
-        close_environments(*cls.docker_environments, cls.test_environment)
+        utils.close_environments(*cls.docker_environments, cls.test_environment)
 
     def test_docker_environment_not_available(self):
         self.assertFalse("on_host_docker_environment" in self.__dict__)

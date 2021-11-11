@@ -1,6 +1,5 @@
 import luigi
 from exasol_integration_test_docker_environment.lib.base.docker_base_task import DockerBaseTask
-from exasol_integration_test_docker_environment.lib.config.docker_config import target_docker_repository_config
 from exasol_integration_test_docker_environment.lib.docker.images.utils import find_images_by_tag
 
 

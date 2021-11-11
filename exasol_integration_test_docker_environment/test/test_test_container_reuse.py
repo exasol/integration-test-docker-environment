@@ -14,7 +14,7 @@ from exasol_integration_test_docker_environment.lib.docker import ContextDockerC
 from exasol_integration_test_docker_environment.lib.test_environment.prepare_network_for_test_environment import \
     PrepareDockerNetworkForTestEnvironment
 from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_container import SpawnTestContainer
-from exasol_integration_test_docker_environment.test.utils import luigi_utils
+from exasol_integration_test_docker_environment.testing import luigi_utils
 
 
 class TestTask(DockerBaseTask):

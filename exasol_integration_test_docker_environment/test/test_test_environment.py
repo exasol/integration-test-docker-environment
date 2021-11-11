@@ -2,8 +2,8 @@ import unittest
 from pathlib import Path
 
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
-from exasol_integration_test_docker_environment.test.utils.utils import close_environments
 from exasol_integration_test_docker_environment.testing import utils
+from exasol_integration_test_docker_environment.testing.exaslct_test_environment import ExaslctTestEnvironment
 
 
 class DockerTestEnvironmentTest(unittest.TestCase):
@@ -14,7 +14,7 @@ class DockerTestEnvironmentTest(unittest.TestCase):
         # We can't use start-test-env. because it only mounts ./ and
         # doesn't work with --build_ouput-directory
         cls.test_environment = \
-            utils.ExaslctTestEnvironment(
+            ExaslctTestEnvironment(
                 cls,
                 utils.INTEGRATION_TEST_DOCKER_ENVIRONMENT_DEFAULT_BIN,
                 clean_images_at_close=False)
@@ -25,7 +25,8 @@ class DockerTestEnvironmentTest(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        close_environments(cls.on_host_docker_environment, cls.google_cloud_docker_environment, cls.test_environment)
+        utils.close_environments(cls.on_host_docker_environment,
+                                 cls.google_cloud_docker_environment, cls.test_environment)
 
     def test_all_containers_started(self):
         with ContextDockerClient() as docker_client:

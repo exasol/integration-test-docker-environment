@@ -1,9 +1,11 @@
 import unittest
-
+from contextlib import ExitStack
 
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
-from exasol_integration_test_docker_environment.test.utils.utils import close_environments
 from exasol_integration_test_docker_environment.testing import utils
+from exasol_integration_test_docker_environment.testing.context_spawned_test_environment import \
+    ContextSpawnedTestEnvironment
+from exasol_integration_test_docker_environment.testing.exaslct_test_environment import ExaslctTestEnvironment
 
 
 class DockerTestEnvironmentDBMemSizeTest(unittest.TestCase):
@@ -14,14 +16,14 @@ class DockerTestEnvironmentDBMemSizeTest(unittest.TestCase):
         # We can't use start-test-env. because it only mounts ./ and
         # doesn't work with --build_ouput-directory
         cls.test_environment = \
-            utils.ExaslctTestEnvironment(
+            ExaslctTestEnvironment(
                 cls,
                 utils.INTEGRATION_TEST_DOCKER_ENVIRONMENT_DEFAULT_BIN,
                 clean_images_at_close=False)
 
     @classmethod
     def tearDownClass(cls):
-        close_environments(cls.test_environment)
+        utils.close_environments(cls.test_environment)
 
     def assert_nameserver(self, nameservers: str):
         with ContextDockerClient() as docker_client:
@@ -41,8 +43,8 @@ class DockerTestEnvironmentDBMemSizeTest(unittest.TestCase):
         self.docker_environment_name = "test_no_nameserver"
         on_host_docker_environment, google_cloud_docker_environment = \
             self.test_environment.spawn_docker_test_environment(self.docker_environment_name)
-        self.assert_nameserver("")
-        close_environments(on_host_docker_environment, google_cloud_docker_environment)
+        with ContextSpawnedTestEnvironment(on_host_docker_environment, google_cloud_docker_environment):
+            self.assert_nameserver("")
 
     def test_single_nameserver(self):
         self.docker_environment_name = "test_single_nameserver"
@@ -51,8 +53,8 @@ class DockerTestEnvironmentDBMemSizeTest(unittest.TestCase):
                                                                 [
                                                                     "--nameserver", "'8.8.8.8'",
                                                                 ])
-        self.assert_nameserver("8.8.8.8")
-        close_environments(on_host_docker_environment, google_cloud_docker_environment)
+        with ContextSpawnedTestEnvironment(on_host_docker_environment, google_cloud_docker_environment):
+            self.assert_nameserver("8.8.8.8")
 
     def test_multiple_nameserver(self):
         self.docker_environment_name = "test_multiple_nameserver"
@@ -62,16 +64,8 @@ class DockerTestEnvironmentDBMemSizeTest(unittest.TestCase):
                                                                     "--nameserver", "'8.8.8.8'",
                                                                     "--nameserver", "'8.8.8.9'",
                                                                 ])
-        self.assert_nameserver("8.8.8.8,8.8.8.9")
-        close_environments(on_host_docker_environment, google_cloud_docker_environment)
-
-    # def test_invalid_db_mem_size(self):
-    #     self.docker_environment_name = "test_invalid_db_mem_size"
-    #     with self.assertRaises(Exception) as context:
-    #         on_host_docker_environment, google_cloud_docker_environment = \
-    #             self.test_environment.spawn_docker_test_environment(self.docker_environment_name,
-    #                                                                # ["--db-mem-size", "'999 MiB'"])
-    #     close_environments(on_host_docker_environment, google_cloud_docker_environment)
+        with ContextSpawnedTestEnvironment(on_host_docker_environment, google_cloud_docker_environment):
+            self.assert_nameserver("8.8.8.8,8.8.8.9")
 
 
 if __name__ == '__main__':
