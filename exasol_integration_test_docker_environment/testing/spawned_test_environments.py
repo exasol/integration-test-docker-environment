@@ -14,6 +14,9 @@ class SpawnedTestEnvironments:
         pass
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
+
+    def close(self):
         if self.on_host_docker_environment is not None:
             self.on_host_docker_environment.close()
 
