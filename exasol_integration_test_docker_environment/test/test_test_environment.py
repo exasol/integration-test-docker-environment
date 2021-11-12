@@ -25,8 +25,7 @@ class DockerTestEnvironmentTest(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        cls.spawned_docker_environments.close()
-        cls.test_environment.close()
+        utils.close_environments(cls.spawned_docker_test_environments, cls.test_environment)
 
     def test_all_containers_started(self):
         on_host_docker_environment = self.spawned_docker_environments.on_host_docker_environment

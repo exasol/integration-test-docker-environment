@@ -20,7 +20,7 @@ class DockerTestEnvironmentDBMemSizeTest(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        cls.test_environment.close()
+        utils.close_environments(cls.test_environment)
 
     def assert_mem_size(self, size: str):
         with ContextDockerClient() as docker_client:

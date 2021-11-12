@@ -51,8 +51,7 @@ class DockerTestEnvironmentDockerRuntimeNoRuntimeGivenTest(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        cls.spawned_docker_test_environments.close()
-        cls.test_environment.close()
+        utils.close_environments(cls.spawned_docker_test_environments, cls.test_environment)
 
     def test_test_container_runtime(self):
         try:
@@ -95,8 +94,7 @@ class DockerTestEnvironmentDockerRuntimeDefaultRuntimeGivenTest(unittest.TestCas
 
     @classmethod
     def tearDownClass(cls):
-        cls.spawned_docker_test_environments.close()
-        cls.test_environment.close()
+        utils.close_environments(cls.spawned_docker_test_environments, cls.test_environment)
 
     def test_test_container_runtime(self):
         on_host_docker_environment = self.spawned_docker_test_environments.on_host_docker_environment
@@ -143,11 +141,10 @@ class DockerTestEnvironmentDockerRuntimeInvalidRuntimeGivenTest(unittest.TestCas
 
     @classmethod
     def tearDownClass(cls):
-        cls.spawned_docker_test_environments.close()
-        cls.test_environment.close()
+        utils.close_environments(cls.spawned_docker_test_environments, cls.test_environment)
 
     def test_docker_environment_not_available(self):
-        self.assertFalse("on_host_docker_environment" in self.__dict__)
+        self.assertFalse("spawned_docker_test_environments" in self.__dict__)
 
 
 if __name__ == '__main__':
