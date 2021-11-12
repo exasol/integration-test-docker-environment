@@ -6,17 +6,19 @@ from exasol_integration_test_docker_environment.testing.exaslct_test_environment
 
 
 def assert_container_runtime(self, container_name, expected_runtime):
+    on_host_docker_environment = self.spawned_docker_test_environments.on_host_docker_environment
     with ContextDockerClient() as docker_client:
         try:
             container = docker_client.containers.get(container_name)
             container.reload()
             actual_runtime = container.attrs['HostConfig']['Runtime']
         except Exception as e:
-            startup_log = self.on_host_docker_environment.completed_process.stdout.decode("utf8")
+            startup_log = on_host_docker_environment.completed_process.stdout.decode("utf8")
             raise Exception(f"Startup log: {startup_log}") from e
         self.assertEqual(actual_runtime, expected_runtime,
                          f"{container_name} has the wrong runtime expected {expected_runtime} got {actual_runtime}."
-                         f"\n Startup log is {self.on_host_docker_environment.completed_process.stdout.decode('utf8')}")
+                         f"\n Startup log is "
+                         f"{on_host_docker_environment.completed_process.stdout.decode('utf8')}")
 
 
 def get_default_docker_runtime():
@@ -43,30 +45,32 @@ class DockerTestEnvironmentDockerRuntimeNoRuntimeGivenTest(unittest.TestCase):
                 utils.INTEGRATION_TEST_DOCKER_ENVIRONMENT_DEFAULT_BIN,
                 clean_images_at_close=False)
         cls.docker_environment_name = "test_no_runtime_given"
-        cls.on_host_docker_environment, cls.google_cloud_docker_environment = \
-            cls.test_environment.spawn_docker_test_environment(cls.docker_environment_name)
+        cls.spawned_docker_test_environments = \
+            cls.test_environment.spawn_docker_test_environments(cls.docker_environment_name)
         cls.default_docker_runtime = get_default_docker_runtime()
 
     @classmethod
     def tearDownClass(cls):
-        utils.close_environments(cls.on_host_docker_environment,
-                                 cls.google_cloud_docker_environment, cls.test_environment)
+        cls.spawned_docker_test_environments.close()
+        utils.close_environments(cls.test_environment)
 
     def test_test_container_runtime(self):
         try:
-            environment_info = self.on_host_docker_environment.environment_info
+            environment_info = self.spawned_docker_test_environments.on_host_docker_environment.environment_info
             test_container_name = environment_info.test_container_info.container_name
         except Exception as e:
-            startup_log = self.on_host_docker_environment.completed_process.stdout.decode("utf8")
+            startup_log = self.spawned_docker_test_environments\
+                .on_host_docker_environment.completed_process.stdout.decode("utf8")
             raise Exception(f"Startup log: {startup_log}") from e
         assert_container_runtime(self, test_container_name, self.default_docker_runtime)
 
     def test_database_container_runtime(self):
         try:
-            environment_info = self.on_host_docker_environment.environment_info
+            environment_info = self.spawned_docker_test_environments.on_host_docker_environment.environment_info
             database_container_name = environment_info.database_info.container_info.container_name
         except Exception as e:
-            startup_log = self.on_host_docker_environment.completed_process.stdout.decode("utf8")
+            startup_log = \
+                self.spawned_docker_test_environments.on_host_docker_environment.completed_process.stdout.decode("utf8")
             raise Exception(f"Startup log: {startup_log}") from e
         assert_container_runtime(self, database_container_name, self.default_docker_runtime)
 
@@ -85,31 +89,32 @@ class DockerTestEnvironmentDockerRuntimeDefaultRuntimeGivenTest(unittest.TestCas
                 clean_images_at_close=False)
         cls.default_docker_runtime = get_default_docker_runtime()
         cls.docker_environment_name = "test_default_runtime_given"
-        cls.on_host_docker_environment, cls.google_cloud_docker_environment = \
-            cls.test_environment.spawn_docker_test_environment(
+        cls.spawned_docker_test_environments = cls.test_environment.spawn_docker_test_environments(
                 cls.docker_environment_name,
                 additional_parameter=["--docker-runtime", cls.default_docker_runtime])
 
     @classmethod
     def tearDownClass(cls):
-        utils.close_environments(cls.on_host_docker_environment,
-                                 cls.test_environment, cls.google_cloud_docker_environment)
+        cls.spawned_docker_test_environments.close()
+        utils.close_environments(cls.google_cloud_docker_environment)
 
     def test_test_container_runtime(self):
+        on_host_docker_environment = self.spawned_docker_test_environments.on_host_docker_environment
         try:
-            environment_info = self.on_host_docker_environment.environment_info
+            environment_info = on_host_docker_environment.environment_info
             test_container_name = environment_info.test_container_info.container_name
         except Exception as e:
-            startup_log = self.on_host_docker_environment.completed_process.stdout.decode("utf8")
+            startup_log = on_host_docker_environment.completed_process.stdout.decode("utf8")
             raise Exception(f"Startup log: {startup_log}") from e
         assert_container_runtime(self, test_container_name, self.default_docker_runtime)
 
     def test_database_container_runtime(self):
+        on_host_docker_environment = self.spawned_docker_test_environments.on_host_docker_environment
         try:
-            environment_info = self.on_host_docker_environment.environment_info
+            environment_info = on_host_docker_environment.environment_info
             database_container_name = environment_info.database_info.container_info.container_name
         except Exception as e:
-            startup_log = self.on_host_docker_environment.completed_process.stdout.decode("utf8")
+            startup_log = on_host_docker_environment.completed_process.stdout.decode("utf8")
             raise Exception(f"Startup log: {startup_log}") from e
         assert_container_runtime(self, database_container_name, self.default_docker_runtime)
 
@@ -130,7 +135,7 @@ class DockerTestEnvironmentDockerRuntimeInvalidRuntimeGivenTest(unittest.TestCas
         cls.docker_environment_name = "test_default_runtime_given"
         cls.docker_environments = ()
         try:
-            cls.docker_environments = cls.test_environment.spawn_docker_test_environment(
+            cls.spawned_docker_test_environments = cls.test_environment.spawn_docker_test_environments(
                     cls.docker_environment_name,
                     additional_parameter=["--docker-runtime", "AAAABBBBCCCC_INVALID_RUNTIME_111122223333"])
         except Exception as e:
@@ -138,7 +143,8 @@ class DockerTestEnvironmentDockerRuntimeInvalidRuntimeGivenTest(unittest.TestCas
 
     @classmethod
     def tearDownClass(cls):
-        utils.close_environments(*cls.docker_environments, cls.test_environment)
+        cls.spawned_docker_test_environments.close()
+        cls.test_environment.close()
 
     def test_docker_environment_not_available(self):
         self.assertFalse("on_host_docker_environment" in self.__dict__)

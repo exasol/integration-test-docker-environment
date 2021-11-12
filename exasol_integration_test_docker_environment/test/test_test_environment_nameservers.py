@@ -1,10 +1,8 @@
 import unittest
-from contextlib import ExitStack
+
 
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.testing import utils
-from exasol_integration_test_docker_environment.testing.context_spawned_test_environment import \
-    ContextSpawnedTestEnvironment
 from exasol_integration_test_docker_environment.testing.exaslct_test_environment import ExaslctTestEnvironment
 
 
@@ -23,7 +21,7 @@ class DockerTestEnvironmentDBMemSizeTest(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        utils.close_environments(cls.test_environment)
+        cls.test_environment.close()
 
     def assert_nameserver(self, nameservers: str):
         with ContextDockerClient() as docker_client:
@@ -41,30 +39,24 @@ class DockerTestEnvironmentDBMemSizeTest(unittest.TestCase):
 
     def test_no_nameserver(self):
         self.docker_environment_name = "test_no_nameserver"
-        on_host_docker_environment, google_cloud_docker_environment = \
-            self.test_environment.spawn_docker_test_environment(self.docker_environment_name)
-        with ContextSpawnedTestEnvironment(on_host_docker_environment, google_cloud_docker_environment):
+        with self.test_environment.spawn_docker_test_environments(self.docker_environment_name):
             self.assert_nameserver("")
 
     def test_single_nameserver(self):
         self.docker_environment_name = "test_single_nameserver"
-        on_host_docker_environment, google_cloud_docker_environment = \
-            self.test_environment.spawn_docker_test_environment(self.docker_environment_name,
-                                                                [
+        with self.test_environment.spawn_docker_test_environments(self.docker_environment_name,
+                                                                  [
                                                                     "--nameserver", "'8.8.8.8'",
-                                                                ])
-        with ContextSpawnedTestEnvironment(on_host_docker_environment, google_cloud_docker_environment):
+                                                                  ]):
             self.assert_nameserver("8.8.8.8")
 
     def test_multiple_nameserver(self):
         self.docker_environment_name = "test_multiple_nameserver"
-        on_host_docker_environment, google_cloud_docker_environment = \
-            self.test_environment.spawn_docker_test_environment(self.docker_environment_name,
-                                                                [
+        with self.test_environment.spawn_docker_test_environments(self.docker_environment_name,
+                                                                  [
                                                                     "--nameserver", "'8.8.8.8'",
                                                                     "--nameserver", "'8.8.8.9'",
-                                                                ])
-        with ContextSpawnedTestEnvironment(on_host_docker_environment, google_cloud_docker_environment):
+                                                                  ]):
             self.assert_nameserver("8.8.8.8,8.8.8.9")
 
 

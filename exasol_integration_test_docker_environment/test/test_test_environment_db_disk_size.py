@@ -1,10 +1,7 @@
 import unittest
-from contextlib import closing
 
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.testing import utils
-from exasol_integration_test_docker_environment.testing.context_spawned_test_environment \
-    import ContextSpawnedTestEnvironment
 from exasol_integration_test_docker_environment.testing.exaslct_test_environment import ExaslctTestEnvironment
 
 
@@ -23,7 +20,7 @@ class DockerTestEnvironmentDBDiskSizeTest(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        utils.close_environments(cls.test_environment)
+        cls.test_environment.close()
 
     def assert_disk_size(self, size: str):
         with ContextDockerClient() as docker_client:
@@ -41,25 +38,21 @@ class DockerTestEnvironmentDBDiskSizeTest(unittest.TestCase):
 
     def test_default_db_disk_size(self):
         self.docker_environment_name = "test_default_db_disk_size"
-        docker_envs = self.test_environment.spawn_docker_test_environment(self.docker_environment_name)
-        with ContextSpawnedTestEnvironment(*docker_envs):
+        with self.test_environment.spawn_docker_test_environments(self.docker_environment_name):
             self.assert_disk_size("2 GiB")
 
     def test_smallest_valid_db_disk_size(self):
         self.docker_environment_name = "test_smallest_valid_db_disk_size"
-        docker_envs = self.test_environment.spawn_docker_test_environment(self.docker_environment_name,
-                                                                          ["--db-disk-size", "'100 MiB'"])
-        with ContextSpawnedTestEnvironment(*docker_envs):
+        with self.test_environment.spawn_docker_test_environments(self.docker_environment_name,
+                                                                  ["--db-disk-size", "'100 MiB'"]):
             self.assert_disk_size("100 MiB")
 
     def test_invalid_db_mem_size(self):
         self.docker_environment_name = "test_invalid_db_disk_size"
-        docker_envs = ()
         with self.assertRaises(Exception) as context:
-            docker_envs = \
-                self.test_environment.spawn_docker_test_environment(self.docker_environment_name,
-                                                                    ["--db-disk-size", "'90 MiB'"])
-            utils.close_environments(*docker_envs)
+            with self.test_environment.spawn_docker_test_environments(self.docker_environment_name,
+                                                                      ["--db-disk-size", "'90 MiB'"]):
+                pass
 
 
 if __name__ == '__main__':

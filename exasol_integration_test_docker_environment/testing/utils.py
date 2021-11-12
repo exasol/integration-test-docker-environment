@@ -49,12 +49,3 @@ def request_registry_repositories(registry_host, registry_port):
     result = requests.request("GET", f"http://{registry_host}:{registry_port}/v2/_catalog/")
     repositories_ = json.loads(result.content.decode("UTF-8"))["repositories"]
     return repositories_
-
-
-def close_environments(*args):
-    for env in args:
-        try:
-            if env is not None:
-                env.close()
-        except Exception as e:
-            print(e)

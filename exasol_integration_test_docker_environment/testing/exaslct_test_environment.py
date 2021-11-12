@@ -6,12 +6,13 @@ import tempfile
 import time
 from pathlib import Path
 import shlex
-from typing import List, Optional, Tuple
+from typing import List
 
 from exasol_integration_test_docker_environment.lib.data.environment_info import EnvironmentInfo
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.testing.exaslct_docker_test_environment import \
     ExaslctDockerTestEnvironment
+from exasol_integration_test_docker_environment.testing.spawned_test_environments import SpawnedTestEnvironments
 from exasol_integration_test_docker_environment.testing.utils import find_free_port
 
 
@@ -107,8 +108,8 @@ class ExaslctTestEnvironment:
         except Exception as e:
             print(e)
 
-    def spawn_docker_test_environment(self, name: str, additional_parameter: List[str] = None) \
-            -> Tuple[ExaslctDockerTestEnvironment, Optional[ExaslctDockerTestEnvironment]]:
+    def spawn_docker_test_environments(self, name: str, additional_parameter: List[str] = None) \
+            -> SpawnedTestEnvironments:
         on_host_parameter = ExaslctDockerTestEnvironment(
             name=self.name + "_" + name,
             database_host="localhost",
@@ -158,9 +159,9 @@ class ExaslctTestEnvironment:
                 db_container.reload()
                 google_cloud_parameter.database_host = \
                     db_container.attrs["NetworkSettings"]["Networks"][cloudbuild_network.name]["IPAddress"]
-                return on_host_parameter, google_cloud_parameter
+                return SpawnedTestEnvironments(on_host_parameter, google_cloud_parameter)
         else:
-            return on_host_parameter, None
+            return SpawnedTestEnvironments(on_host_parameter, None)
 
     def create_registry(self):
         registry_port = find_free_port()
