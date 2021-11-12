@@ -52,7 +52,7 @@ class DockerTestEnvironmentDockerRuntimeNoRuntimeGivenTest(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         cls.spawned_docker_test_environments.close()
-        utils.close_environments(cls.test_environment)
+        cls.test_environment.close()
 
     def test_test_container_runtime(self):
         try:
@@ -96,7 +96,7 @@ class DockerTestEnvironmentDockerRuntimeDefaultRuntimeGivenTest(unittest.TestCas
     @classmethod
     def tearDownClass(cls):
         cls.spawned_docker_test_environments.close()
-        utils.close_environments(cls.google_cloud_docker_environment)
+        cls.test_environment.close()
 
     def test_test_container_runtime(self):
         on_host_docker_environment = self.spawned_docker_test_environments.on_host_docker_environment
