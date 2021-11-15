@@ -141,7 +141,11 @@ class DockerTestEnvironmentDockerRuntimeInvalidRuntimeGivenTest(unittest.TestCas
 
     @classmethod
     def tearDownClass(cls):
-        utils.close_environments(cls.spawned_docker_test_environments, cls.test_environment)
+        try:
+            utils.close_environments(cls.spawned_docker_test_environments)
+        except Exception as e:
+            print(e)
+        utils.close_environments(cls.test_environment)
 
     def test_docker_environment_not_available(self):
         self.assertFalse("spawned_docker_test_environments" in self.__dict__)
