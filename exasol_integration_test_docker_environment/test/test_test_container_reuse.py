@@ -101,10 +101,10 @@ class TestContainerReuseTest(unittest.TestCase):
                 task.cleanup(True)
                 return result
             else:
-                task.cleanup(False)
-                Exception("Task failed")
+                raise Exception("Task failed")
         except Exception as e:
             task.cleanup(False)
+            raise RuntimeError("Error spawning test environment") from e
 
     def run2(self):
         task = generate_root_task(task_class=TestTask, reuse=True, attempt=2)
@@ -116,8 +116,9 @@ class TestContainerReuseTest(unittest.TestCase):
                 return result
             else:
                 raise Exception("Task failed")
-        finally:
+        except Exception as e:
             task.cleanup(False)
+            raise RuntimeError("Error spawning test environment") from e
 
     def test_test_container_no_reuse_after_change(self):
         p1 = self.run1()
