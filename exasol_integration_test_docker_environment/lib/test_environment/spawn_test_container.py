@@ -172,11 +172,9 @@ class SpawnTestContainer(DockerBaseTask):
             pass
 
     def cleanup_task(self, success: bool):
-        self.logger.info(f"___________cleanup_task")
         if (success and not self.no_test_container_cleanup_after_success) or \
                 (not success and not self.no_test_container_cleanup_after_failure):
             try:
-                print(f"Cleaning up container %s", self.test_container_name)
                 self.logger.info(f"Cleaning up container %s", self.test_container_name)
                 self._remove_container(self.test_container_name)
             except Exception as e:
