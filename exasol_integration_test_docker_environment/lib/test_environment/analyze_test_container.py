@@ -43,7 +43,7 @@ class AnalyzeTestContainer(DockerAnalyzeImageTask):
 class DockerTestContainerBuildBase(DockerBuildBase):
 
     def get_goal_class_map(self) -> Dict[str, DockerAnalyzeImageTask]:
-        goal_class_map = {"test-container": AnalyzeTestContainer()}
+        goal_class_map = {"test-container": self.create_child_task(task_class=AnalyzeTestContainer)}
         return goal_class_map
 
     def get_default_goals(self) -> Set[str]:

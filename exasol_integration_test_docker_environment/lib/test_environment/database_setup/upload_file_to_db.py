@@ -36,22 +36,23 @@ class UploadFileToBucketFS(DockerBaseTask):
         log_file = self.get_log_file()
         sync_time_estimation = self.get_sync_time_estimation()
 
-        if self._database_info.container_info is not None:
-            database_container = self._client.containers.get(
-                self._database_info.container_info.container_name)
-        else:
-            database_container = None
-        if not self.should_be_reused(upload_target):
-            self.upload_and_wait(database_container,
-                                 file_to_upload,
-                                 upload_target,
-                                 log_file,
-                                 pattern_to_wait_for,
-                                 sync_time_estimation)
-        else:
-            self.logger.warning("Reusing uploaded target %s instead of file %s",
-                                upload_target, file_to_upload)
-            self.write_logs("Reusing")
+        with self._get_docker_client() as docker_client:
+            if self._database_info.container_info is not None:
+                database_container = docker_client.containers.get(
+                    self._database_info.container_info.container_name)
+            else:
+                database_container = None
+            if not self.should_be_reused(upload_target):
+                self.upload_and_wait(database_container,
+                                     file_to_upload,
+                                     upload_target,
+                                     log_file,
+                                     pattern_to_wait_for,
+                                     sync_time_estimation)
+            else:
+                self.logger.warning("Reusing uploaded target %s instead of file %s",
+                                    upload_target, file_to_upload)
+                self.write_logs("Reusing")
 
     def upload_and_wait(self, database_container,
                         file_to_upload: str, upload_target: str,
@@ -132,12 +133,13 @@ class UploadFileToBucketFS(DockerBaseTask):
         return cmd
 
     def run_command(self, command_type, cmd):
-        test_container = self._client.containers.get(self._test_container_info.container_name)
-        self.logger.info("start %s command %s", command_type, cmd)
-        exit_code, output = test_container.exec_run(cmd=cmd)
-        self.logger.info("finish %s command %s", command_type, cmd)
-        log_output = cmd + "\n\n" + output.decode("utf-8")
-        return exit_code, log_output
+        with self._get_docker_client() as docker_client:
+            test_container = docker_client.containers.get(self._test_container_info.container_name)
+            self.logger.info("start %s command %s", command_type, cmd)
+            exit_code, output = test_container.exec_run(cmd=cmd)
+            self.logger.info("finish %s command %s", command_type, cmd)
+            log_output = cmd + "\n\n" + output.decode("utf-8")
+            return exit_code, log_output
 
     def write_logs(self, output):
         log_file = Path(self.get_log_path(), "log")

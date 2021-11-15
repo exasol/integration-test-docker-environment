@@ -30,11 +30,12 @@ class DockerPushImageBaseTask(DockerBaseTask):
                 "username": target_docker_repository_config().username,
                 "password": target_docker_repository_config().password
             }
-            generator = self._client.images.push(repository=image_info.get_target_complete_name(),
-                                                 tag=image_info.get_target_complete_tag(),
-                                                 auth_config=auth_config,
-                                                 stream=True)
-            self._handle_output(generator, image_info)
+            with self._get_docker_client() as docker_client:
+                generator = docker_client.images.push(repository=image_info.get_target_complete_name(),
+                                               tag=image_info.get_target_complete_tag(),
+                                               auth_config=auth_config,
+                                               stream=True)
+                self._handle_output(generator, image_info)
         self.return_object(image_info)
 
     def _handle_output(self, output_generator, image_info: ImageInfo):

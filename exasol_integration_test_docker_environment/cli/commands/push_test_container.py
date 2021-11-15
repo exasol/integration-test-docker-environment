@@ -1,8 +1,8 @@
 from typing import Tuple
 
 from exasol_integration_test_docker_environment.cli.cli import cli
-from exasol_integration_test_docker_environment.cli.common import add_options, set_docker_repository_config, set_job_id, \
-    run_task, set_build_config
+from exasol_integration_test_docker_environment.cli.common import add_options, set_docker_repository_config, \
+    run_task, set_build_config, generate_root_task
 from exasol_integration_test_docker_environment.cli.options.build_options import build_options
 from exasol_integration_test_docker_environment.cli.options.docker_repository_options import docker_repository_options
 from exasol_integration_test_docker_environment.cli.options.push_options import push_options
@@ -56,8 +56,8 @@ def push_test_container(
                                  source_docker_tag_prefix, "source")
     set_docker_repository_config(target_docker_password, target_docker_repository_name, target_docker_username,
                                  target_docker_tag_prefix, "target")
-    set_job_id(DockerTestContainerPush.__name__)
-    task_creator = lambda: DockerTestContainerPush(force_push=force_push,
+    task_creator = lambda: generate_root_task(task_class=DockerTestContainerPush,
+                                                   force_push=force_push,
                                                    push_all=push_all)
     success, task = run_task(task_creator, workers, task_dependencies_dot_file)
     if not success:

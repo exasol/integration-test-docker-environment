@@ -14,7 +14,6 @@ from luigi.task import TASK_ID_TRUNCATE_HASH
 from exasol_integration_test_docker_environment.abstract_method_exception import AbstractMethodException
 from exasol_integration_test_docker_environment.lib.base.abstract_task_future import AbstractTaskFuture, \
     DEFAULT_RETURN_OBJECT_NAME
-from exasol_integration_test_docker_environment.lib.base.job_config import job_config
 from exasol_integration_test_docker_environment.lib.base.pickle_target import PickleTarget
 from exasol_integration_test_docker_environment.lib.base.task_logger_wrapper import TaskLoggerWrapper
 from exasol_integration_test_docker_environment.lib.base.task_state import TaskState
@@ -71,6 +70,7 @@ class RunTaskFuture(AbstractTaskFuture):
 
 class BaseTask(Task):
     caller_output_path = luigi.ListParameter([], significant=False, visibility=ParameterVisibility.HIDDEN)
+    job_id = luigi.Parameter()
 
     def __init__(self, *args, **kwargs):
         self._registered_tasks = []
@@ -113,7 +113,7 @@ class BaseTask(Task):
         # task_id is a concatenation of task family, the first values of the first 3 parameters
         # sorted by parameter name and a md5hash of the family/parameters as a cananocalised json.
         param_str = json.dumps(params, separators=(',', ':'), sort_keys=True)
-        hash_input = job_config().job_id + param_str
+        hash_input = param_str
         param_hash = hashlib.sha3_256(hash_input.encode('utf-8')).hexdigest()
         return '{}_{}'.format(task_family, param_hash[:TASK_ID_TRUNCATE_HASH])
 
@@ -137,7 +137,7 @@ class BaseTask(Task):
 
     def _get_output_path_for_job(self) -> Path:
         return Path(build_config().output_directory,
-                    "jobs", job_config().job_id)
+                    "jobs", self.job_id)
 
     def _extend_output_path(self):
         extension = self.extend_output_path()
@@ -306,12 +306,14 @@ class BaseTask(Task):
     def create_child_task_with_common_params(self, task_class, **kwargs):
         params = util.common_params(self, task_class)
         params["caller_output_path"] = self._extend_output_path()
+        params["job_id"] = self.job_id
         params.update(kwargs)
         return task_class(**params)
 
     def create_child_task(self, task_class, **kwargs):
         params = {}
         params["caller_output_path"] = self._extend_output_path()
+        params["job_id"] = self.job_id
         params.update(kwargs)
         return task_class(**params)
 

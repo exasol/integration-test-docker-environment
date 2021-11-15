@@ -41,9 +41,10 @@ class DockerSaveImageBaseTask(DockerBaseTask):
 
     def save_image(self, image_info: ImageInfo, tag_for_save: str, save_file_path: pathlib.Path):
         self.remove_save_file_if_necassary(save_file_path)
-        image = self._client.images.get(image_info.get_target_complete_name())
-        generator = image.save(named=tag_for_save)
-        self.write_image_to_file(save_file_path, image_info, generator)
+        with self._get_docker_client() as docker_client:
+            image = docker_client.images.get(image_info.get_target_complete_name())
+            generator = image.save(named=tag_for_save)
+            self.write_image_to_file(save_file_path, image_info, generator)
 
     def remove_save_file_if_necassary(self, save_file_path: pathlib.Path):
         save_file_path.parent.mkdir(exist_ok=True, parents=True)

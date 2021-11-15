@@ -25,14 +25,15 @@ class WaitForTestDockerDatabase(DockerBaseTask, DatabaseCredentialsParameter):
     attempt = luigi.IntParameter(1)
 
     def run_task(self):
-        test_container = self._client.containers.get(self.test_container_info.container_name)
-        db_container_name = self.database_info.container_info.container_name
-        db_container = self._client.containers.get(db_container_name)
-        is_database_ready = \
-            self.wait_for_database_startup(test_container, db_container)
-        after_startup_db_log_file = self.get_log_path().joinpath("after_startup_db_log.tar.gz")
-        self.save_db_log_files_as_gzip_tar(after_startup_db_log_file, db_container)
-        self.return_object(is_database_ready)
+        with self._get_docker_client() as docker_client:
+            test_container = docker_client.containers.get(self.test_container_info.container_name)
+            db_container_name = self.database_info.container_info.container_name
+            db_container = docker_client.containers.get(db_container_name)
+            is_database_ready = \
+                self.wait_for_database_startup(test_container, db_container)
+            after_startup_db_log_file = self.get_log_path().joinpath("after_startup_db_log.tar.gz")
+            self.save_db_log_files_as_gzip_tar(after_startup_db_log_file, db_container)
+            self.return_object(is_database_ready)
 
     def wait_for_database_startup(self,
                                   test_container: Container,

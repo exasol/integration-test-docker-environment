@@ -33,10 +33,11 @@ class PopulateEngineSmallTestDataToDatabase(DockerBaseTask, DatabaseCredentialsP
         self.logger.warning("Uploading data")
         username = self.db_user
         password = self.db_password
-        test_container = self._client.containers.get(self._test_container_info.container_name)
-        cmd = f"""cd /tests/test/enginedb_small; $EXAPLUS -c '{self._database_info.host}:{self._database_info.db_port}' -u '{username}' -p '{password}' -f import.sql"""
-        bash_cmd = f"""bash -c "{cmd}" """
-        exit_code, output = test_container.exec_run(cmd=bash_cmd)
+        with self._get_docker_client() as docker_client:
+            test_container = docker_client.containers.get(self._test_container_info.container_name)
+            cmd = f"""cd /tests/test/enginedb_small; $EXAPLUS -c '{self._database_info.host}:{self._database_info.db_port}' -u '{username}' -p '{password}' -f import.sql"""
+            bash_cmd = f"""bash -c "{cmd}" """
+            exit_code, output = test_container.exec_run(cmd=bash_cmd)
         self.write_logs(output.decode("utf-8"))
         if exit_code != 0:
             raise Exception("Failed to populate the database with data.\nLog: %s" % cmd + "\n" + output.decode("utf-8"))

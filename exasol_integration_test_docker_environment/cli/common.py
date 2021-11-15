@@ -77,11 +77,11 @@ def import_build_steps(flavor_path: Tuple[str, ...]):
         spec.loader.exec_module(module)
 
 
-def set_job_id(name):
+def generate_root_task(task_class, *args, **kwargs):
     strftime = datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
-    job_id = f"{strftime}_{name}"
-    config = luigi.configuration.get_config()
-    config.set('job_config', 'job_id', job_id)
+    params = {"job_id": f"{strftime}_{task_class.__name__}"}
+    params.update(kwargs)
+    return task_class(**params)
 
 
 def run_task(task_creator: Callable[[], DependencyLoggerBaseTask],

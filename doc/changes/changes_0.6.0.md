@@ -30,7 +30,7 @@ If you need further versions, please open an issue.
 
 ## Refactoring:
 
-n/a
+ - #122: make jobid a parameter of the task
 
 ## Security:
  -#126: Update urllib3 package

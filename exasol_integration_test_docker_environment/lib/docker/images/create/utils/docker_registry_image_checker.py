@@ -1,8 +1,8 @@
 import json
 import multiprocessing as mp
 
-import docker
 
+from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.lib.logging.abstract_log_handler import AbstractLogHandler
 
 
@@ -23,19 +23,15 @@ class DockerRegistryImageCheckerPullLogHandler(AbstractLogHandler):
 
 class DockerRegistryImageChecker:
     def map(self, image: str, queue: mp.Queue):
-        client = docker.from_env()  # TODO replace by docker_config
-        try:
-            generator = client.api.pull(
-                repository=image,
-                stream=True,
-            )
-            for log_line in generator:
-                queue.put(log_line)
-            queue.put(None)
-        except Exception as e:
-            queue.put(e)
-        finally:
-            client.close()
+
+        with ContextDockerClient() as docker_client:
+            try:
+                generator = docker_client.api.pull(repository=image, stream=True)
+                for log_line in generator:
+                    queue.put(log_line)
+                queue.put(None)
+            except Exception as e:
+                queue.put(e)
 
     def check(self, image: str):
         log_handler = DockerRegistryImageCheckerPullLogHandler()

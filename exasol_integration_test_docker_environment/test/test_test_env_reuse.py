@@ -1,14 +1,13 @@
 import os
 import unittest
 
-import docker
 import luigi
 
 from exasol_integration_test_docker_environment.lib.data.environment_type import EnvironmentType
+from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_environment import SpawnTestEnvironment
-from exasol_integration_test_docker_environment.test.utils import process_spawn_utils
-from exasol_integration_test_docker_environment.cli.common import set_docker_repository_config
-from exasol_integration_test_docker_environment.test.utils import luigi_utils
+from exasol_integration_test_docker_environment.cli.common import set_docker_repository_config, generate_root_task
+from exasol_integration_test_docker_environment.testing import luigi_utils
 from exasol_integration_test_docker_environment.cli.options import test_environment_options
 
 
@@ -25,7 +24,6 @@ class TestContainerReuseTest(unittest.TestCase):
         return self.__class__.__name__.lower()
 
     def setUp(self):
-        self._client = docker.from_env()
         self._docker_repository_name = self.env_name()
         print("docker_repository_name", self._docker_repository_name)
         luigi_utils.clean(self._docker_repository_name)
@@ -34,9 +32,10 @@ class TestContainerReuseTest(unittest.TestCase):
         if "EXASOL_VERSION" in os.environ and os.environ["EXASOL_VERSION"] != "default":
             self.docker_db_version_parameter = os.environ["EXASOL_VERSION"]
 
+        self.setup_luigi_config()
+
     def tearDown(self):
         luigi_utils.clean(self._docker_repository_name)
-        self._client.close()
 
     def setup_luigi_config(self):
         set_docker_repository_config(
@@ -47,44 +46,38 @@ class TestContainerReuseTest(unittest.TestCase):
             kind="target"
         )
 
-    def run_spawn_test_env_with_cleanup(self):
-        return self.run_spawn_test_env(cleanup=True)
-
-    def run_spawn_test_env_without_cleanup(self):
-        return self.run_spawn_test_env(cleanup=False)
-
     def run_spawn_test_env(self, cleanup: bool):
         result = None
-        self.setup_luigi_config()
-        luigi_utils.set_job_id(SpawnTestEnvironment)
-        task = SpawnTestEnvironment(reuse_database_setup=True,
-                                    reuse_database=True,
-                                    reuse_test_container=True,
-                                    no_test_container_cleanup_after_success=not cleanup,
-                                    no_database_cleanup_after_success=not cleanup,
-                                    external_exasol_xmlrpc_host="",
-                                    external_exasol_db_host="",
-                                    external_exasol_xmlrpc_port=0,
-                                    external_exasol_db_user="",
-                                    external_exasol_db_password="",
-                                    external_exasol_xmlrpc_user="",
-                                    external_exasol_xmlrpc_password="",
-                                    external_exasol_xmlrpc_cluster_name="",
-                                    external_exasol_bucketfs_write_password="",
-                                    environment_type=EnvironmentType.docker_db,
-                                    environment_name=self.env_name(),
-                                    docker_db_image_version=self.docker_db_version_parameter,
-                                    docker_db_image_name="exasol/docker-db"
-                                    )
+
+        task = generate_root_task(task_class=SpawnTestEnvironment,
+                                  reuse_database_setup=True,
+                                  reuse_database=True,
+                                  reuse_test_container=True,
+                                  no_test_container_cleanup_after_success=not cleanup,
+                                  no_database_cleanup_after_success=not cleanup,
+                                  external_exasol_xmlrpc_host="",
+                                  external_exasol_db_host="",
+                                  external_exasol_xmlrpc_port=0,
+                                  external_exasol_db_user="",
+                                  external_exasol_db_password="",
+                                  external_exasol_xmlrpc_user="",
+                                  external_exasol_xmlrpc_password="",
+                                  external_exasol_xmlrpc_cluster_name="",
+                                  external_exasol_bucketfs_write_password="",
+                                  environment_type=EnvironmentType.docker_db,
+                                  environment_name=self.env_name(),
+                                  docker_db_image_version=self.docker_db_version_parameter,
+                                  docker_db_image_name="exasol/docker-db"
+                                  )
         try:
             success = luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
             if success:
                 result = task
             else:
-                task.cleanup(False)
-                Exception("Task failed")
+                raise Exception("Task failed")
         except Exception as e:
             task.cleanup(False)
+            raise RuntimeError("Error spawning test environment") from e
         return result
 
     def _create_exaplus_check_cmd(self, test_environment_info):
@@ -96,12 +89,13 @@ class TestContainerReuseTest(unittest.TestCase):
         return f"""$EXAPLUS -c '{database_host}:{database_port}' -u '{username}' -p '{password}' -sql \\\"{q}\\\""""
 
     def _exec_cmd_in_test_container(self, test_environment_info, cmd):
-        bash_cmd = f"""bash -c "{cmd}" """
-        test_container = self._client.containers.get(test_environment_info.test_container_info.container_name)
+        with ContextDockerClient() as docker_client:
+            bash_cmd = f"""bash -c "{cmd}" """
+            test_container = docker_client.containers.get(test_environment_info.test_container_info.container_name)
 
-        exit_code, output = test_container.exec_run(cmd=bash_cmd)
-        self.assertEquals(exit_code, 0)
-        return output.decode('utf-8')
+            exit_code, output = test_container.exec_run(cmd=bash_cmd)
+            self.assertEquals(exit_code, 0)
+            return output.decode('utf-8')
 
     def _verify_test_data(self, test_environment_info):
         cmd = self._create_exaplus_check_cmd(test_environment_info)
@@ -112,24 +106,26 @@ class TestContainerReuseTest(unittest.TestCase):
         self.assertIn("ENGINETABLE", [output_entry.strip() for output_entry in output_str.split(sep='\n')])
 
     def test_initial_reuse_database_setup_populates_data(self):
-        task = process_spawn_utils.run_in_process(self.run_spawn_test_env_with_cleanup)
+        task = self.run_spawn_test_env(cleanup=True)
         self._verify_test_data(task.get_return_object())
         task.cleanup(True)
 
     def get_instance_ids(self, test_environment_info):
-        test_container = self._client.containers.get(test_environment_info.test_container_info.container_name)
-        db_container = self._client.containers.get(test_environment_info.database_info.container_info.container_name)
-        network = self._client.networks.get(test_environment_info.network_info.network_name)
-        return test_container.id, db_container.id, network.id
+        with ContextDockerClient() as docker_client:
+            test_container = docker_client.containers.get(test_environment_info.test_container_info.container_name)
+            db_container = \
+                docker_client.containers.get(test_environment_info.database_info.container_info.container_name)
+            network = docker_client.networks.get(test_environment_info.network_info.network_name)
+            return test_container.id, db_container.id, network.id
 
     def test_reuse_env_same_instances(self):
-        task = process_spawn_utils.run_in_process(self.run_spawn_test_env_without_cleanup)
+        task = self.run_spawn_test_env(cleanup=False)
         test_environment_info = task.get_return_object()
         old_instance_ids = self.get_instance_ids(test_environment_info)
         # This clean is supposed to not remove docker instances
         task.cleanup(True)
 
-        task = process_spawn_utils.run_in_process(self.run_spawn_test_env_with_cleanup)
+        task = self.run_spawn_test_env(cleanup=True)
         test_environment_info = task.get_return_object()
         new_instance_ids = self.get_instance_ids(test_environment_info)
         self.assertEquals(old_instance_ids, new_instance_ids)
