@@ -20,7 +20,7 @@ class DockerTestEnvironmentTest(unittest.TestCase):
                 clean_images_at_close=False)
         # TODO cls.test_environment.clean_images()
         cls.docker_environment_name = cls.__name__
-        cls.spawned_docker_environments = \
+        cls.spawned_docker_test_environments = \
             cls.test_environment.spawn_docker_test_environments(cls.docker_environment_name)
 
     @classmethod
@@ -28,7 +28,7 @@ class DockerTestEnvironmentTest(unittest.TestCase):
         utils.close_environments(cls.spawned_docker_test_environments, cls.test_environment)
 
     def test_all_containers_started(self):
-        on_host_docker_environment = self.spawned_docker_environments.on_host_docker_environment
+        on_host_docker_environment = self.spawned_docker_test_environments.on_host_docker_environment
         with ContextDockerClient() as docker_client:
             containers = [c.name for c in docker_client.containers.list() if self.docker_environment_name in c.name]
             self.assertEqual(len(containers), 2,
@@ -44,7 +44,7 @@ class DockerTestEnvironmentTest(unittest.TestCase):
                              f"{on_host_docker_environment.completed_process.stdout.decode('utf8')}")
 
     def test_docker_available_in_test_container(self):
-        on_host_docker_environment = self.spawned_docker_environments.on_host_docker_environment
+        on_host_docker_environment = self.spawned_docker_test_environments.on_host_docker_environment
         with ContextDockerClient() as docker_client:
             containers = [c.name for c in docker_client.containers.list() if self.docker_environment_name in c.name]
             test_container = [c for c in containers if "test_container" in c]
@@ -56,7 +56,7 @@ class DockerTestEnvironmentTest(unittest.TestCase):
                              f"Startup log was: {on_host_docker_environment.completed_process.stdout.decode('utf8')}")
 
     def test_envrionment_info_available(self):
-        on_host_docker_environment = self.spawned_docker_environments.on_host_docker_environment
+        on_host_docker_environment = self.spawned_docker_test_environments.on_host_docker_environment
         temp_dir_glob = list(Path(self.test_environment.temp_dir).glob("**/*"))
         path_filter = f"cache/environments/{on_host_docker_environment.name}"
         actual_environment_infos = sorted([path.name
