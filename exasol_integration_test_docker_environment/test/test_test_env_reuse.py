@@ -74,10 +74,10 @@ class TestContainerReuseTest(unittest.TestCase):
             if success:
                 result = task
             else:
-                task.cleanup(False)
-                Exception("Task failed")
+                raise Exception("Task failed")
         except Exception as e:
             task.cleanup(False)
+            raise RuntimeError("Error spawning test environment") from e
         return result
 
     def _create_exaplus_check_cmd(self, test_environment_info):
