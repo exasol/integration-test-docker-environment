@@ -1,10 +1,12 @@
-# Integration-Test-Docker-Environment 0.6.0, released t.b.d.
+# Integration-Test-Docker-Environment 0.6.0, released 2021-11-16
 
-Code name: t.b.d.
+Code name: Docker db 7.1.2 
 
 ## Summary
 
-t.b.d
+This release updates to docker db 7.1.2, and also contains a major refactoring, where the job id needs to be assigned to every root task.
+Besides this, it also contains a bugfix where the test data was not initially populated if the reuse_database_setup was set to true.
+Also some release consistency checks were introduced.
 
 ### Supported Exasol Versions
 
@@ -31,6 +33,9 @@ If you need further versions, please open an issue.
 ## Refactoring:
 
  - #122: make jobid a parameter of the task
+
+## Documentation:
+ - #132: Prepare documentation for release 0.6.0
 
 ## Security:
  -#126: Update urllib3 package
