@@ -39,42 +39,8 @@ jobs:
     - name: Test ./start-test-env
       run: ./start-test-env --help
 
-  test-all:
-    strategy:
-      fail-fast: false
-      matrix:
-        exasol_version:
-        - 7.1.2
-        - 7.0.13
-        - "default"
-        python_version:
-        - 3.6
-        - 3.7
-        - 3.8
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Setup Python for integration-test-docker-environment
-      uses: actions/setup-python@v2
-      with:
-        python-version: "${{ matrix.python_version }}"
-
-    - name: Install Poetry
-      uses: abatilo/actions-poetry@v2.0.0
-      with:
-        poetry-version: 1.1.6
-
-    - name: Run all tests
-      run: ./scripts/test/run_all_tests.sh
-      env:
-        EXASOL_VERSION: "${{ matrix.exasol_version }}"
-
-    - name: Test ./start-test-env-with-poetry
-      run: ./start-test-env-with-poetry --help
-
   upload:
-    needs: [test-all, test-docker-starter, check-release]
+    needs: [test-docker-starter, check-release]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
