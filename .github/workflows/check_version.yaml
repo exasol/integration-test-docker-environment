@@ -4,8 +4,6 @@ on: [push, pull_request]
 
 jobs:
   check-version-numbers:
-    strategy:
-      fail-fast: true
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -15,7 +13,11 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.6
+
       - name: Install Poetry
         uses: abatilo/actions-poetry@v2.0.0
+        with:
+          poetry-version: 1.1.6
+
       - name: Check Release
         run: ./scripts/build/check_release.sh
