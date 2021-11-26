@@ -9,8 +9,8 @@ t.b.d.
 ### Supported Exasol Versions
 
 * **6.2**: up to 6.2.17
-* **7.0**: up to 7.0.13
-* **7.1**: up to 7.1.2
+* **7.0**: up to 7.0.14
+* **7.1**: up to 7.1.3
 
 If you need further versions, please open an issue.
 
@@ -25,7 +25,7 @@ If you need further versions, please open an issue.
 
 ## Features / Enhancements:
 
-n/a
+ - #138: Integrate new Docker dbs 7.1.3 and 7.0.14
 
 ## Refactoring:
 
