@@ -109,33 +109,33 @@ class BaseTaskCleanupTest(unittest.TestCase):
 
     def test_cleanup_of_grandchildren_called_only_once(self):
         """
-        Test that creating the same grandchild task by two different parent task, will invokes cleanup of grandchild
+        Test that creating the same grandchild task by two different parent tasks, will invoke cleanup of grandchild
         task only once! Luigi takes care of invoking run only once, we take care to invoke cleanup() only once.
         """
-        self._run_it(False, False, 1)
+        self._run_it(different_grandchild=False, use_dynamic_dependency=False, expected_result=1)
 
     def test_cleanup_of_grandchildren_called_twice(self):
         """
-        Test that creating grandchild task with different parameters by two different parent task,
-        will invokes cleanup of grandchild twice.
+        Test that creating grandchild task with different parameters by two different parent tasks,
+        will invoke cleanup of grandchild twice.
         """
-        self._run_it(True, False, 2)
+        self._run_it(different_grandchild=True, use_dynamic_dependency=False, expected_result=2)
 
     def test_cleanup_of_grandchildren_called_only_once_dynamic(self):
         """
-        Test that creating the same grandchild task by two different parent task, will invokes cleanup of grandchild
+        Test that creating the same grandchild task by two different parent tasks, will invoke cleanup of grandchild
         task only once! Luigi takes care of invoking run only once, we take care to invoke cleanup() only once.
         In this test all child tasks are created dynamically.
         """
-        self._run_it(False, True, 1)
+        self._run_it(different_grandchild=False, use_dynamic_dependency=True, expected_result=1)
 
     def test_cleanup_of_grandchildren_called_twice_dynamic(self):
         """
-        Test that creating grandchild task with different parameters by two different parent task,
-        will invokes cleanup of grandchild twice.
+        Test that creating grandchild task with different parameters by two different parent tasks,
+        will invoke cleanup of grandchild twice.
         In this test all child tasks are created dynamically.
         """
-        self._run_it(True, True, 2)
+        self._run_it(different_grandchild=True, use_dynamic_dependency=True, expected_result=2)
 
 
 if __name__ == '__main__':
