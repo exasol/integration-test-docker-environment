@@ -3,7 +3,7 @@ import json
 import logging
 import shutil
 from pathlib import Path
-from typing import Dict, List, Generator, Any, Union
+from typing import Dict, List, Generator, Any, Union, Set
 
 import luigi
 import six
@@ -317,24 +317,31 @@ class BaseTask(Task):
         params.update(kwargs)
         return task_class(**params)
 
-    def cleanup(self, success:bool):
-        self.logger.debug("Cleaning up")
-        if self._task_state != TaskState.CLEANUP and self._task_state != TaskState.CLEANED:
-            self._task_state = TaskState.CLEANUP
-            try:
-                self.cleanup_child_task(success)
-            except Exception as e:
-                self.logger.error("Error during cleaning up child tasks", e)
-            try:
-                self.cleanup_task(success)
-            except Exception as e:
-                self.logger.error("Error during cleaning up task", e)
-            if self._get_tmp_path_for_task().exists():
-                shutil.rmtree(self._get_tmp_path_for_task())
-            self._task_state = TaskState.CLEANED
-        self.logger.debug("Cleanup finished")
+    def cleanup(self, success: bool):
+        self.cleanup_internal(success, set())
 
-    def cleanup_child_task(self, success:bool):
+    def cleanup_internal(self, success: bool, cleanup_checklist: Set[str]):
+        self.logger.debug("Cleaning up")
+        if str(self) not in cleanup_checklist:
+            cleanup_checklist.add(str(self))
+            if self._task_state != TaskState.CLEANUP and self._task_state != TaskState.CLEANED:
+                self._task_state = TaskState.CLEANUP
+                try:
+                    self.cleanup_child_task(success, cleanup_checklist)
+                except Exception as e:
+                    self.logger.error("Error during cleaning up child tasks", e)
+                try:
+                    self.cleanup_task(success)
+                except Exception as e:
+                    self.logger.error("Error during cleaning up task", e)
+                if self._get_tmp_path_for_task().exists():
+                    shutil.rmtree(self._get_tmp_path_for_task())
+                self._task_state = TaskState.CLEANED
+            self.logger.debug("Cleanup finished")
+        else:
+            self.logger.debug("Cleanup skipped")
+
+    def cleanup_child_task(self, success: bool, cleanup_checklist: Set[str]):
         if self._run_dependencies_target.exists():
             _run_dependencies_tasks_from_target = self._run_dependencies_target.read()
         else:
@@ -343,12 +350,12 @@ class BaseTask(Task):
         reversed_run_dependencies_task_list = list(_run_dependencies_tasks)
         reversed_run_dependencies_task_list.reverse()
         for task in reversed_run_dependencies_task_list:
-            task.cleanup(success)
+            task.cleanup_internal(success, cleanup_checklist)
 
         reversed_registered_task_list = list(self._registered_tasks)
         reversed_registered_task_list.reverse()
         for task in reversed_registered_task_list:
-            task.cleanup(success)
+            task.cleanup_internal(success, cleanup_checklist)
 
-    def cleanup_task(self, success:bool):
+    def cleanup_task(self, success: bool):
         pass

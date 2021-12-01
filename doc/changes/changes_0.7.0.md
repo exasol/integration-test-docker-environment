@@ -21,7 +21,8 @@ If you need further versions, please open an issue.
 
 ## Bug Fixes:
 
- - #134: Release: Upload of artifacts must not run within matrix build 
+ - #134: Release: Upload of artifacts must not run within matrix build
+ - #25: Avoid that cleanup methods can be called multiple times when the task is a child task of multiple other task
 
 ## Features / Enhancements:
 
