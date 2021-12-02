@@ -34,7 +34,7 @@ n/a
 
 ## Documentation:
 
-n/a
+ - #143: Prepare release 0.7.0
 
 ## Security:
 
