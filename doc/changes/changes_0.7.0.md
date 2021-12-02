@@ -1,10 +1,10 @@
-# Integration-Test-Docker-Environment 0.7.0, released t.b.d.
+# Integration-Test-Docker-Environment 0.7.0, released 2021-12-02
 
-Code name: t.b.d. 
+Code name: Docker db 7.1.3 and 7.0.14
 
 ## Summary
 
-t.b.d.
+This release updates to docker db 7.1.3 and 7.0.14, and also contains a some bugfixes.
 
 ### Supported Exasol Versions
 
@@ -34,7 +34,7 @@ n/a
 
 ## Documentation:
 
-n/a
+ - #143: Prepare release 0.7.0
 
 ## Security:
 
