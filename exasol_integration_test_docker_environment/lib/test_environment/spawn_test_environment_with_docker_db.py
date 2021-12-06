@@ -4,6 +4,8 @@ from exasol_integration_test_docker_environment.lib.data.docker_network_info imp
 from exasol_integration_test_docker_environment.lib.data.environment_type import EnvironmentType
 from exasol_integration_test_docker_environment.lib.test_environment.abstract_spawn_test_environment import \
     AbstractSpawnTestEnvironment
+from exasol_integration_test_docker_environment.lib.test_environment.create_ssl_certificates_task import \
+    CreateSSLCertificatesTask
 from exasol_integration_test_docker_environment.lib.test_environment.database_waiters.wait_for_test_docker_database import \
     WaitForTestDockerDatabase
 from exasol_integration_test_docker_environment.lib.test_environment.parameter.docker_db_test_environment_parameter import \
@@ -20,9 +22,21 @@ class SpawnTestEnvironmentWithDockerDB(
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.db_container_name = f"""db_container_{self.environment_name}"""
+        self.certificate_volume_name = f"""certificates_{self.environment_name}"""
 
     def get_environment_type(self):
         return EnvironmentType.docker_db
+
+    def create_ssl_certificates(self):
+        return \
+            self.create_child_task_with_common_params(
+                CreateSSLCertificatesTask,
+                db_container_name=self.db_container_name,
+                volume_name=self.certificate_volume_name,
+                reuse=self.reuse_database or self.reuse_test_container,
+                no_cleanup_after_success=self.no_database_cleanup_after_success or self.no_test_container_cleanup_after_success,
+                no_cleanup_after_failure=self.no_database_cleanup_after_failure or self.no_test_container_cleanup_after_failure,
+            )
 
     def create_network_task(self, attempt: int):
         return \
@@ -45,6 +59,7 @@ class SpawnTestEnvironmentWithDockerDB(
                 SpawnTestDockerDatabase,
                 db_container_name=self.db_container_name,
                 network_info=network_info,
+                certificate_volume_name=self.certificate_volume_name,
                 ip_address_index_in_subnet=0,
                 attempt=attempt
             )

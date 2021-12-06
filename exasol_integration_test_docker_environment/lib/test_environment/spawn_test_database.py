@@ -33,6 +33,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
     network_info = JsonPickleParameter(DockerNetworkInfo, significant=False)  # type: DockerNetworkInfo
     ip_address_index_in_subnet = luigi.IntParameter(significant=False)  # type: int
     docker_runtime = luigi.OptionalParameter(None, significant=False)  # type: str
+    certificate_volume_name = luigi.Parameter()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -97,7 +98,8 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                     name=self.db_container_name,
                     detach=True,
                     privileged=True,
-                    volumes={db_volume.name: {"bind": "/exa", "mode": "rw"}},
+                    volumes={db_volume.name: {"bind": "/exa", "mode": "rw"},
+                             self.certificate_volume_name: {"bind": "/certificates", "mode": "r"}},
                     network_mode=None,
                     ports=ports,
                     runtime=self.docker_runtime

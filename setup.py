@@ -22,11 +22,13 @@ packages = \
  'exasol_integration_test_docker_environment.lib.test_environment.database_setup',
  'exasol_integration_test_docker_environment.lib.test_environment.database_waiters',
  'exasol_integration_test_docker_environment.lib.test_environment.parameter',
+ 'exasol_integration_test_docker_environment.lib.test_environment.shell',
  'exasol_integration_test_docker_environment.testing']
 
 package_data = \
 {'': ['*'],
- 'exasol_integration_test_docker_environment': ['docker_db_config/6.2.0/*',
+ 'exasol_integration_test_docker_environment': ['docker_db_config/*',
+                                                'docker_db_config/6.2.0/*',
                                                 'docker_db_config/6.2.1/*',
                                                 'docker_db_config/6.2.10/*',
                                                 'docker_db_config/6.2.11/*',

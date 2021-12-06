@@ -133,11 +133,20 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
     def _start_database(self, attempt) \
             -> Generator[BaseTask, BaseTask, Tuple[DockerNetworkInfo, DatabaseInfo, bool, ContainerInfo]]:
         network_info = yield from self._create_network(attempt)
+        ssl_info = yield from self._create_ssl_certificates()
         database_info, test_container_info = \
             yield from self._spawn_database_and_test_container(network_info, attempt)
         is_database_ready = yield from self._wait_for_database(
             database_info, test_container_info, attempt)
         return network_info, database_info, is_database_ready, test_container_info
+
+    def _create_ssl_certificates(self):
+        ssl_info_future = yield from self.run_dependencies(self.create_ssl_certificates())
+        ssl_info = self.get_values_from_future(ssl_info_future)
+        return ssl_info
+
+    def create_ssl_certificates(self):
+        raise AbstractMethodException()
 
     def _create_network(self, attempt):
         network_info_future = yield from self.run_dependencies(self.create_network_task(attempt))
