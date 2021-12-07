@@ -3,6 +3,7 @@ from typing import List
 
 import luigi
 import netaddr
+import pkg_resources
 from docker.models.containers import Container
 from docker.transport import unixconn
 
@@ -182,6 +183,12 @@ class SpawnTestContainer(DockerBaseTask):
 
     def register_certificates(self, test_container: Container):
         if self.certificate_volume_name is not None:
+            script_str = pkg_resources.resource_string(
+                "exasol_integration_test_docker_environment",
+                "test_container_config/install_certificate.sh")  # type: bytes
+
+            # TODO: Upload the script to the test container...
+
             test_container.exec_run("/scripts/install_certificates.sh")
 
     def cleanup_task(self, success: bool):
