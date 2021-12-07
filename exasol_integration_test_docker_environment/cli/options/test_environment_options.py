@@ -18,7 +18,9 @@ docker_db_options = [
                  help="""Docker DB Image Version against which the tests should run."""),
     click.option('--docker-db-image-name', type=str, default="""exasol/docker-db""",
                  show_default=True,
-                 help="""Docker DB Image Name against which the tests should run.""")
+                 help="""Docker DB Image Name against which the tests should run."""),
+    click.option('--create-certificates/--no-create-certificates', default=False,
+                 help="""Creates and injects SSL certificates to the Docker DB container.""")
 ]
 
 external_db_options = [

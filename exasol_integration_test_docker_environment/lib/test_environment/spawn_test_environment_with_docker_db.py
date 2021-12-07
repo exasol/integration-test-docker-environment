@@ -1,6 +1,9 @@
+from typing import Optional
+
 from exasol_integration_test_docker_environment.lib.data.container_info import ContainerInfo
 from exasol_integration_test_docker_environment.lib.data.database_info import DatabaseInfo
 from exasol_integration_test_docker_environment.lib.data.docker_network_info import DockerNetworkInfo
+from exasol_integration_test_docker_environment.lib.data.docker_volume_info import DockerVolumeInfo
 from exasol_integration_test_docker_environment.lib.data.environment_type import EnvironmentType
 from exasol_integration_test_docker_environment.lib.test_environment.abstract_spawn_test_environment import \
     AbstractSpawnTestEnvironment
@@ -53,13 +56,15 @@ class SpawnTestEnvironmentWithDockerDB(
 
     def create_spawn_database_task(self,
                                    network_info: DockerNetworkInfo,
+                                   certificate_volume_info: Optional[DockerVolumeInfo],
                                    attempt: int):
+        certificate_volume_name = certificate_volume_info.volume_name if certificate_volume_info is not None else None
         return \
             self.create_child_task_with_common_params(
                 SpawnTestDockerDatabase,
                 db_container_name=self.db_container_name,
                 network_info=network_info,
-                certificate_volume_name=self.certificate_volume_name,
+                certificate_volume_name=certificate_volume_name,
                 ip_address_index_in_subnet=0,
                 attempt=attempt
             )

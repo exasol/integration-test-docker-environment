@@ -29,3 +29,6 @@ RUN curl -s -o udf_debug.py https://raw.githubusercontent.com/exasol/hadoop-etl-
 
 COPY requirements.txt requirements.txt
 RUN pip install -r "requirements.txt"
+
+RUN mkdir /scripts
+COPY tests/scripts /

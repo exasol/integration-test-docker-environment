@@ -3,6 +3,7 @@ from typing import List
 
 import luigi
 import netaddr
+from docker.models.containers import Container
 from docker.transport import unixconn
 
 from exasol_integration_test_docker_environment.lib.base.docker_base_task import DockerBaseTask
@@ -27,6 +28,7 @@ class SpawnTestContainer(DockerBaseTask):
     no_test_container_cleanup_after_success = luigi.BoolParameter(False, significant=False)
     no_test_container_cleanup_after_failure = luigi.BoolParameter(False, significant=False)
     docker_runtime = luigi.OptionalParameter(None, significant=False)
+    certificate_volume_name = luigi.Parameter()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -114,8 +116,14 @@ class SpawnTestContainer(DockerBaseTask):
             tests_host_path: {
                 "bind": "/tests_src",
                 "mode": "rw"
-            }
+            },
         }
+        if self.certificate_volume_name is not None:
+            volumes[self.certificate_volume_name] = {
+                "bind": "/certificates",
+                "mode": "r"
+            }
+
         with self._get_docker_client() as docker_client:
             docker_unix_sockets = [i for i in docker_client.api.adapters.values()
                                    if isinstance(i, unixconn.UnixHTTPAdapter)]
@@ -140,6 +148,7 @@ class SpawnTestContainer(DockerBaseTask):
             network_aliases = self._get_network_aliases()
             docker_network.connect(test_container, ipv4_address=ip_address, aliases=network_aliases)
             test_container.start()
+            self.register_certificates()
             container_info = self.create_container_info(ip_address, network_aliases, network_info)
             return container_info
 
@@ -171,6 +180,10 @@ class SpawnTestContainer(DockerBaseTask):
         except Exception as e:
             pass
 
+    def register_certificates(self, test_container: Container):
+        if self.certificate_volume_name is not None:
+            test_container.exec_run("/scripts/install_certificates.sh")
+
     def cleanup_task(self, success: bool):
         if (success and not self.no_test_container_cleanup_after_success) or \
                 (not success and not self.no_test_container_cleanup_after_failure):
@@ -179,3 +192,4 @@ class SpawnTestContainer(DockerBaseTask):
                 self._remove_container(self.test_container_name)
             except Exception as e:
                 self.logger.error(f"Error during removing container %s: %s", self.test_container_name, e)
+
