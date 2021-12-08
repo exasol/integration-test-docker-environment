@@ -18,6 +18,22 @@ fi
 
 SCRIPT_DIR="$(dirname "$($rl -f "${BASH_SOURCE[0]}")")"
 
-RUNNER_IMAGE_NAME="$("$SCRIPT_DIR/starter_scripts/construct_docker_runner_image_name.sh")"
 
-bash "$SCRIPT_DIR/starter_scripts/exaslct_within_docker_container_with_container_build.sh" "$RUNNER_IMAGE_NAME" "${@}"
+RUNNER_IMAGE_NAME="$1"
+shift 1
+
+if [[ -z "${EXASLCT_FORCE_REBUILD:-}" ]]; then
+  FIND_IMAGE_LOCALLY=$(docker images -q "$RUNNER_IMAGE_NAME")
+  if [ -z "$FIND_IMAGE_LOCALLY" ]; then
+    docker pull "$RUNNER_IMAGE_NAME" || bash "$SCRIPT_DIR/build_docker_runner_image.sh"
+  fi
+else
+   bash "$SCRIPT_DIR/build_docker_runner_image.sh"
+fi
+
+EXEC_SCRIPT=exaslct_within_docker_container.sh
+if [[ "$(uname)" = Darwin ]]; then
+  EXEC_SCRIPT=exaslct_within_docker_container_slim.sh
+fi
+
+bash "$SCRIPT_DIR/$EXEC_SCRIPT" "$RUNNER_IMAGE_NAME" "${@}"

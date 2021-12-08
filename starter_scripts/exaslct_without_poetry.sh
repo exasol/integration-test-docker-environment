@@ -1,10 +1,11 @@
-#!/usr/bin/env bash
+#!/bin/bash
+
+set -euo pipefail
 
 #####################################################################################
 ###REMEMBER TO TEST ANY CHANGES HERE ON MACOSX!!!
 #####################################################################################
 
-set -euo pipefail
 
 rl=readlink
 if [[ "$(uname)" = Darwin ]]; then
@@ -17,7 +18,8 @@ if [[ ! "$(command -v $rl)" ]]; then
 fi
 
 SCRIPT_DIR="$(dirname "$($rl -f "${BASH_SOURCE[0]}")")"
+PROJECT_ROOT_DIR="$SCRIPT_DIR/.."
 
-RUNNER_IMAGE_NAME="$("$SCRIPT_DIR/starter_scripts/construct_docker_runner_image_name.sh")"
-
-bash "$SCRIPT_DIR/starter_scripts/exaslct_within_docker_container_with_container_build.sh" "$RUNNER_IMAGE_NAME" "${@}"
+export PYTHONPATH="$PROJECT_ROOT_DIR/"
+python3 -u "$PROJECT_ROOT_DIR/exasol_integration_test_docker_environment/main.py" "${@}" # We use "$@" to pass the commandline arguments to the run function to preserve arguments with spaces as a single argument
+exit $?
