@@ -16,6 +16,7 @@ from exasol_integration_test_docker_environment.lib.test_environment.analyze_tes
     DockerTestContainerBuild
 from exasol_integration_test_docker_environment.lib.test_environment.create_export_directory import \
     CreateExportDirectory
+from exasol_integration_test_docker_environment.lib.test_environment.docker_container_copy import DockerContainerCopy
 
 
 class SpawnTestContainer(DockerBaseTask):
@@ -122,7 +123,7 @@ class SpawnTestContainer(DockerBaseTask):
         if self.certificate_volume_name is not None:
             volumes[self.certificate_volume_name] = {
                 "bind": "/certificates",
-                "mode": "r"
+                "mode": "ro"
             }
 
         with self._get_docker_client() as docker_client:
@@ -149,7 +150,7 @@ class SpawnTestContainer(DockerBaseTask):
             network_aliases = self._get_network_aliases()
             docker_network.connect(test_container, ipv4_address=ip_address, aliases=network_aliases)
             test_container.start()
-            self.register_certificates()
+            self.register_certificates(test_container)
             container_info = self.create_container_info(ip_address, network_aliases, network_info)
             return container_info
 
@@ -185,9 +186,11 @@ class SpawnTestContainer(DockerBaseTask):
         if self.certificate_volume_name is not None:
             script_str = pkg_resources.resource_string(
                 "exasol_integration_test_docker_environment",
-                "test_container_config/install_certificate.sh")  # type: bytes
+                "test_container_config/install_certificates.sh")  # type: bytes
 
-            # TODO: Upload the script to the test container...
+            docker_container_copy = DockerContainerCopy(test_container)
+            docker_container_copy.add_string_to_file("scripts/install_certificate.sh", script_str.decode("UTF-8"))
+            docker_container_copy.copy("/")
 
             test_container.exec_run("/scripts/install_certificates.sh")
 

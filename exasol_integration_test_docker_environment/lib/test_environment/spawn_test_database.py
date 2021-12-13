@@ -99,7 +99,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                     detach=True,
                     privileged=True,
                     volumes={db_volume.name: {"bind": "/exa", "mode": "rw"},
-                             self.certificate_volume_name: {"bind": "/certificates", "mode": "r"}},
+                             self.certificate_volume_name: {"bind": "/certificates", "mode": "ro"}},
                     network_mode=None,
                     ports=ports,
                     runtime=self.docker_runtime

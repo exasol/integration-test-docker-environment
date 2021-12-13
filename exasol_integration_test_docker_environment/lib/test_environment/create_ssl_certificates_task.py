@@ -38,7 +38,6 @@ class CreateSSLCertificatesTask(DockerBaseTask):
         with self._get_docker_client() as docker_client:
             volume = docker_client.volumes.create(
                 name=self.volume_name,
-                driver="local",
             )
             volume_info = self.get_volume_info(reused=False)
             create_certificate(host_name=str(self.db_container_name), certificate_dir=volume_info.mount_point)
