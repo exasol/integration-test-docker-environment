@@ -19,5 +19,5 @@ jobs:
         SECRET_DOCKER_USER_NAME: ${{ secrets.DOCKER_USER_NAME }}
         SECRET_DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
     - name: Push new Docker image
-      run: ./scripts/docker/bash push_test_environment_docker_runner.sh
+      run: bash ./scripts/docker/push_test_environment_docker_runner.sh
 
