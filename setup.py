@@ -22,7 +22,6 @@ packages = \
  'exasol_integration_test_docker_environment.lib.test_environment.database_setup',
  'exasol_integration_test_docker_environment.lib.test_environment.database_waiters',
  'exasol_integration_test_docker_environment.lib.test_environment.parameter',
- 'exasol_integration_test_docker_environment.lib.test_environment.shell',
  'exasol_integration_test_docker_environment.testing']
 
 package_data = \

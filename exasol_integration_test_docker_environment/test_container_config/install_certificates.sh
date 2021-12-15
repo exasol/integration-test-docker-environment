@@ -1,8 +1,10 @@
 #!/bin/bash
 
-if [[ -d /certificates ]]; then
-  find /certificates -type f -name '*.crt' |
-    while read P; do cp "$P" /usr/local/share/ca-certificates/; done
-fi
+set -euo pipefail
 
+#Install Linux certificates (useful for pyexasol)
+cp /certificates/rootCA.crt /usr/local/share/ca-certificates/
 update-ca-certificates
+
+#Update java ca certs
+keytool -keystore /etc/ssl/certs/java/cacerts -import -file /certificates/rootCA.crt -storepass changeit -noprompt

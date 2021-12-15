@@ -34,7 +34,11 @@ class SpawnTestEnvironmentWithDockerDB(
         return \
             self.create_child_task_with_common_params(
                 CreateSSLCertificatesTask,
+                environment_name=self.environment_name,
+                test_container_name=self.test_container_name,
                 db_container_name=self.db_container_name,
+                network_name=self.network_name,
+                docker_runtime=self.docker_runtime,
                 volume_name=self.certificate_volume_name,
                 reuse=self.reuse_database or self.reuse_test_container,
                 no_cleanup_after_success=self.no_database_cleanup_after_success or self.no_test_container_cleanup_after_success,
@@ -59,6 +63,7 @@ class SpawnTestEnvironmentWithDockerDB(
                                    certificate_volume_info: Optional[DockerVolumeInfo],
                                    attempt: int):
         certificate_volume_name = certificate_volume_info.volume_name if certificate_volume_info is not None else None
+
         return \
             self.create_child_task_with_common_params(
                 SpawnTestDockerDatabase,

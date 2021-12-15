@@ -30,7 +30,7 @@ class SpawnTestContainer(DockerBaseTask):
     no_test_container_cleanup_after_success = luigi.BoolParameter(False, significant=False)
     no_test_container_cleanup_after_failure = luigi.BoolParameter(False, significant=False)
     docker_runtime = luigi.OptionalParameter(None, significant=False)
-    certificate_volume_name = luigi.Parameter()
+    certificate_volume_name = luigi.OptionalParameter(None, significant=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -189,10 +189,12 @@ class SpawnTestContainer(DockerBaseTask):
                 "test_container_config/install_certificates.sh")  # type: bytes
 
             docker_container_copy = DockerContainerCopy(test_container)
-            docker_container_copy.add_string_to_file("scripts/install_certificate.sh", script_str.decode("UTF-8"))
+            docker_container_copy.add_string_to_file("scripts/install_certificates.sh", script_str.decode("UTF-8"))
             docker_container_copy.copy("/")
 
-            test_container.exec_run("/scripts/install_certificates.sh")
+            exit_code, output = test_container.exec_run("bash /scripts/install_certificates.sh")
+            if exit_code != 0:
+                raise RuntimeError(f"Error installing certificates:{output.decode('utf-8')}")
 
     def cleanup_task(self, success: bool):
         if (success and not self.no_test_container_cleanup_after_success) or \
