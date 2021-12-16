@@ -44,3 +44,12 @@ class DockerContainerCopy:
         self.tar = None
         self.container.put_archive(path_in_container, self.file_like_object.getbuffer().tobytes())
         self.file_like_object = None
+
+
+def copy_script_to_container(script: str, script_path: str, container: Container):
+    """
+    Copy a script, given as string, to the container under specified location, relative to "/"
+    """
+    docker_container_copy = DockerContainerCopy(container)
+    docker_container_copy.add_string_to_file(script_path, script)
+    docker_container_copy.copy("/")

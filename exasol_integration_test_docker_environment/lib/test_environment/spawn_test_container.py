@@ -16,7 +16,8 @@ from exasol_integration_test_docker_environment.lib.test_environment.analyze_tes
     DockerTestContainerBuild
 from exasol_integration_test_docker_environment.lib.test_environment.create_export_directory import \
     CreateExportDirectory
-from exasol_integration_test_docker_environment.lib.test_environment.docker_container_copy import DockerContainerCopy
+from exasol_integration_test_docker_environment.lib.test_environment.docker_container_copy import \
+    copy_script_to_container
 
 
 class SpawnTestContainer(DockerBaseTask):
@@ -186,13 +187,12 @@ class SpawnTestContainer(DockerBaseTask):
         if self.certificate_volume_name is not None:
             script_str = pkg_resources.resource_string(
                 "exasol_integration_test_docker_environment",
-                "test_container_config/install_certificates.sh")  # type: bytes
+                "test_container_config/install_root_certificate.sh")  # type: bytes
 
-            docker_container_copy = DockerContainerCopy(test_container)
-            docker_container_copy.add_string_to_file("scripts/install_certificates.sh", script_str.decode("UTF-8"))
-            docker_container_copy.copy("/")
+            script_location_in_container = "scripts/install_root_certificate.sh"
+            copy_script_to_container(script_str.decode("UTF-8"), script_location_in_container, test_container)
 
-            exit_code, output = test_container.exec_run("bash /scripts/install_certificates.sh")
+            exit_code, output = test_container.exec_run(f"bash {script_location_in_container}")
             if exit_code != 0:
                 raise RuntimeError(f"Error installing certificates:{output.decode('utf-8')}")
 

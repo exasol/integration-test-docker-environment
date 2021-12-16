@@ -18,6 +18,10 @@ class CertificateTest(unittest.TestCase):
                 cls,
                 utils.INTEGRATION_TEST_DOCKER_ENVIRONMENT_DEFAULT_BIN,
                 clean_images_at_close=False)
+        # Important: The test environment will create a hostname consisting of a prefix + the class name +
+        #            the docker environment in the following parameter
+        #            However, host name length is limited to 63 characters. A the class name itself already creates
+        #            a unique environment, we must keep the parameter empty.
         cls.docker_environment_name = ""
         cls.spawned_docker_test_environments = \
             cls.test_environment.spawn_docker_test_environments(cls.docker_environment_name,

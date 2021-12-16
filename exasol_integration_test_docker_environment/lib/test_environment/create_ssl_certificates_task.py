@@ -1,5 +1,3 @@
-import subprocess
-
 import docker
 import luigi
 import pkg_resources
@@ -9,7 +7,8 @@ from exasol_integration_test_docker_environment.lib.base.docker_base_task import
 from exasol_integration_test_docker_environment.lib.data.docker_volume_info import DockerVolumeInfo
 from exasol_integration_test_docker_environment.lib.test_environment.analyze_test_container import \
     DockerTestContainerBuild
-from exasol_integration_test_docker_environment.lib.test_environment.docker_container_copy import DockerContainerCopy
+from exasol_integration_test_docker_environment.lib.test_environment.docker_container_copy import \
+    copy_script_to_container
 
 CERTIFICATES_MOUNT_PATH = "/certificates"
 
@@ -78,13 +77,19 @@ class CreateSSLCertificatesTask(DockerBaseTask):
             except Exception as e:
                 self.logger.error(f"Error during removing volume %s: %s:", self.volume_name, e)
 
+    @property
+    def _construct_complete_host_name(self):
+        """
+        Example: 'db_container_exasol_test.db_network_exasol_test'
+        """
+        return f"{self.db_container_name}.{self.network_name}"
+
     def create_certificate(self) -> None:
         template_str = pkg_resources.resource_string(
             "exasol_integration_test_docker_environment",
             "docker_db_config/create_certificate.sh")  # type: bytes
         template = Template(template_str.decode("utf-8"))
-        rendered_template = template.render(#HOST_NAME='db_container_exasol_test.db_network_exasol_test',
-                                            HOST_NAME=f"{self.db_container_name}.{self.network_name}",
+        rendered_template = template.render(HOST_NAME=self._construct_complete_host_name,
                                             cert_dir=CERTIFICATES_MOUNT_PATH)
         test_container_image_info = \
             self.get_values_from_futures(self.test_container_image_future)["test-container"]  # type:
@@ -110,12 +115,11 @@ class CreateSSLCertificatesTask(DockerBaseTask):
                         runtime=self.docker_runtime
                     )
                 test_container.start()
-                docker_container_copy = DockerContainerCopy(test_container)
-                docker_container_copy.add_string_to_file("scripts/create_certificates.sh", rendered_template)
-                docker_container_copy.copy("/")
+                script_path_in_container = "scripts/create_certificate.sh"
+                copy_script_to_container(rendered_template, script_path_in_container, test_container)
 
                 self.logger.info("Creating certificates...")
-                exit_code, output = test_container.exec_run("bash /scripts/create_certificates.sh")
+                exit_code, output = test_container.exec_run(f"bash {script_path_in_container}")
                 self.logger.info(output.decode('utf-8'))
                 if exit_code != 0:
                     raise RuntimeError(f"Error creating certificates:'{output.decode('utf-8')}'")

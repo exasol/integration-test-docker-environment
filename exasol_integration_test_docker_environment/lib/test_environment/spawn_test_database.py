@@ -25,6 +25,8 @@ from exasol_integration_test_docker_environment.lib.test_environment.parameter.d
 BUCKETFS_PORT = "6583"
 DB_PORT = "8888"
 CERTIFICATES_MOUNT_DIR = "/certificates"
+CERTIFICATES_DEFAULT_DIR = "/exa/etc/ssl/"
+
 
 class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
     environment_name = luigi.Parameter()  # type: str
@@ -228,7 +230,8 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
 
     def _add_exa_conf(self, copy: DockerContainerCopy,
                       db_private_network: str):
-        certificate_dir = CERTIFICATES_MOUNT_DIR if self.certificate_volume_name is not None else "/exa/etc/ssl/"
+        certificate_dir = CERTIFICATES_MOUNT_DIR if self.certificate_volume_name is not None \
+                            else CERTIFICATES_DEFAULT_DIR
         template_str = pkg_resources.resource_string(
             "exasol_integration_test_docker_environment",
             f"{self.docker_db_config_resource_name}/EXAConf") # type: bytes

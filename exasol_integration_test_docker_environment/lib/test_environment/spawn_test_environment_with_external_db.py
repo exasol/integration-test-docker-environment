@@ -36,7 +36,9 @@ class SpawnTestEnvironmentWithExternalDB(AbstractSpawnTestEnvironment,
 
     def create_spawn_database_task(self, network_info: DockerNetworkInfo,
                                    certificate_volume_info: Optional[DockerVolumeInfo], attempt: int):
-        assert certificate_volume_info is None
+        if certificate_volume_info is not None:
+            raise ValueError("Certificate volume must be None when using external database")
+
         return \
             self.create_child_task_with_common_params(
                 SetupExternalDatabaseHost,
