@@ -40,9 +40,15 @@ subjectAltName = @alt_names
 subjectAltName = @alt_names
 [alt_names]
 DNS.1 = $NAME
+DNS.2 = exasol-test-database
 " > san.cnf
 openssl genrsa -out cert.key 2048
 openssl req -new -sha256 -key cert.key -out cert.csr -config san.cnf
-openssl x509 -req -in cert.csr -CA rootCA.crt -CAkey rootCA.key -CAcreateserial -out cert.crt -sha256
+
+echo "
+subjectAltName = DNS.1:$NAME, DNS.2:exasol-test-database
+" > alt_names.ext
+
+openssl x509 -req -in cert.csr -CA rootCA.crt -CAkey rootCA.key -CAcreateserial -out cert.crt -sha256 -extfile alt_names.ext
 
 ls $certs_dir

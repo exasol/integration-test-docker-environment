@@ -117,7 +117,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             return database_info
 
     def _get_network_aliases(self):
-        network_aliases = ["exasol_test_database", self.db_container_name]
+        network_aliases = ["exasol_test_database", "exasol-test-database", self.db_container_name]
         return network_aliases
 
     def _create_database_info(self, db_ip_address: str, reused: bool) -> DatabaseInfo:
