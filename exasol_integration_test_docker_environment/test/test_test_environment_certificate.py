@@ -4,6 +4,8 @@ import unittest
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.testing import utils
 from exasol_integration_test_docker_environment.testing.exaslct_test_environment import ExaslctTestEnvironment
+from exasol_integration_test_docker_environment.testing.utils import check_db_version_from_env, \
+    db_version_supports_custom_certificates
 
 
 class CertificateTest(unittest.TestCase):
@@ -18,20 +20,25 @@ class CertificateTest(unittest.TestCase):
                 cls,
                 utils.INTEGRATION_TEST_DOCKER_ENVIRONMENT_DEFAULT_BIN,
                 clean_images_at_close=False)
-        # Important: The test environment will create a hostname consisting of a prefix + the class name +
-        #            the docker environment in the following parameter
-        #            However, host name length is limited to 63 characters. A the class name itself already creates
-        #            a unique environment, we must keep the parameter empty.
-        cls.docker_environment_name = ""
-        cls.spawned_docker_test_environments = \
-            cls.test_environment.spawn_docker_test_environments(cls.docker_environment_name,
-                                                                additional_parameter=["--deactivate-database-setup",
-                                                                                      "--create-certificates"])
+
+        cls.spawned_docker_test_environments = None
+
+        if db_version_supports_custom_certificates(check_db_version_from_env()):
+            # Important: The test environment will create a hostname consisting of a prefix + the class name +
+            #            the docker environment in the following parameter
+            #            However, host name length is limited to 63 characters. A the class name itself already creates
+            #            a unique environment, we must keep the parameter empty.
+            cls.docker_environment_name = ""
+            cls.spawned_docker_test_environments = \
+                cls.test_environment.spawn_docker_test_environments(cls.docker_environment_name,
+                                                                    additional_parameter=["--deactivate-database-setup",
+                                                                                          "--create-certificates"])
 
     @classmethod
     def tearDownClass(cls):
         utils.close_environments(cls.spawned_docker_test_environments, cls.test_environment)
 
+    @unittest.skipIf(not db_version_supports_custom_certificates(check_db_version_from_env()), "Database not supported")
     def test_certificate(self):
         on_host_docker_environment = self.spawned_docker_test_environments.on_host_docker_environment
         with ContextDockerClient() as docker_client:

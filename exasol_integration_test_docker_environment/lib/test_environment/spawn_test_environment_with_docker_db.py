@@ -16,6 +16,7 @@ from exasol_integration_test_docker_environment.lib.test_environment.parameter.d
 from exasol_integration_test_docker_environment.lib.test_environment.prepare_network_for_test_environment import \
     PrepareDockerNetworkForTestEnvironment
 from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_database import SpawnTestDockerDatabase
+from exasol_integration_test_docker_environment.testing.utils import db_version_supports_custom_certificates
 
 
 class SpawnTestEnvironmentWithDockerDB(
@@ -31,6 +32,8 @@ class SpawnTestEnvironmentWithDockerDB(
         return EnvironmentType.docker_db
 
     def create_ssl_certificates(self):
+        if not db_version_supports_custom_certificates(self.docker_db_image_version):
+            raise ValueError("Minimal supported Database with custom certificates is '7.0.6'")
         return \
             self.create_child_task_with_common_params(
                 CreateSSLCertificatesTask,

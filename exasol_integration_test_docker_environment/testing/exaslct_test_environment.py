@@ -13,7 +13,7 @@ from exasol_integration_test_docker_environment.lib.docker import ContextDockerC
 from exasol_integration_test_docker_environment.testing.exaslct_docker_test_environment import \
     ExaslctDockerTestEnvironment
 from exasol_integration_test_docker_environment.testing.spawned_test_environments import SpawnedTestEnvironments
-from exasol_integration_test_docker_environment.testing.utils import find_free_port
+from exasol_integration_test_docker_environment.testing.utils import find_free_port, check_db_version_from_env
 
 
 class ExaslctTestEnvironment:
@@ -120,8 +120,9 @@ class ExaslctTestEnvironment:
             database_port=find_free_port(),
             bucketfs_port=find_free_port())
         docker_db_version_parameter = ""
-        if "EXASOL_VERSION" in os.environ and os.environ["EXASOL_VERSION"] != "default":
-            docker_db_version_parameter = f'--docker-db-image-version "{os.environ["EXASOL_VERSION"]}"'
+        db_version_from_env = check_db_version_from_env()
+        if db_version_from_env is not None:
+            docker_db_version_parameter = f'--docker-db-image-version "{db_version_from_env}"'
         if additional_parameter is None:
             additional_parameter = []
         arguments = " ".join([f"--environment-name {on_host_parameter.name}",
