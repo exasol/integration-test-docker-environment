@@ -32,9 +32,9 @@
 # SSL options
 [SSL]
     # The SSL certificate, private key and CA for all EXASOL services
-    Cert = {{ certificate_dir }}/ssl.crt
-    CertKey = {{ certificate_dir }}/ssl.key
-    CertAuth = {{ certificate_dir }}/ssl.ca
+    Cert = {{ certificate_dir }}/cert.crt
+    CertKey = {{ certificate_dir }}/cert.key
+    CertAuth = {{ certificate_dir }}/rootCA.crt
     # Options to verify certificates: none, optional, required
     CertVerify = none
     # Domain name in the certifcate
