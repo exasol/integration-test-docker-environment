@@ -4,7 +4,12 @@ set -euo pipefail
 
 NAME={{HOST_NAME}}
 
+echo SubjectName: $NAME
+
 certs_dir={{cert_dir}}
+
+echo Certificate Dir: $certs_dir
+
 if [ ! -d "$certs_dir" ]
 then
   mkdir -p "$certs_dir"
@@ -39,3 +44,5 @@ DNS.1 = $NAME
 openssl genrsa -out cert.key 2048
 openssl req -new -sha256 -key cert.key -out cert.csr -config san.cnf
 openssl x509 -req -in cert.csr -CA rootCA.crt -CAkey rootCA.key -CAcreateserial -out cert.crt -sha256
+
+ls $certs_dir

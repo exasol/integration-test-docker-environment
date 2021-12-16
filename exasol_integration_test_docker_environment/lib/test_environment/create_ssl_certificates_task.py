@@ -88,7 +88,7 @@ class CreateSSLCertificatesTask(DockerBaseTask):
         script_name = "create_certificates.sh"
         template_str = pkg_resources.resource_string(
             "exasol_integration_test_docker_environment",
-            f"docker_db_config/{script_name}")  # type: bytes
+            f"test_container_config/{script_name}")  # type: bytes
         template = Template(template_str.decode("utf-8"))
         rendered_template = template.render(HOST_NAME=self._construct_complete_host_name,
                                             cert_dir=CERTIFICATES_MOUNT_PATH)

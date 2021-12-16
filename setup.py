@@ -26,8 +26,7 @@ packages = \
 
 package_data = \
 {'': ['*'],
- 'exasol_integration_test_docker_environment': ['docker_db_config/*',
-                                                'docker_db_config/6.2.0/*',
+ 'exasol_integration_test_docker_environment': ['docker_db_config/6.2.0/*',
                                                 'docker_db_config/6.2.1/*',
                                                 'docker_db_config/6.2.10/*',
                                                 'docker_db_config/6.2.11/*',
