@@ -40,7 +40,7 @@ class DockerTestEnvironmentDBDiskSizeTest(unittest.TestCase):
         self.docker_environment_name = "test_default_db_disk_size"
         with self.test_environment.spawn_docker_test_environments(name=self.docker_environment_name,
                                                                   additional_parameter=[
-                                                                      "--deactivate - database - setup"
+                                                                      "--deactivate-database-setup"
                                                                   ]):
             self.assert_disk_size("2 GiB")
 
