@@ -185,11 +185,12 @@ class SpawnTestContainer(DockerBaseTask):
 
     def register_certificates(self, test_container: Container):
         if self.certificate_volume_name is not None:
+            script_name = "install_root_certificate.sh"
             script_str = pkg_resources.resource_string(
                 "exasol_integration_test_docker_environment",
-                "test_container_config/install_root_certificate.sh")  # type: bytes
+                f"test_container_config/{script_name}")  # type: bytes
 
-            script_location_in_container = "scripts/install_root_certificate.sh"
+            script_location_in_container = f"scripts/{script_name}"
             copy_script_to_container(script_str.decode("UTF-8"), script_location_in_container, test_container)
 
             exit_code, output = test_container.exec_run(f"bash {script_location_in_container}")

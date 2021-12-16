@@ -85,9 +85,10 @@ class CreateSSLCertificatesTask(DockerBaseTask):
         return f"{self.db_container_name}.{self.network_name}"
 
     def create_certificate(self) -> None:
+        script_name = "create_certificates.sh"
         template_str = pkg_resources.resource_string(
             "exasol_integration_test_docker_environment",
-            "docker_db_config/create_certificate.sh")  # type: bytes
+            f"docker_db_config/{script_name}")  # type: bytes
         template = Template(template_str.decode("utf-8"))
         rendered_template = template.render(HOST_NAME=self._construct_complete_host_name,
                                             cert_dir=CERTIFICATES_MOUNT_PATH)
@@ -115,7 +116,7 @@ class CreateSSLCertificatesTask(DockerBaseTask):
                         runtime=self.docker_runtime
                     )
                 test_container.start()
-                script_path_in_container = "scripts/create_certificate.sh"
+                script_path_in_container = f"scripts/{script_name}"
                 copy_script_to_container(rendered_template, script_path_in_container, test_container)
 
                 self.logger.info("Creating certificates...")
