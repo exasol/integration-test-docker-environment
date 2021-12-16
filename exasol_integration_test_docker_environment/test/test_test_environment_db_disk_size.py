@@ -38,20 +38,29 @@ class DockerTestEnvironmentDBDiskSizeTest(unittest.TestCase):
 
     def test_default_db_disk_size(self):
         self.docker_environment_name = "test_default_db_disk_size"
-        with self.test_environment.spawn_docker_test_environments(self.docker_environment_name):
+        with self.test_environment.spawn_docker_test_environments(name=self.docker_environment_name,
+                                                                  additional_parameter=[
+                                                                      "--deactivate - database - setup"
+                                                                  ]):
             self.assert_disk_size("2 GiB")
 
     def test_smallest_valid_db_disk_size(self):
         self.docker_environment_name = "test_smallest_valid_db_disk_size"
-        with self.test_environment.spawn_docker_test_environments(self.docker_environment_name,
-                                                                  ["--db-disk-size", "'100 MiB'"]):
+        with self.test_environment.spawn_docker_test_environments(name=self.docker_environment_name,
+                                                                  additional_parameter=[
+                                                                    "--db-disk-size", "'100 MiB'",
+                                                                    "--deactivate-database-setup"
+                                                                  ]):
             self.assert_disk_size("100 MiB")
 
     def test_invalid_db_mem_size(self):
         self.docker_environment_name = "test_invalid_db_disk_size"
         with self.assertRaises(Exception) as context:
-            with self.test_environment.spawn_docker_test_environments(self.docker_environment_name,
-                                                                      ["--db-disk-size", "'90 MiB'"]):
+            with self.test_environment.spawn_docker_test_environments(name=self.docker_environment_name,
+                                                                      additional_parameter=[
+                                                                        "--db-disk-size", "'90 MiB'",
+                                                                        "--deactivate-database-setup"
+                                                                      ]):
                 pass
 
 
