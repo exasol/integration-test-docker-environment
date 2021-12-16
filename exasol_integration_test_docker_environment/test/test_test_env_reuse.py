@@ -9,6 +9,7 @@ from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_
 from exasol_integration_test_docker_environment.cli.common import set_docker_repository_config, generate_root_task
 from exasol_integration_test_docker_environment.testing import luigi_utils
 from exasol_integration_test_docker_environment.cli.options import test_environment_options
+from exasol_integration_test_docker_environment.testing.utils import check_db_version_from_env
 
 
 class TestContainerReuseTest(unittest.TestCase):
@@ -28,9 +29,9 @@ class TestContainerReuseTest(unittest.TestCase):
         print("docker_repository_name", self._docker_repository_name)
         luigi_utils.clean(self._docker_repository_name)
 
-        self.docker_db_version_parameter = test_environment_options.LATEST_DB_VERSION
-        if "EXASOL_VERSION" in os.environ and os.environ["EXASOL_VERSION"] != "default":
-            self.docker_db_version_parameter = os.environ["EXASOL_VERSION"]
+        db_version_from_env = check_db_version_from_env()
+        self.docker_db_version_parameter = db_version_from_env \
+            if db_version_from_env is not None else test_environment_options.LATEST_DB_VERSION
 
         self.setup_luigi_config()
 

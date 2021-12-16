@@ -62,7 +62,8 @@ package_data = \
                                                 'docker_db_config/7.1.0/*',
                                                 'docker_db_config/7.1.1/*',
                                                 'docker_db_config/7.1.2/*',
-                                                'docker_db_config/7.1.3/*']}
+                                                'docker_db_config/7.1.3/*',
+                                                'test_container_config/*']}
 
 install_requires = \
 ['click>=7.0',

@@ -32,9 +32,9 @@
 # SSL options
 [SSL]
     # The SSL certificate, private key and CA for all EXASOL services
-    Cert = /exa/etc/ssl/ssl.crt
-    CertKey = /exa/etc/ssl/ssl.key
-    CertAuth = /exa/etc/ssl/ssl.ca
+    Cert = {{ certificate_dir }}/cert.crt
+    CertKey = {{ certificate_dir }}/cert.key
+    CertAuth = {{ certificate_dir }}/rootCA.crt
     # Options to verify certificates: none, optional, required
     CertVerify = none
     # Domain name in the certifcate

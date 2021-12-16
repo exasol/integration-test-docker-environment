@@ -24,6 +24,8 @@ from exasol_integration_test_docker_environment.lib.test_environment.parameter.d
 
 BUCKETFS_PORT = "6583"
 DB_PORT = "8888"
+CERTIFICATES_MOUNT_DIR = "/certificates"
+CERTIFICATES_DEFAULT_DIR = "/exa/etc/ssl/"
 
 
 class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
@@ -33,6 +35,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
     network_info = JsonPickleParameter(DockerNetworkInfo, significant=False)  # type: DockerNetworkInfo
     ip_address_index_in_subnet = luigi.IntParameter(significant=False)  # type: int
     docker_runtime = luigi.OptionalParameter(None, significant=False)  # type: str
+    certificate_volume_name = luigi.OptionalParameter(None, significant=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -91,13 +94,17 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                 ports[f"{DB_PORT}/tcp"] = ('0.0.0.0', int(self.database_port_forward))
             if self.bucketfs_port_forward is not None:
                 ports[f"{BUCKETFS_PORT}/tcp"] = ('0.0.0.0', int(self.bucketfs_port_forward))
+            volumes = {db_volume.name: {"bind": "/exa", "mode": "rw"}}
+            if self.certificate_volume_name is not None:
+                volumes[self.certificate_volume_name] = {"bind": CERTIFICATES_MOUNT_DIR, "mode": "ro"}
+
             db_container = \
                 docker_client.containers.create(
                     image="%s" % (docker_db_image_info.get_source_complete_name()),
                     name=self.db_container_name,
                     detach=True,
                     privileged=True,
-                    volumes={db_volume.name: {"bind": "/exa", "mode": "rw"}},
+                    volumes=volumes,
                     network_mode=None,
                     ports=ports,
                     runtime=self.docker_runtime
@@ -110,7 +117,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             return database_info
 
     def _get_network_aliases(self):
-        network_aliases = ["exasol_test_database", self.db_container_name]
+        network_aliases = ["exasol_test_database", "exasol-test-database", self.db_container_name]
         return network_aliases
 
     def _create_database_info(self, db_ip_address: str, reused: bool) -> DatabaseInfo:
@@ -223,6 +230,8 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
 
     def _add_exa_conf(self, copy: DockerContainerCopy,
                       db_private_network: str):
+        certificate_dir = CERTIFICATES_MOUNT_DIR if self.certificate_volume_name is not None \
+                            else CERTIFICATES_DEFAULT_DIR
         template_str = pkg_resources.resource_string(
             "exasol_integration_test_docker_environment",
             f"{self.docker_db_config_resource_name}/EXAConf") # type: bytes
@@ -232,7 +241,8 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                                             image_version=self.docker_db_image_version,
                                             mem_size=self.mem_size,
                                             disk_size=self.disk_size,
-                                            name_servers=",".join(self.nameservers))
+                                            name_servers=",".join(self.nameservers),
+                                            certificate_dir=certificate_dir)
         copy.add_string_to_file("EXAConf", rendered_template)
 
     def _execute_init_db(self, db_volume: Volume, volume_preperation_container: Container):

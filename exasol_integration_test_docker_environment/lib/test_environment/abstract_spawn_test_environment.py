@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Generator, Tuple
+from typing import Generator, Tuple, Optional
 
 import luigi
 
@@ -10,6 +10,7 @@ from exasol_integration_test_docker_environment.lib.data.container_info import C
 from exasol_integration_test_docker_environment.lib.data.database_credentials import DatabaseCredentialsParameter
 from exasol_integration_test_docker_environment.lib.data.database_info import DatabaseInfo
 from exasol_integration_test_docker_environment.lib.data.docker_network_info import DockerNetworkInfo
+from exasol_integration_test_docker_environment.lib.data.docker_volume_info import DockerVolumeInfo
 from exasol_integration_test_docker_environment.lib.data.environment_info import EnvironmentInfo
 from exasol_integration_test_docker_environment.lib.test_environment.database_setup.populate_data import \
     PopulateEngineSmallTestDataToDatabase
@@ -30,6 +31,7 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
                                    GeneralSpawnTestEnvironmentParameter,
                                    DatabaseCredentialsParameter):
     environment_name = luigi.Parameter()  # type: str
+    create_certificates = luigi.BoolParameter()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -133,11 +135,22 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
     def _start_database(self, attempt) \
             -> Generator[BaseTask, BaseTask, Tuple[DockerNetworkInfo, DatabaseInfo, bool, ContainerInfo]]:
         network_info = yield from self._create_network(attempt)
+        ssl_volume_info = None
+        if self.create_certificates:
+            ssl_volume_info = yield from self._create_ssl_certificates()
         database_info, test_container_info = \
-            yield from self._spawn_database_and_test_container(network_info, attempt)
+            yield from self._spawn_database_and_test_container(network_info, ssl_volume_info, attempt)
         is_database_ready = yield from self._wait_for_database(
             database_info, test_container_info, attempt)
         return network_info, database_info, is_database_ready, test_container_info
+
+    def _create_ssl_certificates(self) -> DockerVolumeInfo:
+        ssl_info_future = yield from self.run_dependencies(self.create_ssl_certificates())
+        ssl_info = self.get_values_from_future(ssl_info_future)
+        return ssl_info
+
+    def create_ssl_certificates(self):
+        raise AbstractMethodException()
 
     def _create_network(self, attempt):
         network_info_future = yield from self.run_dependencies(self.create_network_task(attempt))
@@ -149,7 +162,9 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
 
     def _spawn_database_and_test_container(self,
                                            network_info: DockerNetworkInfo,
+                                           certificate_volume_info: Optional[DockerVolumeInfo],
                                            attempt: int):
+        certificate_volume_name = certificate_volume_info.volume_name if certificate_volume_info is not None else None
         database_and_test_container_info_future = \
             yield from self.run_dependencies({
                 TEST_CONTAINER: \
@@ -158,8 +173,9 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
                         test_container_name=self.test_container_name,
                         network_info=network_info,
                         ip_address_index_in_subnet=1,
+                        certificate_volume_name=certificate_volume_name,
                         attempt=attempt),
-                DATABASE: self.create_spawn_database_task(network_info, attempt)
+                DATABASE: self.create_spawn_database_task(network_info, certificate_volume_info, attempt)
             })
         database_and_test_container_info = \
             self.get_values_from_futures(database_and_test_container_info_future)
@@ -169,6 +185,7 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
 
     def create_spawn_database_task(self,
                                    network_info: DockerNetworkInfo,
+                                   certificate_volume_info: Optional[DockerVolumeInfo],
                                    attempt: int):
         raise AbstractMethodException()
 

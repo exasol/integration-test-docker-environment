@@ -47,7 +47,8 @@ def spawn_test_environment(
         output_directory: str,
         temporary_base_directory: str,
         workers: int,
-        task_dependencies_dot_file: str):
+        task_dependencies_dot_file: str,
+        create_certificates: bool):
     """
     This command spawn a test environment with a docker-db container and a connected test-container.
     The test-container is reachable by the database for output redirects of UDFs.
@@ -85,7 +86,8 @@ def spawn_test_environment(
         no_test_container_cleanup_after_failure=False,
         no_database_cleanup_after_success=True,
         no_database_cleanup_after_failure=False,
-        is_setup_database_activated=not deactivate_database_setup
+        is_setup_database_activated=not deactivate_database_setup,
+        create_certificates=create_certificates
     )
     success, task = run_task(task_creator, workers, task_dependencies_dot_file)
     if not success:

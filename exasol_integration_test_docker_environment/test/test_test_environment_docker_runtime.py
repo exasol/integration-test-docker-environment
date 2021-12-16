@@ -46,7 +46,10 @@ class DockerTestEnvironmentDockerRuntimeNoRuntimeGivenTest(unittest.TestCase):
                 clean_images_at_close=False)
         cls.docker_environment_name = "test_no_runtime_given"
         cls.spawned_docker_test_environments = \
-            cls.test_environment.spawn_docker_test_environments(cls.docker_environment_name)
+            cls.test_environment.spawn_docker_test_environments(name=cls.docker_environment_name,
+                                                                additional_parameter=[
+                                                                    "--deactivate-database-setup"
+                                                                ])
         cls.default_docker_runtime = get_default_docker_runtime()
 
     @classmethod
@@ -90,7 +93,10 @@ class DockerTestEnvironmentDockerRuntimeDefaultRuntimeGivenTest(unittest.TestCas
         cls.docker_environment_name = "test_default_runtime_given"
         cls.spawned_docker_test_environments = cls.test_environment.spawn_docker_test_environments(
                 cls.docker_environment_name,
-                additional_parameter=["--docker-runtime", cls.default_docker_runtime])
+                additional_parameter=[
+                    "--docker-runtime", cls.default_docker_runtime,
+                    "--deactivate-database-setup",
+                ])
 
     @classmethod
     def tearDownClass(cls):
@@ -135,7 +141,10 @@ class DockerTestEnvironmentDockerRuntimeInvalidRuntimeGivenTest(unittest.TestCas
         try:
             cls.spawned_docker_test_environments = cls.test_environment.spawn_docker_test_environments(
                     cls.docker_environment_name,
-                    additional_parameter=["--docker-runtime", "AAAABBBBCCCC_INVALID_RUNTIME_111122223333"])
+                    additional_parameter=[
+                        "--docker-runtime", "AAAABBBBCCCC_INVALID_RUNTIME_111122223333",
+                        "--deactivate-database-setup",
+                    ])
         except Exception as e:
             pass
 

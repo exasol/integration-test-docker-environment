@@ -3,6 +3,8 @@ from typing import List
 
 import luigi
 import netaddr
+import pkg_resources
+from docker.models.containers import Container
 from docker.transport import unixconn
 
 from exasol_integration_test_docker_environment.lib.base.docker_base_task import DockerBaseTask
@@ -14,6 +16,8 @@ from exasol_integration_test_docker_environment.lib.test_environment.analyze_tes
     DockerTestContainerBuild
 from exasol_integration_test_docker_environment.lib.test_environment.create_export_directory import \
     CreateExportDirectory
+from exasol_integration_test_docker_environment.lib.test_environment.docker_container_copy import \
+    copy_script_to_container
 
 
 class SpawnTestContainer(DockerBaseTask):
@@ -27,6 +31,7 @@ class SpawnTestContainer(DockerBaseTask):
     no_test_container_cleanup_after_success = luigi.BoolParameter(False, significant=False)
     no_test_container_cleanup_after_failure = luigi.BoolParameter(False, significant=False)
     docker_runtime = luigi.OptionalParameter(None, significant=False)
+    certificate_volume_name = luigi.OptionalParameter(None, significant=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -114,8 +119,14 @@ class SpawnTestContainer(DockerBaseTask):
             tests_host_path: {
                 "bind": "/tests_src",
                 "mode": "rw"
-            }
+            },
         }
+        if self.certificate_volume_name is not None:
+            volumes[self.certificate_volume_name] = {
+                "bind": "/certificates",
+                "mode": "ro"
+            }
+
         with self._get_docker_client() as docker_client:
             docker_unix_sockets = [i for i in docker_client.api.adapters.values()
                                    if isinstance(i, unixconn.UnixHTTPAdapter)]
@@ -140,6 +151,7 @@ class SpawnTestContainer(DockerBaseTask):
             network_aliases = self._get_network_aliases()
             docker_network.connect(test_container, ipv4_address=ip_address, aliases=network_aliases)
             test_container.start()
+            self.register_certificates(test_container)
             container_info = self.create_container_info(ip_address, network_aliases, network_info)
             return container_info
 
@@ -171,6 +183,20 @@ class SpawnTestContainer(DockerBaseTask):
         except Exception as e:
             pass
 
+    def register_certificates(self, test_container: Container):
+        if self.certificate_volume_name is not None:
+            script_name = "install_root_certificate.sh"
+            script_str = pkg_resources.resource_string(
+                "exasol_integration_test_docker_environment",
+                f"test_container_config/{script_name}")  # type: bytes
+
+            script_location_in_container = f"scripts/{script_name}"
+            copy_script_to_container(script_str.decode("UTF-8"), script_location_in_container, test_container)
+
+            exit_code, output = test_container.exec_run(f"bash {script_location_in_container}")
+            if exit_code != 0:
+                raise RuntimeError(f"Error installing certificates:{output.decode('utf-8')}")
+
     def cleanup_task(self, success: bool):
         if (success and not self.no_test_container_cleanup_after_success) or \
                 (not success and not self.no_test_container_cleanup_after_failure):
@@ -179,3 +205,4 @@ class SpawnTestContainer(DockerBaseTask):
                 self._remove_container(self.test_container_name)
             except Exception as e:
                 self.logger.error(f"Error during removing container %s: %s", self.test_container_name, e)
+
