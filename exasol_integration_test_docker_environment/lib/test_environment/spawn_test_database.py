@@ -18,6 +18,7 @@ from exasol_integration_test_docker_environment.lib.data.database_info import Da
 from exasol_integration_test_docker_environment.lib.data.docker_network_info import DockerNetworkInfo
 from exasol_integration_test_docker_environment.lib.docker.images.create.utils.pull_log_handler import PullLogHandler
 from exasol_integration_test_docker_environment.lib.docker.images.image_info import ImageInfo
+from exasol_integration_test_docker_environment.lib.test_environment.db_version import DbVersion
 from exasol_integration_test_docker_environment.lib.test_environment.docker_container_copy import DockerContainerCopy
 from exasol_integration_test_docker_environment.lib.test_environment.parameter.docker_db_test_environment_parameter import \
     DockerDBTestEnvironmentParameter
@@ -43,10 +44,8 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             raise Exception(
                 "ip_address_index_in_subnet needs to be greater than 0 got %s"
                 % self.ip_address_index_in_subnet)
-        if self.docker_db_image_version.endswith("-d1"):
-            self.db_version = "-".join(self.docker_db_image_version.split("-")[0:-1])
-        else:
-            self.db_version = self.docker_db_image_version
+
+        self.db_version = DbVersion.from_db_version_str(self.docker_db_image_version)
         self.docker_db_config_resource_name = f"docker_db_config/{self.db_version}"
 
     def run_task(self):
@@ -237,7 +236,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             f"{self.docker_db_config_resource_name}/EXAConf") # type: bytes
         template = Template(template_str.decode("utf-8"))
         rendered_template = template.render(private_network=db_private_network,
-                                            db_version=self.db_version,
+                                            db_version=str(self.db_version),
                                             image_version=self.docker_db_image_version,
                                             mem_size=self.mem_size,
                                             disk_size=self.disk_size,
