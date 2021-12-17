@@ -2,10 +2,10 @@ import unittest
 
 
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
+from exasol_integration_test_docker_environment.lib.test_environment import db_version_supports_custom_certificates
 from exasol_integration_test_docker_environment.testing import utils
 from exasol_integration_test_docker_environment.testing.exaslct_test_environment import ExaslctTestEnvironment
-from exasol_integration_test_docker_environment.testing.utils import check_db_version_from_env, \
-    db_version_supports_custom_certificates
+from exasol_integration_test_docker_environment.testing.utils import check_db_version_from_env
 
 
 class CertificateTest(unittest.TestCase):
