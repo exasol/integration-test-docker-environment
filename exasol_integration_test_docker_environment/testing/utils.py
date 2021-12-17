@@ -1,8 +1,8 @@
 import json
 import os
 import socket
-from contextlib import closing
-from typing import Optional
+from contextlib import ExitStack
+from typing import Optional, List
 
 import requests
 
@@ -11,15 +11,24 @@ from exasol_integration_test_docker_environment.lib.docker import ContextDockerC
 INTEGRATION_TEST_DOCKER_ENVIRONMENT_DEFAULT_BIN = "./start-test-env-without-poetry"
 
 
-def find_free_port():
-    with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
-        s.bind(('', 0))
-        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        port = s.getsockname()[1]
-    with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
-        s.bind(('', port))
-        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    return port
+def find_free_ports(num_ports: int) -> List[int]:
+
+    ret_val = list()
+    with ExitStack() as stack:
+        sockets = [stack.enter_context(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) for dummy in range(num_ports)]
+        for s in sockets:
+            s.bind(('', 0))
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            ret_val.append(s.getsockname()[1])
+    with ExitStack() as stack:
+        # Create an array of tuples of new socket + port to use
+        sockets = [(stack.enter_context(socket.socket(socket.AF_INET, socket.SOCK_STREAM)), port) for port in ret_val]
+        for socket_port in sockets:
+            s = socket_port[0]
+            port = socket_port[1]
+            s.bind(('', port))
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    return ret_val
 
 
 def remove_docker_container(containers):

@@ -22,6 +22,7 @@ If you need further versions, please open an issue.
 ## Bug Fixes:
 
  - #148: Fix broken Github actions
+ - #152: Fix bug where Bucket- and Database-forward might be the same 
 
 ## Features / Enhancements:
 

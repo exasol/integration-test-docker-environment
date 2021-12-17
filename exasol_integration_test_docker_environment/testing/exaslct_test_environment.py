@@ -13,7 +13,7 @@ from exasol_integration_test_docker_environment.lib.docker import ContextDockerC
 from exasol_integration_test_docker_environment.testing.exaslct_docker_test_environment import \
     ExaslctDockerTestEnvironment
 from exasol_integration_test_docker_environment.testing.spawned_test_environments import SpawnedTestEnvironments
-from exasol_integration_test_docker_environment.testing.utils import find_free_port, check_db_version_from_env
+from exasol_integration_test_docker_environment.testing.utils import find_free_ports, check_db_version_from_env
 
 
 class ExaslctTestEnvironment:
@@ -110,6 +110,7 @@ class ExaslctTestEnvironment:
 
     def spawn_docker_test_environments(self, name: str, additional_parameter: List[str] = None) \
             -> SpawnedTestEnvironments:
+        database_port, bucketfs_port = find_free_ports(2)
         on_host_parameter = ExaslctDockerTestEnvironment(
             name=self.name + "_" + name,
             database_host="localhost",
@@ -117,8 +118,8 @@ class ExaslctTestEnvironment:
             db_password="exasol",
             bucketfs_username="w",
             bucketfs_password="write",
-            database_port=find_free_port(),
-            bucketfs_port=find_free_port())
+            database_port=database_port,
+            bucketfs_port=bucketfs_port)
         docker_db_version_parameter = ""
         db_version_from_env = check_db_version_from_env()
         if db_version_from_env is not None:
@@ -165,7 +166,7 @@ class ExaslctTestEnvironment:
             return SpawnedTestEnvironments(on_host_parameter, None)
 
     def create_registry(self):
-        registry_port = find_free_port()
+        registry_port = find_free_ports(1)[0]
         registry_container_name = self.name.replace("/", "_") + "_registry"
         with ContextDockerClient() as docker_client:
             print("Start pull of registry:2")
