@@ -76,10 +76,3 @@ def check_db_version_from_env() -> Optional[str]:
     if "EXASOL_VERSION" in os.environ and os.environ["EXASOL_VERSION"] != "default":
         retval = os.environ["EXASOL_VERSION"]
     return retval
-
-
-def db_version_supports_custom_certificates(db_version: Optional[str]) -> bool:
-    # 1. If db_version is None => Latest DB version is used (which already supported custom certificates in EXAConf
-    # 2. If db_version is "default" => Return True, as "default" is lexically greater than "7.0.5"
-    # 3. Return result of db version comparison
-    return True if db_version is None or db_version > "7.0.5" else False

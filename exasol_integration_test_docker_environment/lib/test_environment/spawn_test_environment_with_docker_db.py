@@ -11,12 +11,13 @@ from exasol_integration_test_docker_environment.lib.test_environment.create_ssl_
     CreateSSLCertificatesTask
 from exasol_integration_test_docker_environment.lib.test_environment.database_waiters.wait_for_test_docker_database import \
     WaitForTestDockerDatabase
+from exasol_integration_test_docker_environment.lib.test_environment.db_version import \
+    db_version_supports_custom_certificates
 from exasol_integration_test_docker_environment.lib.test_environment.parameter.docker_db_test_environment_parameter import \
     DockerDBTestEnvironmentParameter
 from exasol_integration_test_docker_environment.lib.test_environment.prepare_network_for_test_environment import \
     PrepareDockerNetworkForTestEnvironment
 from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_database import SpawnTestDockerDatabase
-from exasol_integration_test_docker_environment.testing.utils import db_version_supports_custom_certificates
 
 
 class SpawnTestEnvironmentWithDockerDB(
