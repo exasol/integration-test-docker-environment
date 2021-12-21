@@ -45,7 +45,7 @@ class IsDatabaseReadyThread(Thread):
         username = self.database_credentials.db_user
         password = self.database_credentials.db_password
         connection_options = f"""-c '{self._database_info.host}:{self._database_info.db_port}' -u '{username}' -p '{password}'"""
-        cmd = f"""$EXAPLUS {connection_options}  -sql 'select 1;'"""
+        cmd = f"""$EXAPLUS {connection_options}  -sql 'select 1;' -jdbcparam 'validateservercertificate=0'"""
         bash_cmd = f"""bash -c "{cmd}" """
         return bash_cmd
 
