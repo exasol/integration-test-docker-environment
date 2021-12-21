@@ -1,4 +1,3 @@
-import os
 import unittest
 
 import luigi
@@ -22,7 +21,7 @@ class TestContainerReuseTest(unittest.TestCase):
     '''
 
     def env_name(self):
-        return "reuse_test"
+        return self.__class__.__name__.lower()
 
     def setUp(self):
         self._docker_repository_name = self.env_name()
@@ -68,8 +67,7 @@ class TestContainerReuseTest(unittest.TestCase):
                                   environment_type=EnvironmentType.docker_db,
                                   environment_name=self.env_name(),
                                   docker_db_image_version=self.docker_db_version_parameter,
-                                  docker_db_image_name="exasol/docker-db",
-                                  create_certificates=True
+                                  docker_db_image_name="exasol/docker-db"
                                   )
         try:
             success = luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
@@ -85,10 +83,11 @@ class TestContainerReuseTest(unittest.TestCase):
     def _create_exaplus_check_cmd(self, test_environment_info):
         username = SpawnTestEnvironment.DEFAULT_DB_USER
         password = SpawnTestEnvironment.DEFAULT_DATABASE_PASSWORD
-        database_host = "exasol-test-database"
+        database_host = test_environment_info.database_info.host
         database_port = test_environment_info.database_info.db_port
         q = "SELECT TABLE_NAME FROM SYS.EXA_ALL_TABLES WHERE TABLE_SCHEMA='TEST';"
-        return f"""$EXAPLUS -c '{database_host}:{database_port}' -u '{username}' -p '{password}' -sql \\\"{q}\\\""""
+        return f"$EXAPLUS -c '{database_host}:{database_port}' -u '{username}' -p '{password}' " \
+               f"-jdbcparam 'validateservercertificate=0' -sql \\\"{q}\\\""""
 
     def _exec_cmd_in_test_container(self, test_environment_info, cmd):
         with ContextDockerClient() as docker_client:
@@ -96,7 +95,6 @@ class TestContainerReuseTest(unittest.TestCase):
             test_container = docker_client.containers.get(test_environment_info.test_container_info.container_name)
 
             exit_code, output = test_container.exec_run(cmd=bash_cmd)
-            print(f"output: {output}")
             self.assertEquals(exit_code, 0)
             return output.decode('utf-8')
 

@@ -27,7 +27,7 @@ If you need further versions, please open an issue.
 
 ## Features / Enhancements:
 
-n/a
+ - #150: Updated exaplus and jdbc for test environment and cleaned up Dockerfile
 
 ## Refactoring:
 
