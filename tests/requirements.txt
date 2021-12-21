@@ -1,0 +1,2 @@
+#Need to keep this empty file, as any clients might need a requirements.txt
+#and analyze_test_container.py assumes it's existence
