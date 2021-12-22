@@ -11,3 +11,4 @@ class GeneralSpawnTestEnvironmentParameter(Config):
     max_start_attempts = luigi.IntParameter(2, significant=False)
     is_setup_database_activated = luigi.BoolParameter(True, significant=False)
     docker_runtime = luigi.OptionalParameter(None, significant=False)
+    create_certificates = luigi.BoolParameter()

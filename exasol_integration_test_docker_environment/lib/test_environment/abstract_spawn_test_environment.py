@@ -31,7 +31,6 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
                                    GeneralSpawnTestEnvironmentParameter,
                                    DatabaseCredentialsParameter):
     environment_name = luigi.Parameter()  # type: str
-    create_certificates = luigi.BoolParameter()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

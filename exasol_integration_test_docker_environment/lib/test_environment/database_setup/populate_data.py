@@ -35,7 +35,7 @@ class PopulateEngineSmallTestDataToDatabase(DockerBaseTask, DatabaseCredentialsP
         password = self.db_password
         with self._get_docker_client() as docker_client:
             test_container = docker_client.containers.get(self._test_container_info.container_name)
-            cmd = f"""cd /tests/test/enginedb_small; $EXAPLUS -c '{self._database_info.host}:{self._database_info.db_port}' -u '{username}' -p '{password}' -f import.sql"""
+            cmd = f"""cd /tests/test/enginedb_small; $EXAPLUS -c '{self._database_info.host}:{self._database_info.db_port}' -u '{username}' -p '{password}' -f import.sql -jdbcparam 'validateservercertificate=0'"""
             bash_cmd = f"""bash -c "{cmd}" """
             exit_code, output = test_container.exec_run(cmd=bash_cmd)
         self.write_logs(output.decode("utf-8"))
