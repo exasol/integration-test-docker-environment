@@ -14,5 +14,5 @@ done
 interesting_files=("./start-test-env" "./start-test-env-with-poetry" "./start-test-env-without-poetry")
 
 for f in "${interesting_files[@]}"; do
-  shellcheck -x "$SCRIPT_DIR/$f"
+  shellcheck -x "$SCRIPT_DIR/../../$f"
 done
