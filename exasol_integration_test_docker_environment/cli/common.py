@@ -10,6 +10,7 @@ import luigi
 import networkx
 from networkx import DiGraph
 
+from exasol_integration_test_docker_environment.lib import extract_modulename_for_build_steps
 from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import DependencyLoggerBaseTask
 from exasol_integration_test_docker_environment.lib.base.task_dependency import TaskDependency, DependencyState
 
@@ -71,7 +72,7 @@ def import_build_steps(flavor_path: Tuple[str, ...]):
     import importlib.util
     for path in flavor_path:
         path_to_build_steps = Path(path).joinpath("flavor_base/build_steps.py")
-        module_name_for_build_steps = path.replace("/", "_").replace(".", "_")
+        module_name_for_build_steps = extract_modulename_for_build_steps(path)
         spec = importlib.util.spec_from_file_location(module_name_for_build_steps, path_to_build_steps)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)

@@ -31,7 +31,7 @@ If you need further versions, please open an issue.
 
 ## Refactoring:
 
-n/a
+ - #141: Extract module name extraction into separate method
 
 ## Documentation:
 
