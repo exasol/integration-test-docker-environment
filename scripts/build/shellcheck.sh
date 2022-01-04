@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -euo pipefail
+set -u
 
 interesting_paths=("scripts" "docker_db_config_template" "exasol_integration_test_docker_environment" "githooks")
 
