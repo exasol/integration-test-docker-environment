@@ -17,7 +17,7 @@ request_install_poetry () {
   else
     echo "Do you want to install poetry local to the user using '$install_command'"
     echo -n "yes/no: "
-    read ANSWER
+    read -r ANSWER
   fi
   if [ "$ANSWER" == "yes" ]
   then
@@ -65,7 +65,7 @@ check_python_version(){
   if [ -z "$PYTHON_BIN" ]
   then
     ACCEPTABLE_PYTHON_EXECUTABLES=("python3.6" "python3.7" "python3.8")
-    for python_executable in ${ACCEPTABLE_PYTHON_EXECUTABLES[@]}
+    for python_executable in "${ACCEPTABLE_PYTHON_EXECUTABLES[@]}"
     do
       PYTHON_BIN=$(command -v "$python_executable")
       if [ -n "$PYTHON_BIN" ]

@@ -28,6 +28,7 @@ If you need further versions, please open an issue.
 ## Features / Enhancements:
 
  - #150: Updated exaplus and jdbc for test environment and cleaned up Dockerfile
+ - #157: Add shellcheck verification
 
 ## Refactoring:
 

@@ -2,10 +2,12 @@
 
 set -euo pipefail
 
+#shellcheck disable=SC1083
 NAME={{HOST_NAME}}
 
 echo SubjectName: $NAME
 
+#shellcheck disable=SC1083
 certs_dir={{cert_dir}}
 
 echo Certificate Dir: $certs_dir
