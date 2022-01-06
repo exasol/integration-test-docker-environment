@@ -9,7 +9,7 @@ t.b.d.
 ### Supported Exasol Versions
 
 * **6.2**: up to 6.2.17
-* **7.0**: up to 7.0.14
+* **7.0**: up to 7.0.14, **except 7.0.5**
 * **7.1**: up to 7.1.3
 
 If you need further versions, please open an issue.
@@ -24,6 +24,7 @@ If you need further versions, please open an issue.
  - #148: Fix broken Github actions
  - #152: Fix bug where Bucket- and Database-forward might be the same 
  - #154: Fix comparison of db versions
+ - #160: Remove support for docker db v 7.0.5
 
 ## Features / Enhancements:
 
