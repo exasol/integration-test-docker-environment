@@ -7,7 +7,7 @@ set -euo pipefail
 if [ -n "${1-}" ]; then
   image_suffixes=("$@")
 else
-  image_suffixes="latest"
+  image_suffixes=("latest")
 fi
 
 SCRIPT_DIR="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"

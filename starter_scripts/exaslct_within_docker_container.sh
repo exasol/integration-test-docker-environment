@@ -22,6 +22,8 @@ fi
 
 SCRIPT_DIR="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 declare -a mount_point_paths
+# Ignore shellcheck rules here as alternatives are worse.
+# shellcheck disable=SC2207
 mount_point_paths=($(bash "$SCRIPT_DIR"/mount_point_parsing.sh "${@}"))
 
 quoted_arguments=''
@@ -58,6 +60,7 @@ done
 # because it is a default value for --output-path, and hence might not be part of $chown_directories
 RUN_COMMAND="/integration_test_docker_environment/starter_scripts/exaslct_without_poetry.sh $quoted_arguments; RETURN_CODE=\$?; $chown_directories_cmd chown -R $(id -u):$(id -g) .build_output &> /dev/null; exit \$RETURN_CODE"
 
+
 HOST_DOCKER_SOCKER_PATH="/var/run/docker.sock"
 CONTAINER_DOCKER_SOCKER_PATH="/var/run/docker.sock"
 DOCKER_SOCKET_MOUNT="$HOST_DOCKER_SOCKER_PATH:$CONTAINER_DOCKER_SOCKER_PATH"
@@ -93,6 +96,8 @@ tmpfile_env=$(mktemp)
 trap 'rm -f -- "$tmpfile_env"' INT TERM HUP EXIT
 
 create_env_file_debug_protected "$tmpfile_env"
+# Ignore shellcheck rule as we need to split elements of array by space (they are in form "-v %MOUNT_POINT")
+# shellcheck disable=SC2068
 docker run --network host --env-file "$tmpfile_env" --rm $terminal_parameter -v "$PWD:$PWD" -v "$DOCKER_SOCKET_MOUNT" -w "$PWD" ${mount_point_parameter[@]} "$RUNNER_IMAGE_NAME" bash -c "$RUN_COMMAND"
 
 umask "$old_umask"

@@ -15,7 +15,7 @@ function assert() {
   cmpB="${*}"
   if [[ $cmpA != "$cmpB" ]]; then
     >&2 echo "ERROR: '$cmpA' does not match'$cmpB'"
-    exit -1
+    exit 1
   fi
 }
 
@@ -23,7 +23,7 @@ flavorDirA="$SCRIPT_DIR/test/abc=def"
 exportDirA="$SCRIPT_DIR/test/exportdir=xyz"
 
 mkdir "$flavorDirA" || true
-trap "rm -rf $flavorDirA $exportDirA" EXIT
+trap 'rm -rf "$flavorDirA" "$exportDirA"' EXIT
 
 testStr=$(bash "$SCRIPT_DIR/mount_point_parsing.sh" --flavor-path="$flavorDirA" --export-path "$exportDirA" dummy)
 
