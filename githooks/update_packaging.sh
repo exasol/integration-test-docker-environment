@@ -22,7 +22,12 @@ fi
 
 #pushd "$ROOT_DIR" > /dev/null
 pushd "$ROOT_DIR"
-
+echo -e "Copy docker_db_config_template into package ${grey}(pre-commit hook)${no_color}"
+if [ -d "exasol_integration_test_docker_environment/docker_db_config" ]
+then
+  rm -r "exasol_integration_test_docker_environment/docker_db_config" 
+fi
+cp -rL docker_db_config_template exasol_integration_test_docker_environment/docker_db_config
 echo -e "Generate setup.py ${grey}(pre-commit hook)${no_color}"
 if [ -d "dist" ]
 then
@@ -45,7 +50,8 @@ popd > /dev/null
 if [ "$NO_GIT" == "FALSE" ]
 then
   echo -e "Add generated files ${grey}(pre-commit hook)${no_color}"
-  git add setup.py starter_scripts/checksums
+  git add setup.py exasol_integration_test_docker_environment/docker_db_config starter_scripts/checksums
 fi
+
 
 popd > /dev/null
