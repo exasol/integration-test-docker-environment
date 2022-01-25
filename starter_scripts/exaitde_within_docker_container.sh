@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #####################################################################################
-###REMEMBER TO KEEP THIS FILE IN SYNC WITH exaslct_within_docker_container_slim.sh!!!
+###REMEMBER TO KEEP THIS FILE IN SYNC WITH itde_within_docker_container_slim.sh!!!
 #####################################################################################
 
 #set -e => immediately exit if any command [1] has a non-zero exit status
@@ -58,7 +58,7 @@ done
 
 # Still need to "CHOWN" .build_output
 # because it is a default value for --output-path, and hence might not be part of $chown_directories
-RUN_COMMAND="/integration_test_docker_environment/starter_scripts/exaslct_without_poetry.sh $quoted_arguments; RETURN_CODE=\$?; $chown_directories_cmd chown -R $(id -u):$(id -g) .build_output &> /dev/null; exit \$RETURN_CODE"
+RUN_COMMAND="/integration_test_docker_environment/starter_scripts/exaitde_without_poetry.sh $quoted_arguments; RETURN_CODE=\$?; $chown_directories_cmd chown -R $(id -u):$(id -g) .build_output &> /dev/null; exit \$RETURN_CODE"
 
 
 HOST_DOCKER_SOCKER_PATH="/var/run/docker.sock"

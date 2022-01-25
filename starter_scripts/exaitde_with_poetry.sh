@@ -15,7 +15,7 @@ init_poetry
 if [ -n "$POETRY_BIN" ]
 then
   export PYTHONPATH="$SCRIPT_DIR"
-  $POETRY_BIN run bash "$SCRIPT_DIR/exaslct_without_poetry.sh" "${@}"
+  $POETRY_BIN run bash "$SCRIPT_DIR/exaitde_without_poetry.sh" "${@}"
 else
   echo "Could not find poetry!"
   exit 1

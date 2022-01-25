@@ -31,6 +31,8 @@ If you need further versions, please open an issue.
  - #150: Updated exaplus and jdbc for test environment and cleaned up Dockerfile
  - #157: Add shellcheck verification
  - #146: Port starter scripts from script-languages-container-tool to this project
+ - #140: Create or inject SSL Certificates into the Docker-DB 
+ - #146: Port starter scripts
 
 ## Refactoring:
 

@@ -28,9 +28,9 @@ if [ -z "$FIND_IMAGE_LOCALLY" ]; then
   docker pull "$RUNNER_IMAGE_NAME"
 fi
 
-EXEC_SCRIPT=exaslct_within_docker_container.sh
+EXEC_SCRIPT=exaitde_within_docker_container.sh
 if [[ "$(uname)" = Darwin ]]; then
-  EXEC_SCRIPT=exaslct_within_docker_container_slim.sh
+  EXEC_SCRIPT=exaitde_within_docker_container_slim.sh
 fi
 
 bash "$SCRIPT_DIR/$EXEC_SCRIPT" "$RUNNER_IMAGE_NAME" "${@}"
