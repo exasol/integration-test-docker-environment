@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Integration-Test-Docker-Environment 0.8.0, released t.b.d.
 
 Code name: t.b.d.
@@ -6,24 +5,11 @@ Code name: t.b.d.
 ## Summary
 
 t.b.d.
-=======
-# Integration-Test-Docker-Environment 0.8.0, released t.b.d
-
-Code name: t.b.d
-
-## Summary
-
-t.b.d
->>>>>>> 17fac6e... Update version and changelog [run all tests]
 
 ### Supported Exasol Versions
 
 * **6.2**: up to 6.2.17
-<<<<<<< HEAD
 * **7.0**: up to 7.0.14, **except 7.0.5**
-=======
-* **7.0**: up to 7.0.14
->>>>>>> 17fac6e... Update version and changelog [run all tests]
 * **7.1**: up to 7.1.3
 
 If you need further versions, please open an issue.
