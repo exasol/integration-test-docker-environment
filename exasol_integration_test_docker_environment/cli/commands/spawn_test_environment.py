@@ -4,12 +4,13 @@ import humanfriendly
 
 from exasol_integration_test_docker_environment.cli.cli import cli
 from exasol_integration_test_docker_environment.cli.common import add_options, set_build_config, run_task, \
-    generate_root_task
+    set_docker_repository_config, run_task, generate_root_task
 from exasol_integration_test_docker_environment.cli.options.system_options import system_options, \
     output_directory_option, tempory_base_directory_option
 from exasol_integration_test_docker_environment.cli.options.test_environment_options import docker_db_options
 from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_environment_with_docker_db import \
     SpawnTestEnvironmentWithDockerDB
+from exasol_integration_test_docker_environment.cli.options.docker_repository_options import docker_repository_options
 
 
 @cli.command()
@@ -30,6 +31,7 @@ from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_
 @click.option('--docker-runtime', type=str, default=None, show_default=True,
               help="The docker runtime used to start all containers")
 @add_options(docker_db_options)
+@add_options(docker_repository_options)
 @add_options([output_directory_option])
 @add_options([tempory_base_directory_option])
 @add_options(system_options)
@@ -44,6 +46,14 @@ def spawn_test_environment(
         docker_runtime: str,
         docker_db_image_version: str,
         docker_db_image_name: str,
+        source_docker_repository_name: str,
+        source_docker_tag_prefix: str,
+        source_docker_username: str,
+        source_docker_password: str,
+        target_docker_repository_name: str,
+        target_docker_tag_prefix: str,
+        target_docker_username: str,
+        target_docker_password: str,
         output_directory: str,
         temporary_base_directory: str,
         workers: int,
@@ -69,6 +79,10 @@ def spawn_test_environment(
                      temporary_base_directory,
                      None,
                      None)
+    set_docker_repository_config(source_docker_password, source_docker_repository_name, source_docker_username,
+                                 source_docker_tag_prefix, "source")
+    set_docker_repository_config(target_docker_password, target_docker_repository_name, target_docker_username,
+                                 target_docker_tag_prefix, "target")
     task_creator = lambda: generate_root_task(task_class=SpawnTestEnvironmentWithDockerDB,
         environment_name=environment_name,
         database_port_forward=str(database_port_forward) if database_port_forward is not None else None,

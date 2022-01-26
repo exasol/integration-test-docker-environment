@@ -32,6 +32,7 @@ If you need further versions, please open an issue.
  - #146: Port starter scripts from script-languages-container-tool to this project
  - #140: Create or inject SSL Certificates into the Docker-DB
  - #164: Remove test and support for Exasol DB 6.2.x
+ - #162: Make sure that all docker function calls use docker credentials if possible
 
 ## Refactoring:
 
