@@ -1,15 +1,17 @@
-# Integration-Test-Docker-Environment 0.8.0, released t.b.d.
+# Integration-Test-Docker-Environment 0.8.0, released 2022-01-26
 
-Code name: t.b.d.
+Code name: Certificate injection and automatic docker hub login.
 
 ## Summary
 
-t.b.d.
+This version supports now the automatic creation and injection of SSL certificates to the database and test-container, automatic login to Docker hub for any docker interaction, and uses similar starter scripts as script-language-container-tools.
+Support for Exasol DB 6.2.x and 7.0.5 was dropped, and support for 7.0.15, 7.1.4 and 7.1.5 added. 
+Also, there were several bug-fixes and the CI build now runs shellcheck on all bash scripts.  
 
 ### Supported Exasol Versions
 
-* **7.0**: up to 7.0.14, **except 7.0.5**
-* **7.1**: up to 7.1.3
+* **7.0**: up to 7.0.15, **except 7.0.5**
+* **7.1**: up to 7.1.5
 
 If you need further versions, please open an issue.
 
@@ -33,6 +35,7 @@ If you need further versions, please open an issue.
  - #140: Create or inject SSL Certificates into the Docker-DB
  - #164: Remove test and support for Exasol DB 6.2.x
  - #162: Make sure that all docker function calls use docker credentials if possible
+ - #165: Integrate docker db 7.1.4, 7.1.5 and 7.0.15 and prepare release
 
 ## Refactoring:
 

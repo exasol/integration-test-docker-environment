@@ -103,7 +103,7 @@ Options:
                                   containers
 
   --docker-db-image-version TEXT  Docker DB Image Version against which the
-                                  tests should run.  [default: 7.1.3]
+                                  tests should run.  [default: 7.1.5]
 
   --docker-db-image-name TEXT     Docker DB Image Name against which the tests
                                   should run.  [default: exasol/docker-db]
@@ -175,8 +175,8 @@ The following config files are available:
   
 ### Currently supported Exasol Versions
 
-* **7.0**: up to 7.0.14 **except 7.0.5**
-* **7.1**: up to 7.1.3
+* **7.0**: up to 7.0.15 **except 7.0.5**
+* **7.1**: up to 7.1.5
 
 
 If you need further versions, please open an issue.
