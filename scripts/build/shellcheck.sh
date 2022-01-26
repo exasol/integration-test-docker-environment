@@ -2,7 +2,7 @@
 
 set -u
 
-interesting_paths=("scripts" "docker_db_config_template" "exasol_integration_test_docker_environment" "githooks")
+interesting_paths=("starter_scripts" "scripts" "docker_db_config_template" "exasol_integration_test_docker_environment" "githooks")
 
 SCRIPT_DIR="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 status=0
@@ -13,7 +13,7 @@ for path in "${interesting_paths[@]}"; do
 done
 
 
-interesting_files=("./start-test-env" "./start-test-env-with-poetry" "./start-test-env-without-poetry")
+interesting_files=("./start-test-env")
 
 for f in "${interesting_files[@]}"; do
   shellcheck -x "$SCRIPT_DIR/../../$f"

@@ -36,6 +36,3 @@ jobs:
       run: ./scripts/test/run_all_tests.sh
       env:
         EXASOL_VERSION: "${{ matrix.exasol_version }}"
-
-    - name: Test ./start-test-env-with-poetry 
-      run: ./start-test-env-with-poetry --help

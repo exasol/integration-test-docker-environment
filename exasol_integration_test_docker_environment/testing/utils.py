@@ -8,7 +8,7 @@ import requests
 
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 
-INTEGRATION_TEST_DOCKER_ENVIRONMENT_DEFAULT_BIN = "./start-test-env-without-poetry"
+INTEGRATION_TEST_DOCKER_ENVIRONMENT_DEFAULT_BIN = "./start-test-env"
 
 
 def find_free_ports(num_ports: int) -> List[int]:

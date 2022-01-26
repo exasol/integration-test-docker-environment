@@ -8,7 +8,6 @@ t.b.d.
 
 ### Supported Exasol Versions
 
-* **6.2**: up to 6.2.17
 * **7.0**: up to 7.0.14, **except 7.0.5**
 * **7.1**: up to 7.1.3
 
@@ -30,6 +29,9 @@ If you need further versions, please open an issue.
 
  - #150: Updated exaplus and jdbc for test environment and cleaned up Dockerfile
  - #157: Add shellcheck verification
+ - #146: Port starter scripts from script-languages-container-tool to this project
+ - #140: Create or inject SSL Certificates into the Docker-DB
+ - #164: Remove test and support for Exasol DB 6.2.x
 
 ## Refactoring:
 

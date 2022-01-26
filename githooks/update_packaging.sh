@@ -3,6 +3,8 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
+SCRIPT_DIR="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
+
 # define colors for use in output
 no_color='\033[0m'
 grey='\033[0;90m'
@@ -40,10 +42,16 @@ cp "$extracted_dir/setup.py" ../setup.py
 rm -r "$extracted_dir"
 popd > /dev/null
 
+echo -e "Generate installer checksums ${grey}(pre-commit hook)${no_color}"
+pushd starter_scripts > /dev/null
+bash "$SCRIPT_DIR/create_checksums.sh"
+popd > /dev/null
+
 if [ "$NO_GIT" == "FALSE" ]
 then
   echo -e "Add generated files ${grey}(pre-commit hook)${no_color}"
-  git add setup.py exasol_integration_test_docker_environment/docker_db_config
+  git add setup.py exasol_integration_test_docker_environment/docker_db_config starter_scripts/checksums
 fi
+
 
 popd > /dev/null
