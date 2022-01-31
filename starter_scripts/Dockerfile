@@ -17,7 +17,7 @@ RUN apt-get -y update && \
     apt-get -y autoremove && \
     ldconfig
 
-RUN curl https://bootstrap.pypa.io/get-pip.py | python3
+RUN curl https://bootstrap.pypa.io/pip/3.6/get-pip.py | python3
 
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
