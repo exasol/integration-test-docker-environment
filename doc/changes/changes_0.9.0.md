@@ -21,6 +21,7 @@ If you need further versions, please open an issue.
 ## Bug Fixes:
 
  - #170: Fix docker image publication
+ - #172: Fix Python3.6 installation script
 
 ## Features / Enhancements:
 
