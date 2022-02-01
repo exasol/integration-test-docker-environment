@@ -22,6 +22,7 @@ If you need further versions, please open an issue.
 
  - #170: Fix docker image publication
  - #172: Fix Python3.6 installation script
+ - #175: Fix docker push and allow docker push workflow for ci_test branch
 
 ## Features / Enhancements:
 
