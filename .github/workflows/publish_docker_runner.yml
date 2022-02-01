@@ -22,7 +22,7 @@ jobs:
     - name: Push new Docker image
       if: github.ref == 'refs/heads/master'
       run: bash ./starter_scripts/push_docker_runner_image.sh
-    - name: Push new Docker image
+    - name: Push new ci-release-test Docker image
       if: github.ref != 'refs/heads/master'
       run: bash ./starter_scripts/push_docker_runner_image.sh "ci-release-test"
 
