@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - 'ci-release-test/**'
 
 jobs:
   publish:
@@ -19,5 +20,9 @@ jobs:
         SECRET_DOCKER_USER_NAME: ${{ secrets.DOCKER_USER_NAME }}
         SECRET_DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
     - name: Push new Docker image
-      run: bash ./start_scripts/push_docker_runner_image.sh
+      if: github.ref == 'refs/heads/master'
+      run: bash ./starter_scripts/push_docker_runner_image.sh
+    - name: Push new ci-release-test Docker image
+      if: github.ref != 'refs/heads/master'
+      run: bash ./starter_scripts/push_docker_runner_image.sh "ci-release-test"
 
