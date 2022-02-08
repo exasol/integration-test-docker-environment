@@ -3,7 +3,7 @@ name: Test DB Versions with minimal tests
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
 
 

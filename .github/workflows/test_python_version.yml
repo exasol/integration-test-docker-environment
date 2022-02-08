@@ -3,7 +3,7 @@ name: Test Python Versions with all tests
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
 
 jobs:
