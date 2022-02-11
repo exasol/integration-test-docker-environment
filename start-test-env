@@ -18,6 +18,14 @@ fi
 
 SCRIPT_DIR="$(dirname "$($rl -f "${BASH_SOURCE[0]}")")"
 
+echo -e "\u001b[33mWarning:\u001b[0m +----------------------------------------------------------------------------+"
+echo -e "\u001b[33mWarning:\u001b[0m |            -->  You are using an unmaintained branch! <--                  |"
+echo -e "\u001b[33mWarning:\u001b[0m |                                                                            |"
+echo -e "\u001b[33mWarning:\u001b[0m | * https://github.com/exasol/integration-test-docker-environment/issues/136 |"
+echo -e "\u001b[33mWarning:\u001b[0m | * https://github.com/github/renaming                                       |"
+echo -e "\u001b[33mWarning:\u001b[0m |                                                                            |"
+echo -e "\u001b[33mWarning:\u001b[0m +----------------------------------------------------------------------------+"
+
 RUNNER_IMAGE_NAME="$("$SCRIPT_DIR/starter_scripts/construct_docker_runner_image_name.sh")"
 
 bash "$SCRIPT_DIR/starter_scripts/exaitde_within_docker_container_with_container_build.sh" "$RUNNER_IMAGE_NAME" "${@}"
