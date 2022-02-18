@@ -8,7 +8,6 @@ from exasol_integration_test_docker_environment.doctor import (
 )
 
 
-# TODO: Add flag/option for check, dry run etc.
 @cli.command()
 def doctor():
     """
@@ -16,6 +15,8 @@ def doctor():
 
     If no issues have been found, using the library or executing the test should work just fine.
     For all found issues there will be a proposed fix/solution.
+
+    If the environment was found to be healthy the exit code will be 0.
     """
     success, failure = 0, -1
 
