@@ -10,7 +10,7 @@ from docker.errors import DockerException
 
 
 class ErrorCodes(Enum):
-    """This doctors ICD codes"""
+    """The equivalent of ICD-10 codes this doctor is using"""
 
     Unknown = "Unknown issue"
     UnixSocketNotAvailable = "Could not find unix socket to connect to"
@@ -20,15 +20,15 @@ def recommend_treatment(error_code) -> str:
     """Get treatment advice based on the error_code"""
     return {
         ErrorCodes.Unknown: "You are sick but this symptoms are unknown, please contact the maintainer.",
-        ErrorCodes.UnixSocketNotAvailable: "Make sure you DOCKER_HOST environment variable is configured correctly.",
+        ErrorCodes.UnixSocketNotAvailable: "Make sure your DOCKER_HOST environment variable is configured correctly.",
     }[error_code]
 
 
 def diagnose_docker_daemon_not_available() -> Iterator[ErrorCodes]:
     """Diagnose reasons why docker deamon is not available"""
 
-    def _is_unix_socket_issue(msg):
-        return "FileNotFoundError(2, 'No such file or directory')" in msg
+    def _is_unix_socket_issue(message: str) -> bool:
+        return "FileNotFoundError(2, 'No such file or directory')" in message
 
     errors = set()
     try:
