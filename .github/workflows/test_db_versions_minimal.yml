@@ -52,7 +52,7 @@ jobs:
       run: poetry install
 
     - name: Run Doctor
-      run: python -m  exasol_integration_test_docker_environment.main doctor
+      run: poetry run python -m exasol_integration_test_docker_environment.main doctor
         
     - name: Run minimal tests
       run: |
