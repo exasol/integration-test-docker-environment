@@ -1,16 +1,15 @@
 import os
 import unittest
 from contextlib import contextmanager
+from typing import ContextManager, Mapping
 
 from exasol_integration_test_docker_environment.doctor import (
-    Icd,
-    diagnose_docker_daemon_not_available,
-    is_docker_daemon_available,
-)
+    ErrorCodes, diagnose_docker_daemon_not_available,
+    is_docker_daemon_available)
 
 
 @contextmanager
-def temporary_env(env_vars):
+def temporary_env(env_vars) -> ContextManager[Mapping[str, str]]:
     """
     Creates a temporary environment, containing the current environment variables.
 
@@ -52,13 +51,13 @@ class DiagnoseDockerDaemonNotAvailable(unittest.TestCase):
     """
 
     def test_non_existing_unix_socket(self):
-        expected = {Icd.UnixSocketNotAvailable}
+        expected = {ErrorCodes.UnixSocketNotAvailable}
         env = {"DOCKER_HOST": "unix:///var/non/existent/path"}
         with temporary_env(env):
             self.assertEqual(expected, diagnose_docker_daemon_not_available())
 
     def test_unknown_error(self):
-        expected = {Icd.Unknown}
+        expected = {ErrorCodes.Unknown}
         env = {"DOCKER_HOST": "https://foobar"}
         with temporary_env(env):
             self.assertEqual(expected, diagnose_docker_daemon_not_available())
