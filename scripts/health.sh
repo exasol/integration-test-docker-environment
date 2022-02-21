@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # Check the health status of the current environment
 # If this script executed successfully, ware all set to run.
-
 set -u
 
 MAJOR_MINIMUM_VERSION_DOCKER="17"
