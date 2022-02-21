@@ -13,4 +13,4 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Test ./start-test-env
-      run: ./start-test-env doctor
+      run: ./start-test-env health
