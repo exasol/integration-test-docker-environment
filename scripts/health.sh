@@ -62,24 +62,6 @@ docker_minor_version () {
     echo "$version" | cut -f2 -d "."
 }
 
-
-check_docker_pull () {
-    docker pull ubuntu:18.04fff 2>&1
-    if [ "$?" -eq 0 ]; then
-      return 0
-    fi
-        return 1
-}
-
-check_docker_connectivity () {
-  local docker_internet_test_run=$(docker run --rm ubuntu:18.04 bash -c ": >/dev/tcp/1.1.1.1/53")
-  if [ ! "$?" ]; then
-      return 1
-  fi
-  return 0
-}
-
-
 health_check_docker () {
   local docker_cmd="docker"
   require "$docker_cmd"
@@ -95,7 +77,7 @@ health_check_docker () {
 
   # can't be made local, otherwise it will eat the last return code
   details=$("docker" pull ubuntu:18.04 2>&1)
-  if [ "$?" -ne 0 ]; then
+  if [ $? -ne 0 ]; then
     echo "Could not pull images from docker registry"
     echo "details:"
     echo "$details"
@@ -104,7 +86,7 @@ health_check_docker () {
 
   # can't be made local, otherwise it will eat the last return code
   details=$(docker run --rm ubuntu:18.04 bash -c ": >/dev/tcp/1.1.1.1/53")
-  if [ "$?" -ne 0 ]; then
+  if [ $? -ne 0 ]; then
     echo "The docker machine does not seem to have connectivity"
     echo "details:"
     echo "$details"
@@ -117,7 +99,6 @@ main() {
   if ! health_check_docker; then
     exit 1
   fi
-  exit 0
 }
 
 # run all health checks
