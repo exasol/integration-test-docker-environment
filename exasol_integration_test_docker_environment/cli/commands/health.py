@@ -9,7 +9,7 @@ from exasol_integration_test_docker_environment.doctor import (
 
 
 @cli.command()
-def doctor():
+def health():
     """
     Check the health of the execution environment.
 
