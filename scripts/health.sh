@@ -47,10 +47,12 @@ check_docker_info () {
     local docker_cmd="$1"
     local details
     details=$("$docker_cmd" info)
-    # Can't check return code within the if test, because we need to capture the output to
+    # we want to store the details of the command, for error reporting. Therefore we won't check within the if.
     # shellcheck disable=SC2181
     if [ "$?" -ne 0 ]; then
-      echo "Docker does not seem to configured correctly details: $details"
+      echo "ERROR: Docker does not seem to configured correctly!"
+      echo "details:"
+      echo "$details"
       return 1
     fi
 }
@@ -94,7 +96,7 @@ docker_check_pull () {
   local docker_cmd=$1
   local details
   details=$("docker" pull ubuntu:18.04 2>&1)
-  # Can't check return code within the if test, because we need to capture the output to
+  # We want to store the details of the command, for error reporting. Therefore we won't check within the if.
   # shellcheck disable=SC2181
   if [ $? -ne 0 ]; then
     echo "Could not pull images from docker registry"
@@ -108,7 +110,7 @@ docker_check_connectivity () {
   local docker_cmd=$1
   local details
   details=$(docker run --rm ubuntu:18.04 bash -c ": >/dev/tcp/1.1.1.1/53")
-  # Can't check return code within the if test, because we need to capture the output to
+  # We want to store the details of the command, for error reporting. Therefore we won't check within the if.
   # shellcheck disable=SC2181
   if [ $? -ne 0 ]; then
     echo "The docker machine does not seem to have connectivity"
