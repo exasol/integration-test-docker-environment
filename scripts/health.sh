@@ -43,6 +43,17 @@ require() {
   fi
 }
 
+check_docker_info () {
+    local docker_cmd="$1"
+    local details
+    details=$("$docker_cmd" info)
+    # Can't check return code within the if test, because we need to capture the output to
+    # shellcheck disable=SC2181
+    if [ "$?" -ne 0 ]; then
+      echo "Docker does not seem to configured correctly details: $details"
+      return 1
+    fi
+}
 
 docker_version () {
     local docker_cmd="$1"
@@ -110,6 +121,10 @@ docker_check_connectivity () {
 health_check_docker () {
   local docker_cmd="docker"
   require "$docker_cmd"
+
+  if ! check_docker_info "$docker_cmd"; then
+    return 1
+  fi
 
   if ! docker_check_version "$docker_cmd"; then
     return 1
