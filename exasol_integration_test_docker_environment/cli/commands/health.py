@@ -4,7 +4,7 @@ from inspect import cleandoc
 from exasol_integration_test_docker_environment.cli.cli import cli
 from exasol_integration_test_docker_environment.doctor import (
     health_checkup,
-    recommend_treatment,
+    recommend_mitigation,
 )
 
 
@@ -38,10 +38,14 @@ def health():
         """
     ).format(
         count=len(problems),
-        problems='\n'.join(
-            (suggestion_template.format(problem=icd.value, suggestion=recommend_treatment(icd))
-             for icd in problems)
-        )
+        problems="\n".join(
+            (
+                suggestion_template.format(
+                    problem=icd.value, suggestion=recommend_mitigation(icd)
+                )
+                for icd in problems
+            )
+        ),
     )
     print(message)
     sys.exit(failure)

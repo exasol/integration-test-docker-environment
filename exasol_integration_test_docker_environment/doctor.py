@@ -16,7 +16,7 @@ class ErrorCodes(Enum):
     UnixSocketNotAvailable = "Could not find unix socket to connect to"
 
 
-def recommend_treatment(error_code) -> str:
+def recommend_mitigation(error_code) -> str:
     """Get treatment advice based on the error_code"""
     return {
         ErrorCodes.Unknown: "You are sick but this symptoms are unknown, please contact the maintainer.",
