@@ -18,7 +18,7 @@ fi
 
 SCRIPT_DIR="$(dirname "$($rl -f "${BASH_SOURCE[0]}")")"
 
-source "$SCRIPT_DIR/scripts/health.sh"
+bash "$SCRIPT_DIR/scripts/health.sh" "run"
 
 RUNNER_IMAGE_NAME="$("$SCRIPT_DIR/starter_scripts/construct_docker_runner_image_name.sh")"
 bash "$SCRIPT_DIR/starter_scripts/exaitde_within_docker_container_with_container_build.sh" "$RUNNER_IMAGE_NAME" "${@}"

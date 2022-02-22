@@ -27,7 +27,7 @@ is_version_compatible() {
   if [ "$major" -lt "$min_major" ]; then
     return 1
   fi
-  if [ "$major" -eq "$min_major" ] && [ "$minor" -lt "$min_minor" ]; then
+  if [ "$major" -eq "$min_major" ] && [ "$minor" -ge "$min_minor" ]; then
     return 1
   fi
   return 0
@@ -125,10 +125,11 @@ health_check_docker () {
 }
 
 main() {
+  if [ "$1" != "run" ]; then return 0; fi
   if ! health_check_docker; then
     exit 1
   fi
 }
 
 # run all health checks
-main
+main "$1"
