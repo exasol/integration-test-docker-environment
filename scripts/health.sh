@@ -20,14 +20,14 @@ is_command_available () {
 }
 
 is_version_compatible() {
-  # $1 - expected major version
-  # $2 - expected minor version
-  # $3 - actual major version
-  # $4 - actual minor version
-  if [ "$3" -lt "$1" ]; then
+  local min_major="$1" # $1 - expected min major version
+  local min_minor="$2" # $2 - expected min minor version
+  local major="$3"     # $3 - actual major version
+  local minor="$4"     # $4 - actual minor version
+  if [ "$major" -lt "$min_major" ]; then
     return 1
   fi
-  if [ "$3" -eq "$1" ] && [ "$4" -ge "$2" ]; then
+  if [ "$major" -eq "$min_major" ] && [ "$minor" -ge "$min_minor" ]; then
     return 1
   fi
   return 0
@@ -46,53 +46,82 @@ require() {
 
 docker_version () {
     local docker_cmd="$1"
-    local version=$("$docker_cmd" info | grep  "Server Version: " | cut -f2 -d ":" | tr -d '[:space:]')
+    local version
+    version=$("$docker_cmd" info | grep  "Server Version: " | cut -f2 -d ":" | tr -d '[:space:]')
     echo "$version"
 }
 
 docker_major_version () {
     local docker_cmd="$1"
-    local version=$(docker_version "$docker_cmd")
+    local version
+    version=$(docker_version "$docker_cmd")
     echo "$version" | cut -f1 -d "."
 }
 
 docker_minor_version () {
     local docker_cmd="$1"
-    local version=$(docker_version "$docker_cmd")
+    local version
+    version=$(docker_version "$docker_cmd")
     echo "$version" | cut -f2 -d "."
 }
 
-health_check_docker () {
-  local docker_cmd="docker"
-  require "$docker_cmd"
+docker_check_version () {
+  local docker_cmd=$1
+  local actual_major_version
+  actual_major_version=$(docker_major_version "$docker_cmd")
+  local actual_minor_version
+  actual_minor_version=$(docker_minor_version "$docker_cmd")
 
-  # check docker version
-  local actual_major_version=$(docker_major_version "$docker_cmd")
-  local actual_minor_version=$(docker_minor_version "$docker_cmd")
   if ! is_version_compatible "$MAJOR_MINIMUM_VERSION_DOCKER" "$MINOR_MINIMUM_VERSION_DOCKER" "$actual_major_version" "$actual_minor_version"; then
     echo "The currently installed docker version $actual_major_version.$actual_minor_version version is not compatible"
     help "$docker_cmd"
     return 1
   fi
+}
 
-  # can't be made local, otherwise it will eat the last return code
+docker_check_pull () {
+  local docker_cmd=$1
+  local details
   details=$("docker" pull ubuntu:18.04 2>&1)
+  # Can't check return code within the if test, because we need to capture the output to
+  # shellcheck disable=SC2181
   if [ $? -ne 0 ]; then
     echo "Could not pull images from docker registry"
     echo "details:"
     echo "$details"
     return 1
   fi
+}
 
-  # can't be made local, otherwise it will eat the last return code
+docker_check_connectivity () {
+  local docker_cmd=$1
+  local details
   details=$(docker run --rm ubuntu:18.04 bash -c ": >/dev/tcp/1.1.1.1/53")
+  # Can't check return code within the if test, because we need to capture the output to
+  # shellcheck disable=SC2181
   if [ $? -ne 0 ]; then
     echo "The docker machine does not seem to have connectivity"
     echo "details:"
     echo "$details"
     return 1
   fi
-  return 0
+}
+
+health_check_docker () {
+  local docker_cmd="docker"
+  require "$docker_cmd"
+
+  if ! docker_check_version "$docker_cmd"; then
+    return 1
+  fi
+
+  if ! docker_check_pull "$docker_cmd"; then
+    return 1
+  fi
+
+  if ! docker_check_connectivity "$docker_cmd"; then
+    return 1
+  fi
 }
 
 main() {
