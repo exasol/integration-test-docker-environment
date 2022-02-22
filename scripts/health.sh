@@ -51,7 +51,8 @@ check_docker_info () {
     # shellcheck disable=SC2181
     if [ "$?" -ne 0 ]; then
       echo "ERROR: Docker does not seem to be configured correctly!"
-      echo "details:"
+      echo "Details:"
+      echo
       echo "$details"
       return 1
     fi
