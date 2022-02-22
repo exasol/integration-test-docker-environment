@@ -50,7 +50,7 @@ check_docker_info () {
     # we want to store the details of the command, for error reporting. Therefore we won't check within the if.
     # shellcheck disable=SC2181
     if [ "$?" -ne 0 ]; then
-      echo "ERROR: Docker does not seem to configured correctly!"
+      echo "ERROR: Docker does not seem to be configured correctly!"
       echo "details:"
       echo "$details"
       return 1
