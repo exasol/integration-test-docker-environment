@@ -18,9 +18,9 @@ test_is_version_compatible_invalid_major_version() {
 
 test_is_version_compatible_invalid_minor_version() {
   local major="1"
-  local minor="1"
+  local minor="0"
   local min_major="1"
-  local min_minor="0"
+  local min_minor="1"
   assertFalse "required: >= ${min_major}.${min_minor}, actual: ${major}.${minor}"\
     "is_version_compatible ${min_major} ${min_minor} ${major} ${minor}"
 }
