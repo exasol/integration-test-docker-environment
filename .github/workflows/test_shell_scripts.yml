@@ -3,7 +3,8 @@ name: Test Shell Scripts
 on: [push, pull_request]
 
 jobs:
-  shellcheck:
+  build:
+    name: Test Shell Scripts
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
