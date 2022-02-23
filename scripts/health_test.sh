@@ -13,7 +13,7 @@ test_is_version_compatible_invalid_major_version() {
   local min_major="2"
   local min_minor="1"
   assertFalse "required: >= ${min_major}.${min_minor}, actual: ${major}.${minor}"\
-    "is_version_compatible ${min_major} ${min_major} ${major} ${minor}"
+    "is_version_compatible ${min_major} ${min_minor} ${major} ${minor}"
 }
 
 test_is_version_compatible_invalid_minor_version() {
