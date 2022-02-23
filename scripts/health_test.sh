@@ -31,7 +31,7 @@ test_is_version_compatible_valid_version() {
   local min_major="1"
   local min_minor="2"
   assertTrue "required: >= ${min_major}.${min_minor}, actual: ${major}.${minor}"\
-    "is_version_compatible ${min_major} ${min_major} ${major} ${minor}"
+    "is_version_compatible ${min_major} ${min_minor} ${major} ${minor}"
 }
 
 test_is_command_available_returns_false_if_command_is_not_available() {
