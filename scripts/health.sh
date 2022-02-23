@@ -43,6 +43,13 @@ require() {
   fi
 }
 
+# Why is this check needed?
+# If docker is installed, the client part of it usually works just fine (cli frontend).
+# Unfortunately this does not mean that docker will work.
+# Another crucial part of docker to work properly is, that the server (backend) part works too.
+# If the docker server does not work properly various commands will fail, so will `docker info`
+# (Because it is requesting information from the docker server).
+# Therefore we need this check to be confident docker is operational.
 check_docker_info () {
     local docker_cmd="$1"
     local details
