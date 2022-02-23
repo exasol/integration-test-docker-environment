@@ -27,7 +27,7 @@ is_version_compatible() {
   if [ "$major" -lt "$min_major" ]; then
     return 1
   fi
-  if [ "$major" -eq "$min_major" ] && [ "$minor" -ge "$min_minor" ]; then
+  if [ "$major" -eq "$min_major" ] && [ "$minor" -lt "$min_minor" ]; then
     return 1
   fi
   return 0
