@@ -19,12 +19,12 @@ function assert() {
   fi
 }
 
-flavorDirA="$SCRIPT_DIR/test/abc=def"
-exportDirA="$SCRIPT_DIR/test/exportdir=xyz"
+cacheDirectory="$SCRIPT_DIR/test/abc=def"
+saveDirectory="$SCRIPT_DIR/test/exportdir=xyz"
 
-mkdir "$flavorDirA" || true
-trap 'rm -rf "$flavorDirA" "$exportDirA"' EXIT
+mkdir "$cacheDirectory" || true
+trap 'rm -rf "$cacheDirectory" "$saveDirectory"' EXIT
 
-testStr=$(bash "$SCRIPT_DIR/mount_point_parsing.sh" --flavor-path="$flavorDirA" --export-path "$exportDirA" dummy)
+testStr=$(bash "$SCRIPT_DIR/mount_point_parsing.sh" --cache-directory="$cacheDirectory" --save-directory "$saveDirectory" dummy)
 
-assert "$testStr" "$flavorDirA" "$exportDirA"
+assert "$testStr" "$cacheDirectory" "$saveDirectory"
