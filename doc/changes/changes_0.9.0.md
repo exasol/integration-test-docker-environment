@@ -26,7 +26,7 @@ If you need further versions, please open an issue.
 
 ## Features / Enhancements:
 
-n/a
+ - #17: Improve error message when docker socket can't be found 
 
 ## Refactoring:
 

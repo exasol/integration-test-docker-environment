@@ -1,0 +1,21 @@
+name: Test Shell Scripts
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: Test Shell Scripts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Test Dependencies
+        run: |
+          sudo apt-get install -y shunit2
+
+      - name: Run shunit2 based Shell Tests
+        run: shunit2 scripts/health_test.sh
+
+      - name: Run Starter Script Tests
+        run: starter_scripts/test/test_scripts.sh
+

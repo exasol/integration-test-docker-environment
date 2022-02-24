@@ -49,6 +49,8 @@ jobs:
         poetry-version: 1.1.6
 
     - name: Run minimal tests
-      run: ./scripts/test/run_test.sh exasol_integration_test_docker_environment/test/test_test_environment.py
+      run: |
+          ./scripts/test/run_test.sh exasol_integration_test_docker_environment/test/test_test_environment.py
+          ./scripts/test/run_test.sh exasol_integration_test_docker_environment/test/test_doctor.py
       env:
         EXASOL_VERSION: "${{ matrix.exasol_version }}"

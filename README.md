@@ -123,6 +123,41 @@ You can look at them on the commandline with:
 ./start-test-env spawn-test-environment --help 
 ```
 
+### The integration-test-docker-environment command line tool
+Besides, the already mentioned command `spawn-test-environment`, the integration-test-docker-environemnt
+command line tool provides a couple of other helpful tools.
+
+Run `main.py --help`, to get a list of the available commands:
+```console
+Usage: main.py [OPTIONS] COMMAND [ARGS]...
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  build-test-container    This command builds all stages of the test...
+  health                  Check the health of the execution environment.
+  push-test-container     This command pushs all stages of the test...
+  spawn-test-environment  This command spawn a test environment with a...
+```
+
+To get more details on a specific command run `main.py <command> --help`,
+e.g. `main.py health --help`:
+
+```console
+Usage: main.py health [OPTIONS]
+
+  Check the health of the execution environment.
+
+  If no issues have been found, using the library or executing the test should
+  work just fine. For all found issues there will be a proposed fix/solution.
+
+  If the environment was found to be healthy the exit code will be 0.
+
+Options:
+  --help  Show this message and exit.
+```
+
 ### Default Credentials
 
 The default credentials for the database are
