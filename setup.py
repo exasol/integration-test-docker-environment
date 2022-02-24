@@ -51,7 +51,6 @@ package_data = \
 
 install_requires = \
 ['click>=7.0',
- 'docker>=4.0.0',
  'gitpython>=2.1.0',
  'humanfriendly>=4.18',
  'jinja2>=2.10.1',
@@ -63,6 +62,9 @@ install_requires = \
  'requests>=2.21.0',
  'simplejson>=3.16.0',
  'stopwatch.py>=1.0.0']
+
+extras_require = \
+{':sys_platform != "win32"': ['docker>=4.0.0']}
 
 setup_kwargs = {
     'name': 'exasol-integration-test-docker-environment',
@@ -77,6 +79,7 @@ setup_kwargs = {
     'packages': packages,
     'package_data': package_data,
     'install_requires': install_requires,
+    'extras_require': extras_require,
     'python_requires': '>=3.6,<4',
 }
 
