@@ -38,4 +38,4 @@ n/a
 
 ## Security:
 
-n/a
+ - #186 Fix CVE-2021-32559
