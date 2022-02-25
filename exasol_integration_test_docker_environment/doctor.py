@@ -73,7 +73,7 @@ def health_checkup() -> Iterator[ErrorCodes]:
     """
     examinations = [
         (is_docker_daemon_available, diagnose_docker_daemon_not_available),
-        (is_supported_platform(), lambda: ErrorCodes.TargetPlatformNotSupported),
+        (is_supported_platform, lambda: ErrorCodes.TargetPlatformNotSupported),
     ]
     for is_fine, diagnosis in examinations:
         if not is_fine():
