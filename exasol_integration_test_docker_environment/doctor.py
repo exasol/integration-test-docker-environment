@@ -2,11 +2,14 @@
 The doctor module provides functionality to check the health of the `exasol_integration_test_docker_environment`
 package and also provide help to find potential fixes.
 """
+import sys
 from enum import Enum
 from typing import Iterator
 
 import docker
 from docker.errors import DockerException
+
+SUPPORTED_PLATFORMS = ["linux", "darwin"]
 
 
 class ErrorCodes(Enum):
@@ -14,6 +17,7 @@ class ErrorCodes(Enum):
 
     Unknown = "Unknown issue"
     UnixSocketNotAvailable = "Could not find unix socket to connect to"
+    TargetPlatformNotSupported = "The platform you are running on is not supported."
 
 
 def recommend_mitigation(error_code) -> str:
@@ -21,6 +25,7 @@ def recommend_mitigation(error_code) -> str:
     return {
         ErrorCodes.Unknown: "You are sick but this symptoms are unknown, please contact the maintainer.",
         ErrorCodes.UnixSocketNotAvailable: "Make sure your DOCKER_HOST environment variable is configured correctly.",
+        ErrorCodes.TargetPlatformNotSupported: f"Make sure you are using one of the following platforms: {SUPPORTED_PLATFORMS}.",
     }[error_code]
 
 
@@ -53,13 +58,23 @@ def is_docker_daemon_available() -> bool:
     return True
 
 
+def is_supported_platform() -> bool:
+    """
+    Checks weather or not the current platform is supported.
+    """
+    return sys.platform in SUPPORTED_PLATFORMS
+
+
 def health_checkup() -> Iterator[ErrorCodes]:
     """
     Runs all known examinations
 
     return an iterator of error codes specifying which problems have been identified.
     """
-    examinations = [(is_docker_daemon_available, diagnose_docker_daemon_not_available)]
+    examinations = [
+        (is_docker_daemon_available, diagnose_docker_daemon_not_available),
+        (is_supported_platform(), lambda: ErrorCodes.TargetPlatformNotSupported),
+    ]
     for is_fine, diagnosis in examinations:
         if not is_fine():
             for error_code in diagnosis():
