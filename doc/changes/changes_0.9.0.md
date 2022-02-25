@@ -27,6 +27,7 @@ If you need further versions, please open an issue.
 ## Features / Enhancements:
 
  - #17: Improve error message when docker socket can't be found 
+ - #186: Add support for DB 7.1.6 and 7.0.16
 
 ## Refactoring:
 
