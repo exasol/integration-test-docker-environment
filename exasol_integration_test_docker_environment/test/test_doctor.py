@@ -2,10 +2,15 @@ import os
 import unittest
 from contextlib import contextmanager
 from typing import ContextManager, Mapping
+from unittest.mock import patch
 
 from exasol_integration_test_docker_environment.doctor import (
-    ErrorCodes, diagnose_docker_daemon_not_available,
-    is_docker_daemon_available)
+    SUPPORTED_PLATFORMS,
+    ErrorCodes,
+    diagnose_docker_daemon_not_available,
+    is_docker_daemon_available,
+    is_supported_platform,
+)
 
 
 @contextmanager
@@ -61,6 +66,18 @@ class DiagnoseDockerDaemonNotAvailable(unittest.TestCase):
         env = {"DOCKER_HOST": "https://foobar"}
         with temporary_env(env):
             self.assertEqual(expected, diagnose_docker_daemon_not_available())
+
+
+class IsTargetPlatformSupported(unittest.TestCase):
+    def test_target_platform_is_supported(self):
+        for platform in SUPPORTED_PLATFORMS:
+            with self.subTest(platform=platform):
+                with patch("sys.platform", platform):
+                    self.assertTrue(is_supported_platform())
+
+    def test_target_platform_is_not_supported(self):
+        with patch("sys.platform", "unsupported-platform"):
+            self.assertFalse(is_supported_platform())
 
 
 if __name__ == "__main__":
