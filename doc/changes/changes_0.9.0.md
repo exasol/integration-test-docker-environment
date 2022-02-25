@@ -1,10 +1,10 @@
-# Integration-Test-Docker-Environment 0.9.0, released t.b.d.
+# Integration-Test-Docker-Environment 0.9.0, released  2022-02-25
 
-Code name: t.b.d.
+Code name: Bumblebee - Update Docker DB to 7.0.16 and 7.1.6 
 
 ## Summary
-
-t.b.d.
+This version improves overall stability and adds support for automated health check(s) of the system.
+Added support for new Docker DB's 7.0.16 and 7.1.6 and also fixed various bugs and a security vulnerability.
 
 ### Supported Exasol Versions
 
