@@ -32,7 +32,13 @@ from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_
     "--environment-name",
     type=str,
     required=True,
-    help="Name of the docker environment. This name gets used as suffix for the container db_container_<name> and test_container_<name>",
+    help=" ".join(
+        (
+            "Name of the docker environment.",
+            "This name gets used as suffix for the container",
+            "db_container_<name> and test_container_<name>",
+        )
+    ),
 )
 @click.option(
     "--database-port-forward",
@@ -53,28 +59,54 @@ from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_
     type=str,
     default="2 GiB",
     show_default=True,
-    help="The main memory used by the database. Format <number> <unit>, e.g. 1 GiB. The minimum size is 1 GB, below that the database will not start.",
+    help=" ".join(
+        (
+            "The main memory used by the database.",
+            "Format <number> <unit>, e.g. 1 GiB.",
+            "The minimum size is 1 GB, below that the database will not start.",
+        )
+    ),
 )
 @click.option(
     "--db-disk-size",
     type=str,
     default="2 GiB",
     show_default=True,
-    help="The disk size available for the database. Format <number> <unit>, e.g. 1 GiB. The minimum size is 100 MiB. However, the setup creates volume files with at least 2 GB larger size, because the database needs at least so much more disk.",
+    help=" ".join(
+        (
+            "The disk size available for the database.",
+            "Format <number> <unit>, e.g. 1 GiB. The minimum size is 100 MiB. However,",
+            "the setup creates volume files with at least 2 GB larger size,",
+            "because the database needs at least so much more disk.",
+        )
+    ),
 )
 @click.option(
     "--nameserver",
     type=str,
     default=[],
     multiple=True,
-    help="Add a nameserver to the list of DNS nameservers which the docker-db should use for resolving domain names. You can repeat this option to add further nameservers.",
+    help=" ".join(
+        (
+            "Add a nameserver to the list of DNS nameservers",
+            "which the docker-db should use for resolving domain names.",
+            "You can repeat this option to add further nameservers.",
+        )
+    ),
 )
 @click.option(
     "--deactivate-database-setup/--no-deactivate-database-setup",
     type=bool,
     default=False,
     show_default=True,
-    help="Deactivates the setup of the spawned database, this means no data get populated and no JDBC drivers get uploaded. This can be used either to save time or as a workaround for MacOSX where the test_container seems not to be able to access the tests directory",
+    help=" ".join(
+        (
+            "Deactivates the setup of the spawned database,",
+            "this means no data get populated and no JDBC drivers get uploaded.",
+            "This can be used either to save time or as a workaround for MacOSX",
+            "where the test_container seems not to be able to access the tests directory",
+        )
+    ),
 )
 @click.option(
     "--docker-runtime",
@@ -89,6 +121,7 @@ from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_
 @add_options([tempory_base_directory_option])
 @add_options(system_options)
 def spawn_test_environment(
+    port_mapping: [int],
     environment_name: str,
     database_port_forward: int,
     bucketfs_port_forward: int,
