@@ -1,16 +1,20 @@
 from typing import List
+
 import click
 import humanfriendly
 
 from exasol_integration_test_docker_environment.cli.cli import cli
-from exasol_integration_test_docker_environment.cli.common import add_options, set_build_config, run_task, \
-    set_docker_repository_config, run_task, generate_root_task
-from exasol_integration_test_docker_environment.cli.options.system_options import system_options, \
-    output_directory_option, tempory_base_directory_option
-from exasol_integration_test_docker_environment.cli.options.test_environment_options import docker_db_options
+from exasol_integration_test_docker_environment.cli.common import (
+    add_options, generate_root_task, run_task, set_build_config,
+    set_docker_repository_config)
+from exasol_integration_test_docker_environment.cli.options.docker_repository_options import \
+    docker_repository_options
+from exasol_integration_test_docker_environment.cli.options.system_options import (
+    output_directory_option, system_options, tempory_base_directory_option)
+from exasol_integration_test_docker_environment.cli.options.test_environment_options import \
+    docker_db_options
 from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_environment_with_docker_db import \
     SpawnTestEnvironmentWithDockerDB
-from exasol_integration_test_docker_environment.cli.options.docker_repository_options import docker_repository_options
 
 
 @cli.command()
