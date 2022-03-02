@@ -3,6 +3,7 @@ from typing import List
 import click
 import humanfriendly
 
+from exasol_integration_test_docker_environment.cli import PortMappingType
 from exasol_integration_test_docker_environment.cli.cli import cli
 from exasol_integration_test_docker_environment.cli.common import (
     add_options,
@@ -34,9 +35,9 @@ from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_
     required=True,
     help=" ".join(
         (
-            "Name of the docker environment.",
-            "This name gets used as suffix for the container",
-            "db_container_<name> and test_container_<name>",
+                "Name of the docker environment.",
+                "This name gets used as suffix for the container",
+                "db_container_<name> and test_container_<name>",
         )
     ),
 )
@@ -55,15 +56,27 @@ from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_
     help="Host port to which the BucketFS port gets forwarded",
 )
 @click.option(
+    "-p",
+    "--port-mapping",
+    type=PortMappingType(),
+    required=False,
+    multiple=True,
+    help=" ".join([
+        "Maps the specified container ports to ports of the host machine.",
+        "The expected format is \"<HOST_PORT>:<CONTAINER_PORT>\".",
+        "This option can be specified multiple times.",
+    ])
+)
+@click.option(
     "--db-mem-size",
     type=str,
     default="2 GiB",
     show_default=True,
     help=" ".join(
         (
-            "The main memory used by the database.",
-            "Format <number> <unit>, e.g. 1 GiB.",
-            "The minimum size is 1 GB, below that the database will not start.",
+                "The main memory used by the database.",
+                "Format <number> <unit>, e.g. 1 GiB.",
+                "The minimum size is 1 GB, below that the database will not start.",
         )
     ),
 )
@@ -74,10 +87,10 @@ from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_
     show_default=True,
     help=" ".join(
         (
-            "The disk size available for the database.",
-            "Format <number> <unit>, e.g. 1 GiB. The minimum size is 100 MiB. However,",
-            "the setup creates volume files with at least 2 GB larger size,",
-            "because the database needs at least so much more disk.",
+                "The disk size available for the database.",
+                "Format <number> <unit>, e.g. 1 GiB. The minimum size is 100 MiB. However,",
+                "the setup creates volume files with at least 2 GB larger size,",
+                "because the database needs at least so much more disk.",
         )
     ),
 )
@@ -88,9 +101,9 @@ from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_
     multiple=True,
     help=" ".join(
         (
-            "Add a nameserver to the list of DNS nameservers",
-            "which the docker-db should use for resolving domain names.",
-            "You can repeat this option to add further nameservers.",
+                "Add a nameserver to the list of DNS nameservers",
+                "which the docker-db should use for resolving domain names.",
+                "You can repeat this option to add further nameservers.",
         )
     ),
 )
@@ -101,10 +114,10 @@ from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_
     show_default=True,
     help=" ".join(
         (
-            "Deactivates the setup of the spawned database,",
-            "this means no data get populated and no JDBC drivers get uploaded.",
-            "This can be used either to save time or as a workaround for MacOSX",
-            "where the test_container seems not to be able to access the tests directory",
+                "Deactivates the setup of the spawned database,",
+                "this means no data get populated and no JDBC drivers get uploaded.",
+                "This can be used either to save time or as a workaround for MacOSX",
+                "where the test_container seems not to be able to access the tests directory",
         )
     ),
 )
@@ -121,30 +134,30 @@ from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_
 @add_options([tempory_base_directory_option])
 @add_options(system_options)
 def spawn_test_environment(
-    port_mapping: [int],
-    environment_name: str,
-    database_port_forward: int,
-    bucketfs_port_forward: int,
-    db_mem_size: str,
-    db_disk_size: str,
-    nameserver: List[str],
-    deactivate_database_setup: bool,
-    docker_runtime: str,
-    docker_db_image_version: str,
-    docker_db_image_name: str,
-    source_docker_repository_name: str,
-    source_docker_tag_prefix: str,
-    source_docker_username: str,
-    source_docker_password: str,
-    target_docker_repository_name: str,
-    target_docker_tag_prefix: str,
-    target_docker_username: str,
-    target_docker_password: str,
-    output_directory: str,
-    temporary_base_directory: str,
-    workers: int,
-    task_dependencies_dot_file: str,
-    create_certificates: bool,
+        environment_name: str,
+        database_port_forward: int,
+        bucketfs_port_forward: int,
+        port_mapping: [PortMappingType()],
+        db_mem_size: str,
+        db_disk_size: str,
+        nameserver: List[str],
+        deactivate_database_setup: bool,
+        docker_runtime: str,
+        docker_db_image_version: str,
+        docker_db_image_name: str,
+        source_docker_repository_name: str,
+        source_docker_tag_prefix: str,
+        source_docker_username: str,
+        source_docker_password: str,
+        target_docker_repository_name: str,
+        target_docker_tag_prefix: str,
+        target_docker_username: str,
+        target_docker_password: str,
+        output_directory: str,
+        temporary_base_directory: str,
+        workers: int,
+        task_dependencies_dot_file: str,
+        create_certificates: bool,
 ):
     """
     This command spawn a test environment with a docker-db container and a connected test-container.
@@ -182,9 +195,10 @@ def spawn_test_environment(
         target_docker_tag_prefix,
         "target",
     )
+    port_mapping.append()
     task_creator = lambda: generate_root_task(
         task_class=SpawnTestEnvironmentWithDockerDB,
-        environment_name=environment_name,
+        environment_name=environment_name,  
         database_port_forward=str(database_port_forward)
         if database_port_forward is not None
         else None,
