@@ -27,7 +27,7 @@ jobs:
       run: bash ./starter_scripts/push_docker_runner_image.sh "ci-release-test"
 
   publish-test-container:
-    needs: publish-main
+    needs: publish
 
     runs-on: ubuntu-latest
     environment: publish
