@@ -52,6 +52,7 @@ function create_env_file() {
   if [ -n "${SOURCE_DOCKER_PASSWORD-}" ]; then
     echo "SOURCE_DOCKER_PASSWORD=$SOURCE_DOCKER_PASSWORD" >> "$tmpfile_env"
   fi
+  chmod -w $tmpfile_env
 }
 
 function create_env_file_debug_protected() {
@@ -70,11 +71,12 @@ function create_env_file_debug_protected() {
 }
 
 old_umask=$(umask)
-umask 277
+umask 077
 tmpfile_env=$(mktemp)
 trap 'rm -f -- "$tmpfile_env"' INT TERM HUP EXIT
+umask "$old_umask"
 
 create_env_file_debug_protected "$tmpfile_env"
 docker run --network host --env-file "$tmpfile_env" --rm $terminal_parameter -v "$PWD:$PWD" -v "$DOCKER_SOCKET_MOUNT" -w "$PWD" "$RUNNER_IMAGE_NAME" bash -c "$RUN_COMMAND"
 
-umask "$old_umask"
+
