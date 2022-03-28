@@ -52,7 +52,7 @@ function create_env_file() {
   if [ -n "${SOURCE_DOCKER_PASSWORD-}" ]; then
     echo "SOURCE_DOCKER_PASSWORD=$SOURCE_DOCKER_PASSWORD" >> "$tmpfile_env"
   fi
-  chmod -w $tmpfile_env
+  chmod -w "$tmpfile_env"
 }
 
 function create_env_file_debug_protected() {
