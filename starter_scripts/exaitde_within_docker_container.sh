@@ -66,7 +66,6 @@ CONTAINER_DOCKER_SOCKER_PATH="/var/run/docker.sock"
 DOCKER_SOCKET_MOUNT="$HOST_DOCKER_SOCKER_PATH:$CONTAINER_DOCKER_SOCKER_PATH"
 
 function create_env_file() {
-  echo DEBUG END
   touch "$tmpfile_env"
   if [ -n "${TARGET_DOCKER_PASSWORD-}" ]; then
     echo "TARGET_DOCKER_PASSWORD=$TARGET_DOCKER_PASSWORD" >> "$tmpfile_env"
