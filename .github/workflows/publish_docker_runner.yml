@@ -31,6 +31,7 @@ jobs:
 
     runs-on: ubuntu-latest
     environment: publish
+    steps:
       - uses: actions/checkout@v2
       - name: Build TestContainer
         run: ./start-test-env build-test-container --force-rebuild
