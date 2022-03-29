@@ -38,6 +38,7 @@ jobs:
         - 7.0.0
         - "default"
     runs-on: ubuntu-latest
+    name: Run minimum tests for Exasol ${{ matrix.exasol_version }}
     steps:
     - uses: actions/checkout@v2
 
