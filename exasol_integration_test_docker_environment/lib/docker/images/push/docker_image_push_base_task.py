@@ -31,6 +31,8 @@ class DockerPushImageBaseTask(DockerBaseTask):
                 "password": target_docker_repository_config().password
             }
             with self._get_docker_client() as docker_client:
+                self.logger.info(f"Push images to repo={image_info.get_target_complete_name()}, "
+                                 f"tag={image_info.get_target_complete_tag()}")
                 generator = docker_client.images.push(repository=image_info.get_target_complete_name(),
                                                tag=image_info.get_target_complete_tag(),
                                                auth_config=auth_config,
