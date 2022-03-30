@@ -23,7 +23,7 @@ If you need further versions, please open an issue.
 
 ## Features / Enhancements:
 
-n/a
+ - #198: Added support for Docker db 7.1.7, 7.1.8 and 7.0.17 
 
 ## Refactoring:
 
