@@ -7,8 +7,8 @@ t.b.d.
 
 ### Supported Exasol Versions
 
-* **7.0**: up to 7.0.16, **except 7.0.5**
-* **7.1**: up to 7.1.6
+* **7.0**: up to 7.0.17, **except 7.0.5**
+* **7.1**: up to 7.1.8
 
 If you need further versions, please open an issue.
 

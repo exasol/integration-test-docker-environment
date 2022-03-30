@@ -8,35 +8,22 @@ on:
 
 
 jobs:
+  get_exasol_versions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - id: set-matrix
+        run: |
+          sudo apt-get install jq
+          echo "::set-output name=matrix::$(bash ./scripts/test/get_exasol_versions.sh)"
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+
   test-db-versions-minimal:
     strategy:
       fail-fast: false
       matrix:
-        exasol_version:
-        - 7.1.6
-        - 7.1.5
-        - 7.1.4
-        - 7.1.3
-        - 7.1.2
-        - 7.1.1
-        - 7.1.0-d1
-        - 7.0.16
-        - 7.0.15
-        - 7.0.14
-        - 7.0.13
-        - 7.0.12
-        - 7.0.11
-        - 7.0.10
-        - 7.0.9
-        - 7.0.8
-        - 7.0.7
-        - 7.0.6
-        - 7.0.4
-        - 7.0.3
-        - 7.0.2
-        - 7.0.1
-        - 7.0.0
-        - "default"
+        exasol_version: ${{fromJson(needs.get_exasol_versions.outputs.matrix)}}
     runs-on: ubuntu-latest
     name: Run minimum tests for Exasol ${{ matrix.exasol_version }}
     steps:
