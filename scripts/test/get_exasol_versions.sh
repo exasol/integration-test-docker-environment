@@ -12,3 +12,4 @@ DOCKER_DBS+=($'\ndefault\n')
 DOCKER_DBS+=($'7.1.0-d1\n')
 
 printf '%s' "${DOCKER_DBS[@]}" | jq -R . | jq -cs .
+

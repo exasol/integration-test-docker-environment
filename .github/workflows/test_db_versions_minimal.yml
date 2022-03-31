@@ -12,9 +12,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Install jq
+        run: sudo apt-get install jq
+      - name: Print matrix
+        run: bash ./scripts/test/get_exasol_versions.sh
       - id: set-matrix
         run: |
-          sudo apt-get install jq
           echo "::set-output name=matrix::$(bash ./scripts/test/get_exasol_versions.sh)"
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
