@@ -12,7 +12,11 @@ from networkx import DiGraph
 
 from exasol_integration_test_docker_environment.lib import extract_modulename_for_build_steps
 from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import DependencyLoggerBaseTask
+from exasol_integration_test_docker_environment.lib.base.dynamic_symlink import DynamicSymlink
+from exasol_integration_test_docker_environment.lib.base.luigi_log_config import get_luigi_log_config
 from exasol_integration_test_docker_environment.lib.base.task_dependency import TaskDependency, DependencyState
+
+LOG_FILE_NAME = "main.log"
 
 
 def set_build_config(force_rebuild: bool,
@@ -85,16 +89,19 @@ def generate_root_task(task_class, *args, **kwargs):
     return task_class(**params)
 
 
-def run_task(task_creator: Callable[[], DependencyLoggerBaseTask],
-             workers: int,
-             task_dependencies_dot_file: str) \
+def run_task(task_creator: Callable[[], DependencyLoggerBaseTask], workers: int, task_dependencies_dot_file: str,
+             log_symlink: DynamicSymlink = DynamicSymlink("log_link")) \
         -> Tuple[bool, DependencyLoggerBaseTask]:
     setup_worker()
     start_time = datetime.now()
     task = task_creator()
     success = False
     try:
-        no_scheduling_errors = luigi.build([task], workers=workers, local_scheduler=True, log_level="INFO")
+        log_path = task.get_log_path() / f"{LOG_FILE_NAME}.log"
+        with get_luigi_log_config(log_symlink, log_path) as luigi_log_path:
+            no_scheduling_errors = luigi.build([task], workers=workers,
+                                               local_scheduler=True, log_level="INFO",
+                                               logging_conf_file=luigi_log_path)
         success = not task.failed_target.exists() and no_scheduling_errors
         if success:
             handle_success(task, task_dependencies_dot_file, start_time)

@@ -3,6 +3,7 @@ import luigi
 import pkg_resources
 from jinja2 import Template
 
+from exasol_integration_test_docker_environment.lib import PACKAGE_NAME
 from exasol_integration_test_docker_environment.lib.base.docker_base_task import DockerBaseTask
 from exasol_integration_test_docker_environment.lib.data.docker_volume_info import DockerVolumeInfo
 from exasol_integration_test_docker_environment.lib.test_environment.analyze_test_container import \
@@ -87,7 +88,7 @@ class CreateSSLCertificatesTask(DockerBaseTask):
     def create_certificate(self) -> None:
         script_name = "create_certificates.sh"
         template_str = pkg_resources.resource_string(
-            "exasol_integration_test_docker_environment",
+            PACKAGE_NAME,
             f"test_container_config/{script_name}")  # type: bytes
         template = Template(template_str.decode("utf-8"))
         rendered_template = template.render(HOST_NAME=self._construct_complete_host_name,
