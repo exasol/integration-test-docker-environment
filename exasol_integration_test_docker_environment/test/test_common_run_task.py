@@ -2,13 +2,14 @@ import os
 import tempfile
 import unittest
 from pathlib import Path
-from click.testing import CliRunner
 
 import luigi
 
-from exasol_integration_test_docker_environment.cli.commands.build_test_container import build_test_container
 from exasol_integration_test_docker_environment.cli.common import generate_root_task, run_task
 from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import DependencyLoggerBaseTask
+from multiprocessing import Process
+
+from exasol_integration_test_docker_environment.lib.base.luigi_log_config import LOG_ENV_VARIABLE_NAME
 
 
 class TestTask(DependencyLoggerBaseTask):
@@ -18,44 +19,83 @@ class TestTask(DependencyLoggerBaseTask):
         self.logger.info(f"Logging: {self.x}")
 
 
-class CommonRunTaskTest(unittest.TestCase):
-    pass
-    # def test_same_logging_file(self):
-    #     """
-    #     Integration test which verifies that re-using the same logging for multiple tasks works as expected.
-    #     """
-    #     NUMBER_TASK = 5
-    #     task_id_generator = (x for x in range(NUMBER_TASK))
-    #
-    #     def task_creator():
-    #         task = generate_root_task(task_class=TestTask, x=f"{next(task_id_generator)}")
-    #         return task
-    #
-    #     old_cwd = os.getcwd()
-    #     with tempfile.TemporaryDirectory() as temp_dir:
-    #
-    #         os.chdir(temp_dir)
-    #         for i in range(NUMBER_TASK):
-    #             success, task = run_task(task_creator, workers=5, task_dependencies_dot_file=None)
-    #             self.assertTrue(success)
-    #
-    #         log_path = Path(temp_dir) / ".build_output" / "jobs" / "logs" / "main.log"
-    #         print(log_path)
-    #         assert log_path.exists()
-    #
-    #         with open(log_path, "r") as f:
-    #             log_content = f.read()
-    #             for i in range(NUMBER_TASK):
-    #                 self.assertIn(f"Logging: {i}",  log_content)
+def run_simple_tasks(log_path: Path) -> None:
+    NUMBER_TASK = 5
+    task_id_generator = (x for x in range(NUMBER_TASK))
 
-    # def test_different_output_directory_raises_exception(self):
-    #
-    #     with tempfile.TemporaryDirectory() as temp_dir:
-    #         cli_runner = CliRunner()
-    #         result = cli_runner.invoke(build_test_container, f"--output-directory {temp_dir}/output_1")
-    #         assert result.exit_code == 0
-    #         cli_runner.invoke(build_test_container, f"--output-directory {temp_dir}/output_2")
-    #         assert result.exit_code == 0
+    def task_creator():
+        task = generate_root_task(task_class=TestTask, x=f"{next(task_id_generator)}")
+        return task
+
+    for i in range(NUMBER_TASK):
+        success, task = run_task(task_creator, workers=5, task_dependencies_dot_file=None)
+        assert success
+
+    print(log_path)
+    assert log_path.exists()
+    with open(log_path, "r") as f:
+        log_content = f.read()
+        for i in range(NUMBER_TASK):
+            assert f"Logging: {i}" in log_content
+
+
+def run_test_same_logging_file() -> None:
+    """
+    Integration test which verifies that re-using the same logging for multiple tasks works as expected,
+    using the default log path
+    """
+    with tempfile.TemporaryDirectory() as temp_dir:
+        os.chdir(temp_dir)
+        log_path = Path(temp_dir) / ".build_output" / "jobs" / "logs" / "main.log"
+        run_simple_tasks(log_path=log_path)
+
+
+def run_test_same_logging_file_env_log_path() -> None:
+    """
+    Integration test which verifies that re-using the same logging for multiple tasks works as expected,
+    using a custom log path
+    """
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        log_path = Path(temp_dir) / "main.log"
+        os.environ[LOG_ENV_VARIABLE_NAME] = str(log_path)
+        run_simple_tasks(log_path=log_path)
+
+
+def run_test_different_logging_file_raises_error() -> None:
+    """
+    Integration test which verifies that changing the log path from one invocation of run_task to the next will raise
+    an error.
+    """
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        task_creator = lambda: generate_root_task(task_class=TestTask, x="Test")
+
+        success, task = run_task(task_creator, workers=5, task_dependencies_dot_file=None)
+        assert success
+        log_path = Path(temp_dir) / "main.log"
+        os.environ[LOG_ENV_VARIABLE_NAME] = str(log_path)
+        success, task = run_task(task_creator, workers=5, task_dependencies_dot_file=None)
+        assert success is False
+
+
+class CommonRunTaskTest(unittest.TestCase):
+
+    def _execute_in_new_process(self, target, args):
+        p = Process(target=target, args=args)
+        p.start()
+        p.join()
+        if p.exitcode != 0:
+            self.fail(f"target: {target} did not run successful.")
+
+    def test_same_logging_file(self):
+        self._execute_in_new_process(target=run_test_same_logging_file, args=())
+
+    def test_same_logging_file_custom_log_location(self):
+        self._execute_in_new_process(target=run_test_same_logging_file_env_log_path, args=())
+
+    def test_different_logging_file_raises_error(self):
+        self._execute_in_new_process(target=run_test_different_logging_file_raises_error, args=())
 
 
 if __name__ == '__main__':
