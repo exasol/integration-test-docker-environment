@@ -17,9 +17,13 @@ class DynamicSymlinkTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
             test_target = temp_path / "test"
+            with test_target.open("w"):
+                pass
+
             dynamic_symlink = DynamicSymlink("test_link")
             with dynamic_symlink.point_to(test_target) as dynamic_symlink_ctx:
                 location = dynamic_symlink_ctx.get_symlink_path()
+                self.assertTrue(location.exists())
                 self.assertTrue(location.parent.exists())
             self.assertTrue(location.parent.exists())
             dynamic_symlink = None

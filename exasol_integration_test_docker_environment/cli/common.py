@@ -4,13 +4,14 @@ import os
 import traceback
 from datetime import datetime
 from pathlib import Path
-from typing import Callable, Tuple, Set
+from typing import Callable, Tuple, Set, Optional
 
 import luigi
 import networkx
 from networkx import DiGraph
 
 from exasol_integration_test_docker_environment.lib import extract_modulename_for_build_steps
+from exasol_integration_test_docker_environment.lib.base.base_task import BaseTask
 from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import DependencyLoggerBaseTask
 from exasol_integration_test_docker_environment.lib.base.dynamic_symlink import DynamicSymlink
 from exasol_integration_test_docker_environment.lib.base.luigi_log_config import get_luigi_log_config
@@ -82,26 +83,35 @@ def import_build_steps(flavor_path: Tuple[str, ...]):
         spec.loader.exec_module(module)
 
 
-def generate_root_task(task_class, *args, **kwargs):
+def generate_root_task(task_class, *args, **kwargs) -> DependencyLoggerBaseTask:
     strftime = datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
     params = {"job_id": f"{strftime}_{task_class.__name__}"}
     params.update(kwargs)
     return task_class(**params)
 
 
-def run_task(task_creator: Callable[[], DependencyLoggerBaseTask], workers: int, task_dependencies_dot_file: str,
-             log_symlink: DynamicSymlink = DynamicSymlink("log_link")) \
+def run_task(task_creator: Callable[[], DependencyLoggerBaseTask], workers: int,
+             task_dependencies_dot_file: Optional[str], log_symlink: DynamicSymlink = DynamicSymlink("log_link")) \
         -> Tuple[bool, DependencyLoggerBaseTask]:
     setup_worker()
     start_time = datetime.now()
     task = task_creator()
     success = False
     try:
-        log_path = task.get_log_path() / f"{LOG_FILE_NAME}.log"
-        with get_luigi_log_config(log_symlink, log_path) as luigi_log_path:
-            no_scheduling_errors = luigi.build([task], workers=workers,
-                                               local_scheduler=True, log_level="INFO",
-                                               logging_conf_file=luigi_log_path)
+        log_path = Path(task.get_log_file()).absolute()
+        with log_path.open("w") as f:
+            pass
+        with log_symlink.point_to(log_path.absolute()) as log_symlink_ctx:
+            location = log_symlink_ctx.get_symlink_path().absolute()
+            assert location.is_symlink()
+            assert location.exists()
+            with get_luigi_log_config(location, log_path.absolute()) as luigi_config:
+                assert luigi_config.exists()
+                assert location.is_symlink()
+                assert location.exists()
+                no_scheduling_errors = luigi.build([task], workers=workers,
+                                                   local_scheduler=True, log_level="INFO",
+                                                   logging_conf_file=str(luigi_config))
         success = not task.failed_target.exists() and no_scheduling_errors
         if success:
             handle_success(task, task_dependencies_dot_file, start_time)
@@ -117,7 +127,7 @@ def run_task(task_creator: Callable[[], DependencyLoggerBaseTask], workers: int,
         task.cleanup(success)
 
 
-def handle_failure(task: DependencyLoggerBaseTask, task_dependencies_dot_file: str, start_time: datetime):
+def handle_failure(task: DependencyLoggerBaseTask, task_dependencies_dot_file: Optional[str], start_time: datetime):
     generate_graph_from_task_dependencies(task, task_dependencies_dot_file)
     timedelta = datetime.now() - start_time
     print("The command failed after %s s with:" % timedelta.total_seconds())
@@ -130,13 +140,13 @@ def print_task_failures(task: DependencyLoggerBaseTask):
         print(failure)
     print()
 
-def handle_success(task: DependencyLoggerBaseTask, task_dependencies_dot_file: str, start_time: datetime):
+def handle_success(task: DependencyLoggerBaseTask, task_dependencies_dot_file: Optional[str], start_time: datetime):
     generate_graph_from_task_dependencies(task, task_dependencies_dot_file)
     timedelta = datetime.now() - start_time
     print("The command took %s s" % timedelta.total_seconds())
 
 
-def generate_graph_from_task_dependencies(task: DependencyLoggerBaseTask, task_dependencies_dot_file: str):
+def generate_graph_from_task_dependencies(task: DependencyLoggerBaseTask, task_dependencies_dot_file: Optional[str]):
     if task_dependencies_dot_file is not None:
         print(f"Generate Task Dependency Graph to {task_dependencies_dot_file}")
         print()
