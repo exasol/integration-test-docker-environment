@@ -54,6 +54,7 @@ package_data = \
                                                 'docker_db_config/7.1.7/*',
                                                 'docker_db_config/7.1.8/*',
                                                 'docker_db_config/7.1.9/*',
+                                                'templates/*',
                                                 'test_container_config/*']}
 
 install_requires = \

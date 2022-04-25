@@ -170,6 +170,11 @@ class BaseTask(Task):
         path.mkdir(parents=True, exist_ok=True)
         return path
 
+    def get_main_log_path(self) -> Path:
+        path = Path(build_config().output_directory) / "jobs" / "logs"
+        path.mkdir(parents=True, exist_ok=True)
+        return path
+
     def get_cache_path(self) -> Path:
         path = Path(build_config().output_directory, "cache")
         path.mkdir(parents=True, exist_ok=True)
@@ -359,3 +364,7 @@ class BaseTask(Task):
 
     def cleanup_task(self, success: bool):
         pass
+
+    def get_main_log_file(self):
+        LOG_FILE_NAME = "main.log"
+        return self.get_main_log_path() / LOG_FILE_NAME

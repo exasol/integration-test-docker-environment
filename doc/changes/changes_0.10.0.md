@@ -25,6 +25,7 @@ If you need further versions, please open an issue.
 
  - #198: Added support for Docker db 7.1.7, 7.1.8 and 7.0.17 
  - #201: Added support for Docker db 7.1.9 and 7.0.18
+ - #207: Added support of file logging for Luigi tasks
 
 ## Refactoring:
 
