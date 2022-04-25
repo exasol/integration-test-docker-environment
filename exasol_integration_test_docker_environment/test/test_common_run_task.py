@@ -80,6 +80,10 @@ def run_test_different_logging_file_raises_error() -> None:
 
 
 class CommonRunTaskTest(unittest.TestCase):
+    """
+    All tests are executed in another process as we test the logging behavior which can be configured
+    only once for a process!
+    """
 
     def _execute_in_new_process(self, target, args):
         p = Process(target=target, args=args)
