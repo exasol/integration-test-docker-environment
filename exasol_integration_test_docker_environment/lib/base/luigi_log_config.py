@@ -48,7 +48,7 @@ def get_luigi_log_config(log_file_target: Path, console_log_level: int = logging
     validate_log_file(log_file_target)
     env = jinja2.Environment(loader=jinja2.PackageLoader(PACKAGE_NAME),
                              autoescape=jinja2.select_autoescape())
-    template = env.get_template("templates/luigi_log.conf")
+    template = env.get_template("luigi_log.conf")
     rendered_template = template.render(console_log_level=logging.getLevelName(console_log_level),
                                         log_file_target=str(log_file_target))
     with tempfile.TemporaryDirectory() as temp_dir:
