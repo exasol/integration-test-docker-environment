@@ -14,7 +14,6 @@ from exasol_integration_test_docker_environment.lib import extract_modulename_fo
 from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import DependencyLoggerBaseTask
 from exasol_integration_test_docker_environment.lib.base.luigi_log_config import get_luigi_log_config
 from exasol_integration_test_docker_environment.lib.base.task_dependency import TaskDependency, DependencyState
-from exasol_integration_test_docker_environment.lib.config.build_config import build_config
 
 
 def set_build_config(force_rebuild: bool,
@@ -36,11 +35,9 @@ def set_build_config(force_rebuild: bool,
     if build_name is not None:
         luigi.configuration.get_config().set('build_config', 'build_name', build_name)
     luigi.configuration.get_config().set('build_config', 'log_build_context_content', str(log_build_context_content))
-    build_config.configuration_finished()
 
 
 def set_output_directory(output_directory):
-    build_config().validate_new_parameters(output_directory)
     if output_directory is not None:
         luigi.configuration.get_config().set('build_config', 'output_directory', output_directory)
 
