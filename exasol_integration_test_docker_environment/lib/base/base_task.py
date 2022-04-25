@@ -365,5 +365,3 @@ class BaseTask(Task):
     def cleanup_task(self, success: bool):
         pass
 
-    def get_main_log_file(self) -> Path:
-        return self.get_main_log_path() / "main.log"

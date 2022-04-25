@@ -86,6 +86,16 @@ def generate_root_task(task_class, *args, **kwargs) -> DependencyLoggerBaseTask:
     return task_class(**params)
 
 
+def get_log_path(task: DependencyLoggerBaseTask):
+    def_log_path = Path(task.get_main_log_path()) / "main.log"
+    env_log_path = os.getenv("EXA_BUILD_LOG")
+    if env_log_path is not None:
+        log_path = env_log_path
+    else:
+        log_path = def_log_path
+    return log_path
+
+
 def run_task(task_creator: Callable[[], DependencyLoggerBaseTask], workers: int,
              task_dependencies_dot_file: Optional[str]) \
         -> Tuple[bool, DependencyLoggerBaseTask]:
@@ -94,8 +104,7 @@ def run_task(task_creator: Callable[[], DependencyLoggerBaseTask], workers: int,
     task = task_creator()
     success = False
     try:
-        log_path = Path(task.get_main_log_file()).absolute()
-        with get_luigi_log_config(log_path) as luigi_config:
+        with get_luigi_log_config(get_log_path(task)) as luigi_config:
             no_scheduling_errors = luigi.build([task], workers=workers,
                                                local_scheduler=True, log_level="INFO",
                                                logging_conf_file=str(luigi_config))
