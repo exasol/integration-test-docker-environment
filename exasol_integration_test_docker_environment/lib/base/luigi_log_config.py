@@ -7,17 +7,20 @@ from typing import Optional
 import jinja2
 import logging
 from exasol_integration_test_docker_environment.lib import PACKAGE_NAME
+from exasol_integration_test_docker_environment.lib.config.build_config import build_config
 
 global_log_file: Optional[Path] = None
 
 LOG_ENV_VARIABLE_NAME = "EXA_BUILD_LOG"
 
 
-def get_log_path(main_log_path: Path) -> Path:
+def get_log_path() -> Path:
     """
-    Retrieve the log-file path. Default path is indicated by parameter main_log_path, but can be overwritten by
+    Retrieve the log-file path. Default path is $output_path/jobs/logs/main.log, but can be overwritten by
     the environment variable LOG_ENV_VARIABLE_NAME.
     """
+    main_log_path = Path(build_config().output_directory) / "jobs" / "logs"
+    main_log_path.mkdir(parents=True, exist_ok=True)
     def_log_path = main_log_path / "main.log"
     env_log_path = os.getenv(LOG_ENV_VARIABLE_NAME)
     if env_log_path is not None:
