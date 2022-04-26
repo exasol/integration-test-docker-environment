@@ -97,7 +97,7 @@ def run_task(task_creator: Callable[[], DependencyLoggerBaseTask], workers: int,
         with get_luigi_log_config(get_log_path()) as luigi_config:
             no_scheduling_errors = luigi.build([task], workers=workers,
                                                local_scheduler=True,
-                                               logging_conf_file=str(luigi_config))
+                                               logging_conf_file=f'{luigi_config}')
         success = not task.failed_target.exists() and no_scheduling_errors
         if success:
             handle_success(task, task_dependencies_dot_file, start_time)

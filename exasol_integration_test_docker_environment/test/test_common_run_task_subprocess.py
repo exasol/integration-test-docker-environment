@@ -30,7 +30,7 @@ def run_simple_tasks(log_path: Path) -> None:
         success, task = run_task(task_creator, workers=5, task_dependencies_dot_file=None)
         assert success
 
-    print(log_path)
+    print(log_path, file=sys.stderr)
     assert log_path.exists()
     with open(log_path, "r") as f:
         log_content = f.read()
@@ -80,11 +80,14 @@ def run_test_different_logging_file_raises_error() -> None:
 
 if __name__ == '__main__':
     test_type = sys.argv[1]
-    if test_type == "run_test_different_logging_file_raises_error":
-        run_test_different_logging_file_raises_error()
-    elif test_type == "run_test_same_logging_file_env_log_path":
-        run_test_same_logging_file_env_log_path()
-    elif test_type == "run_test_same_logging_file":
-        run_test_same_logging_file()
-    else:
-        raise ValueError("Unknow Test argument")
+
+    dispatcher = {
+        "run_test_different_logging_file_raises_error": run_test_different_logging_file_raises_error,
+        "run_test_same_logging_file_env_log_path": run_test_same_logging_file_env_log_path,
+        "run_test_same_logging_file": run_test_same_logging_file,
+    }
+    try:
+        dispatcher[test_type]()
+    except KeyError as e:
+        raise ValueError("Unknow Test argument") from e
+
