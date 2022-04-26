@@ -4,7 +4,12 @@ import os
 import traceback
 from datetime import datetime
 from pathlib import Path
-from typing import Callable, Tuple, Set, Optional
+from typing import (
+    Callable,
+    Tuple,
+    Set,
+    Optional
+)
 
 import luigi
 import networkx

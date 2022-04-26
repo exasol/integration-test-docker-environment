@@ -22,15 +22,13 @@ def run_simple_tasks(log_path: Path) -> None:
     NUMBER_TASK = 5
     task_id_generator = (x for x in range(NUMBER_TASK))
 
-    def task_creator():
-        task = generate_root_task(task_class=TestTask, x=f"{next(task_id_generator)}")
-        return task
+    def create_task():
+        return generate_root_task(task_class=TestTask, x=f"{next(task_id_generator)}")
 
     for i in range(NUMBER_TASK):
-        success, task = run_task(task_creator, workers=5, task_dependencies_dot_file=None)
+        success, task = run_task(create_task, workers=5, task_dependencies_dot_file=None)
         assert success
 
-    print(log_path, file=sys.stderr)
     assert log_path.exists()
     with open(log_path, "r") as f:
         log_content = f.read()

@@ -10,6 +10,9 @@ from exasol_integration_test_docker_environment.lib import PACKAGE_NAME
 from exasol_integration_test_docker_environment.lib.config.build_config import build_config
 
 global_log_file: Optional[Path] = None
+"""
+Global variable used to save log path. Should only be used within method validate_log_file(). 
+"""
 
 LOG_ENV_VARIABLE_NAME = "EXA_BUILD_LOG"
 
