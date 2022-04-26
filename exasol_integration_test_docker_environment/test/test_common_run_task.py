@@ -1,105 +1,30 @@
-import os
-import tempfile
+import subprocess
 import unittest
 from pathlib import Path
-
-import luigi
-
-from exasol_integration_test_docker_environment.cli.common import generate_root_task, run_task
-from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import DependencyLoggerBaseTask
-from multiprocessing import Process
-
-from exasol_integration_test_docker_environment.lib.base.luigi_log_config import LOG_ENV_VARIABLE_NAME
-
-
-class TestTask(DependencyLoggerBaseTask):
-    x = luigi.Parameter()
-
-    def run(self):
-        self.logger.info(f"Logging: {self.x}")
-
-
-def run_simple_tasks(log_path: Path) -> None:
-    NUMBER_TASK = 5
-    task_id_generator = (x for x in range(NUMBER_TASK))
-
-    def task_creator():
-        task = generate_root_task(task_class=TestTask, x=f"{next(task_id_generator)}")
-        return task
-
-    for i in range(NUMBER_TASK):
-        success, task = run_task(task_creator, workers=5, task_dependencies_dot_file=None)
-        assert success
-
-    print(log_path)
-    assert log_path.exists()
-    with open(log_path, "r") as f:
-        log_content = f.read()
-        for i in range(NUMBER_TASK):
-            assert f"Logging: {i}" in log_content
-
-
-def run_test_same_logging_file() -> None:
-    """
-    Integration test which verifies that re-using the same logging for multiple tasks works as expected,
-    using the default log path
-    """
-    with tempfile.TemporaryDirectory() as temp_dir:
-        os.chdir(temp_dir)
-        log_path = Path(temp_dir) / ".build_output" / "jobs" / "logs" / "main.log"
-        run_simple_tasks(log_path=log_path)
-
-
-def run_test_same_logging_file_env_log_path() -> None:
-    """
-    Integration test which verifies that re-using the same logging for multiple tasks works as expected,
-    using a custom log path
-    """
-
-    with tempfile.TemporaryDirectory() as temp_dir:
-        log_path = Path(temp_dir) / "main.log"
-        os.environ[LOG_ENV_VARIABLE_NAME] = str(log_path)
-        run_simple_tasks(log_path=log_path)
-
-
-def run_test_different_logging_file_raises_error() -> None:
-    """
-    Integration test which verifies that changing the log path from one invocation of run_task to the next will raise
-    an error.
-    """
-
-    with tempfile.TemporaryDirectory() as temp_dir:
-        task_creator = lambda: generate_root_task(task_class=TestTask, x="Test")
-
-        success, task = run_task(task_creator, workers=5, task_dependencies_dot_file=None)
-        assert success
-        log_path = Path(temp_dir) / "main.log"
-        os.environ[LOG_ENV_VARIABLE_NAME] = str(log_path)
-        success, task = run_task(task_creator, workers=5, task_dependencies_dot_file=None)
-        assert success is False
 
 
 class CommonRunTaskTest(unittest.TestCase):
     """
     All tests are executed in another process as we test the logging behavior which can be configured
     only once for a process!
+    Note that multiprocessing.Process() does not work as it forks the current process, and thus inherits the
+    logging configuration. Hence we need to start a new process with subprocess.
     """
 
-    def _execute_in_new_process(self, target, args):
-        p = Process(target=target, args=args)
-        p.start()
-        p.join()
-        if p.exitcode != 0:
-            self.fail(f"target: {target} did not run successful.")
+    def _execute_in_new_process(self, target):
+        path = Path(__file__)
+        args = ("python", f"{path.parent.absolute()}/test_common_run_task_subprocess.py", target)
+        p = subprocess.run(args)
+        p.check_returncode()
 
     def test_same_logging_file(self):
-        self._execute_in_new_process(target=run_test_same_logging_file, args=())
+        self._execute_in_new_process(target="run_test_same_logging_file")
 
     def test_same_logging_file_custom_log_location(self):
-        self._execute_in_new_process(target=run_test_same_logging_file_env_log_path, args=())
+        self._execute_in_new_process(target="run_test_same_logging_file_env_log_path")
 
     def test_different_logging_file_raises_error(self):
-        self._execute_in_new_process(target=run_test_different_logging_file_raises_error, args=())
+        self._execute_in_new_process(target="run_test_different_logging_file_raises_error")
 
 
 if __name__ == '__main__':
