@@ -1,9 +1,10 @@
-# Integration-Test-Docker-Environment 0.10.0, released  t.b.d.
+# Integration-Test-Docker-Environment 0.10.0, released  2022-04-27
 
-Code name: t.b.d.
+Code name: File logging
 
 ## Summary
-t.b.d.
+
+This release adds support for file logging on execution of luigi tasks. Also, it contains one bugfix which solves the upload of the test container to dockerhub, and added support for new docker-db's.
 
 ### Supported Exasol Versions
 
@@ -33,7 +34,7 @@ n/a
 
 ## Documentation:
 
-n/a
+ - #209: Prepared release 0.10.0
 
 ## Security:
 
