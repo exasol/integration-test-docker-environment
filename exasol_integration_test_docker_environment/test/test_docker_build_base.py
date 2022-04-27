@@ -2,7 +2,6 @@ import shutil
 import unittest
 from pathlib import Path
 
-import docker
 import luigi
 from luigi import Parameter
 

@@ -7,6 +7,7 @@ import pkg_resources
 from docker.models.containers import Container
 from docker.transport import unixconn
 
+from exasol_integration_test_docker_environment.lib import PACKAGE_NAME
 from exasol_integration_test_docker_environment.lib.base.docker_base_task import DockerBaseTask
 from exasol_integration_test_docker_environment.lib.base.json_pickle_parameter import JsonPickleParameter
 from exasol_integration_test_docker_environment.lib.data.container_info import ContainerInfo
@@ -187,7 +188,7 @@ class SpawnTestContainer(DockerBaseTask):
         if self.certificate_volume_name is not None:
             script_name = "install_root_certificate.sh"
             script_str = pkg_resources.resource_string(
-                "exasol_integration_test_docker_environment",
+                PACKAGE_NAME,
                 f"test_container_config/{script_name}")  # type: bytes
 
             script_location_in_container = f"scripts/{script_name}"

@@ -10,6 +10,7 @@ from docker.models.containers import Container
 from docker.models.volumes import Volume
 from jinja2 import Template
 
+from exasol_integration_test_docker_environment.lib import PACKAGE_NAME
 from exasol_integration_test_docker_environment.lib.base.docker_base_task import DockerBaseTask
 from exasol_integration_test_docker_environment.lib.base.json_pickle_parameter import JsonPickleParameter
 from exasol_integration_test_docker_environment.lib.base.still_running_logger import StillRunningLogger
@@ -220,7 +221,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                               db_private_network: str):
         copy = DockerContainerCopy(volume_preperation_container)
         init_db_script_str = pkg_resources.resource_string(
-            "exasol_integration_test_docker_environment",
+            PACKAGE_NAME,
             f"{self.docker_db_config_resource_name}/init_db.sh") # type: bytes
 
         copy.add_string_to_file("init_db.sh", init_db_script_str.decode("utf-8"))
@@ -232,7 +233,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         certificate_dir = CERTIFICATES_MOUNT_DIR if self.certificate_volume_name is not None \
                             else CERTIFICATES_DEFAULT_DIR
         template_str = pkg_resources.resource_string(
-            "exasol_integration_test_docker_environment",
+            PACKAGE_NAME,
             f"{self.docker_db_config_resource_name}/EXAConf") # type: bytes
         template = Template(template_str.decode("utf-8"))
         rendered_template = template.render(private_network=db_private_network,
