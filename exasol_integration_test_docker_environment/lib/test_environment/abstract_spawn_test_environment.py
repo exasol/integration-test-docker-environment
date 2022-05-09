@@ -15,8 +15,6 @@ from exasol_integration_test_docker_environment.lib.data.environment_info import
 from exasol_integration_test_docker_environment.lib.test_environment.database_setup.populate_data import \
     PopulateEngineSmallTestDataToDatabase
 from exasol_integration_test_docker_environment.lib.test_environment.database_setup.upload_exa_jdbc import UploadExaJDBC
-from exasol_integration_test_docker_environment.lib.test_environment.database_setup.upload_virtual_schema_jdbc_adapter import \
-    UploadVirtualSchemaJDBCAdapter
 from exasol_integration_test_docker_environment.lib.test_environment.docker_container_copy import DockerContainerCopy
 from exasol_integration_test_docker_environment.lib.test_environment.parameter.general_spawn_test_environment_parameter import \
     GeneralSpawnTestEnvironmentParameter
@@ -212,10 +210,6 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
             upload_tasks = [
                 self.create_child_task_with_common_params(
                     UploadExaJDBC,
-                    test_environment_info=test_environment_info,
-                    reuse_uploaded=self.reuse_database_setup),
-                self.create_child_task_with_common_params(
-                    UploadVirtualSchemaJDBCAdapter,
                     test_environment_info=test_environment_info,
                     reuse_uploaded=self.reuse_database_setup),
                 self.create_child_task_with_common_params(
