@@ -57,7 +57,7 @@ check_poetry() {
 check_python_version() {
   echo -n "Python available? "
   if [ -z "$PYTHON_BIN" ]; then
-    ACCEPTABLE_PYTHON_EXECUTABLES=("python3.6" "python3.7" "python3.8")
+    ACCEPTABLE_PYTHON_EXECUTABLES=("python3.8" "python3.9" "python3.10")
     for python_executable in "${ACCEPTABLE_PYTHON_EXECUTABLES[@]}"; do
       PYTHON_BIN=$(command -v "$python_executable")
       if [ -n "$PYTHON_BIN" ]; then
@@ -66,7 +66,7 @@ check_python_version() {
     done
     if [ -z "$PYTHON_BIN" ]; then
       echo "[Not found]"
-      echo "Found no compatible Python executable, please install Python 3.6+ or set the environment variable PYTHON_BIN to the path of the Python executable."
+      echo "Found no compatible Python executable, please install Python 3.8+ or set the environment variable PYTHON_BIN to the path of the Python executable."
       echo "Aborting"
       exit 1
     fi
