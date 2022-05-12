@@ -20,7 +20,7 @@ If you need further versions, please open an issue.
 
 ## Bug Fixes:
 
-n/a
+ - #169: Changed start-test-env script so that it switches to itde directory during execution 
 
 ## Features / Enhancements:
 
