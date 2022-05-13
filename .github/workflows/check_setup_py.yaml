@@ -7,7 +7,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.6]
+        python-version: [3.8]
     name: Check setup for Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
 
@@ -16,9 +16,9 @@ jobs:
     - uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
-    - uses: abatilo/actions-poetry@v2.0.0
+    - uses: abatilo/actions-poetry@v2.1.4
       with:
-        poetry-version: 1.1.6
+        poetry-version: 1.1.11
     - name: Run packaging update
       run: bash githooks/update_packaging.sh
     - name: Show changes on working copy

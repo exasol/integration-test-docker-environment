@@ -27,8 +27,7 @@ If you need further versions, please open an issue.
  - #213: Removed virtualschema-jdbc-adaptar.jar 
 
 ## Refactoring:
-
-n/a
+ - #192: Updated minimal supported python version to 3.8
 
 ## Documentation:
 

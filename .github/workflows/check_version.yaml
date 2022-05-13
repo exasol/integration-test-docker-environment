@@ -9,15 +9,15 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: Setup Python 3.6
+      - name: Setup Python 3.8
         uses: actions/setup-python@v2
         with:
-          python-version: 3.6
+          python-version: 3.8
 
       - name: Install Poetry
-        uses: abatilo/actions-poetry@v2.0.0
+        uses: abatilo/actions-poetry@v2.1.4
         with:
-          poetry-version: 1.1.6
+          poetry-version: 1.1.11
 
       - name: Check Release
         run: ./scripts/build/check_release.sh

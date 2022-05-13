@@ -19,7 +19,7 @@ include = ["docker_db_config","ext"]
 exclude = ["exasol_integration_test_docker_environment/test"]
 
 [tool.poetry.dependencies]
-python = ">=3.6,<4"
+python = ">=3.8,<4"
 click = ">=7.0"
 # The `sys_platform` marker makes sure the docker dependency is only installed on
 # non windows platforms.
@@ -35,6 +35,7 @@ pydot = ">=1.4.0"
 requests = ">=2.21.0"
 simplejson = ">=3.16.0"
 "stopwatch.py" = ">=1.0.0"
+
 
 [tool.poetry.dev-dependencies]
 toml = ">=0.10.2"
