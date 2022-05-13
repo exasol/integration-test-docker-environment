@@ -36,5 +36,6 @@ requests = ">=2.21.0"
 simplejson = ">=3.16.0"
 "stopwatch.py" = ">=1.0.0"
 
+
 [tool.poetry.dev-dependencies]
 toml = ">=0.10.2"
