@@ -1,4 +1,4 @@
-# Integration-Test-Docker-Environment 0.11.0, released 13.05.2022
+# Integration-Test-Docker-Environment 0.11.0, released 2022-05-13
 
 Code name: Update python 3.8
 
