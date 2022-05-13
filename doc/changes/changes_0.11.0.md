@@ -1,10 +1,12 @@
-# Integration-Test-Docker-Environment 0.11.0, released t.b.d.
+# Integration-Test-Docker-Environment 0.11.0, released 13.05.2022
 
-Code name: t.b.d.
+Code name: Update python 3.8
 
 ## Summary
 
-t.b.d.
+Updated minimal supported python version to 3.8. Furthermore, changed start-test-env script so that it 
+switches to Integration-Test-Docker-Environment directory during execution.
+
 
 ### Supported Exasol Versions
 
@@ -31,7 +33,8 @@ If you need further versions, please open an issue.
 
 ## Documentation:
 
-n/a
+
+ - #218: Prepare release
 
 ## Security:
 
