@@ -10,7 +10,7 @@ test_environment_options = [
 
 ]
 
-LATEST_DB_VERSION = """7.1.9"""
+LATEST_DB_VERSION = """7.1.10"""
 
 docker_db_options = [
     click.option('--docker-db-image-version', type=str, default=LATEST_DB_VERSION,
