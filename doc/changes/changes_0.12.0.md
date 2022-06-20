@@ -18,7 +18,7 @@ TBD
 
 
 ## Bug Fixes:
-- TBD
+- #228: Fixed graph plot generator
 
 ## Features / Enhancements:
 
