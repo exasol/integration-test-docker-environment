@@ -8,8 +8,8 @@ TBD
 
 ### Supported Exasol Versions
 
-* **7.0**: up to 7.0.18, **except 7.0.5**
-* **7.1**: up to 7.1.10
+* **7.0**: up to 7.0.19, **except 7.0.5**
+* **7.1**: up to 7.1.11
 
 If you need further versions, please open an issue.
 
@@ -23,6 +23,7 @@ TBD
 ## Features / Enhancements:
 
 - #221:  Add support for exasol 7.1.10
+- #223:  Update docker-db versions
 
 ## Refactoring:
 - TBD
