@@ -144,10 +144,10 @@ def generate_graph_from_task_dependencies(task: DependencyLoggerBaseTask, task_d
         dependencies = collect_dependencies(task)
         g = DiGraph()
         for dependency in dependencies:
-            g.add_node(dependency.source, label=dependency.source.representation)
-            g.add_node(dependency.target, label=dependency.target.representation)
-            g.add_edge(dependency.source, dependency.target,
-                       dependency=dependency,
+            g.add_node(dependency.source.formatted_id, label=dependency.source.formatted_representation)
+            g.add_node(dependency.target.formatted_id, label=dependency.target.formatted_representation)
+            g.add_edge(dependency.source.formatted_id, dependency.target.formatted_id,
+                       dependency=dependency.formatted,
                        label=f"\"type={dependency.type}, index={dependency.index}\"")
         networkx.nx_pydot.write_dot(g, task_dependencies_dot_file)
 
