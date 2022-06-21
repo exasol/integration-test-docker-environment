@@ -12,12 +12,12 @@ class TaskDescription:
     @property
     def formatted_representation(self):
         assert '"' not in self.representation
-        return f"\"{self.representation}\""
+        return f'"{self.representation}"'
 
     @property
     def formatted_id(self):
         assert '"' not in self.id
-        return f"\"{self.id}\""
+        return f'"{self.id}"'
 
 
 class DependencyType(Enum):
@@ -55,8 +55,12 @@ class TaskDependency:
     @property
     def formatted(self):
         assert '"' not in str(self)
-        return f"\"{str(self)}\""
+        return f'"{str(self)}"'
 
     def __str__(self):
-        return f"TaskDependency(source={self.source}, target={self.target}, type={self.type}, " \
-               f"index={self.index}, state={self.state})"
+        return (
+                    f"TaskDependency(source={self.source}, "
+                    f"target={self.target}, type={self.type}, " 
+                    f"index={self.index}, state={self.state})"
+               )
+
