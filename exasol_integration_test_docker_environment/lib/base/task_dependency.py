@@ -9,23 +9,15 @@ class TaskDescription:
         self.representation = representation
         self.id = id
 
-    def to_json(self):
-        jsonpickle.set_preferred_backend('simplejson')
-        jsonpickle.set_encoder_options('simplejson', sort_keys=True)
-        return jsonpickle.encode(self)
+    @property
+    def formatted_representation(self):
+        assert '"' not in self.representation
+        return f'"{self.representation}"'
 
-    def __hash__(self):
-        return hash(self.to_json())
-
-    def __eq__(self, other):
-        return (
-                self.__class__ == other.__class__ and
-                self.id == other.id and
-                self.representation == other.representation
-        )
-
-    def __repr__(self):
-        return self.id
+    @property
+    def formatted_id(self):
+        assert '"' not in self.id
+        return f'"{self.id}"'
 
 
 class DependencyType(Enum):
@@ -60,18 +52,15 @@ class TaskDependency:
             raise TypeError("Type %s of loaded object does not match %s" % (type(loaded_object), cls))
         return loaded_object
 
-    def __hash__(self):
-        return hash(self.to_json())
+    @property
+    def formatted(self):
+        assert '"' not in str(self)
+        return f'"{str(self)}"'
 
-    def __eq__(self, other):
+    def __str__(self):
         return (
-                self.__class__ == other.__class__ and
-                self.index == other.index and
-                self.state == other.state and
-                self.type == other.type and
-                self.target == other.target and
-                self.source == other.source
-        )
+                    f"TaskDependency(source={self.source}, "
+                    f"target={self.target}, type={self.type}, " 
+                    f"index={self.index}, state={self.state})"
+               )
 
-    def __repr__(self):
-        return f"TaskDependency(source={self.source}, target={self.target}, type={self.type}, index={self.index}, state={self.state})"
