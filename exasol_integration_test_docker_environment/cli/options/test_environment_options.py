@@ -39,7 +39,7 @@ external_db_options = [
     click.option('--external-exasol-xmlrpc-host', type=str,
                  help="""Hostname for the xmlrpc server"""),
     click.option('--external-exasol-xmlrpc-port', type=int,
-                 default="""443""", show_default=True,
+                 default=443, show_default=True,
                  help="""Port for the xmlrpc server"""),
     click.option('--external-exasol-xmlrpc-user', type=str,
                  default="""admin""", show_default=True,
