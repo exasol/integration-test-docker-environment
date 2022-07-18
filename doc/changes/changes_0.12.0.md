@@ -9,7 +9,7 @@ TBD
 ### Supported Exasol Versions
 
 * **7.0**: up to 7.0.19, **except 7.0.5**
-* **7.1**: up to 7.1.11
+* **7.1**: up to 7.1.12
 
 If you need further versions, please open an issue.
 
