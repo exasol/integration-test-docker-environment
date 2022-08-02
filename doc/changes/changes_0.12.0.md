@@ -20,7 +20,7 @@ TBD
 ## Bug Fixes:
 - #228: Fixed graph plot generator
 - #230: Fixed default value of click option external-exasol-xmlrpc-port should be int
-- #235: Fixed output of test DockerTestEnvironmentDockerRuntimeInvalidRuntimeGivenTest
+- #211: Fixed output of test DockerTestEnvironmentDockerRuntimeInvalidRuntimeGivenTest
 
 ## Features / Enhancements:
 
