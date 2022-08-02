@@ -28,7 +28,8 @@ TBD
 - #223:  Updated docker-db versions
 
 ## Refactoring:
-- TBD
+
+- #235: Moved implementations of all click commands in separate methods
 
 ## Documentation:
 - TBD

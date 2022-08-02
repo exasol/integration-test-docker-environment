@@ -1,0 +1,3 @@
+
+class ArgumentConstraintError(ValueError):
+    pass

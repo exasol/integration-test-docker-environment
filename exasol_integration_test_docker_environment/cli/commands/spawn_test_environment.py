@@ -1,16 +1,14 @@
-from typing import List
+from typing import Optional, Tuple
 import click
-import humanfriendly
 
 from exasol_integration_test_docker_environment.cli.cli import cli
-from exasol_integration_test_docker_environment.cli.common import add_options, set_build_config, run_task, \
-    set_docker_repository_config, run_task, generate_root_task
+from exasol_integration_test_docker_environment.cli.common import add_options
 from exasol_integration_test_docker_environment.cli.options.system_options import system_options, \
     output_directory_option, tempory_base_directory_option
 from exasol_integration_test_docker_environment.cli.options.test_environment_options import docker_db_options
-from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_environment_with_docker_db import \
-    SpawnTestEnvironmentWithDockerDB
+from exasol_integration_test_docker_environment.lib import api
 from exasol_integration_test_docker_environment.cli.options.docker_repository_options import docker_repository_options
+from exasol_integration_test_docker_environment.lib.api.api_errors import ArgumentConstraintError
 
 
 @cli.command()
@@ -37,72 +35,66 @@ from exasol_integration_test_docker_environment.cli.options.docker_repository_op
 @add_options(system_options)
 def spawn_test_environment(
         environment_name: str,
-        database_port_forward: int,
-        bucketfs_port_forward: int,
+        database_port_forward: Optional[int],
+        bucketfs_port_forward: Optional[int],
         db_mem_size: str,
         db_disk_size: str,
-        nameserver:List[str],
+        nameserver: Tuple[str,...],
         deactivate_database_setup: bool,
-        docker_runtime: str,
+        docker_runtime: Optional[str],
         docker_db_image_version: str,
         docker_db_image_name: str,
+        create_certificates: bool,
         source_docker_repository_name: str,
         source_docker_tag_prefix: str,
-        source_docker_username: str,
-        source_docker_password: str,
+        source_docker_username: Optional[str],
+        source_docker_password: Optional[str],
         target_docker_repository_name: str,
         target_docker_tag_prefix: str,
-        target_docker_username: str,
-        target_docker_password: str,
+        target_docker_username: Optional[str],
+        target_docker_password: Optional[str],
         output_directory: str,
         temporary_base_directory: str,
         workers: int,
-        task_dependencies_dot_file: str,
-        create_certificates: bool):
+        task_dependencies_dot_file: Optional[str]):
     """
     This command spawn a test environment with a docker-db container and a connected test-container.
     The test-container is reachable by the database for output redirects of UDFs.
     """
-    parsed_db_mem_size = humanfriendly.parse_size(db_mem_size)
-    if parsed_db_mem_size < humanfriendly.parse_size("1 GiB"):
-        print("The --db-mem-size needs to be at least 1 GiB.")
-        exit(1)
-    parsed_db_disk_size = humanfriendly.parse_size(db_disk_size)
-    if parsed_db_disk_size < humanfriendly.parse_size("100 MiB"):
-        print("The --db-disk-size needs to be at least 100 MiB.")
-        exit(1)
-    set_build_config(False,
-                     tuple(),
-                     False,
-                     False,
-                     output_directory,
-                     temporary_base_directory,
-                     None,
-                     None)
-    set_docker_repository_config(source_docker_password, source_docker_repository_name, source_docker_username,
-                                 source_docker_tag_prefix, "source")
-    set_docker_repository_config(target_docker_password, target_docker_repository_name, target_docker_username,
-                                 target_docker_tag_prefix, "target")
-    task_creator = lambda: generate_root_task(task_class=SpawnTestEnvironmentWithDockerDB,
-        environment_name=environment_name,
-        database_port_forward=str(database_port_forward) if database_port_forward is not None else None,
-        bucketfs_port_forward=str(bucketfs_port_forward) if bucketfs_port_forward is not None else None,
-        mem_size=db_mem_size,
-        disk_size=db_disk_size,
-        nameservers=nameserver,
-        docker_runtime=docker_runtime,
-        docker_db_image_version=docker_db_image_version,
-        docker_db_image_name=docker_db_image_name,
-        db_user="sys",
-        db_password="exasol",
-        bucketfs_write_password="write",
-        no_test_container_cleanup_after_success=True,
-        no_test_container_cleanup_after_failure=False,
-        no_database_cleanup_after_success=True,
-        no_database_cleanup_after_failure=False,
-        is_setup_database_activated=not deactivate_database_setup,
-        create_certificates=create_certificates
-    )
-    success, task = run_task(task_creator, workers, task_dependencies_dot_file)
+    success = False
+    try:
+        success = api.spawn_test_environment(environment_name,
+                                             database_port_forward,
+                                             bucketfs_port_forward,
+                                             db_mem_size,
+                                             db_disk_size,
+                                             nameserver,
+                                             deactivate_database_setup,
+                                             docker_runtime,
+                                             docker_db_image_version,
+                                             docker_db_image_name,
+                                             source_docker_repository_name,
+                                             source_docker_tag_prefix,
+                                             source_docker_username,
+                                             source_docker_password,
+                                             target_docker_repository_name,
+                                             target_docker_tag_prefix,
+                                             target_docker_username,
+                                             target_docker_password,
+                                             output_directory,
+                                             temporary_base_directory,
+                                             workers,
+                                             task_dependencies_dot_file,
+                                             create_certificates)
+    except ArgumentConstraintError as e:
+        handle_wrong_argument_error(*e.args)
     if not success:
         exit(1)
+
+
+def handle_wrong_argument_error(argument_name, message):
+    formatted = f"--{argument_name}".replace("_", "-")
+    print(f"{formatted}: {message}")
+    ctx = click.get_current_context()
+    click.echo(ctx.get_help())
+    exit(1)
