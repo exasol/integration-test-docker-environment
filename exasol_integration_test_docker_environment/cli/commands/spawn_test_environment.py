@@ -73,6 +73,7 @@ def spawn_test_environment(
                                              docker_runtime,
                                              docker_db_image_version,
                                              docker_db_image_name,
+                                             create_certificates,
                                              source_docker_repository_name,
                                              source_docker_tag_prefix,
                                              source_docker_username,
@@ -84,8 +85,7 @@ def spawn_test_environment(
                                              output_directory,
                                              temporary_base_directory,
                                              workers,
-                                             task_dependencies_dot_file,
-                                             create_certificates)
+                                             task_dependencies_dot_file)
     except ArgumentConstraintError as e:
         handle_wrong_argument_error(*e.args)
     if not success:
