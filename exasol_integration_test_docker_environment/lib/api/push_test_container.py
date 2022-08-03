@@ -2,7 +2,7 @@ from typing import Tuple, Optional
 
 from exasol_integration_test_docker_environment.cli.common import set_docker_repository_config, \
     run_task, set_build_config, generate_root_task
-from exasol_integration_test_docker_environment.cli.options.docker_repository_options import DOCKER_REPOSITORY_NAME
+from exasol_integration_test_docker_environment.cli.options.docker_repository_options import DEFAULT_DOCKER_REPOSITORY_NAME
 from exasol_integration_test_docker_environment.cli.options.system_options import DEFAULT_OUTPUT_DIRECTORY
 from exasol_integration_test_docker_environment.lib.test_environment.analyze_test_container import \
     AnalyzeTestContainer, DockerTestContainerPush
@@ -19,11 +19,11 @@ def push_test_container(
         log_build_context_content: bool = False,
         cache_directory: Optional[str] = None,
         build_name: Optional[str] = None,
-        source_docker_repository_name: str = DOCKER_REPOSITORY_NAME,
+        source_docker_repository_name: str = DEFAULT_DOCKER_REPOSITORY_NAME,
         source_docker_tag_prefix: str = '',
         source_docker_username: Optional[str] = None,
         source_docker_password: Optional[str] = None,
-        target_docker_repository_name: str = DOCKER_REPOSITORY_NAME,
+        target_docker_repository_name: str = DEFAULT_DOCKER_REPOSITORY_NAME,
         target_docker_tag_prefix: str = '',
         target_docker_username: Optional[str] = None,
         target_docker_password: Optional[str] = None,
