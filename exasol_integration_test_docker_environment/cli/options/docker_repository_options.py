@@ -1,8 +1,10 @@
 import click
 
+DOCKER_REPOSITORY_NAME = 'exasol/script-language-container'
+
 docker_repository_options = [
     click.option('--source-docker-repository-name', type=str,
-                 default="exasol/script-language-container",
+                 default=DOCKER_REPOSITORY_NAME,
                  show_default=True,
                  help="Name of the docker repository for pulling cached stages. "
                       "The repository name may contain the URL of the docker registry, "
@@ -19,7 +21,7 @@ docker_repository_options = [
                  help="Password for the docker registry from where the system pulls cached stages. "
                       "Without password option the system prompts for the password."),
     click.option('--target-docker-repository-name', type=str,
-                 default="exasol/script-language-container",
+                 default=DOCKER_REPOSITORY_NAME,
                  show_default=True,
                  help="Name of the docker repository for naming and pushing images of stages. "
                       "The repository name may contain the URL of the docker registry, "
@@ -39,7 +41,7 @@ docker_repository_options = [
 
 simple_docker_repository_options = [
     click.option('--docker-repository-name', type=str,
-                 default="exasol/script-language-container",
+                 default=DOCKER_REPOSITORY_NAME,
                  show_default=True,
                  help="Name of the docker repository for naming images. "
                       "The repository name may contain the URL of the docker registry, "

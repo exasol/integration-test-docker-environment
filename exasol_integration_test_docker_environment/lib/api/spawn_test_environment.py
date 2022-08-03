@@ -3,6 +3,8 @@ import humanfriendly
 
 from exasol_integration_test_docker_environment.cli.common import set_build_config, set_docker_repository_config, \
     run_task, generate_root_task
+from exasol_integration_test_docker_environment.cli.options.docker_repository_options import DOCKER_REPOSITORY_NAME
+from exasol_integration_test_docker_environment.cli.options.system_options import DEFAULT_OUTPUT_DIRECTORY
 from exasol_integration_test_docker_environment.cli.options.test_environment_options import LATEST_DB_VERSION
 from exasol_integration_test_docker_environment.lib.api.api_errors import ArgumentConstraintError
 from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_environment_with_docker_db import \
@@ -21,15 +23,15 @@ def spawn_test_environment(
         docker_db_image_version: str = LATEST_DB_VERSION,
         docker_db_image_name: str = "exasol/docker-db",
         create_certificates: bool = False,
-        source_docker_repository_name: str = 'exasol/script-language-container',
+        source_docker_repository_name: str = DOCKER_REPOSITORY_NAME,
         source_docker_tag_prefix: str = '',
         source_docker_username: Optional[str] = None,
         source_docker_password: Optional[str] = None,
-        target_docker_repository_name: str = 'exasol/script-language-container',
+        target_docker_repository_name: str = DOCKER_REPOSITORY_NAME,
         target_docker_tag_prefix: str = '',
         target_docker_username: Optional[str] = None,
         target_docker_password: Optional[str] = None,
-        output_directory: str = ".build_output",
+        output_directory: str = DEFAULT_OUTPUT_DIRECTORY,
         temporary_base_directory: str = "/tmp",
         workers: int = 5,
         task_dependencies_dot_file: Optional[str] = None) -> bool:

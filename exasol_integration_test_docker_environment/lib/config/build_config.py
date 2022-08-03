@@ -1,6 +1,7 @@
 import luigi
 
-DEFAULT_OUTPUT_DIRECTORY = ".build_output"
+from exasol_integration_test_docker_environment.cli.options.system_options import DEFAULT_OUTPUT_DIRECTORY
+
 
 class build_config(luigi.Config):
     force_pull = luigi.BoolParameter(False)

@@ -31,7 +31,12 @@ def build_test_container(
         target_docker_password: Optional[str],
         workers: int,
         task_dependencies_dot_file: Optional[str]):
+    """
+    This command builds all stages of the test container for the test environment.
+    If stages are cached in a docker registry, they command is going to pull them,
+    instead of building them.
 
+    """
     success = api.build_test_container(force_rebuild,
                                        force_rebuild_from,
                                        force_pull,

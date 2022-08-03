@@ -47,9 +47,9 @@ class ClickApiConsistency(unittest.TestCase):
         """
         self.maxDiff = None
 
-        # Get all click commands in module exasol_script_languages_container_tool.cli.commands
+        # Get all click commands in module exasol_integration_test_docker_environment.cli.commands
         click_commands = [c[1] for c in inspect.getmembers(commands, is_click_command)]
-        # Get all functions in module exasol_script_languages_container_tool.lib.api
+        # Get all functions in module exasol_integration_test_docker_environment.lib.api
         api_functions = [f[1] for f in inspect.getmembers(api, inspect.isfunction)]
 
         # Now iterate over the list and compare consistency
@@ -70,9 +70,9 @@ class ClickApiConsistency(unittest.TestCase):
         Validate that the default values for all commands match!
         """
 
-        # Get all click commands in module exasol_script_languages_container_tool.cli.commands
+        # Get all click commands in module exasol_integration_test_docker_environment.cli.commands
         click_commands = [c[1] for c in inspect.getmembers(commands, is_click_command)]
-        # Get all functions in module exasol_script_languages_container_tool.lib.api
+        # Get all functions in module exasol_integration_test_docker_environment.lib.api
         api_functions = [f[1] for f in inspect.getmembers(api, inspect.isfunction)]
 
         # Now iterate over the list and compare consistency
