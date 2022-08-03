@@ -136,9 +136,7 @@ class DockerTestEnvironmentDockerRuntimeInvalidRuntimeGivenTest(unittest.TestCas
                 cls,
                 utils.INTEGRATION_TEST_DOCKER_ENVIRONMENT_DEFAULT_BIN,
                 clean_images_at_close=False)
-        cls.default_docker_runtime = get_default_docker_runtime()
         cls.docker_environment_name = "test_default_runtime_given"
-        cls.docker_environments = ()
 
     @classmethod
     def tearDownClass(cls):
@@ -146,7 +144,7 @@ class DockerTestEnvironmentDockerRuntimeInvalidRuntimeGivenTest(unittest.TestCas
 
     def test_docker_environment_not_available(self):
         exception_thrown = False
-        spawn_docker_successful = False
+        spawn_docker_test_environments_successful = False
         try:
             spawned_docker_test_environments = self.test_environment.spawn_docker_test_environments(
                     self.docker_environment_name,
@@ -154,11 +152,11 @@ class DockerTestEnvironmentDockerRuntimeInvalidRuntimeGivenTest(unittest.TestCas
                         "--docker-runtime", "AAAABBBBCCCC_INVALID_RUNTIME_111122223333",
                         "--deactivate-database-setup",
                     ])
-            spawn_docker_successful = True
+            spawn_docker_test_environments_successful = True
             utils.close_environments(spawned_docker_test_environments)
         except subprocess.CalledProcessError:
             exception_thrown = True
-        self.assertFalse(spawn_docker_successful)
+        self.assertFalse(spawn_docker_test_environments_successful)
         self.assertTrue(exception_thrown)
 
 
