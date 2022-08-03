@@ -1,3 +1,4 @@
+import subprocess
 import unittest
 
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
@@ -135,29 +136,28 @@ class DockerTestEnvironmentDockerRuntimeInvalidRuntimeGivenTest(unittest.TestCas
                 cls,
                 utils.INTEGRATION_TEST_DOCKER_ENVIRONMENT_DEFAULT_BIN,
                 clean_images_at_close=False)
-        cls.default_docker_runtime = get_default_docker_runtime()
         cls.docker_environment_name = "test_default_runtime_given"
-        cls.docker_environments = ()
+
+    @classmethod
+    def tearDownClass(cls):
+        utils.close_environments(cls.test_environment)
+
+    def test_docker_environment_not_available(self):
+        exception_thrown = False
+        spawn_docker_test_environments_successful = False
         try:
-            cls.spawned_docker_test_environments = cls.test_environment.spawn_docker_test_environments(
-                    cls.docker_environment_name,
+            spawned_docker_test_environments = self.test_environment.spawn_docker_test_environments(
+                    self.docker_environment_name,
                     additional_parameter=[
                         "--docker-runtime", "AAAABBBBCCCC_INVALID_RUNTIME_111122223333",
                         "--deactivate-database-setup",
                     ])
-        except Exception as e:
-            pass
-
-    @classmethod
-    def tearDownClass(cls):
-        try:
-            utils.close_environments(cls.spawned_docker_test_environments)
-        except Exception as e:
-            print(e)
-        utils.close_environments(cls.test_environment)
-
-    def test_docker_environment_not_available(self):
-        self.assertFalse("spawned_docker_test_environments" in self.__dict__)
+            spawn_docker_test_environments_successful = True
+            utils.close_environments(spawned_docker_test_environments)
+        except subprocess.CalledProcessError:
+            exception_thrown = True
+        self.assertFalse(spawn_docker_test_environments_successful)
+        self.assertTrue(exception_thrown)
 
 
 if __name__ == '__main__':
