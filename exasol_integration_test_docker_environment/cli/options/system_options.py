@@ -1,7 +1,9 @@
 import click
 
+DEFAULT_OUTPUT_DIRECTORY = ".build_output"
+
 output_directory_option = click.option('--output-directory', type=click.Path(file_okay=False, dir_okay=True),
-                                       default=".build_output",
+                                       default=DEFAULT_OUTPUT_DIRECTORY,
                                        show_default=True,
                                        help="Output directory where the system stores all output and log files.")
 

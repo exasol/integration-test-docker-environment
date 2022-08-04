@@ -6,6 +6,7 @@ from pathlib import Path
 import luigi
 
 from exasol_integration_test_docker_environment.cli.common import generate_root_task, run_task
+from exasol_integration_test_docker_environment.cli.options.system_options import DEFAULT_OUTPUT_DIRECTORY
 from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import DependencyLoggerBaseTask
 
 from exasol_integration_test_docker_environment.lib.base.luigi_log_config import LOG_ENV_VARIABLE_NAME
@@ -43,7 +44,7 @@ def run_test_same_logging_file() -> None:
     """
     with tempfile.TemporaryDirectory() as temp_dir:
         os.chdir(temp_dir)
-        log_path = Path(temp_dir) / ".build_output" / "jobs" / "logs" / "main.log"
+        log_path = Path(temp_dir) / DEFAULT_OUTPUT_DIRECTORY / "jobs" / "logs" / "main.log"
         run_simple_tasks(log_path=log_path)
 
 

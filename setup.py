@@ -7,6 +7,7 @@ packages = \
  'exasol_integration_test_docker_environment.cli.commands',
  'exasol_integration_test_docker_environment.cli.options',
  'exasol_integration_test_docker_environment.lib',
+ 'exasol_integration_test_docker_environment.lib.api',
  'exasol_integration_test_docker_environment.lib.base',
  'exasol_integration_test_docker_environment.lib.config',
  'exasol_integration_test_docker_environment.lib.data',

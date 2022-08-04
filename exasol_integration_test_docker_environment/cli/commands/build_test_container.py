@@ -1,13 +1,11 @@
-from typing import Tuple
+from typing import Tuple, Optional
 
 from exasol_integration_test_docker_environment.cli.cli import cli
-from exasol_integration_test_docker_environment.cli.common import add_options, set_build_config, \
-    set_docker_repository_config, run_task, generate_root_task
+from exasol_integration_test_docker_environment.cli.common import add_options
 from exasol_integration_test_docker_environment.cli.options.build_options import build_options
 from exasol_integration_test_docker_environment.cli.options.docker_repository_options import docker_repository_options
 from exasol_integration_test_docker_environment.cli.options.system_options import system_options
-from exasol_integration_test_docker_environment.lib.test_environment.analyze_test_container import AnalyzeTestContainer, \
-    DockerTestContainerBuild
+from exasol_integration_test_docker_environment.lib import api
 
 
 @cli.command()
@@ -21,39 +19,41 @@ def build_test_container(
         output_directory: str,
         temporary_base_directory: str,
         log_build_context_content: bool,
-        cache_directory: str,
-        build_name: str,
+        cache_directory: Optional[str],
+        build_name: Optional[str],
         source_docker_repository_name: str,
         source_docker_tag_prefix: str,
-        source_docker_username: str,
-        source_docker_password: str,
+        source_docker_username: Optional[str],
+        source_docker_password: Optional[str],
         target_docker_repository_name: str,
         target_docker_tag_prefix: str,
-        target_docker_username: str,
-        target_docker_password: str,
+        target_docker_username: Optional[str],
+        target_docker_password: Optional[str],
         workers: int,
-        task_dependencies_dot_file: str):
+        task_dependencies_dot_file: Optional[str]):
     """
     This command builds all stages of the test container for the test environment.
     If stages are cached in a docker registry, they command is going to pull them,
     instead of building them.
-    """
-    set_build_config(force_rebuild,
-                     force_rebuild_from,
-                     force_pull,
-                     log_build_context_content,
-                     output_directory,
-                     temporary_base_directory,
-                     cache_directory,
-                     build_name)
-    # Use AnalyzeTestContainer to ensure that all luigi processes got it loaded
-    analyze_task = AnalyzeTestContainer.__class__.__name__
 
-    set_docker_repository_config(source_docker_password, source_docker_repository_name, source_docker_username,
-                                 source_docker_tag_prefix, "source")
-    set_docker_repository_config(target_docker_password, target_docker_repository_name, target_docker_username,
-                                 target_docker_tag_prefix, "target")
-    task_creator = lambda: generate_root_task(task_class=DockerTestContainerBuild)
-    success, task = run_task(task_creator, workers, task_dependencies_dot_file)
+    """
+    success = api.build_test_container(force_rebuild,
+                                       force_rebuild_from,
+                                       force_pull,
+                                       output_directory,
+                                       temporary_base_directory,
+                                       log_build_context_content,
+                                       cache_directory,
+                                       build_name,
+                                       source_docker_repository_name,
+                                       source_docker_tag_prefix,
+                                       source_docker_username,
+                                       source_docker_password,
+                                       target_docker_repository_name,
+                                       target_docker_tag_prefix,
+                                       target_docker_username,
+                                       target_docker_password,
+                                       workers,
+                                       task_dependencies_dot_file)
     if not success:
         exit(1)
