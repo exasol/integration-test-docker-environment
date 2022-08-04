@@ -1,5 +1,6 @@
 import getpass
 import json
+import logging
 import os
 import traceback
 from datetime import datetime
@@ -8,7 +9,7 @@ from typing import (
     Callable,
     Tuple,
     Set,
-    Optional
+    Optional, Any, Union
 )
 
 import luigi
@@ -16,6 +17,7 @@ import networkx
 from networkx import DiGraph
 
 from exasol_integration_test_docker_environment.lib import extract_modulename_for_build_steps
+from exasol_integration_test_docker_environment.lib.base.abstract_task_future import DEFAULT_RETURN_OBJECT_NAME
 from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import DependencyLoggerBaseTask
 from exasol_integration_test_docker_environment.lib.base.luigi_log_config import get_luigi_log_config, get_log_path
 from exasol_integration_test_docker_environment.lib.base.task_dependency import TaskDependency, DependencyState
@@ -93,7 +95,7 @@ def generate_root_task(task_class, *args, **kwargs) -> DependencyLoggerBaseTask:
 
 def run_task(task_creator: Callable[[], DependencyLoggerBaseTask], workers: int,
              task_dependencies_dot_file: Optional[str]) \
-        -> Tuple[bool, DependencyLoggerBaseTask]:
+        -> Any:
     setup_worker()
     start_time = datetime.now()
     task = task_creator()
@@ -106,14 +108,18 @@ def run_task(task_creator: Callable[[], DependencyLoggerBaseTask], workers: int,
         success = not task.failed_target.exists() and no_scheduling_errors
         if success:
             handle_success(task, task_dependencies_dot_file, start_time)
-            return True, task
-        else:
+            return task.get_return_object(DEFAULT_RETURN_OBJECT_NAME, True)
+        elif not no_scheduling_errors:
             handle_failure(task, task_dependencies_dot_file, start_time)
-            return False, task
+            logging.error("Task {task} failed. : luigi reported a scheduling error.")
+            raise RuntimeError(f"Task {task} failed. reason: luigi reported a scheduling error.")
+        elif task.failed_target.exists():
+            handle_failure(task, task_dependencies_dot_file, start_time)
+            logging.error("Task {task} failed. failed target exists.")
+            raise RuntimeError(f"Task {task} failed. reason: check {task.failed_target}.")
     except BaseException as e:
-        traceback.print_exc()
-        print("Going to abort the task %s" % task)
-        return False, task  # TODO return exception
+        logging.error("Going to abort the task %s" % task)
+        raise e
     finally:
         task.cleanup(success)
 
@@ -124,12 +130,14 @@ def handle_failure(task: DependencyLoggerBaseTask, task_dependencies_dot_file: O
     print("The command failed after %s s with:" % timedelta.total_seconds())
     print_task_failures(task)
 
+
 def print_task_failures(task: DependencyLoggerBaseTask):
     print()
     print("Task Failures:")
     for failure in task.collect_failures().keys():
         print(failure)
     print()
+
 
 def handle_success(task: DependencyLoggerBaseTask, task_dependencies_dot_file: Optional[str], start_time: datetime):
     generate_graph_from_task_dependencies(task, task_dependencies_dot_file)

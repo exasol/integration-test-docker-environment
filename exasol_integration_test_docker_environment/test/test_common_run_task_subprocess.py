@@ -27,8 +27,7 @@ def run_simple_tasks(log_path: Path) -> None:
         return generate_root_task(task_class=TestTask, x=f"{next(task_id_generator)}")
 
     for i in range(NUMBER_TASK):
-        success, task = run_task(create_task, workers=5, task_dependencies_dot_file=None)
-        assert success
+        run_task(create_task, workers=5, task_dependencies_dot_file=None)
 
     assert log_path.exists()
     with open(log_path, "r") as f:
@@ -69,12 +68,30 @@ def run_test_different_logging_file_raises_error() -> None:
     with tempfile.TemporaryDirectory() as temp_dir:
         task_creator = lambda: generate_root_task(task_class=TestTask, x="Test")
 
-        success, task = run_task(task_creator, workers=5, task_dependencies_dot_file=None)
-        assert success
+        run_task(task_creator, workers=5, task_dependencies_dot_file=None)
         log_path = Path(temp_dir) / "main.log"
         os.environ[LOG_ENV_VARIABLE_NAME] = str(log_path)
-        success, task = run_task(task_creator, workers=5, task_dependencies_dot_file=None)
-        assert success is False
+        run_task(task_creator, workers=5, task_dependencies_dot_file=None)
+
+
+class TestTaskWithReturn(DependencyLoggerBaseTask):
+    x = luigi.Parameter()
+
+    def run(self):
+        self.return_object(f"{self.x}-123")
+
+
+def run_test_return_value() -> None:
+    """
+    Integration test which verifies that changing the log path from one invocation of run_task to the next will raise
+    an error.
+    """
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        task_creator = lambda: generate_root_task(task_class=TestTaskWithReturn, x="Test")
+
+        return_value = run_task(task_creator, workers=5, task_dependencies_dot_file=None)
+        assert return_value == "Test-123"
 
 
 if __name__ == '__main__':

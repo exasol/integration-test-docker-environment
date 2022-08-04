@@ -278,8 +278,8 @@ class BaseTask(Task):
         else:
             raise WrongTaskStateException(self._task_state, "return_target")
 
-    def get_return_object(self, name: str = DEFAULT_RETURN_OBJECT_NAME) -> Any:
-        if self._task_state == TaskState.FINISHED:
+    def get_return_object(self, name: str = DEFAULT_RETURN_OBJECT_NAME, override_state: bool = False) -> Any:
+        if self._task_state == TaskState.FINISHED or override_state:
             return self._registered_return_targets.get(name).read()
         else:
             raise WrongTaskStateException(self._task_state, "get_return_object")

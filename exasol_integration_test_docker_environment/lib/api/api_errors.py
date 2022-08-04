@@ -5,3 +5,7 @@ class ArgumentConstraintError(ValueError):
 
 class HealthProblem(RuntimeError):
     pass
+
+
+class TaskRuntimeError(RuntimeError):
+    pass

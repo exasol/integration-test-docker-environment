@@ -3,7 +3,6 @@ import os
 import shutil
 import subprocess
 import tempfile
-import time
 from pathlib import Path
 import shlex
 from typing import List
@@ -165,33 +164,3 @@ class ExaslctTestEnvironment:
         else:
             return SpawnedTestEnvironments(on_host_parameter, None)
 
-    def create_registry(self):
-        registry_port = find_free_ports(1)[0]
-        registry_container_name = self.name.replace("/", "_") + "_registry"
-        with ContextDockerClient() as docker_client:
-            print("Start pull of registry:2")
-            docker_client.images.pull(repository="registry", tag="2")
-            print(f"Start container of {registry_container_name}")
-            try:
-                docker_client.containers.get(registry_container_name).remove(force=True)
-            except:
-                pass
-            registry_container = docker_client.containers.run(
-                image="registry:2", name=registry_container_name,
-                ports={5000: registry_port},
-                detach=True
-            )
-            time.sleep(10)
-            print(f"Finished start container of {registry_container_name}")
-            if "GOOGLE_CLOUD_BUILD" in os.environ:
-                cloudbuild_network = docker_client.networks.get("cloudbuild")
-                cloudbuild_network.connect(registry_container)
-                registry_container.reload()
-                registry_host = registry_container.attrs["NetworkSettings"]["Networks"][cloudbuild_network.name][
-                    "IPAddress"]
-                # self.repository_prefix = f"{registry_host}:5000"
-                self.repository_prefix = f"localhost:{registry_port}"
-                return registry_container, registry_host, "5000"
-            else:
-                self.repository_prefix = f"localhost:{registry_port}"
-                return registry_container, "localhost", registry_port
