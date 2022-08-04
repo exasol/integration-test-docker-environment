@@ -2,9 +2,10 @@ from inspect import cleandoc
 from typing import Optional
 
 from exasol_integration_test_docker_environment.doctor import health_checkup, recommend_mitigation
+from exasol_integration_test_docker_environment.lib.api.api_errors import HealthProblem
 
 
-def health() -> Optional[str]:
+def health():
     """
     Check the health of the execution environment.
 
@@ -12,11 +13,12 @@ def health() -> Optional[str]:
     For all found issues there will be a proposed fix/solution.
 
     If the environment was found to be healthy it will return None, otherwise a description of the found issues.
+    :raises HealthProblem
     """
 
     problems = set(health_checkup())
     if not problems:
-        return None
+        return
 
     suggestion_template = cleandoc(
         """
@@ -41,4 +43,4 @@ def health() -> Optional[str]:
             )
         ),
     )
-    return message
+    raise HealthProblem(message)

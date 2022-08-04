@@ -2,6 +2,7 @@ import sys
 
 from exasol_integration_test_docker_environment.cli.cli import cli
 from exasol_integration_test_docker_environment.lib import api
+from exasol_integration_test_docker_environment.lib.api.api_errors import HealthProblem
 
 
 @cli.command()
@@ -15,8 +16,9 @@ def health():
     If the environment was found to be healthy the exit code will be 0, otherwise -1.
     """
     success, failure = 0, -1
-    message = api.health()
-    if message is None:
+    try:
+        api.health()
         sys.exit(success)
-    print(message)
-    sys.exit(failure)
+    except HealthProblem as e:
+        print(e.args[0])
+        sys.exit(failure)
