@@ -6,9 +6,16 @@ from exasol_integration_test_docker_environment.lib.base.pickle_target import Pi
 
 
 class PersistentDictionary(MutableMapping):
+    """
+    Implements interface of a dictionary, but stores/reads key-values to/from a file.
+    """
     def __init__(self, dict_path: Path):
-        self.target = PickleTarget(dict_path)
+        self._target = PickleTarget(dict_path)
         self._write(dict())
+
+    @property
+    def get_current(self):
+        return self._read()
 
     def __getitem__(self, key):
         return self._read()[key]
@@ -30,6 +37,10 @@ class PersistentDictionary(MutableMapping):
     def __len__(self):
         d = self._read()
         return len(d)
+
+    @property
+    def target(self):
+        return self._target
 
     def _read(self) -> Dict[str, Any]:
         return self.target.read()

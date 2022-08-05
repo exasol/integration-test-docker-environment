@@ -75,12 +75,14 @@ class ApiTestEnvironment:
                 spawn_test_environment(environment_name=on_host_parameter.name,
                                        database_port_forward=on_host_parameter.database_port,
                                        bucketfs_port_forward=on_host_parameter.bucketfs_port,
-                                       docker_db_image_version=db_version_from_env or LATEST_DB_VERSION)
+                                       docker_db_image_version=db_version_from_env or LATEST_DB_VERSION,
+                                       output_directory=self.temp_dir)
         else:
             on_host_parameter.environment_info = \
                 spawn_test_environment(environment_name=on_host_parameter.name,
                                        database_port_forward=on_host_parameter.database_port,
                                        bucketfs_port_forward=on_host_parameter.bucketfs_port,
                                        docker_db_image_version=db_version_from_env or LATEST_DB_VERSION,
+                                       output_directory=self.temp_dir,
                                        **additional_parameter)
         return on_host_parameter

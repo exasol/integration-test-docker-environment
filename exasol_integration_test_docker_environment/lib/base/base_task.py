@@ -99,7 +99,6 @@ class BaseTask(Task):
         del new_dict["logger"]
         del new_dict["_complete_target"]
         del new_dict["_run_dependencies_target"]
-        del new_dict["_complete_target"]
         del new_dict["_registered_return_targets"]
         return new_dict
 
@@ -234,7 +233,7 @@ class BaseTask(Task):
                 yield from task_generator
             self._task_state = TaskState.FINISHED
             self.logger.info("Write complete_target")
-            self._complete_target.write(self._registered_return_targets)
+            self._complete_target.write(self._registered_return_targets.get_current)
         except Exception as e:
             self._task_state = TaskState.ERROR
             self.logger.exception("Exception in run: %s", e)
