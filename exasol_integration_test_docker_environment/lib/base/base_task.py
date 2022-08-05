@@ -46,9 +46,9 @@ class RequiresTaskFuture(AbstractTaskFuture):
     - It then reads the completion target to get the list of return value targets and reads the requested one.
     """
 
-    def __init__(self, task: "BaseTask", index: int):
-        self._index = index
-        self._task = task
+    def __init__(self, current_task: "BaseTask", child_task_index: int):
+        self._child_task_index = child_task_index
+        self._current_task = current_task
         self._outputs_dict = None
 
     def get_output(self, name: str = DEFAULT_RETURN_OBJECT_NAME):
@@ -58,13 +58,13 @@ class RequiresTaskFuture(AbstractTaskFuture):
         return list(self._get_outputs_dict().keys())
 
     def _get_outputs_dict(self) -> Dict[str, PickleTarget]:
-        if self._task._task_state == TaskState.RUN:
+        if self._current_task._task_state == TaskState.RUN:
             if self._outputs_dict is None:
-                completion_target = self._task.input()[self._index]
+                completion_target = self._current_task.input()[self._child_task_index]
                 self._outputs_dict = completion_target.read()
             return self._outputs_dict
         else:
-            raise WrongTaskStateException(self._task._task_state, "RequiresTaskFuture.read_outputs_dict")
+            raise WrongTaskStateException(self._current_task._task_state, "RequiresTaskFuture.read_outputs_dict")
 
 
 class RunTaskFuture(AbstractTaskFuture):
