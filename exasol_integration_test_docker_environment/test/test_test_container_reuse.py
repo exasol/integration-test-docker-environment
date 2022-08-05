@@ -6,7 +6,7 @@ from pathlib import Path
 
 import luigi
 
-from exasol_integration_test_docker_environment.cli.common import set_build_config, set_docker_repository_config, \
+from exasol_integration_test_docker_environment.lib.api.common import set_build_config, set_docker_repository_config, \
     generate_root_task
 from exasol_integration_test_docker_environment.lib.base.docker_base_task import DockerBaseTask
 from exasol_integration_test_docker_environment.lib.data.container_info import ContainerInfo
@@ -97,7 +97,7 @@ class TestContainerReuseTest(unittest.TestCase):
         try:
             success = luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
             if success:
-                result = task.get_return_object()
+                result = task.get_result()
                 task.cleanup(True)
                 return result
             else:
@@ -112,7 +112,7 @@ class TestContainerReuseTest(unittest.TestCase):
             success = luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
 
             if success:
-                result = task.get_return_object()
+                result = task.get_result()
                 return result
             else:
                 raise Exception("Task failed")
@@ -126,6 +126,10 @@ class TestContainerReuseTest(unittest.TestCase):
         with dockerfile.open("a") as f:
             f.write("\n#Test\n")
         p2 = self.run2()
+        assert "container_id" in p1
+        assert "image_id" in p1
+        assert "container_id" in p2
+        assert "image_id" in p2
         print(p1)
         print(p2)
         assert p1 != p2
@@ -133,6 +137,8 @@ class TestContainerReuseTest(unittest.TestCase):
     def test_test_container_reuse(self):
         p1 = self.run1()
         p2 = self.run2()
+        assert "container_id" in p1
+        assert "image_id" in p1
         print(p1)
         print(p2)
         assert p1 == p2

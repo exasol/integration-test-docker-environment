@@ -2,7 +2,7 @@ from typing import Optional, Tuple
 import click
 
 from exasol_integration_test_docker_environment.cli.cli import cli
-from exasol_integration_test_docker_environment.cli.common import add_options
+from exasol_integration_test_docker_environment.lib.api.common import add_options
 from exasol_integration_test_docker_environment.cli.options.system_options import system_options, \
     output_directory_option, tempory_base_directory_option
 from exasol_integration_test_docker_environment.cli.options.test_environment_options import docker_db_options

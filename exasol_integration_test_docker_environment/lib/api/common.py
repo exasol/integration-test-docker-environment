@@ -2,14 +2,13 @@ import getpass
 import json
 import logging
 import os
-import traceback
 from datetime import datetime
 from pathlib import Path
 from typing import (
     Callable,
     Tuple,
     Set,
-    Optional, Any, Union
+    Optional, Any
 )
 
 import luigi
@@ -17,7 +16,6 @@ import networkx
 from networkx import DiGraph
 
 from exasol_integration_test_docker_environment.lib import extract_modulename_for_build_steps
-from exasol_integration_test_docker_environment.lib.base.abstract_task_future import DEFAULT_RETURN_OBJECT_NAME
 from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import DependencyLoggerBaseTask
 from exasol_integration_test_docker_environment.lib.base.luigi_log_config import get_luigi_log_config, get_log_path
 from exasol_integration_test_docker_environment.lib.base.task_dependency import TaskDependency, DependencyState
@@ -108,7 +106,7 @@ def run_task(task_creator: Callable[[], DependencyLoggerBaseTask], workers: int,
         success = not task.failed_target.exists() and no_scheduling_errors
         if success:
             handle_success(task, task_dependencies_dot_file, start_time)
-            return task.get_default_return_object_if_exists()
+            return task.get_result()
         elif not no_scheduling_errors:
             handle_failure(task, task_dependencies_dot_file, start_time)
             logging.error("Task {task} failed. : luigi reported a scheduling error.")

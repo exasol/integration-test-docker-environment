@@ -5,7 +5,7 @@ from pathlib import Path
 
 import luigi
 
-from exasol_integration_test_docker_environment.cli.common import generate_root_task, run_task
+from exasol_integration_test_docker_environment.lib.api.common import generate_root_task, run_task
 from exasol_integration_test_docker_environment.cli.options.system_options import DEFAULT_OUTPUT_DIRECTORY
 from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import DependencyLoggerBaseTask
 
@@ -88,8 +88,7 @@ class TestTaskWithReturn(DependencyLoggerBaseTask):
 
 def run_test_return_value() -> None:
     """
-    Integration test which verifies that changing the log path from one invocation of run_task to the next will raise
-    an error.
+    Integration test which verifies that the return value processing in run_task works as expected.
     """
 
     with tempfile.TemporaryDirectory() as temp_dir:

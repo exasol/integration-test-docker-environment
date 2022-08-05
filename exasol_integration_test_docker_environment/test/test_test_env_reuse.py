@@ -5,7 +5,7 @@ import luigi
 from exasol_integration_test_docker_environment.lib.data.environment_type import EnvironmentType
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_environment import SpawnTestEnvironment
-from exasol_integration_test_docker_environment.cli.common import set_docker_repository_config, generate_root_task
+from exasol_integration_test_docker_environment.lib.api.common import set_docker_repository_config, generate_root_task
 from exasol_integration_test_docker_environment.testing import luigi_utils
 from exasol_integration_test_docker_environment.cli.options import test_environment_options
 from exasol_integration_test_docker_environment.testing.utils import check_db_version_from_env
@@ -108,7 +108,7 @@ class TestContainerReuseTest(unittest.TestCase):
 
     def test_initial_reuse_database_setup_populates_data(self):
         task = self.run_spawn_test_env(cleanup=True)
-        self._verify_test_data(task.get_return_object())
+        self._verify_test_data(task.get_result())
         task.cleanup(True)
 
     def get_instance_ids(self, test_environment_info):
@@ -121,13 +121,13 @@ class TestContainerReuseTest(unittest.TestCase):
 
     def test_reuse_env_same_instances(self):
         task = self.run_spawn_test_env(cleanup=False)
-        test_environment_info = task.get_return_object()
+        test_environment_info = task.get_result()
         old_instance_ids = self.get_instance_ids(test_environment_info)
         # This clean is supposed to not remove docker instances
         task.cleanup(True)
 
         task = self.run_spawn_test_env(cleanup=True)
-        test_environment_info = task.get_return_object()
+        test_environment_info = task.get_result()
         new_instance_ids = self.get_instance_ids(test_environment_info)
         self.assertEquals(old_instance_ids, new_instance_ids)
         self._verify_test_data(test_environment_info)

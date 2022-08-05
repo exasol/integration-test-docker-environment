@@ -14,7 +14,6 @@ from luigi.task import TASK_ID_TRUNCATE_HASH
 from exasol_integration_test_docker_environment.abstract_method_exception import AbstractMethodException
 from exasol_integration_test_docker_environment.lib.base.abstract_task_future import AbstractTaskFuture, \
     DEFAULT_RETURN_OBJECT_NAME
-from exasol_integration_test_docker_environment.lib.base.persistent_dictionary import PersistentDictionary
 from exasol_integration_test_docker_environment.lib.base.pickle_target import PickleTarget
 from exasol_integration_test_docker_environment.lib.base.task_logger_wrapper import TaskLoggerWrapper
 from exasol_integration_test_docker_environment.lib.base.task_state import TaskState
@@ -22,8 +21,6 @@ from exasol_integration_test_docker_environment.lib.base.wrong_task_state_except
 from exasol_integration_test_docker_environment.lib.config.build_config import build_config
 
 RETURN_TARGETS = "return_targets"
-
-RETURN_TARGET_CATALOG = "return_target_catalog"
 
 COMPLETION_TARGET = "completion_target"
 
@@ -121,7 +118,7 @@ class BaseTask(Task):
         self.logger = TaskLoggerWrapper(logger, self.__repr__())
         self._run_dependencies_target = PickleTarget(path=self._get_tmp_path_for_run_dependencies())
         self._complete_target = PickleTarget(path=self._get_tmp_path_for_completion_target())
-        self._registered_return_targets = PersistentDictionary(self._get_tmp_path_for_registered_return_targets())
+        self._registered_return_targets = dict()
 
     def __getstate__(self):
         new_dict = dict(self.__dict__)
@@ -191,9 +188,6 @@ class BaseTask(Task):
 
     def _get_tmp_path_for_returns(self, name: str) -> Path:
         return Path(self._get_tmp_path_for_task(), RETURN_TARGETS, name)
-
-    def _get_tmp_path_for_registered_return_targets(self) -> Path:
-        return Path(self._get_tmp_path_for_task(), RETURN_TARGET_CATALOG)
 
     def _get_tmp_path_for_completion_target(self) -> Path:
         return Path(self._get_tmp_path_for_task(), COMPLETION_TARGET)
@@ -267,7 +261,7 @@ class BaseTask(Task):
                 yield from task_generator
             self._task_state = TaskState.FINISHED
             self.logger.info("Write complete_target")
-            self._complete_target.write(self._registered_return_targets.get_current)
+            self._complete_target.write(self._registered_return_targets)
         except Exception as e:
             self._task_state = TaskState.ERROR
             self.logger.exception("Exception in run: %s", e)
@@ -325,19 +319,8 @@ class BaseTask(Task):
         else:
             raise WrongTaskStateException(self._task_state, "return_target")
 
-    def get_return_object(self, name: str = DEFAULT_RETURN_OBJECT_NAME) -> Any:
-        if self._task_state != TaskState.CLEANED:
-            return self._registered_return_targets[name].read()
-        else:
-            raise WrongTaskStateException(self._task_state, "get_return_object")
-
-    def get_default_return_object_if_exists(self) -> Optional[Any]:
-        if self._task_state != TaskState.CLEANED:
-            if DEFAULT_RETURN_OBJECT_NAME in self._registered_return_targets:
-                return self._registered_return_targets[DEFAULT_RETURN_OBJECT_NAME].read()
-        else:
-            raise WrongTaskStateException(self._task_state, "get_return_object")
-
+    def get_result(self, key: str = DEFAULT_RETURN_OBJECT_NAME) -> Optional[Any]:
+        return self.output().read()[key].read()
 
     def __repr__(self):
         """
