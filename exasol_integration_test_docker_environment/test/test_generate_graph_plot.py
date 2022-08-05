@@ -39,8 +39,7 @@ class BaseTaskTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             for i in range(NUMBER_TASK):
                 dot_file = Path(d) / f"dot_file_{i}.dot"
-                success, task = run_task(create_task, workers=5, task_dependencies_dot_file=str(dot_file))
-                assert success
+                run_task(create_task, workers=5, task_dependencies_dot_file=str(dot_file))
                 assert dot_file.exists()
 
 
