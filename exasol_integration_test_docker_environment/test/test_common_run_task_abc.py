@@ -9,10 +9,12 @@ from exasol_integration_test_docker_environment.cli.common import generate_root_
 from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import DependencyLoggerBaseTask
 
 
-class TestTaskWithReturn(DependencyLoggerBaseTask):
+class TestTaskWithReturnA(DependencyLoggerBaseTask):
     x = luigi.Parameter()
 
     def run_task(self):
+        print("Coming here")
+        raise RuntimeError("ohoh")
         self.return_object(f"{self.x}-123")
 
 
@@ -24,7 +26,7 @@ class CommonRunTaskTest(unittest.TestCase):
         an error.
         """
 
-        task_creator = lambda: generate_root_task(task_class=TestTaskWithReturn, x="Test")
+        task_creator = lambda: generate_root_task(task_class=TestTaskWithReturnA, x="Test")
 
         return_value = run_task(task_creator, workers=5, task_dependencies_dot_file=None)
         assert return_value == "Test-123"

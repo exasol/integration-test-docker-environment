@@ -14,6 +14,7 @@ from luigi.task import TASK_ID_TRUNCATE_HASH
 from exasol_integration_test_docker_environment.abstract_method_exception import AbstractMethodException
 from exasol_integration_test_docker_environment.lib.base.abstract_task_future import AbstractTaskFuture, \
     DEFAULT_RETURN_OBJECT_NAME
+from exasol_integration_test_docker_environment.lib.base.persistent_dictionary import PersistentDictionary
 from exasol_integration_test_docker_environment.lib.base.pickle_target import PickleTarget
 from exasol_integration_test_docker_environment.lib.base.task_logger_wrapper import TaskLoggerWrapper
 from exasol_integration_test_docker_environment.lib.base.task_state import TaskState
@@ -21,6 +22,8 @@ from exasol_integration_test_docker_environment.lib.base.wrong_task_state_except
 from exasol_integration_test_docker_environment.lib.config.build_config import build_config
 
 RETURN_TARGETS = "return_targets"
+
+RETURN_TARGET_CATALOG = "return_target_catalog"
 
 COMPLETION_TARGET = "completion_target"
 
@@ -75,7 +78,6 @@ class BaseTask(Task):
     def __init__(self, *args, **kwargs):
         self._registered_tasks = []
         self._run_dependencies_tasks = []
-        self._registered_return_targets = {}
         self._task_state = TaskState.INIT
         super().__init__(*args, **kwargs)
         self.task_id = self.task_id_str(self.get_task_family(),
@@ -88,14 +90,15 @@ class BaseTask(Task):
     def _init_non_pickle_attributes(self):
         logger = logging.getLogger(f'luigi-interface.{self.__class__.__name__}')
         self.logger = TaskLoggerWrapper(logger, self.__repr__())
-        self._complete_target = PickleTarget(path=self._get_tmp_path_for_completion_target())
         self._run_dependencies_target = PickleTarget(path=self._get_tmp_path_for_run_dependencies())
+        self._registered_return_targets = PersistentDictionary(self._get_tmp_path_for_registered_return_targets())
 
     def __getstate__(self):
         new_dict = dict(self.__dict__)
         del new_dict["logger"]
         del new_dict["_complete_target"]
         del new_dict["_run_dependencies_target"]
+        del new_dict["_registered_return_targets"]
         return new_dict
 
     def __setstate__(self, new_dict):
@@ -159,6 +162,9 @@ class BaseTask(Task):
     def _get_tmp_path_for_returns(self, name: str) -> Path:
         return Path(self._get_tmp_path_for_task(), RETURN_TARGETS, name)
 
+    def _get_tmp_path_for_registered_return_targets(self) -> Path:
+        return Path(self._get_tmp_path_for_task(), RETURN_TARGET_CATALOG)
+
     def _get_tmp_path_for_completion_target(self) -> Path:
         return Path(self._get_tmp_path_for_task(), COMPLETION_TARGET)
 
@@ -216,7 +222,7 @@ class BaseTask(Task):
         return self._registered_tasks
 
     def output(self):
-        return self._complete_target
+        return self._registered_return_targets.target
 
     def run(self):
         try:
@@ -225,8 +231,6 @@ class BaseTask(Task):
             if task_generator is not None:
                 yield from task_generator
             self._task_state = TaskState.FINISHED
-            self.logger.info("Write complete_target")
-            self._complete_target.write(self._registered_return_targets)
         except Exception as e:
             self._task_state = TaskState.ERROR
             self.logger.exception("Exception in run: %s", e)
@@ -278,9 +282,9 @@ class BaseTask(Task):
         else:
             raise WrongTaskStateException(self._task_state, "return_target")
 
-    def get_return_object(self, name: str = DEFAULT_RETURN_OBJECT_NAME, override_state: bool = False) -> Any:
-        if self._task_state == TaskState.FINISHED or override_state:
-            return self._registered_return_targets.get(name).read()
+    def get_return_object(self, name: str = DEFAULT_RETURN_OBJECT_NAME) -> Any:
+        if self._task_state != TaskState.CLEANED:
+            return self._registered_return_targets[name].read()
         else:
             raise WrongTaskStateException(self._task_state, "get_return_object")
 
