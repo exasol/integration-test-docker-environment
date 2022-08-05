@@ -71,13 +71,18 @@ def run_test_different_logging_file_raises_error() -> None:
         run_task(task_creator, workers=5, task_dependencies_dot_file=None)
         log_path = Path(temp_dir) / "main.log"
         os.environ[LOG_ENV_VARIABLE_NAME] = str(log_path)
-        run_task(task_creator, workers=5, task_dependencies_dot_file=None)
+        exception_thrown = False
+        try:
+            run_task(task_creator, workers=5, task_dependencies_dot_file=None)
+        except ValueError as e:
+            exception_thrown = True
+        assert exception_thrown
 
 
 class TestTaskWithReturn(DependencyLoggerBaseTask):
     x = luigi.Parameter()
 
-    def run(self):
+    def run_task(self):
         self.return_object(f"{self.x}-123")
 
 
@@ -101,9 +106,10 @@ if __name__ == '__main__':
         "run_test_different_logging_file_raises_error": run_test_different_logging_file_raises_error,
         "run_test_same_logging_file_env_log_path": run_test_same_logging_file_env_log_path,
         "run_test_same_logging_file": run_test_same_logging_file,
+        "run_test_return_value": run_test_return_value,
     }
     try:
         dispatcher[test_type]()
     except KeyError as e:
-        raise ValueError("Unknow Test argument") from e
+        raise ValueError("Unknown Test argument") from e
 

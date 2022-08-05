@@ -108,7 +108,7 @@ def run_task(task_creator: Callable[[], DependencyLoggerBaseTask], workers: int,
         success = not task.failed_target.exists() and no_scheduling_errors
         if success:
             handle_success(task, task_dependencies_dot_file, start_time)
-            return task.get_return_object(DEFAULT_RETURN_OBJECT_NAME)
+            return task.get_default_return_object_if_exists()
         elif not no_scheduling_errors:
             handle_failure(task, task_dependencies_dot_file, start_time)
             logging.error("Task {task} failed. : luigi reported a scheduling error.")

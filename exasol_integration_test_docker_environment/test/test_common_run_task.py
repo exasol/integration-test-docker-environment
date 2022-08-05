@@ -26,6 +26,9 @@ class CommonRunTaskTest(unittest.TestCase):
     def test_different_logging_file_raises_error(self):
         self._execute_in_new_process(target="run_test_different_logging_file_raises_error")
 
+    def test_return_value(self):
+        self._execute_in_new_process(target="run_test_return_value")
+
 
 if __name__ == '__main__':
     unittest.main()

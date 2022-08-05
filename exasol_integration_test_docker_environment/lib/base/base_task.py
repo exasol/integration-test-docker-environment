@@ -3,7 +3,7 @@ import json
 import logging
 import shutil
 from pathlib import Path
-from typing import Dict, List, Generator, Any, Union, Set
+from typing import Dict, List, Generator, Any, Union, Set, Optional
 
 import luigi
 import six
@@ -91,6 +91,7 @@ class BaseTask(Task):
         logger = logging.getLogger(f'luigi-interface.{self.__class__.__name__}')
         self.logger = TaskLoggerWrapper(logger, self.__repr__())
         self._run_dependencies_target = PickleTarget(path=self._get_tmp_path_for_run_dependencies())
+        self._complete_target = PickleTarget(path=self._get_tmp_path_for_completion_target())
         self._registered_return_targets = PersistentDictionary(self._get_tmp_path_for_registered_return_targets())
 
     def __getstate__(self):
@@ -98,6 +99,7 @@ class BaseTask(Task):
         del new_dict["logger"]
         del new_dict["_complete_target"]
         del new_dict["_run_dependencies_target"]
+        del new_dict["_complete_target"]
         del new_dict["_registered_return_targets"]
         return new_dict
 
@@ -222,7 +224,7 @@ class BaseTask(Task):
         return self._registered_tasks
 
     def output(self):
-        return self._registered_return_targets.target
+        return self._complete_target
 
     def run(self):
         try:
@@ -231,6 +233,8 @@ class BaseTask(Task):
             if task_generator is not None:
                 yield from task_generator
             self._task_state = TaskState.FINISHED
+            self.logger.info("Write complete_target")
+            self._complete_target.write(self._registered_return_targets)
         except Exception as e:
             self._task_state = TaskState.ERROR
             self.logger.exception("Exception in run: %s", e)
@@ -287,6 +291,14 @@ class BaseTask(Task):
             return self._registered_return_targets[name].read()
         else:
             raise WrongTaskStateException(self._task_state, "get_return_object")
+
+    def get_default_return_object_if_exists(self) -> Optional[Any]:
+        if self._task_state != TaskState.CLEANED:
+            if DEFAULT_RETURN_OBJECT_NAME in self._registered_return_targets:
+                return self._registered_return_targets[DEFAULT_RETURN_OBJECT_NAME].read()
+        else:
+            raise WrongTaskStateException(self._task_state, "get_return_object")
+
 
     def __repr__(self):
         """
@@ -363,4 +375,3 @@ class BaseTask(Task):
 
     def cleanup_task(self, success: bool):
         pass
-
