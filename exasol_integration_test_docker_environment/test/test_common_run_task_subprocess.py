@@ -15,7 +15,7 @@ from exasol_integration_test_docker_environment.lib.base.luigi_log_config import
 class TestTask(DependencyLoggerBaseTask):
     x = luigi.Parameter()
 
-    def run(self):
+    def run_task(self):
         self.logger.info(f"Logging: {self.x}")
 
 

@@ -320,7 +320,9 @@ class BaseTask(Task):
             raise WrongTaskStateException(self._task_state, "return_target")
 
     def get_result(self, key: str = DEFAULT_RETURN_OBJECT_NAME) -> Optional[Any]:
-        return self.output().read()[key].read()
+        output = self.output().read()
+        if key in output:
+            return output[key].read()
 
     def __repr__(self):
         """
