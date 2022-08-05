@@ -31,6 +31,23 @@ RUN_DEPENDENCIES = "run_dependencies"
 
 
 class RequiresTaskFuture(AbstractTaskFuture):
+    """
+    Represents a future for a statically ("requires") registered task.
+    Details:
+    - The RegisterTaskFuture is used with dependency return in luigis required method
+    - In the required method you return tasks and usually you would to get the output target of your child tasks
+      via luigis input() method (check https://luigi.readthedocs.io/en/stable/tasks.html#task-input)
+    - However, if you have multiple child tasks which return in requires, for example in a dict or list,
+      you need address each task in the input first and then you address the output
+    - output can also return a nested dict or list of targets
+    - requires can return a nested dict or list of tasks
+    - we reduced the output to a single completion target with the list of return value targets
+      and the child tasks are collected in the registered_tasks list
+    - The RegisterTaskFuture gets the position of the task in the registered_tasks as input, such as current task
+    - If the user call get_output the RegisterTaskFuture call the input() method of the current task and
+       uses the position of child task to retrieve the completion target of the child task
+    - It then reads the completion target to get the list of return value targets and reads the requested one.
+    """
 
     def __init__(self, task: "BaseTask", index: int):
         self._index = index
@@ -54,6 +71,18 @@ class RequiresTaskFuture(AbstractTaskFuture):
 
 
 class RunTaskFuture(AbstractTaskFuture):
+    """
+    Represents a future for a dynamically registered task.
+    Details:
+    - run_dependencies uses luigi dynamic task by yielding the tasks
+    - luigi returns for each yielded task the return value of that tasks output method
+      (see https://luigi.readthedocs.io/en/stable/tasks.html#dynamic-dependencies)
+    - the output method returns targets and in case of the BaseTask this is always the completion target
+      which contains the list of return value targets
+    - the RunTaskFuture encapsulate the target returned by the yield and handles reading the target for the user,
+      such that the user get directly the return values of the child task
+
+    """
 
     def __init__(self, completion_target: PickleTarget):
         self._outputs_dict = None
@@ -185,7 +214,12 @@ class BaseTask(Task):
     def register_required(self):
         pass
 
-    def register_dependency(self, task: "BaseTask"):
+    def register_dependency(self, task: "BaseTask") -> RequiresTaskFuture:
+        """
+        Registers a 'requires' (a static) dependency of the task. It returns a future which can be used in the
+        run_task() method via BaseTask.get_values_from_future() to get access to the result of the child task.
+        See class RequiresTaskFuture for more details.
+        """
         if self._task_state == TaskState.INIT:
             index = len(self._registered_tasks)
             self._registered_tasks.append(task)
@@ -213,7 +247,7 @@ class BaseTask(Task):
         else:
             return futures
 
-    def get_values_from_future(self, future: AbstractTaskFuture) -> Union[Any, Dict[str, Any]]:
+    def get_values_from_future(self, future: AbstractTaskFuture) -> Union[Any, Set[str]]:
         if len(future.list_outputs()) == 1 and DEFAULT_RETURN_OBJECT_NAME in future.list_outputs():
             return future.get_output()
         else:
@@ -243,6 +277,12 @@ class BaseTask(Task):
         raise AbstractMethodException()
 
     def run_dependencies(self, tasks) -> Generator["BaseTask", PickleTarget, Any]:
+        """
+        Runs a 'run' (a dynamic) dependency
+        (that means a dependencies which was evaluated during the runtime of the task), and returns a RunTaskFuture.
+        The returned future can then be used with BaseTask.get_values_from_futures() to get access to the result
+        of the child task.
+        """
         if self._task_state == TaskState.RUN:
             self._register_run_dependencies(tasks)
             self._run_dependencies_target.write(self._run_dependencies_tasks)
