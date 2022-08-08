@@ -4,7 +4,7 @@ from exasol_integration_test_docker_environment.lib import api
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 
 
-class DockerAPIBuildTestContainerTest(unittest.TestCase):
+class APIBuildTestContainerTest(unittest.TestCase):
 
     def test_build_test_container(self):
         image_info = api.build_test_container()

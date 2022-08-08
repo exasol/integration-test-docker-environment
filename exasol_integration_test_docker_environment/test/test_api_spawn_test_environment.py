@@ -1,12 +1,11 @@
 import unittest
-from pathlib import Path
 
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.testing import utils
 from exasol_integration_test_docker_environment.testing.api_test_environment import ApiTestEnvironment
 
 
-class DockerAPITestEnvironmentTest(unittest.TestCase):
+class APISpawnTestEnvironmentTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):

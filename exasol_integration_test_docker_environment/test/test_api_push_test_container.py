@@ -5,7 +5,7 @@ from exasol_integration_test_docker_environment.testing.api_test_environment imp
 from exasol_integration_test_docker_environment.testing.docker_registry import create_local_registry
 
 
-class DockerPushTest(unittest.TestCase):
+class APIPushTestContainerTest(unittest.TestCase):
 
     def setUp(self):
         print(f"SetUp {self.__class__.__name__}")
