@@ -4,7 +4,7 @@ from pathlib import Path
 
 import luigi
 
-from exasol_integration_test_docker_environment.lib.api.common import generate_root_task, run_task
+from exasol_integration_test_docker_environment.lib.api.common import generate_root_task, run_task, set_build_config
 from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import DependencyLoggerBaseTask
 
 
@@ -14,8 +14,8 @@ class TestTask(DependencyLoggerBaseTask):
     def register_required(self):
         self.register_dependency(self.create_child_task(task_class=TestChildTask))
 
-    def run(self):
-        self._complete_target.write(dict())
+    def run_task(self):
+        pass
 
 
 class TestChildTask(DependencyLoggerBaseTask):
