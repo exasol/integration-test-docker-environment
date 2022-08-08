@@ -14,8 +14,8 @@ class TestTask(DependencyLoggerBaseTask):
     def register_required(self):
         self.register_dependency(self.create_child_task(task_class=TestChildTask))
 
-    def run_task(self):
-        pass
+    def run(self):
+        self._complete_target.write(dict())
 
 
 class TestChildTask(DependencyLoggerBaseTask):
