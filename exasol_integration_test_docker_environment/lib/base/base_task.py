@@ -319,10 +319,21 @@ class BaseTask(Task):
         else:
             raise WrongTaskStateException(self._task_state, "return_target")
 
-    def get_result(self, key: str = DEFAULT_RETURN_OBJECT_NAME) -> Optional[Any]:
+    def get_result(self) -> Dict[str, Any]:
+        """
+        Returns the return values of the task,
+        this means all values which were passed with return_object() during run_task().
+        Note that it's safe to call this method from the client side, ignoring luigi's scheduler, as it uses
+        persistent data to get the result.
+        """
+        if not self.output().exists():
+            # Actual state might be unknown, because we might be called from the client side.
+            raise WrongTaskStateException(TaskState.NONE, "get_result")
         output = self.output().read()
-        if key in output:
-            return output[key].read()
+        result = dict()
+        for key in output:
+            result[key] = output[key].read()
+        return result
 
     def __repr__(self):
         """

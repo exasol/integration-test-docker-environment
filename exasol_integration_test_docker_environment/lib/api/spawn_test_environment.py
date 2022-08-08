@@ -8,6 +8,7 @@ from exasol_integration_test_docker_environment.cli.options.docker_repository_op
 from exasol_integration_test_docker_environment.cli.options.system_options import DEFAULT_OUTPUT_DIRECTORY
 from exasol_integration_test_docker_environment.cli.options.test_environment_options import LATEST_DB_VERSION
 from exasol_integration_test_docker_environment.lib.api.api_errors import ArgumentConstraintError, TaskRuntimeError
+from exasol_integration_test_docker_environment.lib.base.abstract_task_future import DEFAULT_RETURN_OBJECT_NAME
 from exasol_integration_test_docker_environment.lib.data.environment_info import EnvironmentInfo
 from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_environment_with_docker_db import \
     SpawnTestEnvironmentWithDockerDB
@@ -83,8 +84,8 @@ def spawn_test_environment(
                                               create_certificates=create_certificates
                                               )
     try:
-        environment_info = run_task(task_creator, workers, task_dependencies_dot_file)
-        return environment_info
+        result = run_task(task_creator, workers, task_dependencies_dot_file)
+        return result[DEFAULT_RETURN_OBJECT_NAME]
     except Exception as e:
         traceback.print_exc()
         raise TaskRuntimeError from e

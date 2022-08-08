@@ -7,6 +7,7 @@ import luigi
 
 from exasol_integration_test_docker_environment.lib.api.common import generate_root_task, run_task
 from exasol_integration_test_docker_environment.cli.options.system_options import DEFAULT_OUTPUT_DIRECTORY
+from exasol_integration_test_docker_environment.lib.base.abstract_task_future import DEFAULT_RETURN_OBJECT_NAME
 from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import DependencyLoggerBaseTask
 
 from exasol_integration_test_docker_environment.lib.base.luigi_log_config import LOG_ENV_VARIABLE_NAME
@@ -95,7 +96,7 @@ def run_test_return_value() -> None:
         task_creator = lambda: generate_root_task(task_class=TestTaskWithReturn, x="Test")
 
         return_value = run_task(task_creator, workers=5, task_dependencies_dot_file=None)
-        assert return_value == "Test-123"
+        assert return_value[DEFAULT_RETURN_OBJECT_NAME] == "Test-123"
 
 
 if __name__ == '__main__':
