@@ -8,7 +8,7 @@ from typing import (
     Callable,
     Tuple,
     Set,
-    Optional, Any
+    Optional, Any, Dict
 )
 
 import luigi
@@ -93,7 +93,7 @@ def generate_root_task(task_class, *args, **kwargs) -> DependencyLoggerBaseTask:
 
 def run_task(task_creator: Callable[[], DependencyLoggerBaseTask], workers: int,
              task_dependencies_dot_file: Optional[str]) \
-        -> Any:
+        -> Dict[str, Any]:
     setup_worker()
     start_time = datetime.now()
     task = task_creator()

@@ -7,6 +7,7 @@ from typing import Dict, Any
 
 from exasol_integration_test_docker_environment.cli.options.test_environment_options import LATEST_DB_VERSION
 from exasol_integration_test_docker_environment.lib.api import spawn_test_environment
+from exasol_integration_test_docker_environment.testing.docker_registry import DockerRegistry
 from exasol_integration_test_docker_environment.testing.exaslct_docker_test_environment import \
     ExaslctDockerTestEnvironment
 from exasol_integration_test_docker_environment.testing.utils import find_free_ports, check_db_version_from_env
@@ -24,24 +25,13 @@ class ApiTestEnvironment:
         self.name = self.test_class.__name__
         self._repository_prefix = "exaslct_test"
         self.temp_dir = tempfile.mkdtemp()
+        self.docker_registry = DockerRegistry(self.name)
 
     def get_test_flavor(self):
         source_file_of_test_object = inspect.getsourcefile(self.test_class)
         flavor_path = Path(os.path.realpath(source_file_of_test_object)).parent.joinpath(
             "resources/test-flavor")
         return flavor_path
-
-    @property
-    def docker_repository_name(self):
-        return f"{self._repository_prefix.lower()}/{self.name.lower()}"  # docker repository names must be lowercase
-
-    @property
-    def repository_prefix(self):
-        return self._repository_prefix
-
-    @repository_prefix.setter
-    def repository_prefix(self, value):
-        self._repository_prefix = value
 
     @property
     def output_dir(self):
@@ -56,6 +46,7 @@ class ApiTestEnvironment:
             shutil.rmtree(self.temp_dir)
         except Exception as e:
             print(e)
+        self.docker_registry.close()
 
     def spawn_docker_test_environment(self, name: str, additional_parameter: Dict[str, Any] = None) \
             -> ExaslctDockerTestEnvironment:
@@ -71,14 +62,14 @@ class ApiTestEnvironment:
             bucketfs_port=bucketfs_port)
         db_version_from_env = check_db_version_from_env()
         if additional_parameter is None:
-            on_host_parameter.environment_info = \
+            on_host_parameter.environment_info, on_host_parameter.clean_up = \
                 spawn_test_environment(environment_name=on_host_parameter.name,
                                        database_port_forward=on_host_parameter.database_port,
                                        bucketfs_port_forward=on_host_parameter.bucketfs_port,
                                        docker_db_image_version=db_version_from_env or LATEST_DB_VERSION,
                                        output_directory=self.temp_dir)
         else:
-            on_host_parameter.environment_info = \
+            on_host_parameter.environment_info, on_host_parameter.clean_up = \
                 spawn_test_environment(environment_name=on_host_parameter.name,
                                        database_port_forward=on_host_parameter.database_port,
                                        bucketfs_port_forward=on_host_parameter.bucketfs_port,

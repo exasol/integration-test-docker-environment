@@ -2,7 +2,6 @@ import subprocess
 from typing import Optional
 
 from exasol_integration_test_docker_environment.lib.data.environment_info import EnvironmentInfo
-from exasol_integration_test_docker_environment.testing.utils import remove_docker_container, remove_docker_volumes
 
 
 class ExaslctDockerTestEnvironment:
@@ -22,8 +21,8 @@ class ExaslctDockerTestEnvironment:
         self.name = name
         self.environment_info = environment_info
         self.completed_process = completed_process
+        self.clean_up = None
 
     def close(self):
-        remove_docker_container([f"test_container_{self.name}",
-                                 f"db_container_{self.name}"])
-        remove_docker_volumes([f"db_container_{self.name}_volume"])
+        if self.clean_up is not None:
+            self.clean_up()

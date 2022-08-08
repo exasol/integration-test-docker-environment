@@ -1,5 +1,6 @@
+import functools
 import traceback
-from typing import Tuple, Optional
+from typing import Tuple, Optional, Callable
 import humanfriendly
 
 from exasol_integration_test_docker_environment.lib.api.common import set_build_config, set_docker_repository_config, \
@@ -10,8 +11,16 @@ from exasol_integration_test_docker_environment.cli.options.test_environment_opt
 from exasol_integration_test_docker_environment.lib.api.api_errors import ArgumentConstraintError, TaskRuntimeError
 from exasol_integration_test_docker_environment.lib.base.abstract_task_future import DEFAULT_RETURN_OBJECT_NAME
 from exasol_integration_test_docker_environment.lib.data.environment_info import EnvironmentInfo
+from exasol_integration_test_docker_environment.lib.docker.container.utils import remove_docker_container
+from exasol_integration_test_docker_environment.lib.docker.volumes.utils import remove_docker_volumes
 from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_environment_with_docker_db import \
     SpawnTestEnvironmentWithDockerDB
+
+
+def _cleanup(environment_info: EnvironmentInfo) -> None:
+    remove_docker_container([environment_info.test_container_info.container_name,
+                             environment_info.database_info.container_info.container_name])
+    remove_docker_volumes([environment_info.database_info.container_info.volume_name])
 
 
 def spawn_test_environment(
@@ -37,11 +46,14 @@ def spawn_test_environment(
         output_directory: str = DEFAULT_OUTPUT_DIRECTORY,
         temporary_base_directory: str = "/tmp",
         workers: int = 5,
-        task_dependencies_dot_file: Optional[str] = None) -> EnvironmentInfo:
+        task_dependencies_dot_file: Optional[str] = None) -> Tuple[EnvironmentInfo, Callable[[], None]]:
     """
     This command spawn a test environment with a docker-db container and a connected test-container.
     The test-container is reachable by the database for output redirects of UDFs.
+    The function returns an environment_info object, describing the environment, and a cleanup-method, which
+    can be used to stop the environment.
     raises: TaskRuntimeError if spawning the test environment fails
+
     """
     parsed_db_mem_size = humanfriendly.parse_size(db_mem_size)
     if parsed_db_mem_size < humanfriendly.parse_size("1 GiB"):
@@ -85,7 +97,8 @@ def spawn_test_environment(
                                               )
     try:
         result = run_task(task_creator, workers, task_dependencies_dot_file)
-        return result[DEFAULT_RETURN_OBJECT_NAME]
+        environment_info = result[DEFAULT_RETURN_OBJECT_NAME]
+        return environment_info, functools.partial(_cleanup, environment_info)
     except Exception as e:
         traceback.print_exc()
         raise TaskRuntimeError from e

@@ -32,37 +32,6 @@ def find_free_ports(num_ports: int) -> List[int]:
     return ret_val
 
 
-def remove_docker_container(containers):
-    with ContextDockerClient() as docker_client:
-        for container in containers:
-            try:
-                docker_client.containers.get(container).remove(force=True)
-            except Exception as e:
-                print(e)
-
-
-def remove_docker_volumes(volumes):
-    with ContextDockerClient() as docker_client:
-        for volume in volumes:
-            try:
-                docker_client.volumes.get(volume).remove(force=True)
-            except Exception as e:
-                print(e)
-
-
-def request_registry_images(registry_host, registry_port, repo_name):
-    url = f"http://{registry_host}:{registry_port}/v2/{repo_name}/tags/list"
-    result = requests.request("GET", url)
-    images = json.loads(result.content.decode("UTF-8"))
-    return images
-
-
-def request_registry_repositories(registry_host, registry_port):
-    result = requests.request("GET", f"http://{registry_host}:{registry_port}/v2/_catalog/")
-    repositories_ = json.loads(result.content.decode("UTF-8"))["repositories"]
-    return repositories_
-
-
 def close_environments(*args):
     for env in args:
         try:
