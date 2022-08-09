@@ -16,6 +16,7 @@ import networkx
 from networkx import DiGraph
 
 from exasol_integration_test_docker_environment.lib import extract_modulename_for_build_steps
+from exasol_integration_test_docker_environment.lib.api.api_errors import TaskRuntimeError
 from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import DependencyLoggerBaseTask
 from exasol_integration_test_docker_environment.lib.base.luigi_log_config import get_luigi_log_config, get_log_path
 from exasol_integration_test_docker_environment.lib.base.task_dependency import TaskDependency, DependencyState
@@ -107,14 +108,15 @@ def run_task(task_creator: Callable[[], DependencyLoggerBaseTask], workers: int,
         if success:
             handle_success(task, task_dependencies_dot_file, start_time)
             return task.get_result()
-        elif not no_scheduling_errors:
-            handle_failure(task, task_dependencies_dot_file, start_time)
-            logging.error("Task {task} failed. : luigi reported a scheduling error.")
-            raise RuntimeError(f"Task {task} failed. reason: luigi reported a scheduling error.")
         elif task.failed_target.exists():
             handle_failure(task, task_dependencies_dot_file, start_time)
-            logging.error("Task {task} failed. failed target exists.")
-            raise RuntimeError(f"Task {task} failed. reason: check {task.failed_target}.")
+            logging.error(f"Task {task} failed. failed target exists.")
+            raise TaskRuntimeError(msg=f"Task {task} (or any of it's subtasks) failed.",
+                                   inner=list(task.collect_failures().keys()))
+        elif not no_scheduling_errors:
+            handle_failure(task, task_dependencies_dot_file, start_time)
+            logging.error(f"Task {task} failed. : luigi reported a scheduling error.")
+            raise TaskRuntimeError(msg=f"Task {task} failed. reason: luigi reported a scheduling error.")
     except BaseException as e:
         logging.error("Going to abort the task %s" % task)
         raise e

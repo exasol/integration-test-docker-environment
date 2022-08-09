@@ -53,10 +53,6 @@ def build_test_container(
     set_docker_repository_config(target_docker_password, target_docker_repository_name, target_docker_username,
                                  target_docker_tag_prefix, "target")
     task_creator = lambda: generate_root_task(task_class=DockerTestContainerBuild)
-    try:
-        result = run_task(task_creator, workers, task_dependencies_dot_file)
-        image_infos = result[DEFAULT_RETURN_OBJECT_NAME]
-        return image_infos["test-container"]
-    except Exception as e:
-        traceback.print_exc()
-        raise TaskRuntimeError from e
+    result = run_task(task_creator, workers, task_dependencies_dot_file)
+    image_infos = result[DEFAULT_RETURN_OBJECT_NAME]
+    return image_infos["test-container"]

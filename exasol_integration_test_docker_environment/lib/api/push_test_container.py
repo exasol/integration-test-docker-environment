@@ -55,10 +55,6 @@ def push_test_container(
     task_creator = lambda: generate_root_task(task_class=DockerTestContainerPush,
                                               force_push=force_push,
                                               push_all=push_all)
-    try:
-        result = run_task(task_creator, workers, task_dependencies_dot_file)
-        image_infos = result[DEFAULT_RETURN_OBJECT_NAME]
-        return image_infos[0]
-    except Exception as e:
-        traceback.print_exc()
-        raise TaskRuntimeError from e
+    result = run_task(task_creator, workers, task_dependencies_dot_file)
+    image_infos = result[DEFAULT_RETURN_OBJECT_NAME]
+    return image_infos[0]

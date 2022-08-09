@@ -95,10 +95,6 @@ def spawn_test_environment(
                                               is_setup_database_activated=not deactivate_database_setup,
                                               create_certificates=create_certificates
                                               )
-    try:
-        result = run_task(task_creator, workers, task_dependencies_dot_file)
-        environment_info = result[DEFAULT_RETURN_OBJECT_NAME]
-        return environment_info, functools.partial(_cleanup, environment_info)
-    except Exception as e:
-        traceback.print_exc()
-        raise TaskRuntimeError from e
+    result = run_task(task_creator, workers, task_dependencies_dot_file)
+    environment_info = result[DEFAULT_RETURN_OBJECT_NAME]
+    return environment_info, functools.partial(_cleanup, environment_info)
