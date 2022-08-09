@@ -48,7 +48,7 @@ def spawn_test_environment(
         workers: int = 5,
         task_dependencies_dot_file: Optional[str] = None) -> Tuple[EnvironmentInfo, Callable[[], None]]:
     """
-    This command spawn a test environment with a docker-db container and a connected test-container.
+    This function spawns a test environment with a docker-db container and a connected test-container.
     The test-container is reachable by the database for output redirects of UDFs.
     The function returns an environment_info object, describing the environment, and a cleanup-method, which
     can be used to stop the environment.

@@ -1,4 +1,5 @@
 import unittest
+from sys import stderr
 
 from exasol_integration_test_docker_environment.lib import api
 from exasol_integration_test_docker_environment.testing.api_test_environment import ApiTestEnvironment
@@ -8,10 +9,10 @@ from exasol_integration_test_docker_environment.testing.docker_registry import c
 class APIPushTestContainerTest(unittest.TestCase):
 
     def setUp(self):
-        print(f"SetUp {self.__class__.__name__}")
+        print(f"SetUp {self.__class__.__name__}", file=stderr)
         self.test_environment = ApiTestEnvironment(self)
         self.test_environment.docker_registry = create_local_registry(self.test_environment.name)
-        print("registry:", self.test_environment.docker_registry.request_registry_repositories())
+        print("registry:", self.test_environment.docker_registry.request_registry_repositories(), file=stderr)
 
     def tearDown(self):
         self.test_environment.close()
@@ -20,9 +21,9 @@ class APIPushTestContainerTest(unittest.TestCase):
         docker_registry = self.test_environment.docker_registry
         image_info = api.push_test_container(source_docker_repository_name=docker_registry.repository_name,
                                              target_docker_repository_name=docker_registry.repository_name)
-        print("repos:", docker_registry.request_registry_repositories())
+        print("repos:", docker_registry.request_registry_repositories(), file=stderr)
         images = docker_registry.request_registry_images()
-        print("images", images)
+        print("images", images, file=stderr)
         self.assertEqual(len(images["tags"]), 1,
                          f"{images} doesn't have the expected 110 tags, it has {len(images['tags'])}")
         self.assertIn(image_info.get_target_complete_tag(), images["tags"][0])

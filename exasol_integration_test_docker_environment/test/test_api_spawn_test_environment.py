@@ -1,4 +1,5 @@
 import unittest
+from sys import stderr
 
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.testing import utils
@@ -9,7 +10,7 @@ class APISpawnTestEnvironmentTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        print(f"SetUp {cls.__name__}")
+        print(f"SetUp {cls.__name__}", file=stderr)
         # We can't use start-test-env. because it only mounts ./ and
         # doesn't work with --build_ouput-directory
         cls.test_environment = ApiTestEnvironment(cls)

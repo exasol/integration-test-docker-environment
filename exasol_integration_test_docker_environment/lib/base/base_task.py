@@ -31,7 +31,7 @@ class RequiresTaskFuture(AbstractTaskFuture):
     """
     Represents a future for a statically ("requires") registered task.
     Details:
-    - The RegisterTaskFuture is used with dependency return in luigis required method
+    - The RegisterTaskFuture is used with dependencies returned in luigis required method
     - In the required method you return tasks and usually you would to get the output target of your child tasks
       via luigis input() method (check https://luigi.readthedocs.io/en/stable/tasks.html#task-input)
     - However, if you have multiple child tasks which return in requires, for example in a dict or list,
@@ -330,10 +330,7 @@ class BaseTask(Task):
             # Actual state might be unknown, because we might be called from the client side.
             raise WrongTaskStateException(TaskState.NONE, "get_result")
         output = self.output().read()
-        result = dict()
-        for key in output:
-            result[key] = output[key].read()
-        return result
+        return { key: value.read() for key, value in output.items() }
 
     def __repr__(self):
         """

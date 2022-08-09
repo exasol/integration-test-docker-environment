@@ -34,8 +34,8 @@ def push_test_container(
         workers: int = 5,
         task_dependencies_dot_file: Optional[str] = None) -> ImageInfo:
     """
-    This command pushs all stages of the test container for the test environment.
-    If the stages do not exists locally, the system will build or pull them before the push.
+    This function pushes all stages of the test container for the test environment.
+    If the stages do not exist locally, the system will build or pull them before the push.
     """
     set_build_config(force_rebuild,
                      force_rebuild_from,

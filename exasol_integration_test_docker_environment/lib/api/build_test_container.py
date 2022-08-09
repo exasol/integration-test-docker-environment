@@ -32,8 +32,8 @@ def build_test_container(
         workers: int = 5,
         task_dependencies_dot_file: Optional[str] = None) -> ImageInfo:
     """
-    This command builds all stages of the test container for the test environment.
-    If stages are cached in a docker registry, they command is going to pull them,
+    This function builds all stages of the test container for the test environment.
+    If stages are cached in a docker registry, the function is going to pull them,
     instead of building them.
     It returns the image info of the test-container.
     """
