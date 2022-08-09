@@ -8,7 +8,6 @@ import luigi
 
 from exasol_integration_test_docker_environment.lib.api.common import set_build_config, set_docker_repository_config, \
     generate_root_task
-from exasol_integration_test_docker_environment.lib.base.abstract_task_future import DEFAULT_RETURN_OBJECT_NAME
 from exasol_integration_test_docker_environment.lib.base.docker_base_task import DockerBaseTask
 from exasol_integration_test_docker_environment.lib.data.container_info import ContainerInfo
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
@@ -100,7 +99,7 @@ class TestContainerReuseTest(unittest.TestCase):
             if success:
                 result = task.get_result()
                 task.cleanup(True)
-                return result[DEFAULT_RETURN_OBJECT_NAME]
+                return result
             else:
                 raise Exception("Task failed")
         except Exception as e:
@@ -113,8 +112,7 @@ class TestContainerReuseTest(unittest.TestCase):
             success = luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
 
             if success:
-                result = task.get_result()
-                return result[DEFAULT_RETURN_OBJECT_NAME]
+                return task.get_result()
             else:
                 raise Exception("Task failed")
         except Exception as e:

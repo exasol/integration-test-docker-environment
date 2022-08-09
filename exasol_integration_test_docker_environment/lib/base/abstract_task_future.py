@@ -1,11 +1,7 @@
-from exasol_integration_test_docker_environment.abstract_method_exception import AbstractMethodException
-
-DEFAULT_RETURN_OBJECT_NAME = "default"
+import abc
 
 
-class AbstractTaskFuture:
-    def get_output(self, name: str = DEFAULT_RETURN_OBJECT_NAME):
-        raise AbstractMethodException()
-
-    def list_outputs(self):
-        raise AbstractMethodException()
+class AbstractTaskFuture(abc.ABC):
+    @abc.abstractmethod
+    def get_output(self):
+        ...

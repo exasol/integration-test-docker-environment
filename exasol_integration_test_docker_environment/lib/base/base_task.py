@@ -12,8 +12,7 @@ from luigi.parameter import ParameterVisibility
 from luigi.task import TASK_ID_TRUNCATE_HASH
 
 from exasol_integration_test_docker_environment.abstract_method_exception import AbstractMethodException
-from exasol_integration_test_docker_environment.lib.base.abstract_task_future import AbstractTaskFuture, \
-    DEFAULT_RETURN_OBJECT_NAME
+from exasol_integration_test_docker_environment.lib.base.abstract_task_future import AbstractTaskFuture
 from exasol_integration_test_docker_environment.lib.base.pickle_target import PickleTarget
 from exasol_integration_test_docker_environment.lib.base.task_logger_wrapper import TaskLoggerWrapper
 from exasol_integration_test_docker_environment.lib.base.task_state import TaskState
@@ -49,20 +48,14 @@ class RequiresTaskFuture(AbstractTaskFuture):
     def __init__(self, current_task: "BaseTask", child_task_index: int):
         self._child_task_index = child_task_index
         self._current_task = current_task
-        self._outputs_dict = None
+        self._outputs_cache = None
 
-    def get_output(self, name: str = DEFAULT_RETURN_OBJECT_NAME):
-        return self._get_outputs_dict()[name].read()
-
-    def list_outputs(self) -> List[str]:
-        return list(self._get_outputs_dict().keys())
-
-    def _get_outputs_dict(self) -> Dict[str, PickleTarget]:
+    def get_output(self) -> Any:
         if self._current_task._task_state == TaskState.RUN:
-            if self._outputs_dict is None:
+            if self._outputs_cache is None:
                 completion_target = self._current_task.input()[self._child_task_index]
-                self._outputs_dict = completion_target.read()
-            return self._outputs_dict
+                self._outputs_cache = completion_target.read()
+            return self._outputs_cache
         else:
             raise WrongTaskStateException(self._current_task._task_state, "RequiresTaskFuture.read_outputs_dict")
 
@@ -82,19 +75,13 @@ class RunTaskFuture(AbstractTaskFuture):
     """
 
     def __init__(self, completion_target: PickleTarget):
-        self._outputs_dict = None
+        self._outputs_cache = None
         self.completion_target = completion_target
 
-    def get_output(self, name: str = DEFAULT_RETURN_OBJECT_NAME):
-        return self._get_outputs_dict()[name].read()
-
-    def list_outputs(self) -> List[str]:
-        return list(self._get_outputs_dict().keys())
-
-    def _get_outputs_dict(self) -> Dict[str, PickleTarget]:
-        if self._outputs_dict is None:
-            self._outputs_dict = self.completion_target.read()
-        return self._outputs_dict
+    def get_output(self) -> Any:
+        if self._outputs_cache is None:
+            self._outputs_cache = self.completion_target.read()
+        return self._outputs_cache
 
 
 class BaseTask(Task):
@@ -118,14 +105,13 @@ class BaseTask(Task):
         self.logger = TaskLoggerWrapper(logger, self.__repr__())
         self._run_dependencies_target = PickleTarget(path=self._get_tmp_path_for_run_dependencies())
         self._complete_target = PickleTarget(path=self._get_tmp_path_for_completion_target())
-        self._registered_return_targets = dict()
+        self._registered_return_target = None
 
     def __getstate__(self):
         new_dict = dict(self.__dict__)
         del new_dict["logger"]
         del new_dict["_complete_target"]
         del new_dict["_run_dependencies_target"]
-        del new_dict["_registered_return_targets"]
         return new_dict
 
     def __setstate__(self, new_dict):
@@ -186,9 +172,6 @@ class BaseTask(Task):
         return Path(self._get_tmp_path_for_job(),
                     self.task_id)
 
-    def _get_tmp_path_for_returns(self, name: str) -> Path:
-        return Path(self._get_tmp_path_for_task(), RETURN_TARGETS, name)
-
     def _get_tmp_path_for_completion_target(self) -> Path:
         return Path(self._get_tmp_path_for_task(), COMPLETION_TARGET)
 
@@ -242,10 +225,7 @@ class BaseTask(Task):
             return futures
 
     def get_values_from_future(self, future: AbstractTaskFuture) -> Union[Any, Set[str]]:
-        if len(future.list_outputs()) == 1 and DEFAULT_RETURN_OBJECT_NAME in future.list_outputs():
-            return future.get_output()
-        else:
-            return {future.get_output(key) for key in future.list_outputs()}
+        return future.get_output()
 
     def requires(self):
         return self._registered_tasks
@@ -261,7 +241,7 @@ class BaseTask(Task):
                 yield from task_generator
             self._task_state = TaskState.FINISHED
             self.logger.info("Write complete_target")
-            self._complete_target.write(self._registered_return_targets)
+            self._complete_target.write(self._registered_return_target)
         except Exception as e:
             self._task_state = TaskState.ERROR
             self.logger.exception("Exception in run: %s", e)
@@ -307,30 +287,27 @@ class BaseTask(Task):
         else:
             return completion_targets
 
-    def return_object(self, object: Any, name: str = DEFAULT_RETURN_OBJECT_NAME):
+    def return_object(self, object: Any):
         """Returns the object to the calling task. The object needs to be pickleable"""
         if self._task_state == TaskState.RUN:
-            if name not in self._registered_return_targets:
-                target = PickleTarget(self._get_tmp_path_for_returns(name))
-                self._registered_return_targets[name] = target
-                target.write(object)
+            if self._registered_return_target is None:
+                self._registered_return_target = object
             else:
-                raise Exception(f"return target {name} already used")
+                raise Exception(f"return target already used")
         else:
             raise WrongTaskStateException(self._task_state, "return_target")
 
-    def get_result(self) -> Dict[str, Any]:
+    def get_result(self) -> Any:
         """
-        Returns the return values of the task,
-        this means all values which were passed with return_object() during run_task().
+        Returns the return value of the task,
+        this means the single value which was passed with return_object() during run_task().
         Note that it's safe to call this method from the client side, ignoring luigi's scheduler, as it uses
         persistent data to get the result.
         """
         if not self.output().exists():
             # Actual state might be unknown, because we might be called from the client side.
             raise WrongTaskStateException(TaskState.NONE, "get_result")
-        output = self.output().read()
-        return { key: value.read() for key, value in output.items() }
+        return self.output().read()
 
     def __repr__(self):
         """

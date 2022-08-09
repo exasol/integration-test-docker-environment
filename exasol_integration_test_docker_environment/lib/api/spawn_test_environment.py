@@ -1,5 +1,4 @@
 import functools
-import traceback
 from typing import Tuple, Optional, Callable
 import humanfriendly
 
@@ -8,8 +7,7 @@ from exasol_integration_test_docker_environment.lib.api.common import set_build_
 from exasol_integration_test_docker_environment.cli.options.docker_repository_options import DEFAULT_DOCKER_REPOSITORY_NAME
 from exasol_integration_test_docker_environment.cli.options.system_options import DEFAULT_OUTPUT_DIRECTORY
 from exasol_integration_test_docker_environment.cli.options.test_environment_options import LATEST_DB_VERSION
-from exasol_integration_test_docker_environment.lib.api.api_errors import ArgumentConstraintError, TaskRuntimeError
-from exasol_integration_test_docker_environment.lib.base.abstract_task_future import DEFAULT_RETURN_OBJECT_NAME
+from exasol_integration_test_docker_environment.lib.api.api_errors import ArgumentConstraintError
 from exasol_integration_test_docker_environment.lib.data.environment_info import EnvironmentInfo
 from exasol_integration_test_docker_environment.lib.docker.container.utils import remove_docker_container
 from exasol_integration_test_docker_environment.lib.docker.volumes.utils import remove_docker_volumes
@@ -95,6 +93,5 @@ def spawn_test_environment(
                                               is_setup_database_activated=not deactivate_database_setup,
                                               create_certificates=create_certificates
                                               )
-    result = run_task(task_creator, workers, task_dependencies_dot_file)
-    environment_info = result[DEFAULT_RETURN_OBJECT_NAME]
+    environment_info = run_task(task_creator, workers, task_dependencies_dot_file)
     return environment_info, functools.partial(_cleanup, environment_info)

@@ -18,7 +18,6 @@ class TestTask1(TestBaseTask):
 
     def run_task(self):
         self.logger.info("RUN")
-        self.logger.info(f"task2 list_outputs {self.task2.list_outputs()}")
         self.logger.info(f"task2 {self.task2.get_output()}")
         tasks_3 = yield from self.run_dependencies({
             "1": TestTask3(input_param="e"),

@@ -2,7 +2,6 @@ import unittest
 
 import luigi
 
-from exasol_integration_test_docker_environment.lib.base.abstract_task_future import DEFAULT_RETURN_OBJECT_NAME
 from exasol_integration_test_docker_environment.lib.data.environment_type import EnvironmentType
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_environment import SpawnTestEnvironment
@@ -109,7 +108,7 @@ class TestContainerReuseTest(unittest.TestCase):
 
     def test_initial_reuse_database_setup_populates_data(self):
         task = self.run_spawn_test_env(cleanup=True)
-        self._verify_test_data(task.get_result()[DEFAULT_RETURN_OBJECT_NAME])
+        self._verify_test_data(task.get_result())
         task.cleanup(True)
 
     def get_instance_ids(self, test_environment_info):
@@ -122,13 +121,13 @@ class TestContainerReuseTest(unittest.TestCase):
 
     def test_reuse_env_same_instances(self):
         task = self.run_spawn_test_env(cleanup=False)
-        test_environment_info = task.get_result()[DEFAULT_RETURN_OBJECT_NAME]
+        test_environment_info = task.get_result()
         old_instance_ids = self.get_instance_ids(test_environment_info)
         # This clean is supposed to not remove docker instances
         task.cleanup(True)
 
         task = self.run_spawn_test_env(cleanup=True)
-        test_environment_info = task.get_result()[DEFAULT_RETURN_OBJECT_NAME]
+        test_environment_info = task.get_result()
         new_instance_ids = self.get_instance_ids(test_environment_info)
         self.assertEquals(old_instance_ids, new_instance_ids)
         self._verify_test_data(test_environment_info)
