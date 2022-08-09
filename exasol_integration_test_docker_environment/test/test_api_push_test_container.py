@@ -11,18 +11,19 @@ class APIPushTestContainerTest(unittest.TestCase):
     def setUp(self):
         print(f"SetUp {self.__class__.__name__}", file=stderr)
         self.test_environment = ApiTestEnvironment(self)
-        self.test_environment.docker_registry = create_local_registry(self.test_environment.name)
-        print("registry:", self.test_environment.docker_registry.request_registry_repositories(), file=stderr)
+        self.docker_registry = create_local_registry(self.test_environment.name)
+        self.test_environment.docker_registry_description = self.docker_registry.docker_registry_description
+        print("registry:", self.docker_registry.request_registry_repositories(), file=stderr)
 
     def tearDown(self):
-        self.test_environment.close()
+        self.docker_registry.close()
 
     def test_docker_push(self):
-        docker_registry = self.test_environment.docker_registry
-        image_info = api.push_test_container(source_docker_repository_name=docker_registry.repository_name,
-                                             target_docker_repository_name=docker_registry.repository_name)
-        print("repos:", docker_registry.request_registry_repositories(), file=stderr)
-        images = docker_registry.request_registry_images()
+        docker_repository_name = self.docker_registry.docker_registry_description.repository_name
+        image_info = api.push_test_container(source_docker_repository_name=docker_repository_name,
+                                             target_docker_repository_name=docker_repository_name)
+        print("repos:", self.docker_registry.request_registry_repositories(), file=stderr)
+        images = self.docker_registry.request_registry_images()
         print("images", images, file=stderr)
         self.assertEqual(len(images["tags"]), 1,
                          f"{images} doesn't have the expected 110 tags, it has {len(images['tags'])}")
