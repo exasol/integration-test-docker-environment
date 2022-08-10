@@ -1,6 +1,7 @@
 import sys
 from datetime import datetime
 from sys import stderr
+from traceback import print_tb
 
 from exasol_integration_test_docker_environment.lib.api.api_errors import TaskRuntimeError
 
@@ -24,13 +25,14 @@ class TerminationHandler:
             self._handle_success()
         else:
             self._handle_unexpected_failure(exc_val, exc_tb)
+            exit_value = 1
         sys.exit(exit_value)
 
     def _handle_unexpected_failure(self, exc_val, exc_tb):
         timedelta = datetime.now() - self._start_time
         print("The command failed after %s s with:" % timedelta.total_seconds(), file=stderr)
-        print("Caught exception:" % exc_val, file=stderr)
-        print("Traceback:" % exc_tb, file=stderr)
+        print("Caught exception:%s" % exc_val, file=stderr)
+        print_tb(exc_tb)
 
     def _handle_failure(self, task_error: TaskRuntimeError):
         timedelta = datetime.now() - self._start_time
@@ -40,6 +42,7 @@ class TerminationHandler:
     @staticmethod
     def _print_task_failures(task_error: TaskRuntimeError):
         print(file=stderr)
+        print("Task failure message: %s" % task_error.msg, file=stderr)
         print("Task Failures:", file=stderr)
         if task_error.inner is not None:
             for failure in task_error.inner:
