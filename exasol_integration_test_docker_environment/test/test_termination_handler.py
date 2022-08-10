@@ -63,7 +63,6 @@ class TestTerminationHandler(unittest.TestCase):
         p.start()
         p.join()
         res = get_queue_content(q)
-        print(f"Debug - result: {res}")
         self.assertTrue(any(re.match(r"^The command took .+ s$", line) for line in res))
         self.assertEqual(p.exitcode, 0)
 
@@ -73,7 +72,6 @@ class TestTerminationHandler(unittest.TestCase):
         p.start()
         p.join()
         res = get_queue_content(q)
-        print(f"Debug - result: {res}")
         self.assertTrue(any(re.match(r"^The command failed after .+ s with:$", line) for line in res))
         self.assertTrue(any("task runtime error test" == line for line in res))
         self.assertFalse(any(line.startswith("Caught exception:") for line in res))
@@ -85,7 +83,6 @@ class TestTerminationHandler(unittest.TestCase):
         p.start()
         p.join()
         res = get_queue_content(q)
-        print(f"Debug - result: {res}")
         self.assertTrue(any(re.match(r"^The command failed after .+ s with:$", line) for line in res))
         self.assertTrue(any("Caught exception:unknown error" == line for line in res))
         self.assertTrue(any('raise RuntimeError("unknown error")' in line for line in res))
