@@ -27,6 +27,7 @@ def run_positive(queue: Queue) -> None:
     stdout_queue = StdoutQueue(queue)
     sys.stdout = stdout_queue
     sys.stderr = stdout_queue
+    # we need to release the termination module here, otherwise the new sys.stdout/sys.stderr might not be set correctly
     m = reload(exasol_integration_test_docker_environment.cli.termination_handler)
     with m.TerminationHandler():
         pass
@@ -36,6 +37,7 @@ def run_with_task_error(queue: Queue) -> None:
     stdout_queue = StdoutQueue(queue)
     sys.stdout = stdout_queue
     sys.stderr = stdout_queue
+    # we need to release the termination module here, otherwise the new sys.stdout/sys.stderr might not be set correctly
     m = reload(exasol_integration_test_docker_environment.cli.termination_handler)
     with m.TerminationHandler():
         raise TaskRuntimeError(msg="test", inner=["task runtime error test"])
@@ -45,6 +47,7 @@ def run_with_unknown_error(queue: Queue) -> None:
     stdout_queue = StdoutQueue(queue)
     sys.stdout = stdout_queue
     sys.stderr = stdout_queue
+    # we need to release the termination module here, otherwise the new sys.stdout/sys.stderr might not be set correctly
     m = reload(exasol_integration_test_docker_environment.cli.termination_handler)
     with m.TerminationHandler():
         raise RuntimeError("unknown error")
@@ -65,7 +68,6 @@ class TestTerminationHandler(unittest.TestCase):
         p.start()
         p.join()
         res = get_queue_content(q)
-        print(f"Debug - result: {res}", file=sys.stderr)
         self.assertTrue(any(re.match(r"^The command took .+ s$", line) for line in res))
         self.assertEqual(p.exitcode, 0)
 
@@ -75,7 +77,6 @@ class TestTerminationHandler(unittest.TestCase):
         p.start()
         p.join()
         res = get_queue_content(q)
-        print(f"Debug - result: {res}", file=sys.stderr)
         self.assertTrue(any(re.match(r"^The command failed after .+ s with:$", line) for line in res))
         self.assertTrue(any("task runtime error test" == line for line in res))
         self.assertFalse(any(line.startswith("Caught exception:") for line in res))
@@ -87,7 +88,6 @@ class TestTerminationHandler(unittest.TestCase):
         p.start()
         p.join()
         res = get_queue_content(q)
-        print(f"Debug - result: {res}", file=sys.stderr)
         self.assertTrue(any(re.match(r"^The command failed after .+ s with:$", line) for line in res))
         self.assertTrue(any("Caught exception:unknown error" == line for line in res))
         self.assertTrue(any('raise RuntimeError("unknown error")' in line for line in res))
