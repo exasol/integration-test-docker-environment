@@ -17,12 +17,12 @@ class APIPushTestContainerTest(unittest.TestCase):
 
     def test_docker_push(self):
         with LocalDockerRegistryContextManager(self.test_environment.name) as docker_registry:
-            print("registry:", docker_registry.request_registry_repositories(), file=stderr)
-            docker_repository_name = docker_registry.docker_registry_name
+            print("registry:", docker_registry.repositories, file=stderr)
+            docker_repository_name = docker_registry.name
             image_info = api.push_test_container(source_docker_repository_name=docker_repository_name,
                                                  target_docker_repository_name=docker_repository_name)
-            print("repos:", docker_registry.request_registry_repositories(), file=stderr)
-            images = docker_registry.request_registry_images()
+            print("repos:", docker_registry.repositories, file=stderr)
+            images = docker_registry.images
             print("images", images, file=stderr)
             self.assertEqual(len(images["tags"]), 1,
                              f"{images} doesn't have the expected 1 tags, it has {len(images['tags'])}")

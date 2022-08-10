@@ -20,16 +20,18 @@ class LocalDockerRegistry:
         self._registry_port = registry_port
 
     @property
-    def docker_registry_name(self):
+    def name(self):
         return f"localhost:{self._registry_port}/{self._name.lower()}"
 
-    def request_registry_images(self):
+    @property
+    def images(self):
         url = f"http://localhost:{self._registry_port}/v2/{self._name.lower()}/tags/list"
         result = requests.request("GET", url)
         images = json.loads(result.content.decode("UTF-8"))
         return images
 
-    def request_registry_repositories(self):
+    @property
+    def repositories(self):
         result = requests.request("GET", f"http://localhost:{self._registry_port}/v2/_catalog/")
         repositories_ = json.loads(result.content.decode("UTF-8"))["repositories"]
         return repositories_

@@ -11,6 +11,7 @@ from exasol_integration_test_docker_environment.lib.api.api_errors import Argume
 from exasol_integration_test_docker_environment.lib.data.environment_info import EnvironmentInfo
 from exasol_integration_test_docker_environment.lib.docker.container.utils import remove_docker_container
 from exasol_integration_test_docker_environment.lib.docker.volumes.utils import remove_docker_volumes
+from exasol_integration_test_docker_environment.lib.docker.networks.utils import remove_docker_networks
 from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_environment_with_docker_db import \
     SpawnTestEnvironmentWithDockerDB
 
@@ -19,6 +20,7 @@ def _cleanup(environment_info: EnvironmentInfo) -> None:
     remove_docker_container([environment_info.test_container_info.container_name,
                              environment_info.database_info.container_info.container_name])
     remove_docker_volumes([environment_info.database_info.container_info.volume_name])
+    remove_docker_networks([environment_info.network_info.network_name])
 
 
 def spawn_test_environment(

@@ -79,25 +79,6 @@ def run_test_different_logging_file_raises_error() -> None:
         assert exception_thrown
 
 
-class TestTaskWithReturn(DependencyLoggerBaseTask):
-    x = luigi.Parameter()
-
-    def run_task(self):
-        self.return_object(f"{self.x}-123")
-
-
-def run_test_return_value() -> None:
-    """
-    Integration test which verifies that the return value processing in run_task works as expected.
-    """
-
-    with tempfile.TemporaryDirectory() as temp_dir:
-        task_creator = lambda: generate_root_task(task_class=TestTaskWithReturn, x="Test")
-
-        return_value = run_task(task_creator, workers=5, task_dependencies_dot_file=None)
-        assert return_value == "Test-123"
-
-
 if __name__ == '__main__':
     test_type = sys.argv[1]
 
@@ -105,7 +86,6 @@ if __name__ == '__main__':
         "run_test_different_logging_file_raises_error": run_test_different_logging_file_raises_error,
         "run_test_same_logging_file_env_log_path": run_test_same_logging_file_env_log_path,
         "run_test_same_logging_file": run_test_same_logging_file,
-        "run_test_return_value": run_test_return_value,
     }
     try:
         dispatcher[test_type]()

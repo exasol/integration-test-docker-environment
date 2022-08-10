@@ -11,8 +11,6 @@ class APISpawnTestEnvironmentTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         print(f"SetUp {cls.__name__}", file=stderr)
-        # We can't use start-test-env. because it only mounts ./ and
-        # doesn't work with --build_ouput-directory
         cls.test_environment = ApiTestEnvironment(cls)
         cls.docker_environment_name = cls.__name__
         cls.spawned_docker_test_environments = \

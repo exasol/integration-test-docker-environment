@@ -3,6 +3,7 @@ import os
 import shutil
 import tempfile
 from pathlib import Path
+from sys import stderr
 from typing import Dict, Any
 
 from exasol_integration_test_docker_environment.cli.options.test_environment_options import LATEST_DB_VERSION
@@ -43,7 +44,7 @@ class ApiTestEnvironment:
         try:
             shutil.rmtree(self.temp_dir)
         except Exception as e:
-            print(e)
+            print(e, file=stderr)
 
     def spawn_docker_test_environment(self, name: str, additional_parameter: Dict[str, Any] = None) \
             -> ExaslctDockerTestEnvironment:
