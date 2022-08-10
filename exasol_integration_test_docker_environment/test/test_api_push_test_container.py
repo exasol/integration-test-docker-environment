@@ -25,7 +25,7 @@ class APIPushTestContainerTest(unittest.TestCase):
             images = docker_registry.request_registry_images()
             print("images", images, file=stderr)
             self.assertEqual(len(images["tags"]), 1,
-                             f"{images} doesn't have the expected 110 tags, it has {len(images['tags'])}")
+                             f"{images} doesn't have the expected 1 tags, it has {len(images['tags'])}")
             self.assertIn(image_info.get_target_complete_tag(), images["tags"][0])
 
 

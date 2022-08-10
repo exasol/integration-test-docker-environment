@@ -8,7 +8,7 @@ from typing import (
     Callable,
     Tuple,
     Set,
-    Optional, Any, Dict
+    Optional, Any
 )
 
 import luigi
@@ -96,7 +96,6 @@ def run_task(task_creator: Callable[[], DependencyLoggerBaseTask], workers: int,
              task_dependencies_dot_file: Optional[str]) \
         -> Any:
     setup_worker()
-    start_time = datetime.now()
     task = task_creator()
     success = False
     try:
@@ -105,16 +104,15 @@ def run_task(task_creator: Callable[[], DependencyLoggerBaseTask], workers: int,
                                                local_scheduler=True,
                                                logging_conf_file=f'{luigi_config}')
         success = not task.failed_target.exists() and no_scheduling_errors
+        generate_graph_from_task_dependencies(task, task_dependencies_dot_file)
+
         if success:
-            handle_success(task, task_dependencies_dot_file, start_time)
             return task.get_result()
         elif task.failed_target.exists():
-            handle_failure(task, task_dependencies_dot_file, start_time)
             logging.error(f"Task {task} failed. failed target exists.")
             raise TaskRuntimeError(msg=f"Task {task} (or any of it's subtasks) failed.",
                                    inner=list(task.collect_failures().keys()))
         elif not no_scheduling_errors:
-            handle_failure(task, task_dependencies_dot_file, start_time)
             logging.error(f"Task {task} failed. : luigi reported a scheduling error.")
             raise TaskRuntimeError(msg=f"Task {task} failed. reason: luigi reported a scheduling error.")
     except BaseException as e:
@@ -122,27 +120,6 @@ def run_task(task_creator: Callable[[], DependencyLoggerBaseTask], workers: int,
         raise e
     finally:
         task.cleanup(success)
-
-
-def handle_failure(task: DependencyLoggerBaseTask, task_dependencies_dot_file: Optional[str], start_time: datetime):
-    generate_graph_from_task_dependencies(task, task_dependencies_dot_file)
-    timedelta = datetime.now() - start_time
-    print("The command failed after %s s with:" % timedelta.total_seconds())
-    print_task_failures(task)
-
-
-def print_task_failures(task: DependencyLoggerBaseTask):
-    print()
-    print("Task Failures:")
-    for failure in task.collect_failures().keys():
-        print(failure)
-    print()
-
-
-def handle_success(task: DependencyLoggerBaseTask, task_dependencies_dot_file: Optional[str], start_time: datetime):
-    generate_graph_from_task_dependencies(task, task_dependencies_dot_file)
-    timedelta = datetime.now() - start_time
-    print("The command took %s s" % timedelta.total_seconds())
 
 
 def generate_graph_from_task_dependencies(task: DependencyLoggerBaseTask, task_dependencies_dot_file: Optional[str]):

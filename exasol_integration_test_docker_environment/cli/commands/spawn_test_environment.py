@@ -2,6 +2,7 @@ from typing import Optional, Tuple
 import click
 
 from exasol_integration_test_docker_environment.cli.cli import cli
+from exasol_integration_test_docker_environment.cli.termination_handler import TerminationHandler
 from exasol_integration_test_docker_environment.lib.api.common import add_options
 from exasol_integration_test_docker_environment.cli.options.system_options import system_options, \
     output_directory_option, tempory_base_directory_option
@@ -39,7 +40,7 @@ def spawn_test_environment(
         bucketfs_port_forward: Optional[int],
         db_mem_size: str,
         db_disk_size: str,
-        nameserver: Tuple[str,...],
+        nameserver: Tuple[str, ...],
         deactivate_database_setup: bool,
         docker_runtime: Optional[str],
         docker_db_image_version: str,
@@ -61,35 +62,33 @@ def spawn_test_environment(
     This command spawn a test environment with a docker-db container and a connected test-container.
     The test-container is reachable by the database for output redirects of UDFs.
     """
-    success = False
-    try:
-        success = api.spawn_test_environment(environment_name,
-                                             database_port_forward,
-                                             bucketfs_port_forward,
-                                             db_mem_size,
-                                             db_disk_size,
-                                             nameserver,
-                                             deactivate_database_setup,
-                                             docker_runtime,
-                                             docker_db_image_version,
-                                             docker_db_image_name,
-                                             create_certificates,
-                                             source_docker_repository_name,
-                                             source_docker_tag_prefix,
-                                             source_docker_username,
-                                             source_docker_password,
-                                             target_docker_repository_name,
-                                             target_docker_tag_prefix,
-                                             target_docker_username,
-                                             target_docker_password,
-                                             output_directory,
-                                             temporary_base_directory,
-                                             workers,
-                                             task_dependencies_dot_file)
-    except ArgumentConstraintError as e:
-        handle_wrong_argument_error(*e.args)
-    if not success:
-        exit(1)
+    with TerminationHandler():
+        try:
+            api.spawn_test_environment(environment_name,
+                                       database_port_forward,
+                                       bucketfs_port_forward,
+                                       db_mem_size,
+                                       db_disk_size,
+                                       nameserver,
+                                       deactivate_database_setup,
+                                       docker_runtime,
+                                       docker_db_image_version,
+                                       docker_db_image_name,
+                                       create_certificates,
+                                       source_docker_repository_name,
+                                       source_docker_tag_prefix,
+                                       source_docker_username,
+                                       source_docker_password,
+                                       target_docker_repository_name,
+                                       target_docker_tag_prefix,
+                                       target_docker_username,
+                                       target_docker_password,
+                                       output_directory,
+                                       temporary_base_directory,
+                                       workers,
+                                       task_dependencies_dot_file)
+        except ArgumentConstraintError as e:
+            handle_wrong_argument_error(*e.args)
 
 
 def handle_wrong_argument_error(argument_name, message):
