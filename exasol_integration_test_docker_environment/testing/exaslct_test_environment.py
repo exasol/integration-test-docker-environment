@@ -57,20 +57,20 @@ class ExaslctTestEnvironment:
         return flavor_path
 
     @property
-    def docker_repository_name(self):
+    def repository_name(self):
         return self._docker_repository_name
 
-    @docker_repository_name.setter
-    def docker_repository_name(self, value):
+    @repository_name.setter
+    def repository_name(self, value):
         self._docker_repository_name = value
         self._update_attributes()
 
     def _update_attributes(self):
         self.flavor_path_argument = f"--flavor-path {self.get_test_flavor()}"
-        docker_repository_name = self._docker_repository_name
-        self.docker_repository_arguments = f"--source-docker-repository-name {docker_repository_name} " \
-                                           f"--target-docker-repository-name {docker_repository_name}"
-        self.clean_docker_repository_arguments = f"--docker-repository-name {docker_repository_name}"
+        repository_name = self.repository_name
+        self.docker_repository_arguments = f"--source-docker-repository-name {repository_name} " \
+                                           f"--target-docker-repository-name {repository_name}"
+        self.clean_docker_repository_arguments = f"--docker-repository-name {repository_name}"
         self.output_directory_arguments = f"--output-directory {self.temp_dir}"
         self.task_dependencies_argument = " ".join([f"--task-dependencies-dot-file {self.name}.dot", ])
 
