@@ -12,7 +12,7 @@ from exasol_integration_test_docker_environment.lib.data.environment_info import
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.lib.docker.container.utils import remove_docker_container
 from exasol_integration_test_docker_environment.lib.docker.volumes.utils import remove_docker_volumes
-from exasol_integration_test_docker_environment.testing.docker_registry import default_docker_registry_name
+from exasol_integration_test_docker_environment.testing.docker_registry import default_docker_repository_name
 from exasol_integration_test_docker_environment.testing.exaslct_docker_test_environment import \
     ExaslctDockerTestEnvironment
 from exasol_integration_test_docker_environment.testing.spawned_test_environments import SpawnedTestEnvironments
@@ -37,7 +37,7 @@ class ExaslctTestEnvironment:
             self.test_class = self.test_object
         self.flavor_path = self.get_test_flavor()
         self.name = self.test_class.__name__
-        self._docker_registry_name = default_docker_registry_name(self.name)
+        self._docker_repository_name = default_docker_repository_name(self.name)
         if "GOOGLE_CLOUD_BUILD" in os.environ:
             # We need to put the output directories into the workdir,
             # because only this is shared between the current container and
@@ -57,17 +57,17 @@ class ExaslctTestEnvironment:
         return flavor_path
 
     @property
-    def docker_registry_name(self):
-        return self._docker_registry_name
+    def docker_repository_name(self):
+        return self._docker_repository_name
 
-    @docker_registry_name.setter
-    def docker_registry_name(self, value):
-        self._docker_registry_name = value
+    @docker_repository_name.setter
+    def docker_repository_name(self, value):
+        self._docker_repository_name = value
         self._update_attributes()
 
     def _update_attributes(self):
         self.flavor_path_argument = f"--flavor-path {self.get_test_flavor()}"
-        docker_repository_name = self._docker_registry_name
+        docker_repository_name = self._docker_repository_name
         self.docker_repository_arguments = f"--source-docker-repository-name {docker_repository_name} " \
                                            f"--target-docker-repository-name {docker_repository_name}"
         self.clean_docker_repository_arguments = f"--docker-repository-name {docker_repository_name}"

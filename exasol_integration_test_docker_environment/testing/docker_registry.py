@@ -9,7 +9,7 @@ from exasol_integration_test_docker_environment.lib.docker.container.utils impor
 from exasol_integration_test_docker_environment.testing.utils import find_free_ports
 
 
-def default_docker_registry_name(env_name: str) -> str:
+def default_docker_repository_name(env_name: str) -> str:
     return f"exaslct_test/{env_name.lower()}"
 
 

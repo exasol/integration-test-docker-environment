@@ -8,7 +8,7 @@ from typing import Dict, Any
 
 from exasol_integration_test_docker_environment.cli.options.test_environment_options import LATEST_DB_VERSION
 from exasol_integration_test_docker_environment.lib.api import spawn_test_environment
-from exasol_integration_test_docker_environment.testing.docker_registry import default_docker_registry_name
+from exasol_integration_test_docker_environment.testing.docker_registry import default_docker_repository_name
 from exasol_integration_test_docker_environment.testing.exaslct_docker_test_environment import \
     ExaslctDockerTestEnvironment
 from exasol_integration_test_docker_environment.testing.utils import find_free_ports, check_db_version_from_env
@@ -24,7 +24,7 @@ class ApiTestEnvironment:
             self.test_class = self.test_object
         self.flavor_path = self.get_test_flavor()
         self.name = self.test_class.__name__
-        self.docker_registry_name = default_docker_registry_name(self.name)
+        self.docker_repository_name = default_docker_repository_name(self.name)
         self.temp_dir = tempfile.mkdtemp()
 
     def get_test_flavor(self):
