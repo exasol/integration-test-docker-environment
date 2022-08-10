@@ -6,6 +6,7 @@ import subprocess
 import tempfile
 from pathlib import Path
 import shlex
+from sys import stderr
 from typing import List
 
 from exasol_integration_test_docker_environment.lib.data.environment_info import EnvironmentInfo
@@ -94,8 +95,8 @@ class ExaslctTestEnvironment:
             command = f"{command} {self.docker_repository_arguments}"
         if use_docker_repository and clean:
             command = f"{command} {self.clean_docker_repository_arguments}"
-        print()
-        print(f"command: {command}")
+        print(file=stderr)
+        print(f"command: {command}", file=stderr)
         if capture_output:
             completed_process = subprocess.run(shlex.split(command), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         else:
@@ -103,7 +104,8 @@ class ExaslctTestEnvironment:
         try:
             completed_process.check_returncode()
         except subprocess.CalledProcessError as e:
-            print(e.stdout.decode("UTF-8"))
+            if capture_output:
+                print(e.stdout.decode("UTF-8"), file=stderr)
             raise e
         return completed_process
 
@@ -112,11 +114,11 @@ class ExaslctTestEnvironment:
             if self.clean_images_at_close:
                 self.clean_images()
         except Exception as e:
-            print(e)
+            print(e, file=stderr)
         try:
             shutil.rmtree(self.temp_dir)
         except Exception as e:
-            print(e)
+            print(e, file=stderr)
 
     def spawn_docker_test_environments(self, name: str, additional_parameter: List[str] = None) \
             -> SpawnedTestEnvironments:
