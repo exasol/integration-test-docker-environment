@@ -1,5 +1,3 @@
-import os
-import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -9,20 +7,19 @@ import luigi
 from exasol_integration_test_docker_environment.cli.common import generate_root_task, run_task
 from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import DependencyLoggerBaseTask
 
-from exasol_integration_test_docker_environment.lib.base.luigi_log_config import LOG_ENV_VARIABLE_NAME
-
 
 class TestTask(DependencyLoggerBaseTask):
     x = luigi.Parameter()
 
     def register_required(self):
-        self.register_dependency(self.create_child_task(task_class=TestChildTask))
+        self.register_dependency(self.create_child_task(task_class=TestChildTask, y=["1", "2", "3"]))
 
     def run(self):
         pass
 
 
 class TestChildTask(DependencyLoggerBaseTask):
+    y = luigi.ListParameter()
     def run_task(self):
         pass
 
