@@ -46,5 +46,6 @@ jobs:
       run: |
           ./scripts/test/run_test.sh exasol_integration_test_docker_environment/test/test_test_environment.py
           ./scripts/test/run_test.sh exasol_integration_test_docker_environment/test/test_doctor.py
+          ./scripts/test/run_test.sh exasol_integration_test_docker_environment/test/test_termination_handler.py
       env:
         EXASOL_VERSION: "${{ matrix.exasol_version }}"

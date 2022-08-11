@@ -7,7 +7,7 @@ from luigi import Parameter
 
 from typing import Set, Dict
 
-from exasol_integration_test_docker_environment.cli.common import generate_root_task
+from exasol_integration_test_docker_environment.lib.api.common import generate_root_task
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.lib.docker.images.create.docker_build_base import DockerBuildBase
 from exasol_integration_test_docker_environment.lib.docker.images.create.docker_image_analyze_task import \

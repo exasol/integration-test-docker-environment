@@ -1,7 +1,8 @@
 from typing import Tuple, Optional
 
 from exasol_integration_test_docker_environment.cli.cli import cli
-from exasol_integration_test_docker_environment.cli.common import add_options
+from exasol_integration_test_docker_environment.cli.termination_handler import TerminationHandler
+from exasol_integration_test_docker_environment.lib.api.common import add_options
 from exasol_integration_test_docker_environment.cli.options.build_options import build_options
 from exasol_integration_test_docker_environment.cli.options.docker_repository_options import docker_repository_options
 from exasol_integration_test_docker_environment.cli.options.system_options import system_options
@@ -37,23 +38,23 @@ def build_test_container(
     instead of building them.
 
     """
-    success = api.build_test_container(force_rebuild,
-                                       force_rebuild_from,
-                                       force_pull,
-                                       output_directory,
-                                       temporary_base_directory,
-                                       log_build_context_content,
-                                       cache_directory,
-                                       build_name,
-                                       source_docker_repository_name,
-                                       source_docker_tag_prefix,
-                                       source_docker_username,
-                                       source_docker_password,
-                                       target_docker_repository_name,
-                                       target_docker_tag_prefix,
-                                       target_docker_username,
-                                       target_docker_password,
-                                       workers,
-                                       task_dependencies_dot_file)
-    if not success:
-        exit(1)
+
+    with TerminationHandler():
+        api.build_test_container(force_rebuild,
+                                 force_rebuild_from,
+                                 force_pull,
+                                 output_directory,
+                                 temporary_base_directory,
+                                 log_build_context_content,
+                                 cache_directory,
+                                 build_name,
+                                 source_docker_repository_name,
+                                 source_docker_tag_prefix,
+                                 source_docker_username,
+                                 source_docker_password,
+                                 target_docker_repository_name,
+                                 target_docker_tag_prefix,
+                                 target_docker_username,
+                                 target_docker_password,
+                                 workers,
+                                 task_dependencies_dot_file)

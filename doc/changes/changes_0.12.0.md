@@ -31,6 +31,7 @@ TBD
 ## Refactoring:
 
 - #235: Moved implementations of all click commands in separate methods
+- #240: Created more integation tests for api calls and implemented return values
 
 ## Documentation:
 - TBD

@@ -5,7 +5,7 @@ import unittest
 import luigi
 from luigi import Parameter, Config
 
-from exasol_integration_test_docker_environment.cli.common import generate_root_task
+from exasol_integration_test_docker_environment.lib.api.common import generate_root_task
 from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import DependencyLoggerBaseTask
 from exasol_integration_test_docker_environment.lib.base.json_pickle_parameter import JsonPickleParameter
 
@@ -18,7 +18,6 @@ class TestTask1(TestBaseTask):
 
     def run_task(self):
         self.logger.info("RUN")
-        self.logger.info(f"task2 list_outputs {self.task2.list_outputs()}")
         self.logger.info(f"task2 {self.task2.get_output()}")
         tasks_3 = yield from self.run_dependencies({
             "1": TestTask3(input_param="e"),

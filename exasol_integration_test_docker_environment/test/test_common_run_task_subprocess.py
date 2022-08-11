@@ -5,7 +5,7 @@ from pathlib import Path
 
 import luigi
 
-from exasol_integration_test_docker_environment.cli.common import generate_root_task, run_task
+from exasol_integration_test_docker_environment.lib.api.common import generate_root_task, run_task
 from exasol_integration_test_docker_environment.cli.options.system_options import DEFAULT_OUTPUT_DIRECTORY
 from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import DependencyLoggerBaseTask
 
@@ -15,7 +15,7 @@ from exasol_integration_test_docker_environment.lib.base.luigi_log_config import
 class TestTask(DependencyLoggerBaseTask):
     x = luigi.Parameter()
 
-    def run(self):
+    def run_task(self):
         self.logger.info(f"Logging: {self.x}")
 
 
@@ -27,8 +27,7 @@ def run_simple_tasks(log_path: Path) -> None:
         return generate_root_task(task_class=TestTask, x=f"{next(task_id_generator)}")
 
     for i in range(NUMBER_TASK):
-        success, task = run_task(create_task, workers=5, task_dependencies_dot_file=None)
-        assert success
+        run_task(create_task, workers=5, task_dependencies_dot_file=None)
 
     assert log_path.exists()
     with open(log_path, "r") as f:
@@ -69,12 +68,15 @@ def run_test_different_logging_file_raises_error() -> None:
     with tempfile.TemporaryDirectory() as temp_dir:
         task_creator = lambda: generate_root_task(task_class=TestTask, x="Test")
 
-        success, task = run_task(task_creator, workers=5, task_dependencies_dot_file=None)
-        assert success
+        run_task(task_creator, workers=5, task_dependencies_dot_file=None)
         log_path = Path(temp_dir) / "main.log"
         os.environ[LOG_ENV_VARIABLE_NAME] = str(log_path)
-        success, task = run_task(task_creator, workers=5, task_dependencies_dot_file=None)
-        assert success is False
+        exception_thrown = False
+        try:
+            run_task(task_creator, workers=5, task_dependencies_dot_file=None)
+        except ValueError as e:
+            exception_thrown = True
+        assert exception_thrown
 
 
 if __name__ == '__main__':
@@ -88,5 +90,5 @@ if __name__ == '__main__':
     try:
         dispatcher[test_type]()
     except KeyError as e:
-        raise ValueError("Unknow Test argument") from e
+        raise ValueError("Unknown Test argument") from e
 

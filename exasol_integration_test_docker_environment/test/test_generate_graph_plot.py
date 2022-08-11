@@ -4,7 +4,7 @@ from pathlib import Path
 
 import luigi
 
-from exasol_integration_test_docker_environment.cli.common import generate_root_task, run_task
+from exasol_integration_test_docker_environment.lib.api.common import generate_root_task, run_task, set_build_config
 from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import DependencyLoggerBaseTask
 
 
@@ -14,7 +14,7 @@ class TestTask(DependencyLoggerBaseTask):
     def register_required(self):
         self.register_dependency(self.create_child_task(task_class=TestChildTask, y=["1", "2", "3"]))
 
-    def run(self):
+    def run_task(self):
         pass
 
 
@@ -36,8 +36,7 @@ class BaseTaskTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             for i in range(NUMBER_TASK):
                 dot_file = Path(d) / f"dot_file_{i}.dot"
-                success, task = run_task(create_task, workers=5, task_dependencies_dot_file=str(dot_file))
-                assert success
+                run_task(create_task, workers=5, task_dependencies_dot_file=str(dot_file))
                 assert dot_file.exists()
 
 
