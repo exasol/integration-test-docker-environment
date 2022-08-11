@@ -12,13 +12,14 @@ class TestTask(DependencyLoggerBaseTask):
     x = luigi.Parameter()
 
     def register_required(self):
-        self.register_dependency(self.create_child_task(task_class=TestChildTask))
+        self.register_dependency(self.create_child_task(task_class=TestChildTask, y=["1", "2", "3"]))
 
     def run_task(self):
         pass
 
 
 class TestChildTask(DependencyLoggerBaseTask):
+    y = luigi.ListParameter()
     def run_task(self):
         pass
 
