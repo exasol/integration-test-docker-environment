@@ -1,4 +1,5 @@
 from enum import Enum
+from sys import stderr
 
 import jsonpickle
 
@@ -11,8 +12,8 @@ class TaskDescription:
 
     @property
     def formatted_representation(self):
-        assert '"' not in self.representation
-        return f'"{self.representation}"'
+        representation = self.representation.replace('"', '\\"')
+        return f'"{representation}"'
 
     @property
     def formatted_id(self):
