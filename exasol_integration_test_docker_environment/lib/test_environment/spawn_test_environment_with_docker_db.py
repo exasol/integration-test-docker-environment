@@ -87,4 +87,5 @@ class SpawnTestEnvironmentWithDockerDB(
                 WaitForTestDockerDatabase,
                 test_container_info=test_container_info,
                 database_info=database_info,
-                attempt=attempt)
+                attempt=attempt,
+                docker_db_image_version=self.docker_db_image_version)
