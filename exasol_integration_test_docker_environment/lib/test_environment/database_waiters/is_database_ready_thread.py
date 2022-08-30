@@ -48,7 +48,7 @@ class IsDatabaseReadyThread(Thread):
         password = self.database_credentials.db_password
         connection_options = f"""-c 'localhost:{self._database_info.db_port}' -u '{username}' -p '{password}'"""
 
-        exaplus = f"/usr/opt/EXASuite-7/EASolution-{self.docker_db_image_version}/bin/Console/exaplus"
+        exaplus = f"/usr/opt/EXASuite-7/EXASolution-{self.docker_db_image_version}/bin/Console/exaplus"
         cmd = f"""{exaplus} {connection_options}  -sql 'select 1;' -jdbcparam 'validateservercertificate=0'"""
         bash_cmd = f"""bash -c "{cmd}" """
         return bash_cmd
