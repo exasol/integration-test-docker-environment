@@ -7,7 +7,7 @@ from exasol_integration_test_docker_environment.lib.data.docker_volume_info impo
 from exasol_integration_test_docker_environment.lib.data.environment_type import EnvironmentType
 from exasol_integration_test_docker_environment.lib.test_environment.abstract_spawn_test_environment import \
     AbstractSpawnTestEnvironment
-from exasol_integration_test_docker_environment.lib.test_environment.create_ssl_certificates_task import \
+from exasol_integration_test_docker_environment.lib.test_environment.create_certificates.create_ssl_certificates_task import \
     CreateSSLCertificatesTask
 from exasol_integration_test_docker_environment.lib.test_environment.database_waiters.wait_for_test_docker_database import \
     WaitForTestDockerDatabase

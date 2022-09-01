@@ -1,10 +1,7 @@
 import inspect
-import unittest
 from typing import Any, List, Tuple
 
 import click
-
-from exasol_integration_test_docker_environment.testing.utils import multiassert
 
 
 def adjust_default_value_for_multiple(x: Any):
@@ -50,7 +47,8 @@ def get_click_and_api_functions(click_module, api_module) -> Tuple[List[Any], Li
     # Get all click commands in module 'click_module'
     click_commands = [c[1] for c in inspect.getmembers(click_module, is_click_command)]
     # Get all functions in module 'api_module'
-    api_functions = [f[1] for f in inspect.getmembers(api_module, inspect.isfunction)]
+    api_functions = [f[1] for f in inspect.getmembers(api_module, inspect.isfunction)
+                     if f[1].__cli_function__]
     return click_commands, api_functions
 
 
@@ -58,5 +56,6 @@ def get_click_and_api_function_names(click_module, api_module) -> Tuple[List[Any
     # Get all click command names in module 'click_module'
     click_command_names = [c[0] for c in inspect.getmembers(click_module, is_click_command)]
     # Get all function names in module 'api_module'
-    api_function_names = [f[0] for f in inspect.getmembers(api_module, inspect.isfunction)]
+    api_function_names = [f[0] for f in inspect.getmembers(api_module, inspect.isfunction)
+                          if f[1].__cli_function__]
     return click_command_names, api_function_names

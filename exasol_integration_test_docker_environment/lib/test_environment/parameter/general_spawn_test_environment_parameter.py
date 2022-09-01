@@ -1,6 +1,10 @@
 import luigi
 from luigi import Config
 
+from exasol_integration_test_docker_environment.lib.base.json_pickle_parameter import JsonPickleParameter
+from exasol_integration_test_docker_environment.lib.data.test_container_content_description import \
+    TestContainerContentDescription
+
 
 class GeneralSpawnTestEnvironmentParameter(Config):
 
@@ -12,3 +16,4 @@ class GeneralSpawnTestEnvironmentParameter(Config):
     is_setup_database_activated = luigi.BoolParameter(True, significant=False)
     docker_runtime = luigi.OptionalParameter(None, significant=False)
     create_certificates = luigi.BoolParameter()
+    test_container_content = JsonPickleParameter(TestContainerContentDescription, significant=False)

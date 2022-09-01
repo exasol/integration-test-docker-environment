@@ -1,4 +1,3 @@
-import pathlib
 from typing import List
 
 import luigi
@@ -12,11 +11,11 @@ from exasol_integration_test_docker_environment.lib.base.docker_base_task import
 from exasol_integration_test_docker_environment.lib.base.json_pickle_parameter import JsonPickleParameter
 from exasol_integration_test_docker_environment.lib.data.container_info import ContainerInfo
 from exasol_integration_test_docker_environment.lib.data.docker_network_info import DockerNetworkInfo
+from exasol_integration_test_docker_environment.lib.data.test_container_content_description import \
+    TestContainerContentDescription
 from exasol_integration_test_docker_environment.lib.docker.images.image_info import ImageState, ImageInfo
 from exasol_integration_test_docker_environment.lib.test_environment.analyze_test_container import \
     DockerTestContainerBuild
-from exasol_integration_test_docker_environment.lib.test_environment.create_export_directory import \
-    CreateExportDirectory
 from exasol_integration_test_docker_environment.lib.test_environment.docker_container_copy import \
     copy_script_to_container
 
@@ -33,6 +32,7 @@ class SpawnTestContainer(DockerBaseTask):
     no_test_container_cleanup_after_failure = luigi.BoolParameter(False, significant=False)
     docker_runtime = luigi.OptionalParameter(None, significant=False)
     certificate_volume_name = luigi.OptionalParameter(None, significant=False)
+    test_container_content = JsonPickleParameter(TestContainerContentDescription, significant=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -43,9 +43,8 @@ class SpawnTestContainer(DockerBaseTask):
 
     def register_required(self):
         self.test_container_image_future = \
-            self.register_dependency(self.create_child_task(task_class=DockerTestContainerBuild))
-        self.export_directory_future = \
-            self.register_dependency(self.create_child_task(task_class=CreateExportDirectory))
+            self.register_dependency(self.create_child_task(task_class=DockerTestContainerBuild,
+                                                            test_container_content=self.test_container_content))
 
     def is_reuse_possible(self) -> bool:
         test_container_image_info = \
@@ -74,18 +73,22 @@ class SpawnTestContainer(DockerBaseTask):
             container_info = self._create_test_container(ip_address, self.network_info)
         with self._get_docker_client() as docker_client:
             docker_client.containers.get(self.test_container_name)
-        self._copy_tests()
+        self._copy_runtime_targets()
         self.return_object(container_info)
 
-    def _copy_tests(self):
-        self.logger.warning("Copy tests in test container %s.", self.test_container_name)
+    def _copy_runtime_targets(self):
+        self.logger.info("Copy runtime targets in test container %s.", self.test_container_name)
         with self._get_docker_client() as docker_client:
             test_container = docker_client.containers.get(self.test_container_name)
-            try:
-                test_container.exec_run(cmd="rm -r /tests")
-            except:
-                pass
-            test_container.exec_run(cmd="cp -r /tests_src /tests")
+            for runtime_mapping in self.test_container_content.runtime_mappings:
+                if runtime_mapping.deployment_target is not None:
+                    self.logger.warning(f"Copy runtime target {runtime_mapping.target} "
+                                        f"in test container {self.test_container_name}.")
+                    try:
+                        test_container.exec_run(cmd=f"rm -r {runtime_mapping.deployment_target}")
+                    except:
+                        pass
+                    test_container.exec_run(cmd=f"cp -r {runtime_mapping.target} {runtime_mapping.deployment_target}")
 
     def _try_to_reuse_test_container(self, ip_address: str,
                                      network_info: DockerNetworkInfo) -> ContainerInfo:
@@ -107,21 +110,12 @@ class SpawnTestContainer(DockerBaseTask):
         test_container_image_info = \
             self.get_values_from_futures(self.test_container_image_future)["test-container"]
 
-        # A later task which uses the test_container needs the exported container,
-        # but to access exported container from inside the test_container,
-        # we need to mount the release directory into the test_container.
-        exports_host_path = pathlib.Path(self._get_export_directory()).absolute()
-        tests_host_path = pathlib.Path("./tests").absolute()
-        volumes = {
-            exports_host_path: {
-                "bind": "/exports",
+        volumes = dict()
+        for runtime_mapping in self.test_container_content.runtime_mappings:
+            volumes[runtime_mapping.source.absolute()] = {
+                "bind": runtime_mapping.target,
                 "mode": "rw"
-            },
-            tests_host_path: {
-                "bind": "/tests_src",
-                "mode": "rw"
-            },
-        }
+            }
         if self.certificate_volume_name is not None:
             volumes[self.certificate_volume_name] = {
                 "bind": "/certificates",
@@ -189,7 +183,7 @@ class SpawnTestContainer(DockerBaseTask):
             script_name = "install_root_certificate.sh"
             script_str = pkg_resources.resource_string(
                 PACKAGE_NAME,
-                f"test_container_config/{script_name}")  # type: bytes
+                f"certificate_resources/{script_name}")  # type: bytes
 
             script_location_in_container = f"scripts/{script_name}"
             copy_script_to_container(script_str.decode("UTF-8"), script_location_in_container, test_container)
@@ -206,4 +200,3 @@ class SpawnTestContainer(DockerBaseTask):
                 self._remove_container(self.test_container_name)
             except Exception as e:
                 self.logger.error(f"Error during removing container %s: %s", self.test_container_name, e)
-

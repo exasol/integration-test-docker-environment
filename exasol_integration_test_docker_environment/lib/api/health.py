@@ -1,10 +1,11 @@
 from inspect import cleandoc
-from typing import Optional
 
 from exasol_integration_test_docker_environment.doctor import health_checkup, recommend_mitigation
 from exasol_integration_test_docker_environment.lib.api.api_errors import HealthProblem
+from exasol_integration_test_docker_environment.lib.api.common import cli_function
 
 
+@cli_function
 def health():
     """
     Check the health of the execution environment.

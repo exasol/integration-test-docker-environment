@@ -1,7 +1,7 @@
 from typing import Tuple, Optional
 
 from exasol_integration_test_docker_environment.lib.api.common import set_docker_repository_config, \
-    run_task, set_build_config, generate_root_task
+    run_task, set_build_config, generate_root_task, cli_function
 from exasol_integration_test_docker_environment.cli.options.docker_repository_options import DEFAULT_DOCKER_REPOSITORY_NAME
 from exasol_integration_test_docker_environment.cli.options.system_options import DEFAULT_OUTPUT_DIRECTORY
 from exasol_integration_test_docker_environment.lib.docker.images.image_info import ImageInfo
@@ -9,6 +9,7 @@ from exasol_integration_test_docker_environment.lib.test_environment.analyze_tes
     AnalyzeTestContainer, DockerTestContainerPush
 
 
+@cli_function
 def push_test_container(
         force_push: bool = False,
         push_all: bool = False,

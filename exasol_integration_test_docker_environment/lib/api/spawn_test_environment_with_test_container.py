@@ -3,12 +3,14 @@ from typing import Tuple, Optional, Callable
 import humanfriendly
 
 from exasol_integration_test_docker_environment.lib.api.common import set_build_config, set_docker_repository_config, \
-    run_task, generate_root_task, cli_function
+    run_task, generate_root_task, no_cli_function
 from exasol_integration_test_docker_environment.cli.options.docker_repository_options import DEFAULT_DOCKER_REPOSITORY_NAME
 from exasol_integration_test_docker_environment.cli.options.system_options import DEFAULT_OUTPUT_DIRECTORY
 from exasol_integration_test_docker_environment.cli.options.test_environment_options import LATEST_DB_VERSION
 from exasol_integration_test_docker_environment.lib.api.api_errors import ArgumentConstraintError
 from exasol_integration_test_docker_environment.lib.data.environment_info import EnvironmentInfo
+from exasol_integration_test_docker_environment.lib.data.test_container_content_description import \
+    TestContainerContentDescription
 from exasol_integration_test_docker_environment.lib.docker.container.utils import remove_docker_container
 from exasol_integration_test_docker_environment.lib.docker.volumes.utils import remove_docker_volumes
 from exasol_integration_test_docker_environment.lib.docker.networks.utils import remove_docker_networks
@@ -23,9 +25,10 @@ def _cleanup(environment_info: EnvironmentInfo) -> None:
     remove_docker_networks([environment_info.network_info.network_name])
 
 
-@cli_function
-def spawn_test_environment(
+@no_cli_function
+def spawn_test_environment_with_test_container(
         environment_name: str,
+        test_container_content: TestContainerContentDescription,
         database_port_forward: Optional[int] = None,
         bucketfs_port_forward: Optional[int] = None,
         db_mem_size: str = "2 GiB",
@@ -47,7 +50,8 @@ def spawn_test_environment(
         output_directory: str = DEFAULT_OUTPUT_DIRECTORY,
         temporary_base_directory: str = "/tmp",
         workers: int = 5,
-        task_dependencies_dot_file: Optional[str] = None) -> Tuple[EnvironmentInfo, Callable[[], None]]:
+        task_dependencies_dot_file: Optional[str] = None) \
+        -> Tuple[EnvironmentInfo, Callable[[], None]]:
     """
     This function spawns a test environment with a docker-db container and a connected test-container.
     The test-container is reachable by the database for output redirects of UDFs.
@@ -94,7 +98,8 @@ def spawn_test_environment(
                                               no_database_cleanup_after_success=True,
                                               no_database_cleanup_after_failure=False,
                                               is_setup_database_activated=not deactivate_database_setup,
-                                              create_certificates=create_certificates
+                                              create_certificates=create_certificates,
+                                              test_container_content=test_container_content
                                               )
     environment_info = run_task(task_creator, workers, task_dependencies_dot_file)
     return environment_info, functools.partial(_cleanup, environment_info)

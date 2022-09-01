@@ -12,9 +12,6 @@ from exasol_integration_test_docker_environment.lib.data.database_info import Da
 from exasol_integration_test_docker_environment.lib.data.docker_network_info import DockerNetworkInfo
 from exasol_integration_test_docker_environment.lib.data.docker_volume_info import DockerVolumeInfo
 from exasol_integration_test_docker_environment.lib.data.environment_info import EnvironmentInfo
-from exasol_integration_test_docker_environment.lib.test_environment.database_setup.populate_data import \
-    PopulateEngineSmallTestDataToDatabase
-from exasol_integration_test_docker_environment.lib.test_environment.database_setup.upload_exa_jdbc import UploadExaJDBC
 from exasol_integration_test_docker_environment.lib.test_environment.docker_container_copy import DockerContainerCopy
 from exasol_integration_test_docker_environment.lib.test_environment.parameter.general_spawn_test_environment_parameter import \
     GeneralSpawnTestEnvironmentParameter
@@ -40,7 +37,6 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
 
     def run_task(self):
         test_environment_info = yield from self._attempt_database_start()
-        yield from self._setup_test_database(test_environment_info)
         self.return_object(test_environment_info)
 
     def _attempt_database_start(self):
@@ -171,7 +167,9 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
                         network_info=network_info,
                         ip_address_index_in_subnet=1,
                         certificate_volume_name=certificate_volume_name,
-                        attempt=attempt),
+                        attempt=attempt,
+                        test_container_content=self.test_container_content
+                    ),
                 DATABASE: self.create_spawn_database_task(network_info, certificate_volume_info, attempt)
             })
         database_and_test_container_info = \
@@ -202,19 +200,3 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
                                       database_info: DatabaseInfo,
                                       test_container_info: ContainerInfo):
         raise AbstractMethodException()
-
-    def _setup_test_database(self, test_environment_info: EnvironmentInfo):
-        # TODO check if database is setup
-        if self.is_setup_database_activated:
-            self.logger.info("Setup database")
-            upload_tasks = [
-                self.create_child_task_with_common_params(
-                    UploadExaJDBC,
-                    test_environment_info=test_environment_info,
-                    reuse_uploaded=self.reuse_database_setup),
-                self.create_child_task_with_common_params(
-                    PopulateEngineSmallTestDataToDatabase,
-                    test_environment_info=test_environment_info,
-                    reuse_data=self.reuse_database_setup
-                )]
-            yield from self.run_dependencies(upload_tasks)
