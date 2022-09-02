@@ -1,5 +1,6 @@
 import base64
 import hashlib
+from pathlib import Path
 from typing import Dict
 
 # TODO add hash config to the hash
@@ -29,7 +30,10 @@ class BuildContextHasher:
                                     use_relative_paths=True)
         files_directories_to_hash = [PathMapping(destination, source) for destination, source in
                                      self.image_description.mapping_of_build_files_and_directories.items()]
-        files_directories_to_hash.append(PathMapping(self.image_description.dockerfile,
+        # Use only the dockerfile itself for hashing. In order to accomplish that,
+        # set the dockerfile only as destination in the mapping
+        dockerfile = Path(self.image_description.dockerfile).name
+        files_directories_to_hash.append(PathMapping(str(dockerfile),
                                                      self.image_description.dockerfile))
         self.logger.debug("files_directories_list_hasher %s", files_directories_to_hash)
         hash_of_build_context = files_directories_list_hasher.hash(files_directories_to_hash)
