@@ -1,9 +1,10 @@
 import hashlib
 import os
 import stat
+from dataclasses import dataclass
 from multiprocessing import Pool
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Tuple, NamedTuple
 
 import humanfriendly
 
@@ -13,6 +14,19 @@ HASH_FUNCTIONS = {
     'sha256': hashlib.sha256,
     'sha512': hashlib.sha512
 }
+
+
+@dataclass
+class PathMapping:
+    destination: str
+    source: str
+
+
+
+
+class RelativePath(NamedTuple):
+    root: str
+    path: str
 
 
 class FileDirectoryListHasher:
@@ -60,20 +74,31 @@ class FileDirectoryListHasher:
                                       use_relative_paths=use_relative_paths)
         self.file_content_hasher = FileContentHasher(hashfunc, blocksize)
 
-    def hash(self, files_and_directories: List[str]) -> bytes:
-        collected_directories = []
-        collected_files = []
+    def hash(self, files_and_directories: List[PathMapping]) -> bytes:
+        collected_directories: List[RelativePath] = list()
+        collected_files: List[RelativePath] = list()
+
         if not isinstance(files_and_directories, List):
             raise Exception("List with paths expected and not '%s' with type %s"
                             % (files_and_directories, type(files_and_directories)))
         for file_or_directory in files_and_directories:
-            if os.path.isdir(file_or_directory):
+            source = file_or_directory.source
+            dest = file_or_directory.destination
+            if not source.endswith(dest):
+                raise AssertionError("source and destination must match. "
+                                     "Pathname of destination must be a suffix of source. "
+                                     "Otherwise the root path cannot be determined")
+            root_path = Path(source.rstrip(dest))
+            if not root_path.exists():
+                raise AssertionError(f"calculated root directory '{root_path}' does not exist. Please check mapping:"
+                                     f"{file_or_directory}")
+            if os.path.isdir(source):
                 self.collect_files_and_directories(
-                    file_or_directory, collected_directories, collected_files)
-            elif os.path.isfile(file_or_directory):
-                collected_files.append(("", file_or_directory))
+                    str(root_path), source, collected_directories, collected_files)
+            elif os.path.isfile(source):
+                collected_files.append(RelativePath(str(root_path), source))
             else:
-                raise FileNotFoundError("Could not find file or directory %s" % file_or_directory)
+                raise FileNotFoundError("Could not find file or directory %s" % source)
         hashes = self.compute_hashes(collected_directories, collected_files)
         return self._reduce_hash(hashes)
 
@@ -112,13 +137,13 @@ class FileDirectoryListHasher:
         return f in self.excluded_directories
 
     def collect_files_and_directories(
-            self, directory: str,
-            collected_directories: List[Tuple[str, str]],
-            collected_files: List[Tuple[str, str]]):
-        tmp_collected_directories = []
-        tmp_collected_files = []
+            self, root_dir: str, directory: str,
+            collected_directories: List[RelativePath],
+            collected_files: List[RelativePath]):
+        tmp_collected_directories = list()
+        tmp_collected_files = list()
         if self.hash_directory_names:
-            tmp_collected_directories.append((directory, directory))
+            tmp_collected_directories.append(RelativePath(root_dir, str(directory)))
         inodes = set()
         numCharacters = 0
 
@@ -131,19 +156,20 @@ class FileDirectoryListHasher:
 
             if self.hash_directory_names:
                 new_directories = [d for d in dirs if not self.is_excluded_directory(d)]
-                tmp_collected_directories.extend([(directory, os.path.join(root, d)) for d in new_directories])
+                tmp_collected_directories.extend([RelativePath(root_dir, os.path.join(root, d))
+                                                  for d in new_directories])
                 numCharacters += sum([len(d) for d in new_directories])
 
             new_files = [f for f in files
                          if not self.is_excluded_file(f) and not self.has_excluded_extension(f)]
-            tmp_collected_files.extend([(directory, os.path.join(root, f)) for f in new_files])
+            tmp_collected_files.extend([RelativePath(root_dir, os.path.join(root, f)) for f in new_files])
             numCharacters += sum([len(f) for f in new_files])
 
             if numCharacters > self.MAX_CHARACTERS_PATHS:
                 raise OSError(f"Walking through too many directories. Aborting. Please verify: {directory}")
 
-        collected_directories.extend(sorted(tmp_collected_directories, key=lambda x: x[1]))
-        collected_files.extend(sorted(tmp_collected_files, key=lambda x: x[1]))
+        collected_directories.extend(sorted(tmp_collected_directories, key=lambda x: x.path))
+        collected_files.extend(sorted(tmp_collected_files, key=lambda x: x.path))
 
     def _reduce_hash(self, hashes):
         hasher = self.hash_func()

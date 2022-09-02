@@ -3,11 +3,21 @@ import os
 import shutil
 import tempfile
 import unittest
+from pathlib import Path
 
 from exasol_integration_test_docker_environment.lib.docker.images.create.utils.file_directory_list_hasher import \
-    FileDirectoryListHasher
+    FileDirectoryListHasher, PathMapping
 
 TEST_FILE = "/tmp/SEFQWEFWQEHDUWEFDGZWGDZWEFDUWESGRFUDWEGFUDWAFGWAZESGFDWZA"
+
+
+def simple_path_mapping(src: str) -> PathMapping:
+    """
+    Helper function which maps a directory-path to: PathMapping(directory-name, directory-path),
+    e.g. /tmp/tmp123/test1 becomes PathMapping('test1', '/tmp/tmp123/test1')
+    """
+    p = Path(src)
+    return PathMapping(p.name, src)
 
 
 class HashTempDirTest(unittest.TestCase):
@@ -59,7 +69,7 @@ class HashTempDirTest(unittest.TestCase):
                                          hash_file_names=True)
         old_pwd = os.getcwd()
         os.chdir(self.test_dir3)
-        hash = hasher.hash(["."])
+        hash = hasher.hash([simple_path_mapping(".")])
         ascii_hash = base64.b32encode(hash).decode("ASCII")
         self.assertEqual("W5VNU3LMI7OM2ZM7CNBW52YQ7FWZRCW5Z7PHTEUP3KSNOF3OPZXQ====", ascii_hash)
         os.chdir(old_pwd)
@@ -69,7 +79,7 @@ class HashTempDirTest(unittest.TestCase):
                                          use_relative_paths=False,
                                          hash_directory_names=False,
                                          hash_file_names=False)
-        hash = hasher.hash([TEST_FILE])
+        hash = hasher.hash([simple_path_mapping(TEST_FILE)])
         ascii_hash = base64.b32encode(hash).decode("ASCII")
         self.assertEqual("SVGVUSP5ODM3RPG3GXJFEJTYFGKX67XX7JWHJ6EEDG64L2BCBH2A====", ascii_hash)
 
@@ -78,7 +88,7 @@ class HashTempDirTest(unittest.TestCase):
                                          use_relative_paths=False,
                                          hash_directory_names=True,
                                          hash_file_names=True)
-        hash = hasher.hash([TEST_FILE])
+        hash = hasher.hash([simple_path_mapping(TEST_FILE)])
         ascii_hash = base64.b32encode(hash).decode("ASCII")
         self.assertEqual("AOBF7HELTYAPHBEW6HQQ74N3BKGSNZTJXB4MTOEROHO5VH6YYJOA====", ascii_hash)
 
@@ -87,7 +97,7 @@ class HashTempDirTest(unittest.TestCase):
                                          use_relative_paths=True,
                                          hash_directory_names=True,
                                          hash_file_names=True)
-        hash = hasher.hash([self.test_dir1])
+        hash = hasher.hash([PathMapping("level0", f"{self.test_dir1}/level0")])
         ascii_hash = base64.b32encode(hash).decode("ASCII")
         self.assertEqual("VIN3VCPDX7DAC4GD37IDF4KQTCDNNH72QV5PARVGGQ4OMB4DZTLA====", ascii_hash)
 
@@ -96,7 +106,7 @@ class HashTempDirTest(unittest.TestCase):
                                          use_relative_paths=False,
                                          hash_directory_names=False,
                                          hash_file_names=False)
-        hash = hasher.hash([self.test_dir1])
+        hash = hasher.hash([PathMapping("level0", f"{self.test_dir1}/level0")])
         ascii_hash = base64.b32encode(hash).decode("ASCII")
         self.assertEqual("TM2V22T326TCTLQ537BZAOR3I5NVHXE6IDJ4TXPCJPTUGDTI5WYQ====", ascii_hash)
 
@@ -105,8 +115,8 @@ class HashTempDirTest(unittest.TestCase):
                                          use_relative_paths=True,
                                          hash_directory_names=True,
                                          hash_file_names=True)
-        hash1 = hasher.hash([self.test_dir1])
-        hash2 = hasher.hash([self.test_dir2])
+        hash1 = hasher.hash([PathMapping("level0", f"{self.test_dir1}/level0")])
+        hash2 = hasher.hash([PathMapping("level0", f"{self.test_dir2}/level0")])
         ascii_hash1 = base64.b32encode(hash1).decode("ASCII")
         ascii_hash2 = base64.b32encode(hash2).decode("ASCII")
         self.assertEqual(ascii_hash1, ascii_hash2)
@@ -116,8 +126,8 @@ class HashTempDirTest(unittest.TestCase):
                                          use_relative_paths=False,
                                          hash_directory_names=True,
                                          hash_file_names=True)
-        hash1 = hasher.hash([self.test_dir1])
-        hash2 = hasher.hash([self.test_dir2])
+        hash1 = hasher.hash([simple_path_mapping(self.test_dir1)])
+        hash2 = hasher.hash([simple_path_mapping(self.test_dir2)])
         ascii_hash1 = base64.b32encode(hash1).decode("ASCII")
         ascii_hash2 = base64.b32encode(hash2).decode("ASCII")
         self.assertNotEqual(ascii_hash1, ascii_hash2)
@@ -127,8 +137,8 @@ class HashTempDirTest(unittest.TestCase):
                                          use_relative_paths=False,
                                          hash_directory_names=False,
                                          hash_file_names=False)
-        hash1 = hasher.hash([self.test_dir1])
-        hash2 = hasher.hash([self.test_dir2])
+        hash1 = hasher.hash([simple_path_mapping(self.test_dir1)])
+        hash2 = hasher.hash([simple_path_mapping(self.test_dir2)])
         ascii_hash1 = base64.b32encode(hash1).decode("ASCII")
         ascii_hash2 = base64.b32encode(hash2).decode("ASCII")
         self.assertEqual(ascii_hash1, ascii_hash2)
@@ -138,8 +148,8 @@ class HashTempDirTest(unittest.TestCase):
                                          use_relative_paths=True,
                                          hash_directory_names=False,
                                          hash_file_names=False)
-        hash1 = hasher.hash([self.test_dir1])
-        hash2 = hasher.hash([self.test_dir2])
+        hash1 = hasher.hash([simple_path_mapping(self.test_dir1)])
+        hash2 = hasher.hash([simple_path_mapping(self.test_dir2)])
         ascii_hash1 = base64.b32encode(hash1).decode("ASCII")
         ascii_hash2 = base64.b32encode(hash2).decode("ASCII")
         self.assertEqual(ascii_hash1, ascii_hash2)
@@ -155,8 +165,8 @@ class HashTempDirTest(unittest.TestCase):
                                     use_relative_paths=True,
                                     hash_directory_names=True,
                                     hash_file_names=True)
-        hash1_content_only = hasher_content_only.hash([self.test_dir1])
-        hash2_with_paths = hasher_with_paths.hash([self.test_dir2])
+        hash1_content_only = hasher_content_only.hash([simple_path_mapping(self.test_dir1)])
+        hash2_with_paths = hasher_with_paths.hash([simple_path_mapping(self.test_dir2)])
         ascii_hash1_content_only = base64.b32encode(hash1_content_only).decode("ASCII")
         ascii_hash2_with_paths = base64.b32encode(hash2_with_paths).decode("ASCII")
         self.assertNotEqual(ascii_hash1_content_only, ascii_hash2_with_paths)
@@ -172,8 +182,8 @@ class HashTempDirTest(unittest.TestCase):
                                     use_relative_paths=False,
                                     hash_directory_names=True,
                                     hash_file_names=False)
-        hash1_content_only = hasher_content_only.hash([self.test_dir1])
-        hash2_with_paths = hasher_with_paths.hash([self.test_dir1])
+        hash1_content_only = hasher_content_only.hash([simple_path_mapping(self.test_dir1)])
+        hash2_with_paths = hasher_with_paths.hash([simple_path_mapping(self.test_dir1)])
         ascii_hash1_content_only = base64.b32encode(hash1_content_only).decode("ASCII")
         ascii_hash2_with_paths = base64.b32encode(hash2_with_paths).decode("ASCII")
         self.assertNotEqual(ascii_hash1_content_only, ascii_hash2_with_paths)
@@ -189,8 +199,8 @@ class HashTempDirTest(unittest.TestCase):
                                     use_relative_paths=False,
                                     hash_directory_names=False,
                                     hash_file_names=True)
-        hash1_content_only = hasher_content_only.hash([self.test_dir1])
-        hash2_with_paths = hasher_with_paths.hash([self.test_dir1])
+        hash1_content_only = hasher_content_only.hash([simple_path_mapping(self.test_dir1)])
+        hash2_with_paths = hasher_with_paths.hash([simple_path_mapping(self.test_dir1)])
         ascii_hash1_content_only = base64.b32encode(hash1_content_only).decode("ASCII")
         ascii_hash2_with_paths = base64.b32encode(hash2_with_paths).decode("ASCII")
         self.assertNotEqual(ascii_hash1_content_only, ascii_hash2_with_paths)
@@ -206,11 +216,27 @@ class HashTempDirTest(unittest.TestCase):
                                     use_relative_paths=True,
                                     hash_directory_names=True,
                                     hash_file_names=False)
-        hash1_content_only = hasher_content_only.hash([self.test_dir1])
-        hash2_with_paths = hasher_with_paths.hash([self.test_dir2])
+        hash1_content_only = hasher_content_only.hash([simple_path_mapping(self.test_dir1)])
+        hash2_with_paths = hasher_with_paths.hash([simple_path_mapping(self.test_dir2)])
         ascii_hash1_content_only = base64.b32encode(hash1_content_only).decode("ASCII")
         ascii_hash2_with_paths = base64.b32encode(hash2_with_paths).decode("ASCII")
         self.assertNotEqual(ascii_hash1_content_only, ascii_hash2_with_paths)
+
+#     def test_file_name_with_relative_path(self):
+#         hasher_content_only = \
+#             FileDirectoryListHasher(followlinks=True,
+#                                     hashfunc="sha256",
+#                                     hash_file_names=True,
+#                                     hash_directory_names=True,
+#                                     hash_permissions=True,
+#                                     use_relative_paths=True)
+#         test_file = f"{self.test_dir1}/test.txt"
+#         with open(test_file, "w") as f:
+#             f.write("test")
+#             hash1_content_only = hasher_content_only.hash([PathMapping("test.txt", test_file)])
+#
+#         ascii_hash1_content_only = base64.b32encode(hash1_content_only).decode("ASCII")
+# #        self.assertNotEqual(ascii_hash1_content_only, ascii_hash2_with_paths)
 
 
 if __name__ == '__main__':

@@ -22,6 +22,7 @@ TBD
 - #230: Fixed default value of click option external-exasol-xmlrpc-port should be int
 - #211: Fixed output of test DockerTestEnvironmentDockerRuntimeInvalidRuntimeGivenTest
 - #244: Fixed bug in generate graph plot if task uses luigi.ListParameter
+- #249: Fixed bug of calculation of hash value of docker images when using volatile absolute paths
 
 ## Features / Enhancements:
 
