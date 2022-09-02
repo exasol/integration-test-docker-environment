@@ -97,9 +97,9 @@ class HashTempDirTest(unittest.TestCase):
                                          use_relative_paths=True,
                                          hash_directory_names=True,
                                          hash_file_names=True)
-        hash = hasher.hash([PathMapping("level0", f"{self.test_dir1}/level0")])
+        hash = hasher.hash([simple_path_mapping(self.test_dir1)])
         ascii_hash = base64.b32encode(hash).decode("ASCII")
-        self.assertEqual("VIN3VCPDX7DAC4GD37IDF4KQTCDNNH72QV5PARVGGQ4OMB4DZTLA====", ascii_hash)
+        self.assertEqual("RX5DGLU5AV6UAEZS3AE6L7WKCYOABQY7ISLX2JYX2GWJ22HH5GYQ====", ascii_hash)
 
     def test_directory_content_only_fixed_hash(self):
         hasher = FileDirectoryListHasher(hashfunc="sha256",
@@ -222,21 +222,27 @@ class HashTempDirTest(unittest.TestCase):
         ascii_hash2_with_paths = base64.b32encode(hash2_with_paths).decode("ASCII")
         self.assertNotEqual(ascii_hash1_content_only, ascii_hash2_with_paths)
 
-#     def test_file_name_with_relative_path(self):
-#         hasher_content_only = \
-#             FileDirectoryListHasher(followlinks=True,
-#                                     hashfunc="sha256",
-#                                     hash_file_names=True,
-#                                     hash_directory_names=True,
-#                                     hash_permissions=True,
-#                                     use_relative_paths=True)
-#         test_file = f"{self.test_dir1}/test.txt"
-#         with open(test_file, "w") as f:
-#             f.write("test")
-#             hash1_content_only = hasher_content_only.hash([PathMapping("test.txt", test_file)])
-#
-#         ascii_hash1_content_only = base64.b32encode(hash1_content_only).decode("ASCII")
-# #        self.assertNotEqual(ascii_hash1_content_only, ascii_hash2_with_paths)
+    def test_file_name_with_relative_path(self):
+        hasher_content_only = \
+            FileDirectoryListHasher(followlinks=True,
+                                    hashfunc="sha256",
+                                    hash_file_names=True,
+                                    hash_directory_names=True,
+                                    hash_permissions=True,
+                                    use_relative_paths=True)
+        test_file1 = f"{self.test_dir1}/test.txt"
+        with open(test_file1, "w") as f:
+            f.write("test")
+            hash1_content_only = hasher_content_only.hash([PathMapping("test.txt", test_file1)])
+
+        test_file2 = f"{self.test_dir2}/test.txt"
+        with open(test_file2, "w") as f:
+            f.write("test")
+            hash2_content_only = hasher_content_only.hash([PathMapping("test.txt", test_file2)])
+
+        ascii_hash1_content_only = base64.b32encode(hash1_content_only).decode("ASCII")
+        ascii_hash2_content_only = base64.b32encode(hash2_content_only).decode("ASCII")
+        self.assertEqual(ascii_hash1_content_only, ascii_hash2_content_only)
 
 
 if __name__ == '__main__':

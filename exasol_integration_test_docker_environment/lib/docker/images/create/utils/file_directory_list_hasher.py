@@ -94,11 +94,10 @@ class FileDirectoryListHasher:
             # 3. PathMapping(dest="requirements.txt", source="test/requirements.txt") => root_path = "./test"
             # 4. PathMapping(dest="requirements.txt", source="/tmp/tmp123/requirements.txt") => root_path = "/tmp/tmp123/"
             root_path = Path(source.rstrip(dest))
+            root_path_str = str(root_path)
             if not root_path.is_dir():
                 raise AssertionError(f"calculated root directory '{root_path}' is not valid. Please check mapping:"
                                      f"{file_or_directory}")
-            # To keep compatibility we append the slash
-            root_path_str = str(root_path) + "/"
             if os.path.isdir(source):
                 self.collect_files_and_directories(root_path_str, source, collected_directories, collected_files)
             elif os.path.isfile(source):
