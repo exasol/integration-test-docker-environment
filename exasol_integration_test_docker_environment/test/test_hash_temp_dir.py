@@ -324,5 +324,21 @@ class HashTempDirTest(unittest.TestCase):
         ascii_hash2_content_only = base64.b32encode(hash2_content_only).decode("ASCII")
         self.assertEqual(ascii_hash1_content_only, ascii_hash2_content_only)
 
+    def test_invalid_mapping_raises_exception(self):
+        """
+        Test that an invalid mapping raises an exception.
+        Invalid means here that the destination must be a suffix of the source.
+        """
+        hasher_content_only = \
+            FileDirectoryListHasher(followlinks=True,
+                                    hashfunc="sha256",
+                                    hash_file_names=True,
+                                    hash_directory_names=True,
+                                    hash_permissions=True,
+                                    use_relative_paths=True)
+        self.assertRaises(AssertionError, lambda: hasher_content_only.hash([PathMapping("/level_INVALID/level1_0",
+                                                                           f"{self.test_dir1}/level0/level1_0")]))
+
+
 if __name__ == '__main__':
     unittest.main()

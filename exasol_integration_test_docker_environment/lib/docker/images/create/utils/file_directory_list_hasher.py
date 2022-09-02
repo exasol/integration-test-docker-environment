@@ -1,7 +1,6 @@
 import hashlib
 import os
 import stat
-from dataclasses import dataclass
 from multiprocessing import Pool
 from pathlib import Path
 from typing import List, Tuple, NamedTuple
@@ -16,12 +15,9 @@ HASH_FUNCTIONS = {
 }
 
 
-@dataclass
-class PathMapping:
+class PathMapping(NamedTuple):
     destination: str
     source: str
-
-
 
 
 class RelativePath(NamedTuple):
