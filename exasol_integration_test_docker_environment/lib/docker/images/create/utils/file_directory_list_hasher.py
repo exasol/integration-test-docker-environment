@@ -88,15 +88,21 @@ class FileDirectoryListHasher:
                 raise AssertionError("source and destination must match. "
                                      "Pathname of destination must be a suffix of source. "
                                      "Otherwise the root path cannot be determined")
+            # We calculate the root path based on the information in the mapping, examples:
+            # 1. PathMapping(dest="requirements.txt", source="requirements.txt") => root_path = "."
+            # 2. PathMapping(dest="test/requirements.txt", source="test/requirements.txt") => root_path = "."
+            # 3. PathMapping(dest="requirements.txt", source="test/requirements.txt") => root_path = "./test"
+            # 4. PathMapping(dest="requirements.txt", source="/tmp/tmp123/requirements.txt") => root_path = "/tmp/tmp123/"
             root_path = Path(source.rstrip(dest))
-            if not root_path.exists():
-                raise AssertionError(f"calculated root directory '{root_path}' does not exist. Please check mapping:"
+            if not root_path.is_dir():
+                raise AssertionError(f"calculated root directory '{root_path}' is not valid. Please check mapping:"
                                      f"{file_or_directory}")
+            # To keep compatibility we append the slash
+            root_path_str = str(root_path) + "/"
             if os.path.isdir(source):
-                self.collect_files_and_directories(
-                    str(root_path), source, collected_directories, collected_files)
+                self.collect_files_and_directories(root_path_str, source, collected_directories, collected_files)
             elif os.path.isfile(source):
-                collected_files.append(RelativePath(str(root_path), source))
+                collected_files.append(RelativePath(root_path_str, source))
             else:
                 raise FileNotFoundError("Could not find file or directory %s" % source)
         hashes = self.compute_hashes(collected_directories, collected_files)
