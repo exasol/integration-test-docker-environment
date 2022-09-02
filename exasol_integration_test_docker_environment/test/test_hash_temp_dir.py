@@ -223,6 +223,9 @@ class HashTempDirTest(unittest.TestCase):
         self.assertNotEqual(ascii_hash1_content_only, ascii_hash2_with_paths)
 
     def test_file_name_with_relative_path(self):
+        """
+        Test that hashing of same files in different paths gives same result
+        """
         hasher_content_only = \
             FileDirectoryListHasher(followlinks=True,
                                     hashfunc="sha256",
@@ -244,6 +247,82 @@ class HashTempDirTest(unittest.TestCase):
         ascii_hash2_content_only = base64.b32encode(hash2_content_only).decode("ASCII")
         self.assertEqual(ascii_hash1_content_only, ascii_hash2_content_only)
 
+    def test_file_name_with_relative_path_in_same_sub_path(self):
+        """
+        Test that hashing of same files in different paths, but under same subpath, gives same result
+        """
+        hasher_content_only = \
+            FileDirectoryListHasher(followlinks=True,
+                                    hashfunc="sha256",
+                                    hash_file_names=True,
+                                    hash_directory_names=True,
+                                    hash_permissions=True,
+                                    use_relative_paths=True)
+        test_file1 = f"{self.test_dir1}/level0/test.txt"
+        with open(test_file1, "w") as f:
+            f.write("test")
+            hash1_content_only = hasher_content_only.hash([PathMapping("level0/test.txt", test_file1)])
+
+        test_file2 = f"{self.test_dir2}/level0/test.txt"
+        with open(test_file2, "w") as f:
+            f.write("test")
+            hash2_content_only = hasher_content_only.hash([PathMapping("level0/test.txt", test_file2)])
+
+        ascii_hash1_content_only = base64.b32encode(hash1_content_only).decode("ASCII")
+        ascii_hash2_content_only = base64.b32encode(hash2_content_only).decode("ASCII")
+        self.assertEqual(ascii_hash1_content_only, ascii_hash2_content_only)
+
+    def test_file_name_with_relative_path_in_different_sub_path(self):
+        """
+        Test that hashing of same files in different paths, and different subpaths, gives different result
+        """
+        hasher_content_only = \
+            FileDirectoryListHasher(followlinks=True,
+                                    hashfunc="sha256",
+                                    hash_file_names=True,
+                                    hash_directory_names=True,
+                                    hash_permissions=True,
+                                    use_relative_paths=True)
+        test_file1 = f"{self.test_dir1}/level0/test.txt"
+        with open(test_file1, "w") as f:
+            f.write("test")
+            hash1_content_only = hasher_content_only.hash([PathMapping("level0/test.txt", test_file1)])
+
+        test_file2 = f"{self.test_dir2}/level0/level1_0/test.txt"
+        with open(test_file2, "w") as f:
+            f.write("test")
+            hash2_content_only = hasher_content_only.hash([PathMapping("level0/level1_0/test.txt", test_file2)])
+
+        ascii_hash1_content_only = base64.b32encode(hash1_content_only).decode("ASCII")
+        ascii_hash2_content_only = base64.b32encode(hash2_content_only).decode("ASCII")
+        self.assertNotEqual(ascii_hash1_content_only, ascii_hash2_content_only)
+
+    def test_file_name_with_relative_path_in_relative_path_as_argument(self):
+        """
+        Test that hashing of same files in different paths, gives same result, using relative paths as argument
+        """
+        hasher_content_only = \
+            FileDirectoryListHasher(followlinks=True,
+                                    hashfunc="sha256",
+                                    hash_file_names=True,
+                                    hash_directory_names=True,
+                                    hash_permissions=True,
+                                    use_relative_paths=True)
+        test_file = f"test.txt"
+        old_pwd = os.getcwd()
+        os.chdir(self.test_dir1)
+        with open(test_file, "w") as f:
+            f.write("test")
+            hash1_content_only = hasher_content_only.hash([PathMapping("test.txt", test_file)])
+        os.chdir(self.test_dir2)
+
+        with open(test_file, "w") as f:
+            f.write("test")
+            hash2_content_only = hasher_content_only.hash([PathMapping("test.txt", test_file)])
+        os.chdir(old_pwd)
+        ascii_hash1_content_only = base64.b32encode(hash1_content_only).decode("ASCII")
+        ascii_hash2_content_only = base64.b32encode(hash2_content_only).decode("ASCII")
+        self.assertEqual(ascii_hash1_content_only, ascii_hash2_content_only)
 
 if __name__ == '__main__':
     unittest.main()
