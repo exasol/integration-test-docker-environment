@@ -1,6 +1,7 @@
 import hashlib
 import os
 import stat
+from dataclasses import dataclass
 from multiprocessing import Pool
 from pathlib import Path
 from typing import List, NamedTuple, Callable
@@ -20,13 +21,16 @@ class PathMapping(NamedTuple):
     source: str
 
 
-class DestinationMapping(NamedTuple):
+@dataclass(frozen=True)
+class DestinationMapping:
     destination: str
     source: str
     dest_root: str
+    is_file: bool
 
 
-class DirectoryMappingResult(NamedTuple):
+@dataclass(frozen=True)
+class DirectoryMappingResult:
     sources: List[str]
     destinations: List[DestinationMapping]
 
@@ -81,18 +85,24 @@ class FileDirectoryListHasher:
                             % (files_and_directories, type(files_and_directories)))
 
         directory_mapping_result = self.collect_dest_path_and_src_files(files_and_directories)
+        self.validate(directory_mapping_result)
         hashes = self.compute_hashes(directory_mapping_result)
         return self._reduce_hash(hashes)
 
+    def validate(self, directory_mapping_result: DirectoryMappingResult) -> None:
+        # Verify that there are no duplicate mappings to same destination
+        destinations = [p.destination for p in directory_mapping_result.destinations]
+        if len(set(destinations)) != len(destinations):
+            raise AssertionError(f"Directory content for hashing contains duplicates: {destinations}")
+
     def collect_dest_path_and_src_files(self, files_and_directories: List[PathMapping]) -> DirectoryMappingResult:
         collected_dest_paths: List[DestinationMapping] = list()
-        collected_src_files: List[str] = list()
 
         def replace_src_by_dest_path(src: str, dest: str, target: str) -> str:
             if not target.startswith(src):
                 raise RuntimeError(f"path target {target} does not start with source: {src}")
-            target = target.lstrip(source)
-            return dest + target
+            p = Path(target).relative_to(src)
+            return str(Path(dest) / p)
 
         for file_or_directory in files_and_directories:
             source = file_or_directory.source
@@ -102,26 +112,27 @@ class FileDirectoryListHasher:
                 if self.hash_directory_names:
                     new_dest_paths_mappings = [DestinationMapping(destination=replace_src_by_dest_path(source, destination, p),
                                                            source=p,
-                                                           dest_root=destination) for p in directories]
+                                                           dest_root=destination,
+                                                           is_file=False) for p in directories]
                     collected_dest_paths.extend(new_dest_paths_mappings)
 
             def handle_files(files: List[str]) -> None:
-                collected_src_files.extend(files)
                 if self.hash_file_names:
                     collected_dest_paths.extend([DestinationMapping(
                                                            destination=replace_src_by_dest_path(source, destination, f),
                                                            source=f,
-                                                           dest_root=destination) for f in files])
+                                                           dest_root=destination,
+                                                           is_file=True) for f in files])
 
             if os.path.isdir(source):
                 self.traverse_directory(source, handle_directory, handle_files)
             elif os.path.isfile(source) and self.hash_file_names:
-                collected_dest_paths.append(DestinationMapping(destination=destination, source=source, dest_root="."))
-                collected_src_files.append(source)
+                collected_dest_paths.append(DestinationMapping(destination=destination, source=source,
+                                                               dest_root=".", is_file=True))
             else:
                 raise FileNotFoundError("Could not find file or directory %s" % source)
-        collected_dest_paths.sort(key=lambda x: x.source)
-        collected_src_files.sort()
+        collected_dest_paths.sort(key=lambda x: x.destination)
+        collected_src_files = [p.source for p in collected_dest_paths if p.is_file]
         return DirectoryMappingResult(sources=collected_src_files, destinations=collected_dest_paths)
 
     def compute_hashes(self, directory_mapping_result: DirectoryMappingResult) -> List[str]:
