@@ -71,7 +71,7 @@ class HashTempDirTest(unittest.TestCase):
         os.chdir(self.test_dir3)
         hash = hasher.hash([simple_path_mapping(".")])
         ascii_hash = base64.b32encode(hash).decode("ASCII")
-        self.assertEqual("W5VNU3LMI7OM2ZM7CNBW52YQ7FWZRCW5Z7PHTEUP3KSNOF3OPZXQ====", ascii_hash)
+        self.assertEqual("LVE2ZFQRMP6QLY43MKMZRHIEHE7KNSUS5LFWVJKPOWMI6JUPZHEQ====", ascii_hash)
         os.chdir(old_pwd)
 
     def test_file_content_only_fixed_hash(self):
@@ -90,7 +90,7 @@ class HashTempDirTest(unittest.TestCase):
                                          hash_file_names=True)
         hash = hasher.hash([simple_path_mapping(TEST_FILE)])
         ascii_hash = base64.b32encode(hash).decode("ASCII")
-        self.assertEqual("AOBF7HELTYAPHBEW6HQQ74N3BKGSNZTJXB4MTOEROHO5VH6YYJOA====", ascii_hash)
+        self.assertEqual("7D34CBUU2SNSWF3UFM6A7BYFJVV5ZFEY5F6THIMGJY725WC45KEA====", ascii_hash)
 
     def test_directory_with_relative_paths_fixed_hash(self):
         hasher = FileDirectoryListHasher(hashfunc="sha256",

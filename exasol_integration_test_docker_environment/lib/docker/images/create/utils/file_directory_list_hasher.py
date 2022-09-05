@@ -28,6 +28,12 @@ class DestinationMapping:
     dest_root: str
     is_file: bool
 
+    def use_for_hashing(self, hash_files: bool, hash_directories: bool) -> bool:
+        if self.is_file:
+            return hash_files
+        else:
+            return hash_directories
+
 
 @dataclass(frozen=True)
 class DirectoryMappingResult:
@@ -109,31 +115,33 @@ class FileDirectoryListHasher:
             destination = file_or_directory.destination
 
             def handle_directory(directories: List[str]) -> None:
-                if self.hash_directory_names:
-                    new_dest_paths_mappings = [DestinationMapping(destination=replace_src_by_dest_path(source, destination, p),
-                                                           source=p,
-                                                           dest_root=destination,
-                                                           is_file=False) for p in directories]
-                    collected_dest_paths.extend(new_dest_paths_mappings)
+                new_dest_paths_mappings = [DestinationMapping(destination=replace_src_by_dest_path(source, destination, p),
+                                                       source=p,
+                                                       dest_root=destination,
+                                                       is_file=False) for p in directories]
+                collected_dest_paths.extend(new_dest_paths_mappings)
 
             def handle_files(files: List[str]) -> None:
-                if self.hash_file_names:
-                    collected_dest_paths.extend([DestinationMapping(
-                                                           destination=replace_src_by_dest_path(source, destination, f),
-                                                           source=f,
-                                                           dest_root=destination,
-                                                           is_file=True) for f in files])
+                collected_dest_paths.extend([DestinationMapping(
+                                                       destination=replace_src_by_dest_path(source, destination, f),
+                                                       source=f,
+                                                       dest_root=destination,
+                                                       is_file=True) for f in files])
 
             if os.path.isdir(source):
                 self.traverse_directory(source, handle_directory, handle_files)
-            elif os.path.isfile(source) and self.hash_file_names:
+            elif os.path.isfile(source):
                 collected_dest_paths.append(DestinationMapping(destination=destination, source=source,
                                                                dest_root=".", is_file=True))
             else:
                 raise FileNotFoundError("Could not find file or directory %s" % source)
         collected_dest_paths.sort(key=lambda x: x.destination)
+
+        filtered_dest_paths = [d for d in collected_dest_paths
+                               if d.use_for_hashing(self.hash_file_names, self.hash_directory_names)]
+
         collected_src_files = [p.source for p in collected_dest_paths if p.is_file]
-        return DirectoryMappingResult(sources=collected_src_files, destinations=collected_dest_paths)
+        return DirectoryMappingResult(sources=collected_src_files, destinations=filtered_dest_paths)
 
     def compute_hashes(self, directory_mapping_result: DirectoryMappingResult) -> List[str]:
         collected_dest_paths = directory_mapping_result.destinations
