@@ -38,7 +38,7 @@ class DestinationMapping:
 @dataclass(frozen=True)
 class DirectoryMappingResult:
     sources: List[str]
-    destinations: List[DestinationMapping]
+    paths_for_hashing: List[DestinationMapping]
 
 
 class FileDirectoryListHasher:
@@ -91,17 +91,24 @@ class FileDirectoryListHasher:
                             % (files_and_directories, type(files_and_directories)))
 
         directory_mapping_result = self.collect_dest_path_and_src_files(files_and_directories)
-        self.validate(directory_mapping_result)
         hashes = self.compute_hashes(directory_mapping_result)
         return self._reduce_hash(hashes)
 
-    def validate(self, directory_mapping_result: DirectoryMappingResult) -> None:
+    def validate(self, mappings: List[DestinationMapping]) -> None:
         # Verify that there are no duplicate mappings to same destination
-        destinations = [p.destination for p in directory_mapping_result.destinations]
+        destinations = [p.destination for p in mappings]
         if len(set(destinations)) != len(destinations):
             raise AssertionError(f"Directory content for hashing contains duplicates: {destinations}")
 
     def collect_dest_path_and_src_files(self, files_and_directories: List[PathMapping]) -> DirectoryMappingResult:
+        """
+        Iterate over all mappings and collect:
+        1) Destination paths-names (for Hashing): Mapping of source -> destination of file/directory, ordered by destination path
+        2) Source files, ordered by destination path
+        Collection is done considering the current configuration
+         - for both: excluded_directory/excluded_extensions/excluded_file
+         - for 1): hash_file_names/hash_directory_names
+        """
         collected_dest_paths: List[DestinationMapping] = list()
 
         def replace_src_by_dest_path(src: str, dest: str, target: str) -> str:
@@ -136,19 +143,21 @@ class FileDirectoryListHasher:
             else:
                 raise FileNotFoundError("Could not find file or directory %s" % source)
         collected_dest_paths.sort(key=lambda x: x.destination)
+        self.validate(collected_dest_paths)
 
+        # Now, after we sorted the collected paths, filter out paths which are not needed for current configuration
         filtered_dest_paths = [d for d in collected_dest_paths
                                if d.use_for_hashing(self.hash_file_names, self.hash_directory_names)]
 
         collected_src_files = [p.source for p in collected_dest_paths if p.is_file]
-        return DirectoryMappingResult(sources=collected_src_files, destinations=filtered_dest_paths)
+        return DirectoryMappingResult(sources=collected_src_files, paths_for_hashing=filtered_dest_paths)
 
     def compute_hashes(self, directory_mapping_result: DirectoryMappingResult) -> List[str]:
-        collected_dest_paths = directory_mapping_result.destinations
+        paths_for_hashing = directory_mapping_result.paths_for_hashing
         collected_src_files = directory_mapping_result.sources
         pool = Pool(processes=self.workers)
         dest_path_hashes_future = \
-            pool.map_async(self.path_hasher.hash, collected_dest_paths, chunksize=2)
+            pool.map_async(self.path_hasher.hash, paths_for_hashing, chunksize=2)
         file_content_hashes_future = \
             pool.map_async(self.file_content_hasher.hash, collected_src_files, chunksize=2)
         hashes = []
