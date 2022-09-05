@@ -99,7 +99,7 @@ class HashTempDirTest(unittest.TestCase):
                                          hash_file_names=True)
         hash = hasher.hash([simple_path_mapping(self.test_dir1)])
         ascii_hash = base64.b32encode(hash).decode("ASCII")
-        self.assertEqual("RX5DGLU5AV6UAEZS3AE6L7WKCYOABQY7ISLX2JYX2GWJ22HH5GYQ====", ascii_hash)
+        self.assertEqual("EZ3ER6KZHAAYG4JNFGFLHUI7TVHZVIRVOV4QWJT4ERQ4XGI2GLUA====", ascii_hash)
 
     def test_directory_content_only_fixed_hash(self):
         hasher = FileDirectoryListHasher(hashfunc="sha256",
@@ -324,10 +324,9 @@ class HashTempDirTest(unittest.TestCase):
         ascii_hash2_content_only = base64.b32encode(hash2_content_only).decode("ASCII")
         self.assertEqual(ascii_hash1_content_only, ascii_hash2_content_only)
 
-    def test_invalid_mapping_raises_exception(self):
+    def test_duplicated_file_mapping_raises_exception(self):
         """
-        Test that an invalid mapping raises an exception.
-        Invalid means here that the destination must be a suffix of the source.
+        Test that a duplicated mapping raises an exception.
         """
         hasher_content_only = \
             FileDirectoryListHasher(followlinks=True,
@@ -336,9 +335,42 @@ class HashTempDirTest(unittest.TestCase):
                                     hash_directory_names=True,
                                     hash_permissions=True,
                                     use_relative_paths=True)
-        self.assertRaises(AssertionError, lambda: hasher_content_only.hash([PathMapping("/level_INVALID/level1_0",
-                                                                           f"{self.test_dir1}/level0/level1_0")]))
+        test_file1 = f"{self.test_dir1}/level0/level1_0/test.txt"
+        with open(test_file1, "w") as f:
+            f.write("test")
+        test_file2 = f"{self.test_dir1}/level0/level1_1/test.txt"
+        with open(test_file2, "w") as f:
+            f.write("test")
 
+        self.assertRaises(AssertionError, lambda: hasher_content_only.hash([PathMapping("test.txt", test_file1),
+                                                                            PathMapping("test.txt", test_file2)]))
+
+    def test_duplicated_path_mapping_raises_exception(self):
+        """
+        Test that a duplicated mapping raises an exception.
+        """
+        hasher_content_only = \
+            FileDirectoryListHasher(followlinks=True,
+                                    hashfunc="sha256",
+                                    hash_file_names=True,
+                                    hash_directory_names=True,
+                                    hash_permissions=True,
+                                    use_relative_paths=True)
+        test_file1 = f"{self.test_dir1}/level0/level1_0/test/test.txt"
+        p = Path(f"{self.test_dir1}/level0/level1_0/test")
+        p.mkdir()
+        with open(test_file1, "w") as f:
+            f.write("test")
+        test_file2 = f"{self.test_dir1}/level0/level1_1/test/test.txt"
+        p = Path(f"{self.test_dir1}/level0/level1_1/test")
+        p.mkdir()
+        with open(test_file2, "w") as f:
+            f.write("test")
+
+        path1 = f"{self.test_dir1}/level0/level1_0/"
+        path2 = f"{self.test_dir1}/level0/level1_1/"
+        self.assertRaises(AssertionError, lambda: hasher_content_only.hash([PathMapping("test", path1),
+                                                                            PathMapping("test", path2)]))
 
 if __name__ == '__main__':
     unittest.main()
