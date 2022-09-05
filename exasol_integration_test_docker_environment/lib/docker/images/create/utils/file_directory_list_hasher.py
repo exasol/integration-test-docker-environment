@@ -3,7 +3,7 @@ import os
 import stat
 from multiprocessing import Pool
 from pathlib import Path
-from typing import List, Tuple, NamedTuple
+from typing import List, NamedTuple, Callable
 
 import humanfriendly
 
@@ -20,9 +20,15 @@ class PathMapping(NamedTuple):
     source: str
 
 
-class RelativePath(NamedTuple):
-    root: str
-    path: str
+class DestinationMapping(NamedTuple):
+    destination: str
+    source: str
+    dest_root: str
+
+
+class DirectoryMappingResult(NamedTuple):
+    sources: List[str]
+    destinations: List[DestinationMapping]
 
 
 class FileDirectoryListHasher:
@@ -66,66 +72,70 @@ class FileDirectoryListHasher:
             self.excluded_extensions = []
 
         self.path_hasher = PathHasher(hashfunc,
-                                      hash_permissions=hash_permissions,
-                                      use_relative_paths=use_relative_paths)
+                                      hash_permissions=hash_permissions)
         self.file_content_hasher = FileContentHasher(hashfunc, blocksize)
 
     def hash(self, files_and_directories: List[PathMapping]) -> bytes:
-        collected_directories: List[RelativePath] = list()
-        collected_files: List[RelativePath] = list()
-
         if not isinstance(files_and_directories, List):
             raise Exception("List with paths expected and not '%s' with type %s"
                             % (files_and_directories, type(files_and_directories)))
-        for file_or_directory in files_and_directories:
-            source = file_or_directory.source
-            dest = file_or_directory.destination
-            if not source.endswith(dest):
-                raise AssertionError("source and destination must match. "
-                                     "Pathname of destination must be a suffix of source. "
-                                     "Otherwise the root path cannot be determined")
-            # We calculate the root path based on the information in the mapping, examples:
-            # 1. PathMapping(dest="requirements.txt", source="requirements.txt") => root_path = "."
-            # 2. PathMapping(dest="test/requirements.txt", source="test/requirements.txt") => root_path = "."
-            # 3. PathMapping(dest="requirements.txt", source="test/requirements.txt") => root_path = "./test"
-            # 4. PathMapping(dest="requirements.txt", source="/tmp/tmp123/requirements.txt") => root_path = "/tmp/tmp123/"
-            root_path = Path(source.rstrip(dest))
-            root_path_str = str(root_path)
-            if not root_path.is_dir():
-                raise AssertionError(f"calculated root directory '{root_path}' is not valid. Please check mapping:"
-                                     f"{file_or_directory}")
-            if os.path.isdir(source):
-                self.collect_files_and_directories(root_path_str, source, collected_directories, collected_files)
-            elif os.path.isfile(source):
-                collected_files.append(RelativePath(root_path_str, source))
-            else:
-                raise FileNotFoundError("Could not find file or directory %s" % source)
-        hashes = self.compute_hashes(collected_directories, collected_files)
+
+        directory_mapping_result = self.collect_dest_path_and_src_files(files_and_directories)
+        hashes = self.compute_hashes(directory_mapping_result)
         return self._reduce_hash(hashes)
 
-    def compute_hashes(self, collected_directories, collected_files):
+    def collect_dest_path_and_src_files(self, files_and_directories: List[PathMapping]) -> DirectoryMappingResult:
+        collected_dest_paths: List[DestinationMapping] = list()
+        collected_src_files: List[str] = list()
+
+        def replace_src_by_dest_path(src: str, dest: str, target: str) -> str:
+            if not target.startswith(src):
+                raise RuntimeError(f"path target {target} does not start with source: {src}")
+            target = target.lstrip(source)
+            return dest + target
+
+        for file_or_directory in files_and_directories:
+            source = file_or_directory.source
+            destination = file_or_directory.destination
+
+            def handle_directory(directories: List[str]) -> None:
+                if self.hash_directory_names:
+                    new_dest_paths_mappings = [DestinationMapping(destination=replace_src_by_dest_path(source, destination, p),
+                                                           source=p,
+                                                           dest_root=destination) for p in directories]
+                    collected_dest_paths.extend(new_dest_paths_mappings)
+
+            def handle_files(files: List[str]) -> None:
+                collected_src_files.extend(files)
+                if self.hash_file_names:
+                    collected_dest_paths.extend([DestinationMapping(
+                                                           destination=replace_src_by_dest_path(source, destination, f),
+                                                           source=f,
+                                                           dest_root=destination) for f in files])
+
+            if os.path.isdir(source):
+                self.traverse_directory(source, handle_directory, handle_files)
+            elif os.path.isfile(source) and self.hash_file_names:
+                collected_dest_paths.append(DestinationMapping(destination=destination, source=source, dest_root="."))
+                collected_src_files.append(source)
+            else:
+                raise FileNotFoundError("Could not find file or directory %s" % source)
+        collected_dest_paths.sort(key=lambda x: x.source)
+        collected_src_files.sort()
+        return DirectoryMappingResult(sources=collected_src_files, destinations=collected_dest_paths)
+
+    def compute_hashes(self, directory_mapping_result: DirectoryMappingResult) -> List[str]:
+        collected_dest_paths = directory_mapping_result.destinations
+        collected_src_files = directory_mapping_result.sources
         pool = Pool(processes=self.workers)
-        if self.hash_directory_names:
-            file_path_hashes_of_directories_future = \
-                pool.map_async(self.path_hasher.hash, collected_directories, chunksize=2)
-        else:
-            file_path_hashes_of_directories_future = None
-        if self.hash_file_names:
-            file_path_hashes_of_files_future = \
-                pool.map_async(self.path_hasher.hash, collected_files, chunksize=2)
-        else:
-            file_path_hashes_of_files_future = None
-        file_list = [path for root, path in collected_files]
+        dest_path_hashes_future = \
+            pool.map_async(self.path_hasher.hash, collected_dest_paths, chunksize=2)
         file_content_hashes_future = \
-            pool.map_async(self.file_content_hasher.hash, file_list, chunksize=2)
+            pool.map_async(self.file_content_hasher.hash, collected_src_files, chunksize=2)
         hashes = []
         hashes.extend(file_content_hashes_future.get())
-        if self.hash_directory_names:
-            file_path_hashes_of_directories = file_path_hashes_of_directories_future.get()
-            hashes.extend(file_path_hashes_of_directories)
-        if self.hash_file_names:
-            file_path_hashes_of_files = file_path_hashes_of_files_future.get()
-            hashes.extend(file_path_hashes_of_files)
+        file_path_hashes_of_directories = dest_path_hashes_future.get()
+        hashes.extend(file_path_hashes_of_directories)
         return hashes
 
     def has_excluded_extension(self, f: str):
@@ -137,14 +147,9 @@ class FileDirectoryListHasher:
     def is_excluded_directory(self, f: str):
         return f in self.excluded_directories
 
-    def collect_files_and_directories(
-            self, root_dir: str, directory: str,
-            collected_directories: List[RelativePath],
-            collected_files: List[RelativePath]):
-        tmp_collected_directories = list()
-        tmp_collected_files = list()
-        if self.hash_directory_names:
-            tmp_collected_directories.append(RelativePath(root_dir, str(directory)))
+    def traverse_directory(self, directory: str,
+                           directory_handler: Callable[[List[str]], None],
+                           file_handler: Callable[[List[str]], None]) -> None:
         inodes = set()
         numCharacters = 0
 
@@ -155,22 +160,17 @@ class FileDirectoryListHasher:
                     f"Directory: {directory} contains symlink loops (Symlinks pointing to a parent directory). Please fix!")
             inodes.add(stat.st_ino)
 
-            if self.hash_directory_names:
-                new_directories = [d for d in dirs if not self.is_excluded_directory(d)]
-                tmp_collected_directories.extend([RelativePath(root_dir, os.path.join(root, d))
-                                                  for d in new_directories])
-                numCharacters += sum([len(d) for d in new_directories])
+            new_directories = [os.path.join(root, d) for d in dirs if not self.is_excluded_directory(d)]
+            directory_handler(new_directories)
+            numCharacters += sum([len(d) for d in new_directories])
 
-            new_files = [f for f in files
+            new_files = [os.path.join(root, f) for f in files
                          if not self.is_excluded_file(f) and not self.has_excluded_extension(f)]
-            tmp_collected_files.extend([RelativePath(root_dir, os.path.join(root, f)) for f in new_files])
+            file_handler(new_files)
             numCharacters += sum([len(f) for f in new_files])
 
             if numCharacters > self.MAX_CHARACTERS_PATHS:
                 raise OSError(f"Walking through too many directories. Aborting. Please verify: {directory}")
-
-        collected_directories.extend(sorted(tmp_collected_directories, key=lambda x: x.path))
-        collected_files.extend(sorted(tmp_collected_files, key=lambda x: x.path))
 
     def _reduce_hash(self, hashes):
         hasher = self.hash_func()
@@ -182,23 +182,25 @@ class FileDirectoryListHasher:
 class PathHasher:
     def __init__(self, hashfunc: str = 'md5',
                  hash_permissions: bool = False,
-                 use_relative_paths: bool = False, ):
+                 use_relative_paths: bool = False,):
         self.use_relative_paths = use_relative_paths
         self.hash_permissions = hash_permissions
         self.hash_func = HASH_FUNCTIONS.get(hashfunc)
         if not self.hash_func:
             raise NotImplementedError('{} not implemented.'.format(hashfunc))
 
-    def hash(self, root_path_pair: Tuple[str, str]):
-        original_path = Path(root_path_pair[1])
-        if self.use_relative_paths and len(root_path_pair[0]) > 0:
-            path = original_path.relative_to(Path(root_path_pair[0]))
+    def hash(self, path_mapping: DestinationMapping):
+        src_path = Path(path_mapping.source)
+        dest_path = Path(path_mapping.destination)
+        dest_root = Path(path_mapping.dest_root)
+        if self.use_relative_paths and len(path_mapping.dest_root) > 0:
+            path = dest_path.relative_to(dest_root)
         else:
-            path = original_path
+            path = dest_path
         hasher = self.hash_func()
         hasher.update(str(path).encode('utf-8'))
         if self.hash_permissions:
-            stat_result = os.stat(original_path)
+            stat_result = os.stat(src_path)
             # we only check the executable right of the user, because git only remembers this
             user_has_executable_rights = stat.S_IXUSR & stat_result[stat.ST_MODE]
             hasher.update(str(user_has_executable_rights).encode("utf-8"))
