@@ -1,10 +1,11 @@
 import base64
 import hashlib
+from pathlib import Path
 from typing import Dict
 
 # TODO add hash config to the hash
 from exasol_integration_test_docker_environment.lib.docker.images.create.utils.file_directory_list_hasher import \
-    FileDirectoryListHasher
+    FileDirectoryListHasher, PathMapping
 from exasol_integration_test_docker_environment.lib.docker.images.image_info import ImageDescription, ImageInfo
 
 
@@ -25,10 +26,14 @@ class BuildContextHasher:
                                     hashfunc="sha256",
                                     hash_file_names=True,
                                     hash_directory_names=True,
-                                    hash_permissions=True,
-                                    use_relative_paths=True)
-        files_directories_to_hash = list(self.image_description.mapping_of_build_files_and_directories.values()) + \
-                                    [str(self.image_description.dockerfile)]
+                                    hash_permissions=True)
+        files_directories_to_hash = [PathMapping(destination, source) for destination, source in
+                                     self.image_description.mapping_of_build_files_and_directories.items()]
+        # Use only the dockerfile itself for hashing. In order to accomplish that,
+        # set the dockerfile only as destination in the mapping
+        dockerfile = Path(self.image_description.dockerfile).name
+        files_directories_to_hash.append(PathMapping(str(dockerfile),
+                                                     self.image_description.dockerfile))
         self.logger.debug("files_directories_list_hasher %s", files_directories_to_hash)
         hash_of_build_context = files_directories_list_hasher.hash(files_directories_to_hash)
         self.logger.debug("hash_of_build_context %s", self._encode_hash(hash_of_build_context))

@@ -4,7 +4,7 @@ import unittest
 import tempfile
 
 from exasol_integration_test_docker_environment.lib.docker.images.create.utils.file_directory_list_hasher import \
-    FileDirectoryListHasher
+    FileDirectoryListHasher, PathMapping
 
 
 class TestSymlinkLoops(unittest.TestCase):
@@ -47,13 +47,12 @@ class TestSymlinkLoops(unittest.TestCase):
     def test_symlink_detection(self):
         self.generate_test_dir(True)
         hasher = FileDirectoryListHasher(hashfunc="sha256",
-                                         use_relative_paths=False,
                                          hash_directory_names=True,
                                          hash_file_names=True,
                                          followlinks=True)
         exception_thrown = False
         try:
-            hash = hasher.hash([self.temp_dir])
+            hash = hasher.hash([PathMapping(destination=self.__class__.__name__, source=self.temp_dir)])
         except OSError as e:
             if "contains symlink loops" in str(e):
                 exception_thrown = True
@@ -62,14 +61,13 @@ class TestSymlinkLoops(unittest.TestCase):
     def test_symlink_detection_size(self):
         self.generate_test_dir(True)
         hasher = FileDirectoryListHasher(hashfunc="sha256",
-                                         use_relative_paths=False,
                                          hash_directory_names=True,
                                          hash_file_names=True,
                                          followlinks=True,
                                          max_characters_paths=100)
         exception_thrown = False
         try:
-            hash = hasher.hash([self.temp_dir])
+            hash = hasher.hash([PathMapping(destination=self.__class__.__name__, source=self.temp_dir)])
         except OSError as e:
             if "Walking through too many directories." in str(e):
                 exception_thrown = True
@@ -79,11 +77,10 @@ class TestSymlinkLoops(unittest.TestCase):
         symlink_dest = self.generate_test_dir(False)
         os.symlink(self.temp_dir_dummy, symlink_dest)
         hasher = FileDirectoryListHasher(hashfunc="sha256",
-                                         use_relative_paths=False,
                                          hash_directory_names=True,
                                          hash_file_names=True,
                                          followlinks=True)
-        hash = hasher.hash([self.temp_dir])
+        hash = hasher.hash([PathMapping(destination=self.__class__.__name__, source=self.temp_dir)])
 
 
 if __name__ == '__main__':
