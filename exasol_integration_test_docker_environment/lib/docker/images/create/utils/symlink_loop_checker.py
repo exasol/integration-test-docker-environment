@@ -2,10 +2,10 @@ import os
 
 
 class SymlinkLoopChecker:
-    def __int__(self):
+    def __init__(self):
         self._inodes = set()
 
-    def check_and_add(self, directory: str):
+    def check_and_add(self, directory: str) -> None:
         stat = os.stat(directory)
         if stat.st_ino > 0 and stat.st_ino in self._inodes:
             raise OSError(

@@ -26,8 +26,7 @@ class BuildContextHasher:
                                     hashfunc="sha256",
                                     hash_file_names=True,
                                     hash_directory_names=True,
-                                    hash_permissions=True,
-                                    use_relative_paths=True)
+                                    hash_permissions=True)
         files_directories_to_hash = [PathMapping(destination, source) for destination, source in
                                      self.image_description.mapping_of_build_files_and_directories.items()]
         # Use only the dockerfile itself for hashing. In order to accomplish that,

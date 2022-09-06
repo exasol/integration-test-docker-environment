@@ -64,7 +64,6 @@ class HashTempDirTest(unittest.TestCase):
 
     def test_single_character_directory_name(self):
         hasher = FileDirectoryListHasher(hashfunc="sha256",
-                                         use_relative_paths=False,
                                          hash_directory_names=True,
                                          hash_file_names=True)
         old_pwd = os.getcwd()
@@ -76,7 +75,6 @@ class HashTempDirTest(unittest.TestCase):
 
     def test_file_content_only_fixed_hash(self):
         hasher = FileDirectoryListHasher(hashfunc="sha256",
-                                         use_relative_paths=False,
                                          hash_directory_names=False,
                                          hash_file_names=False)
         hash = hasher.hash([simple_path_mapping(TEST_FILE)])
@@ -85,7 +83,6 @@ class HashTempDirTest(unittest.TestCase):
 
     def test_file_with_path(self):
         hasher = FileDirectoryListHasher(hashfunc="sha256",
-                                         use_relative_paths=False,
                                          hash_directory_names=True,
                                          hash_file_names=True)
         hash = hasher.hash([simple_path_mapping(TEST_FILE)])
@@ -94,7 +91,6 @@ class HashTempDirTest(unittest.TestCase):
 
     def test_directory_with_relative_paths_fixed_hash(self):
         hasher = FileDirectoryListHasher(hashfunc="sha256",
-                                         use_relative_paths=True,
                                          hash_directory_names=True,
                                          hash_file_names=True)
         hash = hasher.hash([simple_path_mapping(self.test_dir1)])
@@ -103,27 +99,24 @@ class HashTempDirTest(unittest.TestCase):
 
     def test_directory_content_only_fixed_hash(self):
         hasher = FileDirectoryListHasher(hashfunc="sha256",
-                                         use_relative_paths=False,
                                          hash_directory_names=False,
                                          hash_file_names=False)
         hash = hasher.hash([PathMapping("level0", f"{self.test_dir1}/level0")])
         ascii_hash = base64.b32encode(hash).decode("ASCII")
         self.assertEqual("TM2V22T326TCTLQ537BZAOR3I5NVHXE6IDJ4TXPCJPTUGDTI5WYQ====", ascii_hash)
 
-    def test_directory_with_relative_paths_equal(self):
+    def test_directory_to_same_destination_equal(self):
         hasher = FileDirectoryListHasher(hashfunc="sha256",
-                                         use_relative_paths=True,
                                          hash_directory_names=True,
                                          hash_file_names=True)
-        hash1 = hasher.hash([PathMapping("level0", f"{self.test_dir1}/level0")])
-        hash2 = hasher.hash([PathMapping("level0", f"{self.test_dir2}/level0")])
+        hash1 = hasher.hash([PathMapping("test", self.test_dir1)])
+        hash2 = hasher.hash([PathMapping("test", self.test_dir2)])
         ascii_hash1 = base64.b32encode(hash1).decode("ASCII")
         ascii_hash2 = base64.b32encode(hash2).decode("ASCII")
         self.assertEqual(ascii_hash1, ascii_hash2)
 
     def test_directory_without_relative_paths_not_equal(self):
         hasher = FileDirectoryListHasher(hashfunc="sha256",
-                                         use_relative_paths=False,
                                          hash_directory_names=True,
                                          hash_file_names=True)
         hash1 = hasher.hash([simple_path_mapping(self.test_dir1)])
@@ -134,18 +127,6 @@ class HashTempDirTest(unittest.TestCase):
 
     def test_directory_content_only_equal(self):
         hasher = FileDirectoryListHasher(hashfunc="sha256",
-                                         use_relative_paths=False,
-                                         hash_directory_names=False,
-                                         hash_file_names=False)
-        hash1 = hasher.hash([simple_path_mapping(self.test_dir1)])
-        hash2 = hasher.hash([simple_path_mapping(self.test_dir2)])
-        ascii_hash1 = base64.b32encode(hash1).decode("ASCII")
-        ascii_hash2 = base64.b32encode(hash2).decode("ASCII")
-        self.assertEqual(ascii_hash1, ascii_hash2)
-
-    def test_directory_relative_paths_equal(self):
-        hasher = FileDirectoryListHasher(hashfunc="sha256",
-                                         use_relative_paths=True,
                                          hash_directory_names=False,
                                          hash_file_names=False)
         hash1 = hasher.hash([simple_path_mapping(self.test_dir1)])
@@ -157,12 +138,10 @@ class HashTempDirTest(unittest.TestCase):
     def test_directory_content_only_not_equal_to_with_paths(self):
         hasher_content_only = \
             FileDirectoryListHasher(hashfunc="sha256",
-                                    use_relative_paths=False,
                                     hash_directory_names=False,
                                     hash_file_names=False)
         hasher_with_paths = \
             FileDirectoryListHasher(hashfunc="sha256",
-                                    use_relative_paths=True,
                                     hash_directory_names=True,
                                     hash_file_names=True)
         hash1_content_only = hasher_content_only.hash([simple_path_mapping(self.test_dir1)])
@@ -174,12 +153,10 @@ class HashTempDirTest(unittest.TestCase):
     def test_directory_content_only_not_equal_to_dir_names(self):
         hasher_content_only = \
             FileDirectoryListHasher(hashfunc="sha256",
-                                    use_relative_paths=False,
                                     hash_directory_names=False,
                                     hash_file_names=False)
         hasher_with_paths = \
             FileDirectoryListHasher(hashfunc="sha256",
-                                    use_relative_paths=False,
                                     hash_directory_names=True,
                                     hash_file_names=False)
         hash1_content_only = hasher_content_only.hash([simple_path_mapping(self.test_dir1)])
@@ -191,12 +168,10 @@ class HashTempDirTest(unittest.TestCase):
     def test_directory_content_only_not_equal_to_file_names(self):
         hasher_content_only = \
             FileDirectoryListHasher(hashfunc="sha256",
-                                    use_relative_paths=False,
                                     hash_directory_names=False,
                                     hash_file_names=False)
         hasher_with_paths = \
             FileDirectoryListHasher(hashfunc="sha256",
-                                    use_relative_paths=False,
                                     hash_directory_names=False,
                                     hash_file_names=True)
         hash1_content_only = hasher_content_only.hash([simple_path_mapping(self.test_dir1)])
@@ -208,12 +183,10 @@ class HashTempDirTest(unittest.TestCase):
     def test_directory_file_names_not_equal_to_dir_names(self):
         hasher_content_only = \
             FileDirectoryListHasher(hashfunc="sha256",
-                                    use_relative_paths=True,
                                     hash_directory_names=False,
                                     hash_file_names=True)
         hasher_with_paths = \
             FileDirectoryListHasher(hashfunc="sha256",
-                                    use_relative_paths=True,
                                     hash_directory_names=True,
                                     hash_file_names=False)
         hash1_content_only = hasher_content_only.hash([simple_path_mapping(self.test_dir1)])
@@ -231,8 +204,7 @@ class HashTempDirTest(unittest.TestCase):
                                     hashfunc="sha256",
                                     hash_file_names=True,
                                     hash_directory_names=True,
-                                    hash_permissions=True,
-                                    use_relative_paths=True)
+                                    hash_permissions=True)
         test_file1 = f"{self.test_dir1}/test.txt"
         with open(test_file1, "w") as f:
             f.write("test")
@@ -256,8 +228,7 @@ class HashTempDirTest(unittest.TestCase):
                                     hashfunc="sha256",
                                     hash_file_names=True,
                                     hash_directory_names=True,
-                                    hash_permissions=True,
-                                    use_relative_paths=True)
+                                    hash_permissions=True)
         test_file1 = f"{self.test_dir1}/level0/test.txt"
         with open(test_file1, "w") as f:
             f.write("test")
@@ -281,8 +252,7 @@ class HashTempDirTest(unittest.TestCase):
                                     hashfunc="sha256",
                                     hash_file_names=True,
                                     hash_directory_names=True,
-                                    hash_permissions=True,
-                                    use_relative_paths=True)
+                                    hash_permissions=True)
         test_file1 = f"{self.test_dir1}/level0/test.txt"
         with open(test_file1, "w") as f:
             f.write("test")
@@ -306,8 +276,7 @@ class HashTempDirTest(unittest.TestCase):
                                     hashfunc="sha256",
                                     hash_file_names=True,
                                     hash_directory_names=True,
-                                    hash_permissions=True,
-                                    use_relative_paths=True)
+                                    hash_permissions=True)
         test_file = f"test.txt"
         old_pwd = os.getcwd()
         os.chdir(self.test_dir1)
@@ -333,8 +302,7 @@ class HashTempDirTest(unittest.TestCase):
                                     hashfunc="sha256",
                                     hash_file_names=True,
                                     hash_directory_names=True,
-                                    hash_permissions=True,
-                                    use_relative_paths=True)
+                                    hash_permissions=True)
         test_file1 = f"{self.test_dir1}/level0/level1_0/test.txt"
         with open(test_file1, "w") as f:
             f.write("test")
@@ -354,8 +322,7 @@ class HashTempDirTest(unittest.TestCase):
                                     hashfunc="sha256",
                                     hash_file_names=True,
                                     hash_directory_names=True,
-                                    hash_permissions=True,
-                                    use_relative_paths=True)
+                                    hash_permissions=True)
         test_file1 = f"{self.test_dir1}/level0/level1_0/test/test.txt"
         p = Path(f"{self.test_dir1}/level0/level1_0/test")
         p.mkdir()

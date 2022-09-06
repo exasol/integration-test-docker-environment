@@ -47,7 +47,6 @@ class TestSymlinkLoops(unittest.TestCase):
     def test_symlink_detection(self):
         self.generate_test_dir(True)
         hasher = FileDirectoryListHasher(hashfunc="sha256",
-                                         use_relative_paths=False,
                                          hash_directory_names=True,
                                          hash_file_names=True,
                                          followlinks=True)
@@ -62,7 +61,6 @@ class TestSymlinkLoops(unittest.TestCase):
     def test_symlink_detection_size(self):
         self.generate_test_dir(True)
         hasher = FileDirectoryListHasher(hashfunc="sha256",
-                                         use_relative_paths=False,
                                          hash_directory_names=True,
                                          hash_file_names=True,
                                          followlinks=True,
@@ -79,7 +77,6 @@ class TestSymlinkLoops(unittest.TestCase):
         symlink_dest = self.generate_test_dir(False)
         os.symlink(self.temp_dir_dummy, symlink_dest)
         hasher = FileDirectoryListHasher(hashfunc="sha256",
-                                         use_relative_paths=False,
                                          hash_directory_names=True,
                                          hash_file_names=True,
                                          followlinks=True)

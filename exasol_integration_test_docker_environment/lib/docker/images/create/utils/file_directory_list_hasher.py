@@ -34,8 +34,6 @@ class DestinationMapping:
     """The path of the file/directory in the destination (including destination_root_path)"""
     source_path: str
     """The path of the file/directory in the source"""
-    destination_root_path: str
-    """The root of the destination as given in the mapping"""
     is_file: bool
     """Indicates if the entry is a file or directory."""
 
@@ -67,7 +65,6 @@ class FileDirectoryListHasher:
                  hash_file_names: bool = False,
                  hash_permissions: bool = False,
                  hash_directory_names: bool = False,
-                 use_relative_paths: bool = False,
                  excluded_directories=None,
                  excluded_files=None,
                  excluded_extensions=None,
@@ -76,7 +73,6 @@ class FileDirectoryListHasher:
                  max_characters_paths: int = 500000000
                  ):
         self.MAX_CHARACTERS_PATHS = max_characters_paths
-        self.use_relative_paths = use_relative_paths
         self.workers = workers
         self.excluded_files = excluded_files
         self.excluded_extensions = excluded_extensions
@@ -149,7 +145,6 @@ class FileDirectoryListHasher:
                 new_dest_paths_mappings = [DestinationMapping(
                                             destination_path=replace_src_by_dest_path(source, destination, p),
                                             source_path=p,
-                                            destination_root_path=destination,
                                             is_file=False) for p in directories]
                 collected_dest_paths.extend(new_dest_paths_mappings)
 
@@ -157,17 +152,16 @@ class FileDirectoryListHasher:
                 collected_dest_paths.extend([DestinationMapping(
                                            destination_path=replace_src_by_dest_path(source, destination, f),
                                            source_path=f,
-                                           destination_root_path=destination,
                                            is_file=True) for f in files])
 
             if os.path.isdir(source):
                 self.traverse_directory(source, handle_directory, handle_files)
             elif os.path.isfile(source):
                 collected_dest_paths.append(DestinationMapping(destination_path=destination, source_path=source,
-                                                               destination_root_path=".", is_file=True))
+                                                               is_file=True))
             else:
                 raise FileNotFoundError("Could not find file or directory %s" % source)
-        collected_dest_paths.sort(key=lambda x: x.destination)
+        collected_dest_paths.sort(key=lambda x: x.destination_path)
         self.check_no_duplicate_destinations(collected_dest_paths)
 
         # Now, after we sorted the collected paths, filter out paths which are not needed for current configuration
@@ -230,9 +224,7 @@ class FileDirectoryListHasher:
 
 class PathHasher:
     def __init__(self, hashfunc: str = 'md5',
-                 hash_permissions: bool = False,
-                 use_relative_paths: bool = False,):
-        self.use_relative_paths = use_relative_paths
+                 hash_permissions: bool = False):
         self.hash_permissions = hash_permissions
         self.hash_func = HASH_FUNCTIONS.get(hashfunc)
         if not self.hash_func:
@@ -241,13 +233,8 @@ class PathHasher:
     def hash(self, path_mapping: DestinationMapping):
         src_path = Path(path_mapping.source_path)
         dest_path = Path(path_mapping.destination_path)
-        dest_root = Path(path_mapping.destination_root_path)
-        if self.use_relative_paths and len(path_mapping.destination_root_path) > 0:
-            path = dest_path.relative_to(dest_root)
-        else:
-            path = dest_path
         hasher = self.hash_func()
-        hasher.update(str(path).encode('utf-8'))
+        hasher.update(str(dest_path).encode('utf-8'))
         if self.hash_permissions:
             stat_result = os.stat(src_path)
             # we only check the executable right of the user, because git only remembers this
