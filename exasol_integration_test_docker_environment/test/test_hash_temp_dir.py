@@ -3,7 +3,7 @@ import os
 import shutil
 import tempfile
 import unittest
-from pathlib import Path
+from pathlib import Path, PurePath
 
 from exasol_integration_test_docker_environment.lib.docker.images.create.utils.file_directory_list_hasher import \
     FileDirectoryListHasher, PathMapping
@@ -17,7 +17,7 @@ def simple_path_mapping(src: str) -> PathMapping:
     e.g. /tmp/tmp123/test1 becomes PathMapping('test1', '/tmp/tmp123/test1')
     """
     p = Path(src)
-    return PathMapping(p.name, src)
+    return PathMapping(destination=PurePath(p.name), source=p)
 
 
 class HashTempDirTest(unittest.TestCase):
@@ -109,8 +109,8 @@ class HashTempDirTest(unittest.TestCase):
         hasher = FileDirectoryListHasher(hashfunc="sha256",
                                          hash_directory_names=True,
                                          hash_file_names=True)
-        hash1 = hasher.hash([PathMapping("test", self.test_dir1)])
-        hash2 = hasher.hash([PathMapping("test", self.test_dir2)])
+        hash1 = hasher.hash([PathMapping(PurePath("test"), Path(self.test_dir1))])
+        hash2 = hasher.hash([PathMapping(PurePath("test"), Path(self.test_dir2))])
         ascii_hash1 = base64.b32encode(hash1).decode("ASCII")
         ascii_hash2 = base64.b32encode(hash2).decode("ASCII")
         self.assertEqual(ascii_hash1, ascii_hash2)

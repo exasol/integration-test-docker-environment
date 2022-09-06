@@ -2,7 +2,7 @@ import base64
 import os
 import tempfile
 import unittest
-from pathlib import Path
+from pathlib import Path, PurePath
 
 from exasol_integration_test_docker_environment.lib.docker.images.create.utils.file_directory_list_hasher import \
     FileDirectoryListHasher, PathMapping
@@ -33,15 +33,17 @@ class HashTempDirTest(unittest.TestCase):
                                     hash_file_names=True,
                                     hash_directory_names=True,
                                     hash_permissions=True)
-        test_file1 = f"{self.test_path1}/test.txt"
+        test_file1 = Path(f"{self.test_path1}/test.txt")
         with open(test_file1, "w") as f:
             f.write("test")
-            hash1_content_only = hasher_content_only.hash([PathMapping("test.txt", test_file1)])
+        mapping = PathMapping(PurePath("test.txt"), test_file1)
+        hash1_content_only = hasher_content_only.hash([mapping])
 
-        test_file2 = f"{self.test_path2}/test.txt"
+        test_file2 = Path(f"{self.test_path2}/test.txt")
         with open(test_file2, "w") as f:
             f.write("test")
-            hash2_content_only = hasher_content_only.hash([PathMapping("test.txt", test_file2)])
+        mapping = PathMapping(PurePath("test.txt"), test_file2)
+        hash2_content_only = hasher_content_only.hash([mapping])
 
         ascii_hash1_content_only = base64.b32encode(hash1_content_only).decode("ASCII")
         ascii_hash2_content_only = base64.b32encode(hash2_content_only).decode("ASCII")
@@ -64,14 +66,16 @@ class HashTempDirTest(unittest.TestCase):
         test_file1 = p1 / "test.txt"
         with open(test_file1, "w") as f:
             f.write("test")
-            hash1_content_only = hasher_content_only.hash([PathMapping("level0/test.txt", str(test_file1))])
+        mapping = PathMapping(PurePath("level0/test.txt"), test_file1)
+        hash1_content_only = hasher_content_only.hash([mapping])
 
         p2 = self.test_path2 / "level0"
         p2.mkdir()
         test_file2 = p2 / "test.txt"
         with open(test_file2, "w") as f:
             f.write("test")
-            hash2_content_only = hasher_content_only.hash([PathMapping("level0/test.txt", str(test_file2))])
+        mapping = PathMapping(PurePath("level0/test.txt"), test_file2)
+        hash2_content_only = hasher_content_only.hash([mapping])
 
         ascii_hash1_content_only = base64.b32encode(hash1_content_only).decode("ASCII")
         ascii_hash2_content_only = base64.b32encode(hash2_content_only).decode("ASCII")
@@ -94,7 +98,7 @@ class HashTempDirTest(unittest.TestCase):
         test_file1 = p1 / "test.txt"
         with open(test_file1, "w") as f:
             f.write("test")
-            hash1_content_only = hasher_content_only.hash([PathMapping("level0/test.txt", str(test_file1))])
+        hash1_content_only = hasher_content_only.hash([PathMapping(PurePath("level0/test.txt"), test_file1)])
 
         p2 = self.test_path2 / "level0" / "level1_0"
         p2.mkdir(parents=True)
@@ -102,8 +106,8 @@ class HashTempDirTest(unittest.TestCase):
 
         with open(test_file2, "w") as f:
             f.write("test")
-            hash2_content_only = hasher_content_only.hash([PathMapping("level0/level1_0/test.txt",
-                                                                       str(test_file2))])
+        hash2_content_only = hasher_content_only.hash([PathMapping(PurePath("level0/level1_0/test.txt"),
+                                                                   test_file2)])
 
         ascii_hash1_content_only = base64.b32encode(hash1_content_only).decode("ASCII")
         ascii_hash2_content_only = base64.b32encode(hash2_content_only).decode("ASCII")
@@ -128,12 +132,14 @@ class HashTempDirTest(unittest.TestCase):
         os.chdir(self.test_path1)
         with open(test_file, "w") as f:
             f.write("test")
-            hash1_content_only = hasher_content_only.hash([PathMapping("test.txt", test_file)])
+        mapping = PathMapping(PurePath("test.txt"), Path(test_file))
+        hash1_content_only = hasher_content_only.hash([mapping])
         os.chdir(self.test_path2)
 
         with open(test_file, "w") as f:
             f.write("test")
-            hash2_content_only = hasher_content_only.hash([PathMapping("test.txt", test_file)])
+        mapping = PathMapping(PurePath("test.txt"), Path(test_file))
+        hash2_content_only = hasher_content_only.hash([mapping])
         os.chdir(old_pwd)
         ascii_hash1_content_only = base64.b32encode(hash1_content_only).decode("ASCII")
         ascii_hash2_content_only = base64.b32encode(hash2_content_only).decode("ASCII")
@@ -164,7 +170,8 @@ class HashTempDirTest(unittest.TestCase):
         with open(test_file2, "w") as f:
             f.write("test")
 
-        path_mappings = [PathMapping("test.txt", str(test_file1)), PathMapping("test.txt", str(test_file2))]
+        path_mappings = [PathMapping(PurePath("test.txt"), test_file1),
+                         PathMapping(PurePath("test.txt"), test_file2)]
         self.assertRaises(AssertionError, lambda: hasher_content_only.hash(path_mappings))
 
     def test_duplicated_path_mapping_raises_exception(self):
@@ -193,7 +200,8 @@ class HashTempDirTest(unittest.TestCase):
 
         path1 = p1.parent
         path2 = p2.parent
-        path_mappings = [PathMapping("test", str(path1)), PathMapping("test", str(path2))]
+        path_mappings = [PathMapping(PurePath("test"), path1),
+                         PathMapping(PurePath("test"), path2)]
         self.assertRaises(AssertionError, lambda: hasher_content_only.hash(path_mappings))
 
     def test_duplicated_path_mapping_with_subpath_raises_exception(self):
@@ -222,8 +230,8 @@ class HashTempDirTest(unittest.TestCase):
 
         path1 = p1.parent
         path2 = p2.parent
-        destination_path = "test/abc"
-        path_mappings = [PathMapping(destination_path, str(path1)), PathMapping(destination_path, str(path2))]
+        destination_path = PurePath("test/abc")
+        path_mappings = [PathMapping(destination_path, path1), PathMapping(destination_path, path2)]
         self.assertRaises(AssertionError, lambda: hasher_content_only.hash(path_mappings))
 
     def test_duplicated_path_mapping_with_destination_subpath_raises_exception(self):
@@ -256,7 +264,7 @@ class HashTempDirTest(unittest.TestCase):
         path1 = self.test_path1
         path2 = self.test_path2
 
-        path_mappings = [PathMapping("test/abc", str(path1)), PathMapping("test", str(path2))]
+        path_mappings = [PathMapping(PurePath("test/abc"), path1), PathMapping(PurePath("test"), path2)]
         self.assertRaises(AssertionError, lambda: hasher_content_only.hash(path_mappings))
 
 

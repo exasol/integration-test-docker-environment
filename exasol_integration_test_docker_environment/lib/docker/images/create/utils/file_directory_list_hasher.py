@@ -3,7 +3,7 @@ import os
 import stat
 from dataclasses import dataclass
 from multiprocessing import Pool
-from pathlib import Path
+from pathlib import Path, PurePath
 from typing import List, Callable
 
 import humanfriendly
@@ -26,8 +26,8 @@ class PathMapping:
     """
     Describes a mapping of a file or directory from source to destination.
     """
-    destination: str
-    source: str
+    destination: PurePath
+    source: Path
 
 
 @dataclass(frozen=True)
@@ -35,7 +35,7 @@ class DestinationMapping:
     """
     Represents one file/directory found by traversing the source directory tree.
     """
-    destination_path: Path
+    destination_path: PurePath
     """The path of the file/directory in the destination (including destination_root_path)"""
     source_path: Path
     """The path of the file/directory in the source"""
@@ -136,8 +136,8 @@ class FileDirectoryListHasher:
         """
         collected_dest_paths: List[DestinationMapping] = list()
 
-        def replace_src_by_dest_path(src: str, dest: str, target: str) -> Path:
-            if not target.startswith(src):
+        def replace_src_by_dest_path(src: PurePath, dest: PurePath, target: str) -> PurePath:
+            if not target.startswith(str(src)):
                 raise RuntimeError(f"path target {target} does not start with source: {src}")
             p = Path(target).relative_to(src)
             return Path(dest) / p
@@ -197,7 +197,7 @@ class FileDirectoryListHasher:
     def is_excluded_directory(self, f: str):
         return f in self.excluded_directories
 
-    def traverse_directory(self, directory: str,
+    def traverse_directory(self, directory: PurePath,
                            directory_handler: Callable[[List[str]], None],
                            file_handler: Callable[[List[str]], None]) -> None:
 

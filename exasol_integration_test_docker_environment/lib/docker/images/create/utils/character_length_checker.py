@@ -1,3 +1,4 @@
+from pathlib import PurePath
 from typing import List
 
 
@@ -8,7 +9,7 @@ class CharacterLengthChecker:
     The goal is to avoid high memory consumption for calculation of huge directories
     which contain many sub-directories/files (broad directory trees) and long names.
     """
-    def __init__(self, root_directory: str, max_characters_paths: int,
+    def __init__(self, root_directory: PurePath, max_characters_paths: int,
                  count_directory_names: bool, count_file_names: bool):
         self._num_characters = 0
         self._max_characters_paths = max_characters_paths
