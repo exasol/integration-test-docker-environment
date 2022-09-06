@@ -101,7 +101,7 @@ class HashTempDirTest(unittest.TestCase):
         hasher = FileDirectoryListHasher(hashfunc="sha256",
                                          hash_directory_names=False,
                                          hash_file_names=False)
-        hash = hasher.hash([PathMapping("level0", f"{self.test_dir1}/level0")])
+        hash = hasher.hash([simple_path_mapping(self.test_dir1)])
         ascii_hash = base64.b32encode(hash).decode("ASCII")
         self.assertEqual("TM2V22T326TCTLQ537BZAOR3I5NVHXE6IDJ4TXPCJPTUGDTI5WYQ====", ascii_hash)
 
@@ -197,147 +197,185 @@ class HashTempDirTest(unittest.TestCase):
 
     def test_file_name_with_relative_path(self):
         """
-        Test that hashing of same files in different paths gives same result
+        Test that hashing of same files in different paths gives same result.
+        Note: Cannot use the class-wide temporary directories here as we add new files.
         """
-        hasher_content_only = \
-            FileDirectoryListHasher(followlinks=True,
-                                    hashfunc="sha256",
-                                    hash_file_names=True,
-                                    hash_directory_names=True,
-                                    hash_permissions=True)
-        test_file1 = f"{self.test_dir1}/test.txt"
-        with open(test_file1, "w") as f:
-            f.write("test")
-            hash1_content_only = hasher_content_only.hash([PathMapping("test.txt", test_file1)])
+        with tempfile.TemporaryDirectory() as d1:
+            with tempfile.TemporaryDirectory() as d2:
+                hasher_content_only = \
+                    FileDirectoryListHasher(followlinks=True,
+                                            hashfunc="sha256",
+                                            hash_file_names=True,
+                                            hash_directory_names=True,
+                                            hash_permissions=True)
+                test_file1 = f"{d1}/test.txt"
+                with open(test_file1, "w") as f:
+                    f.write("test")
+                    hash1_content_only = hasher_content_only.hash([PathMapping("test.txt", test_file1)])
 
-        test_file2 = f"{self.test_dir2}/test.txt"
-        with open(test_file2, "w") as f:
-            f.write("test")
-            hash2_content_only = hasher_content_only.hash([PathMapping("test.txt", test_file2)])
+                test_file2 = f"{d2}/test.txt"
+                with open(test_file2, "w") as f:
+                    f.write("test")
+                    hash2_content_only = hasher_content_only.hash([PathMapping("test.txt", test_file2)])
 
-        ascii_hash1_content_only = base64.b32encode(hash1_content_only).decode("ASCII")
-        ascii_hash2_content_only = base64.b32encode(hash2_content_only).decode("ASCII")
-        self.assertEqual(ascii_hash1_content_only, ascii_hash2_content_only)
+                ascii_hash1_content_only = base64.b32encode(hash1_content_only).decode("ASCII")
+                ascii_hash2_content_only = base64.b32encode(hash2_content_only).decode("ASCII")
+                self.assertEqual(ascii_hash1_content_only, ascii_hash2_content_only)
 
     def test_file_name_with_relative_path_in_same_sub_path(self):
         """
         Test that hashing of same files in different paths, but under same subpath, gives same result
+        Note: Cannot use the class-wide temporary directories here as we add new files.
         """
-        hasher_content_only = \
-            FileDirectoryListHasher(followlinks=True,
-                                    hashfunc="sha256",
-                                    hash_file_names=True,
-                                    hash_directory_names=True,
-                                    hash_permissions=True)
-        test_file1 = f"{self.test_dir1}/level0/test.txt"
-        with open(test_file1, "w") as f:
-            f.write("test")
-            hash1_content_only = hasher_content_only.hash([PathMapping("level0/test.txt", test_file1)])
+        with tempfile.TemporaryDirectory() as d1:
+            with tempfile.TemporaryDirectory() as d2:
+                hasher_content_only = \
+                    FileDirectoryListHasher(followlinks=True,
+                                            hashfunc="sha256",
+                                            hash_file_names=True,
+                                            hash_directory_names=True,
+                                            hash_permissions=True)
+                p1 = Path(d1) / "level0"
+                p1.mkdir()
+                test_file1 = p1 / "test.txt"
+                with open(test_file1, "w") as f:
+                    f.write("test")
+                    hash1_content_only = hasher_content_only.hash([PathMapping("level0/test.txt", str(test_file1))])
 
-        test_file2 = f"{self.test_dir2}/level0/test.txt"
-        with open(test_file2, "w") as f:
-            f.write("test")
-            hash2_content_only = hasher_content_only.hash([PathMapping("level0/test.txt", test_file2)])
+                p2 = Path(d2) / "level0"
+                p1.mkdir()
+                test_file2 = p2 / "test.txt"
+                with open(test_file2, "w") as f:
+                    f.write("test")
+                    hash2_content_only = hasher_content_only.hash([PathMapping("level0/test.txt", str(test_file2))])
 
-        ascii_hash1_content_only = base64.b32encode(hash1_content_only).decode("ASCII")
-        ascii_hash2_content_only = base64.b32encode(hash2_content_only).decode("ASCII")
-        self.assertEqual(ascii_hash1_content_only, ascii_hash2_content_only)
+                ascii_hash1_content_only = base64.b32encode(hash1_content_only).decode("ASCII")
+                ascii_hash2_content_only = base64.b32encode(hash2_content_only).decode("ASCII")
+                self.assertEqual(ascii_hash1_content_only, ascii_hash2_content_only)
 
     def test_file_name_with_relative_path_in_different_sub_path(self):
         """
         Test that hashing of same files in different paths, and different subpaths, gives different result
+        Note: Cannot use the class-wide temporary directories here as we add new files.
         """
-        hasher_content_only = \
-            FileDirectoryListHasher(followlinks=True,
-                                    hashfunc="sha256",
-                                    hash_file_names=True,
-                                    hash_directory_names=True,
-                                    hash_permissions=True)
-        test_file1 = f"{self.test_dir1}/level0/test.txt"
-        with open(test_file1, "w") as f:
-            f.write("test")
-            hash1_content_only = hasher_content_only.hash([PathMapping("level0/test.txt", test_file1)])
+        with tempfile.TemporaryDirectory() as d1:
+            with tempfile.TemporaryDirectory() as d2:
+                hasher_content_only = \
+                    FileDirectoryListHasher(followlinks=True,
+                                            hashfunc="sha256",
+                                            hash_file_names=True,
+                                            hash_directory_names=True,
+                                            hash_permissions=True)
+                p1 = Path(d1) / "level0"
+                p1.mkdir()
+                test_file1 = p1 / "test.txt"
+                with open(test_file1, "w") as f:
+                    f.write("test")
+                    hash1_content_only = hasher_content_only.hash([PathMapping("level0/test.txt", str(test_file1))])
 
-        test_file2 = f"{self.test_dir2}/level0/level1_0/test.txt"
-        with open(test_file2, "w") as f:
-            f.write("test")
-            hash2_content_only = hasher_content_only.hash([PathMapping("level0/level1_0/test.txt", test_file2)])
+                p2 = Path(d2) / "level0" / "level1_0"
+                p1.mkdir(parents=True)
+                test_file2 = p2 / "test.txt"
 
-        ascii_hash1_content_only = base64.b32encode(hash1_content_only).decode("ASCII")
-        ascii_hash2_content_only = base64.b32encode(hash2_content_only).decode("ASCII")
-        self.assertNotEqual(ascii_hash1_content_only, ascii_hash2_content_only)
+                with open(test_file2, "w") as f:
+                    f.write("test")
+                    hash2_content_only = hasher_content_only.hash([PathMapping("level0/level1_0/test.txt",
+                                                                               str(test_file2))])
+
+                ascii_hash1_content_only = base64.b32encode(hash1_content_only).decode("ASCII")
+                ascii_hash2_content_only = base64.b32encode(hash2_content_only).decode("ASCII")
+                self.assertNotEqual(ascii_hash1_content_only, ascii_hash2_content_only)
 
     def test_file_name_with_relative_path_in_relative_path_as_argument(self):
         """
         Test that hashing of same files in different paths, gives same result, using relative paths as argument
+        Note: Cannot use the class-wide temporary directories here as we add new files.
         """
-        hasher_content_only = \
-            FileDirectoryListHasher(followlinks=True,
-                                    hashfunc="sha256",
-                                    hash_file_names=True,
-                                    hash_directory_names=True,
-                                    hash_permissions=True)
-        test_file = f"test.txt"
-        old_pwd = os.getcwd()
-        os.chdir(self.test_dir1)
-        with open(test_file, "w") as f:
-            f.write("test")
-            hash1_content_only = hasher_content_only.hash([PathMapping("test.txt", test_file)])
-        os.chdir(self.test_dir2)
+        with tempfile.TemporaryDirectory() as d1:
+            with tempfile.TemporaryDirectory() as d2:
+                hasher_content_only = \
+                    FileDirectoryListHasher(followlinks=True,
+                                            hashfunc="sha256",
+                                            hash_file_names=True,
+                                            hash_directory_names=True,
+                                            hash_permissions=True)
+                test_file = f"test.txt"
+                old_pwd = os.getcwd()
+                os.chdir(d1)
+                with open(test_file, "w") as f:
+                    f.write("test")
+                    hash1_content_only = hasher_content_only.hash([PathMapping("test.txt", test_file)])
+                os.chdir(d2)
 
-        with open(test_file, "w") as f:
-            f.write("test")
-            hash2_content_only = hasher_content_only.hash([PathMapping("test.txt", test_file)])
-        os.chdir(old_pwd)
-        ascii_hash1_content_only = base64.b32encode(hash1_content_only).decode("ASCII")
-        ascii_hash2_content_only = base64.b32encode(hash2_content_only).decode("ASCII")
-        self.assertEqual(ascii_hash1_content_only, ascii_hash2_content_only)
+                with open(test_file, "w") as f:
+                    f.write("test")
+                    hash2_content_only = hasher_content_only.hash([PathMapping("test.txt", test_file)])
+                os.chdir(old_pwd)
+                ascii_hash1_content_only = base64.b32encode(hash1_content_only).decode("ASCII")
+                ascii_hash2_content_only = base64.b32encode(hash2_content_only).decode("ASCII")
+                self.assertEqual(ascii_hash1_content_only, ascii_hash2_content_only)
 
     def test_duplicated_file_mapping_raises_exception(self):
         """
         Test that a duplicated mapping raises an exception.
+        Note: Cannot use the class-wide temporary directories here as we add new files.
         """
-        hasher_content_only = \
-            FileDirectoryListHasher(followlinks=True,
-                                    hashfunc="sha256",
-                                    hash_file_names=True,
-                                    hash_directory_names=True,
-                                    hash_permissions=True)
-        test_file1 = f"{self.test_dir1}/level0/level1_0/test.txt"
-        with open(test_file1, "w") as f:
-            f.write("test")
-        test_file2 = f"{self.test_dir1}/level0/level1_1/test.txt"
-        with open(test_file2, "w") as f:
-            f.write("test")
+        with tempfile.TemporaryDirectory() as d1:
+            with tempfile.TemporaryDirectory() as d2:
+                hasher_content_only = \
+                    FileDirectoryListHasher(followlinks=True,
+                                            hashfunc="sha256",
+                                            hash_file_names=True,
+                                            hash_directory_names=True,
+                                            hash_permissions=True)
+                p1 = Path(d1) / "level0" / "level1_0"
+                p1.mkdir(parents=True)
+                test_file1 = p1 / "test.txt"
 
-        self.assertRaises(AssertionError, lambda: hasher_content_only.hash([PathMapping("test.txt", test_file1),
-                                                                            PathMapping("test.txt", test_file2)]))
+                with open(test_file1, "w") as f:
+                    f.write("test")
+
+                p2 = Path(d2) / "level0" / "level1_1"
+                p2.mkdir(parents=True)
+                test_file2 = p2 / "test.txt"
+                with open(test_file2, "w") as f:
+                    f.write("test")
+
+                self.assertRaises(AssertionError,
+                                  lambda: hasher_content_only.hash([PathMapping("test.txt", str(test_file1)),
+                                                                    PathMapping("test.txt", str(test_file2))]))
 
     def test_duplicated_path_mapping_raises_exception(self):
         """
         Test that a duplicated mapping raises an exception.
+        Note: Cannot use the class-wide temporary directories here as we add new files.
         """
-        hasher_content_only = \
-            FileDirectoryListHasher(followlinks=True,
-                                    hashfunc="sha256",
-                                    hash_file_names=True,
-                                    hash_directory_names=True,
-                                    hash_permissions=True)
-        test_file1 = f"{self.test_dir1}/level0/level1_0/test/test.txt"
-        p = Path(f"{self.test_dir1}/level0/level1_0/test")
-        p.mkdir()
-        with open(test_file1, "w") as f:
-            f.write("test")
-        test_file2 = f"{self.test_dir1}/level0/level1_1/test/test.txt"
-        p = Path(f"{self.test_dir1}/level0/level1_1/test")
-        p.mkdir()
-        with open(test_file2, "w") as f:
-            f.write("test")
+        with tempfile.TemporaryDirectory() as d1:
+            with tempfile.TemporaryDirectory() as d2:
+                hasher_content_only = \
+                    FileDirectoryListHasher(followlinks=True,
+                                            hashfunc="sha256",
+                                            hash_file_names=True,
+                                            hash_directory_names=True,
+                                            hash_permissions=True)
 
-        path1 = f"{self.test_dir1}/level0/level1_0/"
-        path2 = f"{self.test_dir1}/level0/level1_1/"
-        self.assertRaises(AssertionError, lambda: hasher_content_only.hash([PathMapping("test", path1),
-                                                                            PathMapping("test", path2)]))
+                p1 = Path(d1) / "level0" / "level1_0" / "test"
+                test_file1 = p1 / "test.txt"
+                p1.mkdir(parents=True)
+                with open(test_file1, "w") as f:
+                    f.write("test")
+                p2 = Path(d2) / "level0" / "level1_0" / "test"
+                test_file2 = p2 / "test.txt"
+                p2.mkdir(parents=True)
+                test_file2 = p2 / "test.txt"
+                with open(test_file2, "w") as f:
+                    f.write("test")
+
+                path1 = p1.parent
+                path2 = p2.parent
+                self.assertRaises(AssertionError, lambda: hasher_content_only.hash([PathMapping("test", str(path1)),
+                                                                                    PathMapping("test", str(path2))]))
+
 
 if __name__ == '__main__':
     unittest.main()
