@@ -113,11 +113,13 @@ class FileDirectoryListHasher:
         hashes = self.compute_hashes(directory_mapping_result)
         return self._reduce_hash(hashes)
 
-    def check_no_duplicate_destinations(self, mappings: List[DestinationMapping]) -> None:
+    @staticmethod
+    def check_no_duplicate_destinations(mappings: List[DestinationMapping]) -> None:
         """
         Verify that there are no duplicate mappings to same destination.
         This can happen, if the destination of two mappings are equal and the two sources contains the same sub-path
-        structure; or if the destination of two mappings is the same file.
+        structure; or if subpaths of destinations and sources somehow match;
+        or if the destination of two mappings is the same file.
         """
         destination_paths_set = set(p.destination_path for p in mappings)
         if len(destination_paths_set) != len(mappings):
