@@ -24,6 +24,8 @@ class HashTempDirTest(unittest.TestCase):
     def test_file_name_with_relative_path(self):
         """
         Test that hashing of same files in different paths gives same result.
+        1. Mapping dest="test.txt", src="/tmp/.../$tmpA/test.txt"
+        2. Mapping dest="test.txt", src="/tmp/.../$tmpB/test.txt"
         """
         hasher_content_only = \
             FileDirectoryListHasher(followlinks=True,
@@ -48,6 +50,8 @@ class HashTempDirTest(unittest.TestCase):
     def test_file_name_with_relative_path_in_same_sub_path(self):
         """
         Test that hashing of same files in different paths, but under same subpath, gives same result
+        1. Mapping dest="level0/test.txt", src="/tmp/.../$tmpA/level0/test.txt"
+        2. Mapping dest="level0/test.txt", src="/tmp/.../$tmpB/level0/test.txt"
         """
         hasher_content_only = \
             FileDirectoryListHasher(followlinks=True,
@@ -75,7 +79,9 @@ class HashTempDirTest(unittest.TestCase):
 
     def test_file_name_with_relative_path_in_different_sub_path(self):
         """
-        Test that hashing of same files in different paths, and different subpaths, gives different result
+        Test that hashing of same files in different paths, and different subpaths, gives different result.
+        1. Mapping dest="level0/test.txt", src="/tmp/.../level0/test.txt"
+        2. Mapping dest="level0/level1_0/test.txt", src="/tmp/.../level0/level1_0/test.txt"
         """
         hasher_content_only = \
             FileDirectoryListHasher(followlinks=True,
@@ -106,6 +112,10 @@ class HashTempDirTest(unittest.TestCase):
     def test_file_name_with_relative_path_in_relative_path_as_argument(self):
         """
         Test that hashing of same files in different paths, gives same result, using relative paths as argument
+        for source and destination path in the mapping.
+        For that, we need to change pwd before running hasher_content_only.hash.
+        1. Mapping dest="test.txt", src="test.txt"
+        2. Mapping dest="test.txt", src="test.txt"
         """
         hasher_content_only = \
             FileDirectoryListHasher(followlinks=True,
@@ -132,6 +142,8 @@ class HashTempDirTest(unittest.TestCase):
     def test_duplicated_file_mapping_raises_exception(self):
         """
         Test that a duplicated mapping raises an exception.
+        1. Mapping dest="test.txt", src="/tmp/.../$tmpB/level0/level1_0/test.txt"
+        2. Mapping dest="test.txt", src="/tmp/.../$tmpB/level0/level1_1/test.txt"
         """
         hasher_content_only = \
             FileDirectoryListHasher(followlinks=True,
@@ -157,7 +169,9 @@ class HashTempDirTest(unittest.TestCase):
 
     def test_duplicated_path_mapping_raises_exception(self):
         """
-        Test that a duplicated mapping raises an exception.
+        Test that a duplicated mapping raises an exception. Mapping source is here a directory containing one file.
+        1. Mapping dest="test", src="/tmp/.../$tmpA/level0/level1_0/test"
+        2. Mapping dest="test", src="/tmp/.../$tmpB/level0/level1_1/test"
         """
         hasher_content_only = \
             FileDirectoryListHasher(followlinks=True,
@@ -184,7 +198,9 @@ class HashTempDirTest(unittest.TestCase):
 
     def test_duplicated_path_mapping_with_subpath_raises_exception(self):
         """
-        Test that a duplicated mapping raises an exception.
+        Test that a duplicated mapping raises an exception. Mapping source is here a directory containing one file.
+        1. Mapping dest="test/abc", src="/tmp/.../$tmpA/level0/level1_0/test"
+        2. Mapping dest="test/abc", src="/tmp/.../$tmpB/level0/level1_1/test"
         """
         hasher_content_only = \
             FileDirectoryListHasher(followlinks=True,
@@ -216,6 +232,8 @@ class HashTempDirTest(unittest.TestCase):
         In this scenario we have one path which maps to a destination containing a subpath;
         the second path maps to root destination of the first, but contains the subdirectory of the first in the
         source directory.
+        1. Mapping dest="test", src="/tmp/.../$tmpA/abc/level0/level1_0/test"
+        2. Mapping dest="test/abc", src="/tmp/.../$tmpB/level0/level1_0/test"
         """
         hasher_content_only = \
             FileDirectoryListHasher(followlinks=True,
@@ -240,6 +258,7 @@ class HashTempDirTest(unittest.TestCase):
 
         path_mappings = [PathMapping("test", str(path1)), PathMapping("test/abc", str(path2))]
         self.assertRaises(AssertionError, lambda: hasher_content_only.hash(path_mappings))
+
 
 if __name__ == '__main__':
     unittest.main()
