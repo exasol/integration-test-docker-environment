@@ -170,8 +170,8 @@ class HashTempDirTest(unittest.TestCase):
     def test_duplicated_path_mapping_raises_exception(self):
         """
         Test that a duplicated mapping raises an exception. Mapping source is here a directory containing one file.
-        1. Mapping dest="test", src="/tmp/.../$tmpA/level0/level1_0/test"
-        2. Mapping dest="test", src="/tmp/.../$tmpB/level0/level1_1/test"
+        1. Mapping dest="test", src="/tmp/.../$tmpA/level0/level1_0", content under src="test/test.txt"
+        2. Mapping dest="test", src="/tmp/.../$tmpB/level0/level1_1", content under src="test/test.txt"
         """
         hasher_content_only = \
             FileDirectoryListHasher(followlinks=True,
@@ -199,8 +199,8 @@ class HashTempDirTest(unittest.TestCase):
     def test_duplicated_path_mapping_with_subpath_raises_exception(self):
         """
         Test that a duplicated mapping raises an exception. Mapping source is here a directory containing one file.
-        1. Mapping dest="test/abc", src="/tmp/.../$tmpA/level0/level1_0/test"
-        2. Mapping dest="test/abc", src="/tmp/.../$tmpB/level0/level1_1/test"
+        1. Mapping dest="test/abc", src="/tmp/.../$tmpA/level0/level1_0", content under src="test/test.txt"
+        2. Mapping dest="test/abc", src="/tmp/.../$tmpB/level0/level1_1", content under src="test/test.txt"
         """
         hasher_content_only = \
             FileDirectoryListHasher(followlinks=True,
@@ -232,8 +232,8 @@ class HashTempDirTest(unittest.TestCase):
         In this scenario we have one path which maps to a destination containing a subpath;
         the second path maps to root destination of the first, but contains the subdirectory of the first in the
         source directory.
-        1. Mapping dest="test", src="/tmp/.../$tmpA/abc/level0/level1_0/test"
-        2. Mapping dest="test/abc", src="/tmp/.../$tmpB/level0/level1_0/test"
+        1. Mapping dest="test", src="/tmp/.../$tmpA", content under src="abc/level0/level1_0/test/test.txt"
+        2. Mapping dest="test/abc", src="/tmp/.../$tmpB", content under src="level0/level1_0/test/test.txt"
         """
         hasher_content_only = \
             FileDirectoryListHasher(followlinks=True,
@@ -242,12 +242,12 @@ class HashTempDirTest(unittest.TestCase):
                                     hash_directory_names=True,
                                     hash_permissions=True)
 
-        p1 = self.test_path1 / "abc" / "level1_0" / "test"
+        p1 = self.test_path1 / "level1_0" / "test"
         test_file1 = p1 / "test.txt"
         p1.mkdir(parents=True)
         with open(test_file1, "w") as f:
             f.write("test")
-        p2 = self.test_path2 / "level1_0" / "test"
+        p2 = self.test_path2 / "abc" /"level1_0" / "test"
         p2.mkdir(parents=True)
         test_file2 = p2 / "test.txt"
         with open(test_file2, "w") as f:
@@ -256,7 +256,7 @@ class HashTempDirTest(unittest.TestCase):
         path1 = self.test_path1
         path2 = self.test_path2
 
-        path_mappings = [PathMapping("test", str(path1)), PathMapping("test/abc", str(path2))]
+        path_mappings = [PathMapping("test/abc", str(path1)), PathMapping("test", str(path2))]
         self.assertRaises(AssertionError, lambda: hasher_content_only.hash(path_mappings))
 
 
