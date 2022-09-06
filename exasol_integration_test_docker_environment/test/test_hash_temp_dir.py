@@ -243,7 +243,7 @@ class HashTempDirTest(unittest.TestCase):
                     hash1_content_only = hasher_content_only.hash([PathMapping("level0/test.txt", str(test_file1))])
 
                 p2 = Path(d2) / "level0"
-                p1.mkdir()
+                p2.mkdir()
                 test_file2 = p2 / "test.txt"
                 with open(test_file2, "w") as f:
                     f.write("test")
@@ -274,7 +274,7 @@ class HashTempDirTest(unittest.TestCase):
                     hash1_content_only = hasher_content_only.hash([PathMapping("level0/test.txt", str(test_file1))])
 
                 p2 = Path(d2) / "level0" / "level1_0"
-                p1.mkdir(parents=True)
+                p2.mkdir(parents=True)
                 test_file2 = p2 / "test.txt"
 
                 with open(test_file2, "w") as f:
@@ -341,9 +341,8 @@ class HashTempDirTest(unittest.TestCase):
                 with open(test_file2, "w") as f:
                     f.write("test")
 
-                self.assertRaises(AssertionError,
-                                  lambda: hasher_content_only.hash([PathMapping("test.txt", str(test_file1)),
-                                                                    PathMapping("test.txt", str(test_file2))]))
+                path_mappings = [PathMapping("test.txt", str(test_file1)), PathMapping("test.txt", str(test_file2))]
+                self.assertRaises(AssertionError, lambda: hasher_content_only.hash(path_mappings))
 
     def test_duplicated_path_mapping_raises_exception(self):
         """
@@ -364,8 +363,7 @@ class HashTempDirTest(unittest.TestCase):
                 p1.mkdir(parents=True)
                 with open(test_file1, "w") as f:
                     f.write("test")
-                p2 = Path(d2) / "level0" / "level1_0" / "test"
-                test_file2 = p2 / "test.txt"
+                p2 = Path(d2) / "level0" / "level1_1" / "test"
                 p2.mkdir(parents=True)
                 test_file2 = p2 / "test.txt"
                 with open(test_file2, "w") as f:
@@ -373,9 +371,39 @@ class HashTempDirTest(unittest.TestCase):
 
                 path1 = p1.parent
                 path2 = p2.parent
-                self.assertRaises(AssertionError, lambda: hasher_content_only.hash([PathMapping("test", str(path1)),
-                                                                                    PathMapping("test", str(path2))]))
+                path_mappings = [PathMapping("test", str(path1)), PathMapping("test", str(path2))]
+                self.assertRaises(AssertionError, lambda: hasher_content_only.hash(path_mappings))
 
+    def test_duplicated_path_mapping_with_subpath_raises_exception(self):
+        """
+        Test that a duplicated mapping raises an exception.
+        Note: Cannot use the class-wide temporary directories here as we add new files.
+        """
+        with tempfile.TemporaryDirectory() as d1:
+            with tempfile.TemporaryDirectory() as d2:
+                hasher_content_only = \
+                    FileDirectoryListHasher(followlinks=True,
+                                            hashfunc="sha256",
+                                            hash_file_names=True,
+                                            hash_directory_names=True,
+                                            hash_permissions=True)
+
+                p1 = Path(d1) / "level0" / "level1_0" / "test"
+                test_file1 = p1 / "test.txt"
+                p1.mkdir(parents=True)
+                with open(test_file1, "w") as f:
+                    f.write("test")
+                p2 = Path(d2) / "level0" / "level1_1" / "test"
+                p2.mkdir(parents=True)
+                test_file2 = p2 / "test.txt"
+                with open(test_file2, "w") as f:
+                    f.write("test")
+
+                path1 = p1.parent
+                path2 = p2.parent
+                destination_path = "test/abc"
+                path_mappings = [PathMapping(destination_path, str(path1)), PathMapping(destination_path, str(path2))]
+                self.assertRaises(AssertionError, lambda: hasher_content_only.hash(path_mappings))
 
 if __name__ == '__main__':
     unittest.main()
