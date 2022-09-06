@@ -4,9 +4,12 @@ import stat
 from dataclasses import dataclass
 from multiprocessing import Pool
 from pathlib import Path
-from typing import List, NamedTuple, Callable
+from typing import List, Callable
 
 import humanfriendly
+
+from exasol_integration_test_docker_environment.lib.docker.images.create.utils.symlink_loop_checker import \
+    SymlinkLoopChecker
 
 HASH_FUNCTIONS = {
     'md5': hashlib.md5,
@@ -16,19 +19,31 @@ HASH_FUNCTIONS = {
 }
 
 
-class PathMapping(NamedTuple):
+@dataclass(frozen=True)
+class PathMapping:
     destination: str
     source: str
 
 
 @dataclass(frozen=True)
 class DestinationMapping:
-    destination: str
-    source: str
-    dest_root: str
+    """
+    Represents one file/directory found by traversing the source directory tree.
+    """
+    destination_path: str
+    """The path of the file/directory in the destination (including destination_root_path)"""
+    source_path: str
+    """The path of the file/directory in the source"""
+    destination_root_path: str
+    """The root of the destination as given in the mapping"""
     is_file: bool
+    """Indicates if the entry is a file or directory."""
 
     def use_for_hashing(self, hash_files: bool, hash_directories: bool) -> bool:
+        """
+        Returns if this file/directory entry should be used for file hashing, considering parameters
+        "hash_files" and "hash_directories".
+        """
         if self.is_file:
             return hash_files
         else:
@@ -37,6 +52,9 @@ class DestinationMapping:
 
 @dataclass(frozen=True)
 class DirectoryMappingResult:
+    """
+    Contains all entries found by traversing all mapping directory paths.
+    """
     sources: List[str]
     paths_for_hashing: List[DestinationMapping]
 
@@ -94,16 +112,22 @@ class FileDirectoryListHasher:
         hashes = self.compute_hashes(directory_mapping_result)
         return self._reduce_hash(hashes)
 
-    def validate(self, mappings: List[DestinationMapping]) -> None:
-        # Verify that there are no duplicate mappings to same destination
-        destinations = [p.destination for p in mappings]
-        if len(set(destinations)) != len(destinations):
-            raise AssertionError(f"Directory content for hashing contains duplicates: {destinations}")
+    def check_no_duplicate_destinations(self, mappings: List[DestinationMapping]) -> None:
+        """
+        Verify that there are no duplicate mappings to same destination.
+        This can happen, if the destination of two mappings are equal and the two sources contains the same sub-path
+        structure; or if the destination of two mappings is the same file.
+        """
+        destination_paths = [p.destination_path for p in mappings]
+        if len(set(destination_paths)) != len(destination_paths):
+            raise AssertionError(f"Directory content for hashing contains duplicates: {destination_paths}")
 
     def collect_dest_path_and_src_files(self, files_and_directories: List[PathMapping]) -> DirectoryMappingResult:
         """
-        Iterate over all mappings and collect:
-        1) Destination paths-names (for Hashing): Mapping of source -> destination of file/directory, ordered by destination path
+        Traverse the source paths of all mappings and assemble two lists:
+        1) Destination paths-names (for Hashing):
+            Mapping of source file/directory -> destination of file/directory,
+            ordered by destination path. List[DestinationMapping].
         2) Source files, ordered by destination path
         Collection is done considering the current configuration
          - for both: excluded_directory/excluded_extensions/excluded_file
@@ -122,34 +146,35 @@ class FileDirectoryListHasher:
             destination = file_or_directory.destination
 
             def handle_directory(directories: List[str]) -> None:
-                new_dest_paths_mappings = [DestinationMapping(destination=replace_src_by_dest_path(source, destination, p),
-                                                       source=p,
-                                                       dest_root=destination,
-                                                       is_file=False) for p in directories]
+                new_dest_paths_mappings = [DestinationMapping(
+                                            destination_path=replace_src_by_dest_path(source, destination, p),
+                                            source_path=p,
+                                            destination_root_path=destination,
+                                            is_file=False) for p in directories]
                 collected_dest_paths.extend(new_dest_paths_mappings)
 
             def handle_files(files: List[str]) -> None:
                 collected_dest_paths.extend([DestinationMapping(
-                                                       destination=replace_src_by_dest_path(source, destination, f),
-                                                       source=f,
-                                                       dest_root=destination,
-                                                       is_file=True) for f in files])
+                                           destination_path=replace_src_by_dest_path(source, destination, f),
+                                           source_path=f,
+                                           destination_root_path=destination,
+                                           is_file=True) for f in files])
 
             if os.path.isdir(source):
                 self.traverse_directory(source, handle_directory, handle_files)
             elif os.path.isfile(source):
-                collected_dest_paths.append(DestinationMapping(destination=destination, source=source,
-                                                               dest_root=".", is_file=True))
+                collected_dest_paths.append(DestinationMapping(destination_path=destination, source_path=source,
+                                                               destination_root_path=".", is_file=True))
             else:
                 raise FileNotFoundError("Could not find file or directory %s" % source)
         collected_dest_paths.sort(key=lambda x: x.destination)
-        self.validate(collected_dest_paths)
+        self.check_no_duplicate_destinations(collected_dest_paths)
 
         # Now, after we sorted the collected paths, filter out paths which are not needed for current configuration
         filtered_dest_paths = [d for d in collected_dest_paths
                                if d.use_for_hashing(self.hash_file_names, self.hash_directory_names)]
 
-        collected_src_files = [p.source for p in collected_dest_paths if p.is_file]
+        collected_src_files = [p.source_path for p in collected_dest_paths if p.is_file]
         return DirectoryMappingResult(sources=collected_src_files, paths_for_hashing=filtered_dest_paths)
 
     def compute_hashes(self, directory_mapping_result: DirectoryMappingResult) -> List[str]:
@@ -178,16 +203,12 @@ class FileDirectoryListHasher:
     def traverse_directory(self, directory: str,
                            directory_handler: Callable[[List[str]], None],
                            file_handler: Callable[[List[str]], None]) -> None:
-        inodes = set()
+
+        symlink_loop_checker = SymlinkLoopChecker()
         numCharacters = 0
 
         for root, dirs, files in os.walk(directory, topdown=True, followlinks=self.followlinks):
-            stat = os.stat(root)
-            if stat.st_ino > 0 and stat.st_ino in inodes:
-                raise OSError(
-                    f"Directory: {directory} contains symlink loops (Symlinks pointing to a parent directory). Please fix!")
-            inodes.add(stat.st_ino)
-
+            symlink_loop_checker.check_and_add(root)
             new_directories = [os.path.join(root, d) for d in dirs if not self.is_excluded_directory(d)]
             directory_handler(new_directories)
             numCharacters += sum([len(d) for d in new_directories])
@@ -218,10 +239,10 @@ class PathHasher:
             raise NotImplementedError('{} not implemented.'.format(hashfunc))
 
     def hash(self, path_mapping: DestinationMapping):
-        src_path = Path(path_mapping.source)
-        dest_path = Path(path_mapping.destination)
-        dest_root = Path(path_mapping.dest_root)
-        if self.use_relative_paths and len(path_mapping.dest_root) > 0:
+        src_path = Path(path_mapping.source_path)
+        dest_path = Path(path_mapping.destination_path)
+        dest_root = Path(path_mapping.destination_root_path)
+        if self.use_relative_paths and len(path_mapping.destination_root_path) > 0:
             path = dest_path.relative_to(dest_root)
         else:
             path = dest_path
