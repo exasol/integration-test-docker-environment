@@ -8,6 +8,8 @@ from typing import List, Callable
 
 import humanfriendly
 
+from exasol_integration_test_docker_environment.lib.docker.images.create.utils.character_length_checker import \
+    CharacterLengthChecker
 from exasol_integration_test_docker_environment.lib.docker.images.create.utils.symlink_loop_checker import \
     SymlinkLoopChecker
 
@@ -21,6 +23,9 @@ HASH_FUNCTIONS = {
 
 @dataclass(frozen=True)
 class PathMapping:
+    """
+    Describes a mapping of a file or directory from source to destination.
+    """
     destination: str
     source: str
 
@@ -114,9 +119,9 @@ class FileDirectoryListHasher:
         This can happen, if the destination of two mappings are equal and the two sources contains the same sub-path
         structure; or if the destination of two mappings is the same file.
         """
-        destination_paths = [p.destination_path for p in mappings]
-        if len(set(destination_paths)) != len(destination_paths):
-            raise AssertionError(f"Directory content for hashing contains duplicates: {destination_paths}")
+        destination_paths_set = set(p.destination_path for p in mappings)
+        if len(destination_paths_set) != len(mappings):
+            raise AssertionError(f"Directory content for hashing contains duplicates: {mappings}")
 
     def collect_dest_path_and_src_files(self, files_and_directories: List[PathMapping]) -> DirectoryMappingResult:
         """
@@ -199,21 +204,18 @@ class FileDirectoryListHasher:
                            file_handler: Callable[[List[str]], None]) -> None:
 
         symlink_loop_checker = SymlinkLoopChecker()
-        numCharacters = 0
+        character_length_checker = CharacterLengthChecker(directory, self.MAX_CHARACTERS_PATHS,
+                                                          self.hash_directory_names, self.hash_file_names)
 
         for root, dirs, files in os.walk(directory, topdown=True, followlinks=self.followlinks):
             symlink_loop_checker.check_and_add(root)
+
             new_directories = [os.path.join(root, d) for d in dirs if not self.is_excluded_directory(d)]
             directory_handler(new_directories)
-            numCharacters += sum([len(d) for d in new_directories])
-
             new_files = [os.path.join(root, f) for f in files
                          if not self.is_excluded_file(f) and not self.has_excluded_extension(f)]
+            character_length_checker.add_and_check(new_directories, new_files)
             file_handler(new_files)
-            numCharacters += sum([len(f) for f in new_files])
-
-            if numCharacters > self.MAX_CHARACTERS_PATHS:
-                raise OSError(f"Walking through too many directories. Aborting. Please verify: {directory}")
 
     def _reduce_hash(self, hashes):
         hasher = self.hash_func()
