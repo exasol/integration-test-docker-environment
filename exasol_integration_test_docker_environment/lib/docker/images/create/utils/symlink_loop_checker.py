@@ -3,7 +3,7 @@ import os
 
 class SymlinkLoopChecker:
     """
-    Collects all visited directory names in a set and checks for duplicates.
+    Collects all visited directory inodes in a set and checks for duplicates.
     Can be used to check for symlink loops.
     """
     def __init__(self):
