@@ -210,6 +210,36 @@ class HashTempDirTest(unittest.TestCase):
         path_mappings = [PathMapping(destination_path, str(path1)), PathMapping(destination_path, str(path2))]
         self.assertRaises(AssertionError, lambda: hasher_content_only.hash(path_mappings))
 
+    def test_duplicated_path_mapping_with_destination_subpath_raises_exception(self):
+        """
+        Test that a duplicated mapping raises an exception.
+        In this scenario we have one path which maps to a destination containing a subpath;
+        the second path maps to root destination of the first, but contains the subdirectory of the first in the
+        source directory.
+        """
+        hasher_content_only = \
+            FileDirectoryListHasher(followlinks=True,
+                                    hashfunc="sha256",
+                                    hash_file_names=True,
+                                    hash_directory_names=True,
+                                    hash_permissions=True)
+
+        p1 = self.test_path1 / "abc" / "level1_0" / "test"
+        test_file1 = p1 / "test.txt"
+        p1.mkdir(parents=True)
+        with open(test_file1, "w") as f:
+            f.write("test")
+        p2 = self.test_path2 / "level1_0" / "test"
+        p2.mkdir(parents=True)
+        test_file2 = p2 / "test.txt"
+        with open(test_file2, "w") as f:
+            f.write("test")
+
+        path1 = self.test_path1
+        path2 = self.test_path2
+
+        path_mappings = [PathMapping("test", str(path1)), PathMapping("test/abc", str(path2))]
+        self.assertRaises(AssertionError, lambda: hasher_content_only.hash(path_mappings))
 
 if __name__ == '__main__':
     unittest.main()
