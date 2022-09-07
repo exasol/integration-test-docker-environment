@@ -11,7 +11,7 @@ jobs:
   check-release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -21,9 +21,9 @@ jobs:
           python-version: 3.8
 
       - name: Install Poetry
-        uses: abatilo/actions-poetry@v2.1.4
+        uses: abatilo/actions-poetry@v2
         with:
-          poetry-version: 1.1.11
+          poetry-version: 1.2.0
 
       - name: Check Release
         run: ./scripts/build/check_release.sh
@@ -31,7 +31,7 @@ jobs:
   test-docker-starter:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Build new Docker image
       run: bash ./starter_scripts/build_docker_runner_image.sh
@@ -43,7 +43,7 @@ jobs:
     needs: [test-docker-starter, check-release]
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Setup Python 3.8
       uses: actions/setup-python@v2
@@ -51,9 +51,9 @@ jobs:
         python-version: 3.8
 
     - name: Install Poetry
-      uses: abatilo/actions-poetry@v2.0.0
+      uses: abatilo/actions-poetry@v2
       with:
-        poetry-version: 1.1.11
+        poetry-version: 1.2.0
 
     - name: Build Release
       run: |

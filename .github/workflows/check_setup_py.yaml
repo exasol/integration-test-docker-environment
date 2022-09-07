@@ -12,13 +12,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
-    - uses: abatilo/actions-poetry@v2.1.4
+    - uses: abatilo/actions-poetry@v2
       with:
-        poetry-version: 1.1.11
+        poetry-version: 1.2.0
     - name: Run packaging update
       run: bash githooks/update_packaging.sh
     - name: Show changes on working copy
