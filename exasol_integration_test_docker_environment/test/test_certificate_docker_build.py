@@ -13,7 +13,7 @@ from exasol_integration_test_docker_environment.lib.utils.resource_directory imp
 import exasol_integration_test_docker_environment.certificate_resources.container
 
 
-class DockerBuildBaseTest(unittest.TestCase):
+class DockerCertificateBuildTest(unittest.TestCase):
 
     def clean(self):
         task = generate_root_task(task_class=CleanImagesStartingWith,
