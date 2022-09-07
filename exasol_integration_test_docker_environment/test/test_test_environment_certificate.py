@@ -4,7 +4,9 @@ import unittest
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.lib.test_environment.db_version import \
     db_version_supports_custom_certificates
+from exasol_integration_test_docker_environment.test.get_test_container_content import get_test_container_content
 from exasol_integration_test_docker_environment.testing import utils
+from exasol_integration_test_docker_environment.testing.api_test_environment import ApiTestEnvironment
 from exasol_integration_test_docker_environment.testing.exaslct_test_environment import ExaslctTestEnvironment
 from exasol_integration_test_docker_environment.testing.utils import check_db_version_from_env
 
@@ -16,11 +18,7 @@ class CertificateTest(unittest.TestCase):
         print(f"SetUp {cls.__name__}")
         # We can't use start-test-env. because it only mounts ./ and
         # doesn't work with --build_ouput-directory
-        cls.test_environment = \
-            ExaslctTestEnvironment(
-                cls,
-                utils.INTEGRATION_TEST_DOCKER_ENVIRONMENT_DEFAULT_BIN,
-                clean_images_at_close=False)
+        cls.test_environment = ApiTestEnvironment(cls)
 
         cls.spawned_docker_test_environments = None
 
@@ -30,10 +28,13 @@ class CertificateTest(unittest.TestCase):
             #            However, host name length is limited to 63 characters. A the class name itself already creates
             #            a unique environment, we must keep the parameter empty.
             cls.docker_environment_name = ""
+            additional_parameter = {"create_certificates": True,
+                                    "deactivate_database_setup": True}
+
             cls.spawned_docker_test_environments = \
-                cls.test_environment.spawn_docker_test_environments(cls.docker_environment_name,
-                                                                    additional_parameter=["--deactivate-database-setup",
-                                                                                          "--create-certificates"])
+                cls.test_environment.spawn_docker_test_environment(cls.docker_environment_name,
+                                                                    test_container_content=get_test_container_content(),
+                                                                    additional_parameter=additional_parameter)
 
     @classmethod
     def tearDownClass(cls):

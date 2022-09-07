@@ -36,6 +36,8 @@ requests = ">=2.21.0"
 simplejson = ">=3.16.0"
 importlib_resources = ">=5.4.0" #Needed to copy resource files, can be removed after upgrading to Python 3.9 (see https://docs.python.org/3.11/library/importlib.resources.html#importlib.resources.files)
 "stopwatch.py" = ">=1.0.0"
+exasol-bucketfs-utils-python = {url = "https://github.com/exasol/bucketfs-utils-python/releases/download/0.3.0/exasol_bucketfs_utils_python-0.3.0-py3-none-any.whl"}
+
 
 
 [tool.poetry.dev-dependencies]

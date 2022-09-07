@@ -35,7 +35,7 @@ class AnalyzeTestContainer(DockerAnalyzeImageTask):
             return f"db-test-container"
 
     def get_mapping_of_build_files_and_directories(self):
-        return {str(mapping.source) : mapping.target for mapping
+        return {mapping.target: str(mapping.source) for mapping
                 in self.test_container_content.build_files_and_directories}
 
     def get_dockerfile(self):

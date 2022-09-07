@@ -6,6 +6,7 @@ from exasol_integration_test_docker_environment.lib.data.environment_type import
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_environment import SpawnTestEnvironment
 from exasol_integration_test_docker_environment.lib.api.common import set_docker_repository_config, generate_root_task
+from exasol_integration_test_docker_environment.test.get_test_container_content import get_test_container_content
 from exasol_integration_test_docker_environment.testing import luigi_utils
 from exasol_integration_test_docker_environment.cli.options import test_environment_options
 from exasol_integration_test_docker_environment.testing.utils import check_db_version_from_env
@@ -67,7 +68,8 @@ class TestContainerReuseTest(unittest.TestCase):
                                   environment_type=EnvironmentType.docker_db,
                                   environment_name=self.env_name(),
                                   docker_db_image_version=self.docker_db_version_parameter,
-                                  docker_db_image_name="exasol/docker-db"
+                                  docker_db_image_name="exasol/docker-db",
+                                  test_container_content=get_test_container_content()
                                   )
         try:
             success = luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
@@ -98,19 +100,6 @@ class TestContainerReuseTest(unittest.TestCase):
             self.assertEquals(exit_code, 0)
             return output.decode('utf-8')
 
-    def _verify_test_data(self, test_environment_info):
-        cmd = self._create_exaplus_check_cmd(test_environment_info)
-        output_str = self._exec_cmd_in_test_container(test_environment_info, cmd)
-
-        # TODO read /tests/test/import.sql and apply a regular expression to
-        # get all table names and compare then one-by-one
-        self.assertIn("ENGINETABLE", [output_entry.strip() for output_entry in output_str.split(sep='\n')])
-
-    def test_initial_reuse_database_setup_populates_data(self):
-        task = self.run_spawn_test_env(cleanup=True)
-        self._verify_test_data(task.get_result())
-        task.cleanup(True)
-
     def get_instance_ids(self, test_environment_info):
         with ContextDockerClient() as docker_client:
             test_container = docker_client.containers.get(test_environment_info.test_container_info.container_name)
@@ -130,7 +119,6 @@ class TestContainerReuseTest(unittest.TestCase):
         test_environment_info = task.get_result()
         new_instance_ids = self.get_instance_ids(test_environment_info)
         self.assertEquals(old_instance_ids, new_instance_ids)
-        self._verify_test_data(test_environment_info)
 
         task.cleanup(True)
 

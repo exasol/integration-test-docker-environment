@@ -9,6 +9,8 @@ from exasol_integration_test_docker_environment.cli.options.system_options impor
 from exasol_integration_test_docker_environment.cli.options.test_environment_options import LATEST_DB_VERSION
 from exasol_integration_test_docker_environment.lib.api.api_errors import ArgumentConstraintError
 from exasol_integration_test_docker_environment.lib.data.environment_info import EnvironmentInfo
+from exasol_integration_test_docker_environment.lib.data.test_container_content_description import \
+    TestContainerContentDescription
 from exasol_integration_test_docker_environment.lib.docker.container.utils import remove_docker_container
 from exasol_integration_test_docker_environment.lib.docker.volumes.utils import remove_docker_volumes
 from exasol_integration_test_docker_environment.lib.docker.networks.utils import remove_docker_networks
@@ -74,6 +76,9 @@ def spawn_test_environment(
                                  source_docker_tag_prefix, "source")
     set_docker_repository_config(target_docker_password, target_docker_repository_name, target_docker_username,
                                  target_docker_tag_prefix, "target")
+    test_container_content = TestContainerContentDescription(docker_file=None,
+                                                             build_files_and_directories=list(),
+                                                             runtime_mappings=list())
     task_creator = lambda: generate_root_task(task_class=SpawnTestEnvironmentWithDockerDB,
                                               environment_name=environment_name,
                                               database_port_forward=str(
@@ -94,7 +99,8 @@ def spawn_test_environment(
                                               no_database_cleanup_after_success=True,
                                               no_database_cleanup_after_failure=False,
                                               is_setup_database_activated=not deactivate_database_setup,
-                                              create_certificates=create_certificates
+                                              create_certificates=create_certificates,
+                                              test_container_content=test_container_content
                                               )
     environment_info = run_task(task_creator, workers, task_dependencies_dot_file)
     return environment_info, functools.partial(_cleanup, environment_info)

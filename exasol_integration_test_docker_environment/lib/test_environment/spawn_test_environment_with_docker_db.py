@@ -39,7 +39,6 @@ class SpawnTestEnvironmentWithDockerDB(
             self.create_child_task_with_common_params(
                 CreateSSLCertificatesTask,
                 environment_name=self.environment_name,
-                test_container_name=self.test_container_name,
                 db_container_name=self.db_container_name,
                 network_name=self.network_name,
                 docker_runtime=self.docker_runtime,

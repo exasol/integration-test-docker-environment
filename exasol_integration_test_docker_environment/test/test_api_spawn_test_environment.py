@@ -2,6 +2,7 @@ import unittest
 from sys import stderr
 
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
+from exasol_integration_test_docker_environment.test.get_test_container_content import get_test_container_content
 from exasol_integration_test_docker_environment.testing import utils
 from exasol_integration_test_docker_environment.testing.api_test_environment import ApiTestEnvironment
 
@@ -14,7 +15,8 @@ class APISpawnTestEnvironmentTest(unittest.TestCase):
         cls.test_environment = ApiTestEnvironment(cls)
         cls.docker_environment_name = cls.__name__
         cls.spawned_docker_test_environments = \
-            cls.test_environment.spawn_docker_test_environment(name=cls.docker_environment_name)
+            cls.test_environment.spawn_docker_test_environment(name=cls.docker_environment_name,
+                                                               test_container_content=get_test_container_content())
 
     @classmethod
     def tearDownClass(cls):

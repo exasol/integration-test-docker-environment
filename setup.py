@@ -23,14 +23,18 @@ packages = \
  'exasol_integration_test_docker_environment.lib.docker.volumes',
  'exasol_integration_test_docker_environment.lib.logging',
  'exasol_integration_test_docker_environment.lib.test_environment',
+ 'exasol_integration_test_docker_environment.lib.test_environment.create_certificates',
  'exasol_integration_test_docker_environment.lib.test_environment.database_setup',
  'exasol_integration_test_docker_environment.lib.test_environment.database_waiters',
  'exasol_integration_test_docker_environment.lib.test_environment.parameter',
+ 'exasol_integration_test_docker_environment.lib.utils',
  'exasol_integration_test_docker_environment.testing']
 
 package_data = \
 {'': ['*'],
- 'exasol_integration_test_docker_environment': ['docker_db_config/7.0.0/*',
+ 'exasol_integration_test_docker_environment': ['certificate_resources/*',
+                                                'certificate_resources/container/*',
+                                                'docker_db_config/7.0.0/*',
                                                 'docker_db_config/7.0.1/*',
                                                 'docker_db_config/7.0.10/*',
                                                 'docker_db_config/7.0.11/*',
@@ -62,13 +66,15 @@ package_data = \
                                                 'docker_db_config/7.1.7/*',
                                                 'docker_db_config/7.1.8/*',
                                                 'docker_db_config/7.1.9/*',
-                                                'templates/*',
-                                                'test_container_config/*']}
+                                                'templates/*']}
 
 install_requires = \
 ['click>=7.0',
+ 'exasol-bucketfs-utils-python @ '
+ 'https://github.com/exasol/bucketfs-utils-python/releases/download/0.3.0/exasol_bucketfs_utils_python-0.3.0-py3-none-any.whl',
  'gitpython>=2.1.0',
  'humanfriendly>=4.18',
+ 'importlib_resources>=5.4.0',
  'jinja2>=2.10.1',
  'jsonpickle>=1.1',
  'luigi>=2.8.4',
