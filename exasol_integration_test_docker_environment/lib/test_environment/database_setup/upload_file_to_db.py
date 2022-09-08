@@ -70,11 +70,13 @@ class UploadFileToBucketFS(DockerBaseTask):
         sync_checker = self.get_sync_checker(database_container, sync_time_estimation,
                                              log_file, pattern_to_wait_for)
         sync_checker.prepare_upload()
-        output = self.upload_file(file_to_upload=file_to_upload, upload_target=upload_target)
-        sync_checker.wait_for_bucketfs_sync()
-        thread.stop()
-        thread.join()
-        self.write_logs(output)
+        try:
+            output = self.upload_file(file_to_upload=file_to_upload, upload_target=upload_target)
+            sync_checker.wait_for_bucketfs_sync()
+            self.write_logs(output)
+        finally:
+            thread.stop()
+            thread.join()
 
     def get_sync_checker(self, database_container: Container,
                          sync_time_estimation: int,
