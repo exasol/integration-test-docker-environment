@@ -15,3 +15,11 @@ def get_test_container_content(runtime_mapping: Tuple[TestContainerRuntimeMappin
                                                                target="/test.text")],
         runtime_mappings=list(runtime_mapping)
     )
+
+
+def get_empty_test_container_content() -> TestContainerContentDescription:
+    return TestContainerContentDescription(
+        docker_file=None,
+        build_files_and_directories=list(),
+        runtime_mappings=list()
+    )
