@@ -25,8 +25,6 @@ from exasol_integration_test_docker_environment.lib.api.api_errors import Argume
               help="The disk size available for the database. Format <number> <unit>, e.g. 1 GiB. The minimum size is 100 MiB. However, the setup creates volume files with at least 2 GB larger size, because the database needs at least so much more disk.")
 @click.option('--nameserver', type=str, default=[], multiple=True,
               help="Add a nameserver to the list of DNS nameservers which the docker-db should use for resolving domain names. You can repeat this option to add further nameservers.")
-@click.option('--deactivate-database-setup/--no-deactivate-database-setup', type=bool, default=False, show_default=True,
-              help="Deactivates the setup of the spawned database, this means no data get populated and no JDBC drivers get uploaded. This can be used either to save time or as a workaround for MacOSX where the test_container seems not to be able to access the tests directory")
 @click.option('--docker-runtime', type=str, default=None, show_default=True,
               help="The docker runtime used to start all containers")
 @add_options(docker_db_options)
@@ -41,7 +39,6 @@ def spawn_test_environment(
         db_mem_size: str,
         db_disk_size: str,
         nameserver: Tuple[str, ...],
-        deactivate_database_setup: bool,
         docker_runtime: Optional[str],
         docker_db_image_version: str,
         docker_db_image_name: str,
@@ -70,7 +67,6 @@ def spawn_test_environment(
                                        db_mem_size,
                                        db_disk_size,
                                        nameserver,
-                                       deactivate_database_setup,
                                        docker_runtime,
                                        docker_db_image_version,
                                        docker_db_image_name,

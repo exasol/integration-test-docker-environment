@@ -34,7 +34,6 @@ def spawn_test_environment_with_test_container(
         db_mem_size: str = "2 GiB",
         db_disk_size: str = "2 GiB",
         nameserver: Tuple[str,...] = tuple(),
-        deactivate_database_setup: bool = False,
         docker_runtime: Optional[str] = None,
         docker_db_image_version: str = LATEST_DB_VERSION,
         docker_db_image_name: str = "exasol/docker-db",
@@ -97,7 +96,6 @@ def spawn_test_environment_with_test_container(
                                               no_test_container_cleanup_after_failure=False,
                                               no_database_cleanup_after_success=True,
                                               no_database_cleanup_after_failure=False,
-                                              is_setup_database_activated=not deactivate_database_setup,
                                               create_certificates=create_certificates,
                                               test_container_content=test_container_content
                                               )

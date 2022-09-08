@@ -39,19 +39,14 @@ class DockerTestEnvironmentDBMemSizeTest(unittest.TestCase):
 
     def test_no_nameserver(self):
         self.docker_environment_name = "test_no_nameserver"
-        with self.test_environment.spawn_docker_test_environments(self.docker_environment_name,
-                                                                  [
-                                                                      "--deactivate-database-setup",
-                                                                  ]
-                                                                  ):
+        with self.test_environment.spawn_docker_test_environments(self.docker_environment_name):
             self.assert_nameserver("")
 
     def test_single_nameserver(self):
         self.docker_environment_name = "test_single_nameserver"
         with self.test_environment.spawn_docker_test_environments(self.docker_environment_name,
                                                                   [
-                                                                    "--nameserver", "'8.8.8.8'",
-                                                                    "--deactivate-database-setup",
+                                                                    "--nameserver", "'8.8.8.8'"
                                                                   ]):
             self.assert_nameserver("8.8.8.8")
 
@@ -61,7 +56,6 @@ class DockerTestEnvironmentDBMemSizeTest(unittest.TestCase):
                                                                   [
                                                                     "--nameserver", "'8.8.8.8'",
                                                                     "--nameserver", "'8.8.8.9'",
-                                                                    "--deactivate-database-setup",
                                                                   ]):
             self.assert_nameserver("8.8.8.8,8.8.8.9")
 

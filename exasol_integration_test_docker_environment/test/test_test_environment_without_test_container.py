@@ -20,10 +20,7 @@ class DockerTestEnvironmentTest(unittest.TestCase):
         # TODO cls.test_environment.clean_images()
         cls.docker_environment_name = cls.__name__
         cls.spawned_docker_test_environments = \
-            cls.test_environment.spawn_docker_test_environments(name=cls.docker_environment_name,
-                                                                additional_parameter=[
-                                                                    "--deactivate-database-setup"
-                                                                ])
+            cls.test_environment.spawn_docker_test_environments(name=cls.docker_environment_name)
 
     @classmethod
     def tearDownClass(cls):

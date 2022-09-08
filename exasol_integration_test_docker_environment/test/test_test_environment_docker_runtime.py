@@ -1,25 +1,21 @@
 import subprocess
 import unittest
 
+from exasol_integration_test_docker_environment.lib.api import api_errors
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
+from exasol_integration_test_docker_environment.test.get_test_container_content import get_test_container_content
 from exasol_integration_test_docker_environment.testing import utils
+from exasol_integration_test_docker_environment.testing.api_test_environment import ApiTestEnvironment
 from exasol_integration_test_docker_environment.testing.exaslct_test_environment import ExaslctTestEnvironment
 
 
 def assert_container_runtime(self, container_name, expected_runtime):
-    on_host_docker_environment = self.spawned_docker_test_environments.on_host_docker_environment
     with ContextDockerClient() as docker_client:
-        try:
-            container = docker_client.containers.get(container_name)
-            container.reload()
-            actual_runtime = container.attrs['HostConfig']['Runtime']
-        except Exception as e:
-            startup_log = on_host_docker_environment.completed_process.stdout.decode("utf8")
-            raise Exception(f"Startup log: {startup_log}") from e
+        container = docker_client.containers.get(container_name)
+        container.reload()
+        actual_runtime = container.attrs['HostConfig']['Runtime']
         self.assertEqual(actual_runtime, expected_runtime,
-                         f"{container_name} has the wrong runtime expected {expected_runtime} got {actual_runtime}."
-                         f"\n Startup log is "
-                         f"{on_host_docker_environment.completed_process.stdout.decode('utf8')}")
+                         f"{container_name} has the wrong runtime expected {expected_runtime} got {actual_runtime}.")
 
 
 def get_default_docker_runtime():
@@ -40,41 +36,25 @@ class DockerTestEnvironmentDockerRuntimeNoRuntimeGivenTest(unittest.TestCase):
         print(f"SetUp {cls.__name__}")
         # We can't use start-test-env. because it only mounts ./ and
         # doesn't work with --build_ouput-directory
-        cls.test_environment = \
-            ExaslctTestEnvironment(
-                cls,
-                utils.INTEGRATION_TEST_DOCKER_ENVIRONMENT_DEFAULT_BIN,
-                clean_images_at_close=False)
+        cls.test_environment = ApiTestEnvironment(cls)
         cls.docker_environment_name = "test_no_runtime_given"
-        cls.spawned_docker_test_environments = \
-            cls.test_environment.spawn_docker_test_environments(name=cls.docker_environment_name,
-                                                                additional_parameter=[
-                                                                    "--deactivate-database-setup"
-                                                                ])
+        cls.environment = \
+            cls.test_environment.spawn_docker_test_environment(name=cls.docker_environment_name,
+                                                               test_container_content=get_test_container_content())
         cls.default_docker_runtime = get_default_docker_runtime()
 
     @classmethod
     def tearDownClass(cls):
-        utils.close_environments(cls.spawned_docker_test_environments, cls.test_environment)
+        utils.close_environments(cls.environment, cls.test_environment)
 
     def test_test_container_runtime(self):
-        try:
-            environment_info = self.spawned_docker_test_environments.on_host_docker_environment.environment_info
-            test_container_name = environment_info.test_container_info.container_name
-        except Exception as e:
-            startup_log = self.spawned_docker_test_environments\
-                .on_host_docker_environment.completed_process.stdout.decode("utf8")
-            raise Exception(f"Startup log: {startup_log}") from e
+        environment_info = self.environment.environment_info
+        test_container_name = environment_info.test_container_info.container_name
         assert_container_runtime(self, test_container_name, self.default_docker_runtime)
 
     def test_database_container_runtime(self):
-        try:
-            environment_info = self.spawned_docker_test_environments.on_host_docker_environment.environment_info
-            database_container_name = environment_info.database_info.container_info.container_name
-        except Exception as e:
-            startup_log = \
-                self.spawned_docker_test_environments.on_host_docker_environment.completed_process.stdout.decode("utf8")
-            raise Exception(f"Startup log: {startup_log}") from e
+        environment_info = self.environment.environment_info
+        database_container_name = environment_info.database_info.container_info.container_name
         assert_container_runtime(self, database_container_name, self.default_docker_runtime)
 
 
@@ -85,42 +65,28 @@ class DockerTestEnvironmentDockerRuntimeDefaultRuntimeGivenTest(unittest.TestCas
         print(f"SetUp {cls.__name__}")
         # We can't use start-test-env. because it only mounts ./ and
         # doesn't work with --build_ouput-directory
-        cls.test_environment = \
-            ExaslctTestEnvironment(
-                cls,
-                utils.INTEGRATION_TEST_DOCKER_ENVIRONMENT_DEFAULT_BIN,
-                clean_images_at_close=False)
+        cls.test_environment = ApiTestEnvironment(cls)
         cls.default_docker_runtime = get_default_docker_runtime()
         cls.docker_environment_name = "test_default_runtime_given"
-        cls.spawned_docker_test_environments = cls.test_environment.spawn_docker_test_environments(
+        cls.environment = cls.test_environment.spawn_docker_test_environment(
                 cls.docker_environment_name,
-                additional_parameter=[
-                    "--docker-runtime", cls.default_docker_runtime,
-                    "--deactivate-database-setup",
-                ])
+                test_container_content=get_test_container_content(),
+                additional_parameter={
+                    "docker_runtime": cls.default_docker_runtime,
+                })
 
     @classmethod
     def tearDownClass(cls):
-        utils.close_environments(cls.spawned_docker_test_environments, cls.test_environment)
+        utils.close_environments(cls.environment, cls.test_environment)
 
     def test_test_container_runtime(self):
-        on_host_docker_environment = self.spawned_docker_test_environments.on_host_docker_environment
-        try:
-            environment_info = on_host_docker_environment.environment_info
-            test_container_name = environment_info.test_container_info.container_name
-        except Exception as e:
-            startup_log = on_host_docker_environment.completed_process.stdout.decode("utf8")
-            raise Exception(f"Startup log: {startup_log}") from e
+        environment_info = self.environment.environment_info
+        test_container_name = environment_info.test_container_info.container_name
         assert_container_runtime(self, test_container_name, self.default_docker_runtime)
 
     def test_database_container_runtime(self):
-        on_host_docker_environment = self.spawned_docker_test_environments.on_host_docker_environment
-        try:
-            environment_info = on_host_docker_environment.environment_info
-            database_container_name = environment_info.database_info.container_info.container_name
-        except Exception as e:
-            startup_log = on_host_docker_environment.completed_process.stdout.decode("utf8")
-            raise Exception(f"Startup log: {startup_log}") from e
+        environment_info = self.environment.environment_info
+        database_container_name = environment_info.database_info.container_info.container_name
         assert_container_runtime(self, database_container_name, self.default_docker_runtime)
 
 
@@ -131,11 +97,7 @@ class DockerTestEnvironmentDockerRuntimeInvalidRuntimeGivenTest(unittest.TestCas
         print(f"SetUp {cls.__name__}")
         # We can't use start-test-env. because it only mounts ./ and
         # doesn't work with --build_ouput-directory
-        cls.test_environment = \
-            ExaslctTestEnvironment(
-                cls,
-                utils.INTEGRATION_TEST_DOCKER_ENVIRONMENT_DEFAULT_BIN,
-                clean_images_at_close=False)
+        cls.test_environment = ApiTestEnvironment(cls)
         cls.docker_environment_name = "test_default_runtime_given"
 
     @classmethod
@@ -146,15 +108,15 @@ class DockerTestEnvironmentDockerRuntimeInvalidRuntimeGivenTest(unittest.TestCas
         exception_thrown = False
         spawn_docker_test_environments_successful = False
         try:
-            spawned_docker_test_environments = self.test_environment.spawn_docker_test_environments(
+            environment = self.test_environment.spawn_docker_test_environment(
                     self.docker_environment_name,
-                    additional_parameter=[
-                        "--docker-runtime", "AAAABBBBCCCC_INVALID_RUNTIME_111122223333",
-                        "--deactivate-database-setup",
-                    ])
+                    test_container_content=get_test_container_content(),
+                    additional_parameter={
+                        "docker_runtime": "AAAABBBBCCCC_INVALID_RUNTIME_111122223333"
+                    })
             spawn_docker_test_environments_successful = True
-            utils.close_environments(spawned_docker_test_environments)
-        except subprocess.CalledProcessError:
+            utils.close_environments(environment)
+        except api_errors.TaskRuntimeError:
             exception_thrown = True
         self.assertFalse(spawn_docker_test_environments_successful)
         self.assertTrue(exception_thrown)

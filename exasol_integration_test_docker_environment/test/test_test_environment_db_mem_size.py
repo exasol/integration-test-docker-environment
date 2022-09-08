@@ -38,10 +38,7 @@ class DockerTestEnvironmentDBMemSizeTest(unittest.TestCase):
 
     def test_default_db_mem_size(self):
         self.docker_environment_name = "test_default_db_mem_size"
-        with self.test_environment.spawn_docker_test_environments(name=self.docker_environment_name,
-                                                                  additional_parameter=[
-                                                                      "--deactivate-database-setup",
-                                                                  ]):
+        with self.test_environment.spawn_docker_test_environments(name=self.docker_environment_name):
             self.assert_mem_size("2 GiB")
 
     def test_smallest_valid_db_mem_size(self):
@@ -49,8 +46,7 @@ class DockerTestEnvironmentDBMemSizeTest(unittest.TestCase):
 
         with self.test_environment.spawn_docker_test_environments(name=self.docker_environment_name,
                                                                   additional_parameter=[
-                                                                      "--db-mem-size", "'1 GiB'",
-                                                                      "--deactivate-database-setup",
+                                                                      "--db-mem-size", "'1 GiB'"
                                                                   ]):
             self.assert_mem_size("1 GiB")
 
@@ -59,8 +55,7 @@ class DockerTestEnvironmentDBMemSizeTest(unittest.TestCase):
         with self.assertRaises(Exception) as context:
             with self.test_environment.spawn_docker_test_environments(name=self.docker_environment_name,
                                                                       additional_parameter=[
-                                                                        "--db-mem-size", "'999 MiB'",
-                                                                        "--deactivate-database-setup",
+                                                                        "--db-mem-size", "'999 MiB'"
                                                                       ]):
                 pass
 

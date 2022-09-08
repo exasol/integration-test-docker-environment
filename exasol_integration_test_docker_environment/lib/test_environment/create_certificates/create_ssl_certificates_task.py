@@ -7,7 +7,7 @@ from exasol_integration_test_docker_environment.lib.data.docker_volume_info impo
 from exasol_integration_test_docker_environment.lib.docker.images.image_info import ImageInfo
 from exasol_integration_test_docker_environment.lib.test_environment.create_certificates.analyze_certificate_container import \
     DockerCertificateContainerBuild, DockerCertificateBuildBase
-from exasol_integration_test_docker_environment.lib.utils.resource_directory import resource_directory
+from exasol_integration_test_docker_environment.lib.utils.resource_directory import ResourceDirectory
 import exasol_integration_test_docker_environment.certificate_resources.container
 
 CERTIFICATES_MOUNT_PATH = "/certificates"
@@ -22,6 +22,20 @@ class CreateSSLCertificatesTask(DockerBaseTask):
     no_cleanup_after_success = luigi.BoolParameter(False, significant=False)
     no_cleanup_after_failure = luigi.BoolParameter(False, significant=False)
     volume_name = luigi.Parameter()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._temp_resource_directory = \
+            ResourceDirectory(exasol_integration_test_docker_environment.certificate_resources.container)
+        self._temp_resource_directory.create()
+
+    def on_failure(self, exception):
+        super(CreateSSLCertificatesTask, self).on_failure(exception)
+        self._temp_resource_directory.cleanup()
+
+    def on_success(self):
+        super(CreateSSLCertificatesTask, self).on_success()
+        self._temp_resource_directory.cleanup()
 
     def run_task(self):
         self.volume_info = None
@@ -40,12 +54,11 @@ class CreateSSLCertificatesTask(DockerBaseTask):
         self.return_object(self.volume_info)
 
     def build(self) -> Dict[str, ImageInfo]:
-        with resource_directory(exasol_integration_test_docker_environment.certificate_resources.container) as d:
-            task = self.create_child_task(task_class=DockerCertificateContainerBuild,
-                                          certificate_container_root_directory=d)
-            image_infos_future = yield from self.run_dependencies(task)
-            image_infos = self.get_values_from_future(image_infos_future)
-            return image_infos
+        task = self.create_child_task(task_class=DockerCertificateContainerBuild,
+                                      certificate_container_root_directory=self._temp_resource_directory.tmp_directory)
+        image_infos_future = yield from self.run_dependencies(task)
+        image_infos = self.get_values_from_future(image_infos_future)
+        return image_infos
 
     def get_volume_info(self, reused: bool) -> DockerVolumeInfo:
         with self._get_docker_client() as docker_client:

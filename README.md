@@ -90,15 +90,6 @@ Options:
                                   for resolving domain names. You can repeat
                                   this option to add further nameservers.
 
-  --deactivate-database-setup / --no-deactivate-database-setup
-                                  Deactivates the setup of the spawned
-                                  database, this means no data get populated
-                                  and no JDBC drivers get uploaded. This can
-                                  be used either to save time or as a
-                                  workaround for MacOSX where the
-                                  test_container seems not to be able to
-                                  access the tests directory  [default: False]
-
   --docker-runtime TEXT           The docker runtime used to start all
                                   containers
 

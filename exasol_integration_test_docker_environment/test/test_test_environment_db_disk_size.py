@@ -38,18 +38,14 @@ class DockerTestEnvironmentDBDiskSizeTest(unittest.TestCase):
 
     def test_default_db_disk_size(self):
         self.docker_environment_name = "test_default_db_disk_size"
-        with self.test_environment.spawn_docker_test_environments(name=self.docker_environment_name,
-                                                                  additional_parameter=[
-                                                                      "--deactivate-database-setup"
-                                                                  ]):
+        with self.test_environment.spawn_docker_test_environments(name=self.docker_environment_name):
             self.assert_disk_size("2 GiB")
 
     def test_smallest_valid_db_disk_size(self):
         self.docker_environment_name = "test_smallest_valid_db_disk_size"
         with self.test_environment.spawn_docker_test_environments(name=self.docker_environment_name,
                                                                   additional_parameter=[
-                                                                    "--db-disk-size", "'100 MiB'",
-                                                                    "--deactivate-database-setup"
+                                                                    "--db-disk-size", "'100 MiB'"
                                                                   ]):
             self.assert_disk_size("100 MiB")
 
@@ -58,8 +54,7 @@ class DockerTestEnvironmentDBDiskSizeTest(unittest.TestCase):
         with self.assertRaises(Exception) as context:
             with self.test_environment.spawn_docker_test_environments(name=self.docker_environment_name,
                                                                       additional_parameter=[
-                                                                        "--db-disk-size", "'90 MiB'",
-                                                                        "--deactivate-database-setup"
+                                                                        "--db-disk-size", "'90 MiB'"
                                                                       ]):
                 pass
 

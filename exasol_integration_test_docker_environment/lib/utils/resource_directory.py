@@ -1,7 +1,10 @@
 import contextlib
+import importlib
 import logging
 import tempfile
 from pathlib import Path
+from types import ModuleType
+
 import importlib_resources as ir
 
 LOG = logging.getLogger("resource_directory")
@@ -47,15 +50,40 @@ def _copy_importlib_resources_dir_tree(src_path: ir.abc.Traversable, target_path
             _copy_importlib_resources_dir_tree(file, file_target)
 
 
-@contextlib.contextmanager
-def resource_directory(resource_package):
+class ResourceDirectory:
     """
     Copies all files stored within the given package (resource_package) into a temporary directory
     and yields the directory name.
     :resource_package The module whose content should be copied to a temporary directory.
     """
-    with tempfile.TemporaryDirectory() as d:
-        source_path = ir.files(resource_package)
-        LOG.debug(f"Copying resource package: '{resource_package}' to '{d}'")
-        _copy_importlib_resources_dir_tree(source_path, Path(d))
-        yield d
+
+    def __init__(self, resource_package: ModuleType):
+        # We need to transform the module to a string and later back to a module
+        # because this class will be pickled by luigi and modules are not supported for serialization
+        self._resource_package_str = resource_package.__name__
+        self._tmp_directory = None
+
+    @property
+    def tmp_directory(self):
+        if self._tmp_directory is not None:
+            return self._tmp_directory.name
+        else:
+            return None
+
+    def create(self) -> str:
+        self._tmp_directory = tempfile.TemporaryDirectory()
+        resource_module = importlib.import_module(self._resource_package_str)
+        source_path = ir.files(resource_module)
+        LOG.debug(f"Copying resource package: '{self._resource_package_str}' to '{self._tmp_directory.name}'")
+        _copy_importlib_resources_dir_tree(source_path, Path(self._tmp_directory.name))
+        return self._tmp_directory.name
+
+    def cleanup(self):
+        self._tmp_directory.cleanup()
+        self._tmp_directory = None
+
+    def __enter__(self):
+        return self.create()
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.cleanup()
