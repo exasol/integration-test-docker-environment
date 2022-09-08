@@ -16,7 +16,8 @@ from exasol_integration_test_docker_environment.test.get_test_container_content 
 from exasol_integration_test_docker_environment.testing import utils
 from exasol_integration_test_docker_environment.testing.api_test_environment import ApiTestEnvironment
 
-BUCKET_NAME = "upload_test"
+BUCKET_NAME = "default"
+PATH_IN_BUCKET = "upload_test"
 
 
 class TestfileUpload(UploadFileToBucketFS):
@@ -33,7 +34,7 @@ class TestfileUpload(UploadFileToBucketFS):
         return f"{Path(str(self.path)) / str(self.file_to_upload)}"
 
     def get_upload_target(self) -> str:
-        return f"{BUCKET_NAME}/{self.file_to_upload}"
+        return f"{BUCKET_NAME}/{PATH_IN_BUCKET}/{self.file_to_upload}"
 
     def get_sync_time_estimation(self) -> int:
         """Estimated time in seconds which the bucketfs needs to extract and sync a uploaded file"""
@@ -72,9 +73,9 @@ class TestUpload(unittest.TestCase):
             raise RuntimeError("Error uploading test file.") from e
 
     def get_bucket_config(self):
-
+        db_info = self.environment.environment_info.database_info
         connection_config = BucketFSConnectionConfig(
-            host=self.environment.database_host, port=self.environment.database_port,
+            host=db_info.host, port=int(db_info.bucketfs_port),
             user=self.environment.bucketfs_username, pwd=self.environment.bucketfs_password,
             is_https=False)
         bucketfs_config = BucketFSConfig(
@@ -91,7 +92,7 @@ class TestUpload(unittest.TestCase):
         local_output_file_path = output_path / filename
         download.download_from_bucketfs_to_file(
             bucket_config=self.get_bucket_config(),
-            bucket_file_path=filename,
+            bucket_file_path=f"{PATH_IN_BUCKET}/{filename}",
             local_file_path=local_output_file_path)
         file_content = local_output_file_path.read_text()
         return file_content
@@ -109,8 +110,8 @@ class TestUpload(unittest.TestCase):
             self._upload(d, file_two)
 
         bucket_config = self.get_bucket_config()
-        files = list_files.list_files_in_bucketfs(bucket_config=bucket_config, bucket_file_path="")
-        assert list(files) == [file_one, file_two]
+        files = list_files.list_files_in_bucketfs(bucket_config=bucket_config, bucket_file_path=PATH_IN_BUCKET)
+        self.assertEquals(sorted(list(files)), [file_one, file_two])
         with tempfile.TemporaryDirectory() as d_target:
             p_target = Path(d_target)
             file_one_content = self.download_file_and_read(p_target, file_one)
