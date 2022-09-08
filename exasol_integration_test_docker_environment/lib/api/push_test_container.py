@@ -1,16 +1,19 @@
 from typing import Tuple, Optional
 
 from exasol_integration_test_docker_environment.lib.api.common import set_docker_repository_config, \
-    run_task, set_build_config, generate_root_task, cli_function
+    run_task, set_build_config, generate_root_task, no_cli_function
 from exasol_integration_test_docker_environment.cli.options.docker_repository_options import DEFAULT_DOCKER_REPOSITORY_NAME
 from exasol_integration_test_docker_environment.cli.options.system_options import DEFAULT_OUTPUT_DIRECTORY
+from exasol_integration_test_docker_environment.lib.data.test_container_content_description import \
+    TestContainerContentDescription
 from exasol_integration_test_docker_environment.lib.docker.images.image_info import ImageInfo
 from exasol_integration_test_docker_environment.lib.test_environment.analyze_test_container import \
     AnalyzeTestContainer, DockerTestContainerPush
 
 
-@cli_function
+@no_cli_function
 def push_test_container(
+        test_container_content: TestContainerContentDescription,
         force_push: bool = False,
         push_all: bool = False,
         force_rebuild: bool = False,
@@ -51,6 +54,7 @@ def push_test_container(
     set_docker_repository_config(target_docker_password, target_docker_repository_name, target_docker_username,
                                  target_docker_tag_prefix, "target")
     task_creator = lambda: generate_root_task(task_class=DockerTestContainerPush,
+                                              test_container_content=test_container_content,
                                               force_push=force_push,
                                               push_all=push_all)
     image_infos = run_task(task_creator, workers, task_dependencies_dot_file)

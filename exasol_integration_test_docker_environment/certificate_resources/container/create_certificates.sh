@@ -5,12 +5,12 @@ set -euo pipefail
 #shellcheck disable=SC1083
 NAME=$1
 
-echo SubjectName: $NAME
+echo SubjectName: "$NAME"
 
 #shellcheck disable=SC1083
 certs_dir=$2
 
-echo Certificate Dir: $certs_dir
+echo Certificate Dir: "$certs_dir"
 
 if [ ! -d "$certs_dir" ]
 then
@@ -53,4 +53,4 @@ subjectAltName = DNS.1:$NAME, DNS.2:exasol-test-database
 
 openssl x509 -req -in cert.csr -CA rootCA.crt -CAkey rootCA.key -CAcreateserial -out cert.crt -sha256 -extfile alt_names.ext
 
-ls $certs_dir
+ls "$certs_dir"

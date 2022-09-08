@@ -9,7 +9,7 @@ from exasol_integration_test_docker_environment.lib.docker.images.clean.clean_im
 from exasol_integration_test_docker_environment.lib.docker.images.utils import find_images_by_tag
 from exasol_integration_test_docker_environment.lib.test_environment.create_certificates.analyze_certificate_container import \
     DockerCertificateContainerBuild
-from exasol_integration_test_docker_environment.lib.utils.resource_directory import resource_directory
+from exasol_integration_test_docker_environment.lib.utils.resource_directory import ResourceDirectory
 import exasol_integration_test_docker_environment.certificate_resources.container
 
 
@@ -43,7 +43,7 @@ class DockerCertificateBuildTest(unittest.TestCase):
                 kind="target"
             )
 
-            with resource_directory(exasol_integration_test_docker_environment.certificate_resources.container) as d:
+            with ResourceDirectory(exasol_integration_test_docker_environment.certificate_resources.container) as d:
                 task = generate_root_task(task_class=DockerCertificateContainerBuild,
                                           certificate_container_root_directory=d)
                 luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
