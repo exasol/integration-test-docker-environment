@@ -6,7 +6,6 @@ from exasol_integration_test_docker_environment.lib.docker import ContextDockerC
 from exasol_integration_test_docker_environment.test.get_test_container_content import get_test_container_content
 from exasol_integration_test_docker_environment.testing import utils
 from exasol_integration_test_docker_environment.testing.api_test_environment import ApiTestEnvironment
-from exasol_integration_test_docker_environment.testing.exaslct_test_environment import ExaslctTestEnvironment
 
 
 def assert_container_runtime(self, container_name, expected_runtime):
