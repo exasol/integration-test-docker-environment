@@ -6,7 +6,6 @@ from pathlib import Path
 from sys import stderr
 from typing import Dict, Any
 
-from exasol_integration_test_docker_environment.cli.options.test_environment_options import LATEST_DB_VERSION
 from exasol_integration_test_docker_environment.lib.api import spawn_test_environment
 from exasol_integration_test_docker_environment.lib.api import spawn_test_environment_with_test_container
 from exasol_integration_test_docker_environment.lib.data.test_container_content_description import \
@@ -14,7 +13,7 @@ from exasol_integration_test_docker_environment.lib.data.test_container_content_
 from exasol_integration_test_docker_environment.testing.docker_registry import default_docker_repository_name
 from exasol_integration_test_docker_environment.testing.exaslct_docker_test_environment import \
     ExaslctDockerTestEnvironment
-from exasol_integration_test_docker_environment.testing.utils import find_free_ports, check_db_version_from_env
+from exasol_integration_test_docker_environment.testing.utils import find_free_ports
 
 
 class ApiTestEnvironment:
@@ -67,8 +66,7 @@ class ApiTestEnvironment:
             -> ExaslctDockerTestEnvironment:
         database_port, bucketfs_port = find_free_ports(2)
         on_host_parameter = self._get_default_test_environment(name, database_port, bucketfs_port)
-        db_version_from_env = check_db_version_from_env()
-        docker_db_image_version = db_version_from_env or LATEST_DB_VERSION
+        docker_db_image_version = on_host_parameter.docker_db_image_version
         if additional_parameter is None:
             on_host_parameter.environment_info, on_host_parameter.clean_up = \
                 spawn_test_environment_with_test_container(environment_name=on_host_parameter.name,
@@ -91,19 +89,17 @@ class ApiTestEnvironment:
             -> ExaslctDockerTestEnvironment:
         database_port, bucketfs_port = find_free_ports(2)
         on_host_parameter = self._get_default_test_environment(name, database_port, bucketfs_port)
-        db_version_from_env = check_db_version_from_env()
-        docker_db_image_version = db_version_from_env or LATEST_DB_VERSION
         if additional_parameter is None:
             on_host_parameter.environment_info, on_host_parameter.clean_up = \
                 spawn_test_environment(environment_name=on_host_parameter.name,
                                        database_port_forward=on_host_parameter.database_port,
                                        bucketfs_port_forward=on_host_parameter.bucketfs_port,
-                                       docker_db_image_version=docker_db_image_version)
+                                       docker_db_image_version=on_host_parameter.docker_db_image_version)
         else:
             on_host_parameter.environment_info, on_host_parameter.clean_up = \
                 spawn_test_environment(environment_name=on_host_parameter.name,
                                        database_port_forward=on_host_parameter.database_port,
                                        bucketfs_port_forward=on_host_parameter.bucketfs_port,
-                                       docker_db_image_version=docker_db_image_version,
+                                       docker_db_image_version=on_host_parameter.docker_db_image_version,
                                        **additional_parameter)
         return on_host_parameter

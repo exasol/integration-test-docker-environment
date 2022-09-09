@@ -29,9 +29,7 @@ class TestContainerReuseTest(unittest.TestCase):
         print("docker_repository_name", self._docker_repository_name)
         luigi_utils.clean(self._docker_repository_name)
 
-        db_version_from_env = check_db_version_from_env()
-        self.docker_db_version_parameter = db_version_from_env \
-            if db_version_from_env is not None else test_environment_options.LATEST_DB_VERSION
+        self.docker_db_version_parameter = check_db_version_from_env() or test_environment_options.LATEST_DB_VERSION
 
         self.setup_luigi_config()
 

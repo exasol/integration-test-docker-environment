@@ -14,7 +14,7 @@ class APISpawnTestEnvironmentTest(unittest.TestCase):
         print(f"SetUp {cls.__name__}", file=stderr)
         cls.test_environment = ApiTestEnvironment(cls)
         cls.docker_environment_name = cls.__name__
-        cls.spawned_docker_test_environments = \
+        cls.environment = \
             cls.test_environment.spawn_docker_test_environment_with_test_container(
                 name=cls.docker_environment_name,
                 test_container_content=get_test_container_content()
@@ -22,7 +22,7 @@ class APISpawnTestEnvironmentTest(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        utils.close_environments(cls.spawned_docker_test_environments, cls.test_environment)
+        utils.close_environments(cls.environment, cls.test_environment)
 
     def test_all_containers_started(self):
         with ContextDockerClient() as docker_client:
@@ -37,7 +37,7 @@ class APISpawnTestEnvironmentTest(unittest.TestCase):
                              f"Found no test container in {containers}.")
 
     def test_docker_available_in_test_container(self):
-        environment_info = self.spawned_docker_test_environments.environment_info
+        environment_info = self.environment.environment_info
         with ContextDockerClient() as docker_client:
             test_container = docker_client.containers.get(environment_info.test_container_info.container_name)
             exit_result = test_container.exec_run("docker ps")
@@ -47,7 +47,7 @@ class APISpawnTestEnvironmentTest(unittest.TestCase):
                              f"Error while executing 'docker ps' in test container got output\n {output}.")
 
     def test_db_container_available(self):
-        environment_info = self.spawned_docker_test_environments.environment_info
+        environment_info = self.environment.environment_info
         with ContextDockerClient() as docker_client:
             db_container = docker_client.containers.get(environment_info.database_info.container_info.container_name)
             exit_result = db_container.exec_run("ls /exa")
@@ -57,7 +57,7 @@ class APISpawnTestEnvironmentTest(unittest.TestCase):
                              f"Error while executing 'ls /exa' in db container got output\n {output}.")
 
     def test_db_available(self):
-        environment_info = self.spawned_docker_test_environments.environment_info
+        environment_info = self.environment.environment_info
         with ContextDockerClient() as docker_client:
             test_container = docker_client.containers.get(environment_info.test_container_info.container_name)
             exit_result = test_container.exec_run(self.create_db_connection_command())
@@ -67,7 +67,7 @@ class APISpawnTestEnvironmentTest(unittest.TestCase):
                              f"Error while executing 'exaplus' in test container got output\n {output}.")
 
     def create_db_connection_command(self):
-        spawned_docker_test_environments = self.spawned_docker_test_environments
+        spawned_docker_test_environments = self.environment
         username = spawned_docker_test_environments.db_username
         password = spawned_docker_test_environments.db_password
         db_host = spawned_docker_test_environments.environment_info.database_info.host

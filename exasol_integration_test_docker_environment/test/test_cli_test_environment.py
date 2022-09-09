@@ -38,6 +38,30 @@ class DockerTestEnvironmentTest(unittest.TestCase):
                              f"Found no db container in {containers}.\nStartup log was: "
                              f"{on_host_docker_environment.completed_process.stdout.decode('utf8')}")
 
+    def test_db_available(self):
+        environment_info = self.spawned_docker_test_environments.on_host_docker_environment
+        db_container_name = environment_info.environment_info.database_info.container_info.container_name
+        with ContextDockerClient() as docker_client:
+            db_container = docker_client.containers.get(db_container_name)
+            exit_result = db_container.exec_run(self.create_db_connection_command())
+            exit_code = exit_result[0]
+            output = exit_result[1]
+            self.assertEqual(exit_code, 0,
+                             f"Error while executing 'exaplus' in test container got output\n {output}.")
+
+    def create_db_connection_command(self):
+        spawned_docker_test_environments = self.spawned_docker_test_environments
+        username = spawned_docker_test_environments.on_host_docker_environment.db_username
+        password = spawned_docker_test_environments.on_host_docker_environment.db_password
+        db_host = spawned_docker_test_environments.on_host_docker_environment.environment_info.database_info.host
+        db_port = spawned_docker_test_environments.on_host_docker_environment.environment_info.database_info.db_port
+        db_version = spawned_docker_test_environments.on_host_docker_environment.docker_db_image_version
+        connection_options = f"-c '{db_host}:{db_port}' -u '{username}' -p '{password}'"
+        exaplus = f"/usr/opt/EXASuite-7/EXASolution-{db_version}/bin/Console/exaplus"
+        cmd = f"""{exaplus} {connection_options}  -sql 'select 1;' -jdbcparam 'validateservercertificate=0'"""
+        bash_cmd = f"""bash -c "{cmd}" """
+        return bash_cmd
+
 
 if __name__ == '__main__':
     unittest.main()
