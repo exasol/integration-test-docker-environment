@@ -33,8 +33,6 @@ class DockerTestEnvironmentDockerRuntimeNoRuntimeGivenTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         print(f"SetUp {cls.__name__}")
-        # We can't use start-test-env. because it only mounts ./ and
-        # doesn't work with --build_ouput-directory
         cls.test_environment = ApiTestEnvironment(cls)
         cls.docker_environment_name = "test_no_runtime_given"
         cls.environment = \
@@ -64,8 +62,6 @@ class DockerTestEnvironmentDockerRuntimeDefaultRuntimeGivenTest(unittest.TestCas
     @classmethod
     def setUpClass(cls):
         print(f"SetUp {cls.__name__}")
-        # We can't use start-test-env. because it only mounts ./ and
-        # doesn't work with --build_ouput-directory
         cls.test_environment = ApiTestEnvironment(cls)
         cls.default_docker_runtime = get_default_docker_runtime()
         cls.docker_environment_name = "test_default_runtime_given"
@@ -96,8 +92,6 @@ class DockerTestEnvironmentDockerRuntimeInvalidRuntimeGivenTest(unittest.TestCas
     @classmethod
     def setUpClass(cls):
         print(f"SetUp {cls.__name__}")
-        # We can't use start-test-env. because it only mounts ./ and
-        # doesn't work with --build_ouput-directory
         cls.test_environment = ApiTestEnvironment(cls)
         cls.docker_environment_name = "test_default_runtime_given"
 

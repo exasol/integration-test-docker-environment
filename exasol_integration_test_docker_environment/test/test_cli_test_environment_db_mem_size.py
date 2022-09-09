@@ -10,8 +10,6 @@ class DockerTestEnvironmentDBMemSizeTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         print(f"SetUp {cls.__name__}")
-        # We can't use start-test-env. because it only mounts ./ and
-        # doesn't work with --build_ouput-directory
         cls.test_environment = \
             ExaslctTestEnvironment(
                 cls,
