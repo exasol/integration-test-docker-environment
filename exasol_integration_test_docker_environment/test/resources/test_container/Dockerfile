@@ -20,3 +20,5 @@ RUN curl -fsSL https://get.docker.com -o get-docker.sh && sh get-docker.sh
 RUN mkdir -p downloads/EXAplus
 RUN curl -s https://www.exasol.com/support/secure/attachment/175394/EXAplus-7.1.3.tar.gz | tar -C downloads/EXAplus --strip-components 1 -zxf -
 ENV EXAPLUS=/downloads/EXAplus/exaplus
+
+COPY test.text /test.text

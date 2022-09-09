@@ -12,6 +12,6 @@ def get_test_container_content(runtime_mapping: Tuple[TestContainerRuntimeMappin
     return TestContainerContentDescription(
         docker_file=f"{TEST_CONTAINER_PATH}/Dockerfile",
         build_files_and_directories=[TestContainerBuildMapping(source=TEST_CONTAINER_PATH / "test.txt",
-                                                               target="/test.text")],
+                                                               target="test.text")],
         runtime_mappings=list(runtime_mapping)
     )
