@@ -1,4 +1,3 @@
-import contextlib
 import importlib
 import logging
 import tempfile
@@ -72,8 +71,7 @@ class ResourceDirectory:
 
     def create(self) -> str:
         self._tmp_directory = tempfile.TemporaryDirectory()
-        resource_module = importlib.import_module(self._resource_package_str)
-        source_path = ir.files(resource_module)
+        source_path = ir.files(self._resource_package_str)
         LOG.debug(f"Copying resource package: '{self._resource_package_str}' to '{self._tmp_directory.name}'")
         _copy_importlib_resources_dir_tree(source_path, Path(self._tmp_directory.name))
         return self._tmp_directory.name

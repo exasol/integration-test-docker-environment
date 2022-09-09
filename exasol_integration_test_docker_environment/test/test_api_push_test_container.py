@@ -21,16 +21,18 @@ class APIPushTestContainerTest(unittest.TestCase):
         with LocalDockerRegistryContextManager(self.test_environment.name) as docker_registry:
             print("registry:", docker_registry.repositories, file=stderr)
             docker_repository_name = docker_registry.name
-            image_info = api.push_test_container(source_docker_repository_name=docker_repository_name,
-                                                 target_docker_repository_name=docker_repository_name,
-                                                 test_container_content=get_test_container_content())
-            print("repos:", docker_registry.repositories, file=stderr)
-            images = docker_registry.images
-            print("images", images, file=stderr)
-            self.assertEqual(len(images["tags"]), 1,
-                             f"{images} doesn't have the expected 1 tags, it has {len(images['tags'])}")
-            self.assertIn(image_info.get_target_complete_tag(), images["tags"][0])
-            luigi_utils.clean(docker_repository_name)
+            try:
+                image_info = api.push_test_container(source_docker_repository_name=docker_repository_name,
+                                                     target_docker_repository_name=docker_repository_name,
+                                                     test_container_content=get_test_container_content())
+                print("repos:", docker_registry.repositories, file=stderr)
+                images = docker_registry.images
+                print("images", images, file=stderr)
+                self.assertEqual(len(images["tags"]), 1,
+                                 f"{images} doesn't have the expected 1 tags, it has {len(images['tags'])}")
+                self.assertIn(image_info.get_target_complete_tag(), images["tags"][0])
+            finally:
+                luigi_utils.clean(docker_repository_name)
 
 
 if __name__ == '__main__':

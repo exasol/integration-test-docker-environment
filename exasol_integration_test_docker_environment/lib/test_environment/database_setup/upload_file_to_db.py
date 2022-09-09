@@ -112,7 +112,9 @@ class UploadFileToBucketFS(DockerBaseTask):
             files = list_files.list_files_in_bucketfs(
                 bucket_config=bucket_config,
                 bucket_file_path=upload_target)
-            assert upload_target in files
+            if upload_target not in files:
+                raise RuntimeError(f"Unexpected behavior of list_files.list_files_in_bucketfs. "
+                                   f"bucket_file_path='{upload_target}' was requested, but not returned.")
         except FileNotFoundError as ex:
             return False
         return True

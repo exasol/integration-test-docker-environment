@@ -18,9 +18,8 @@ class DockerCertificateBuildTest(unittest.TestCase):
     def clean(self):
         task = generate_root_task(task_class=CleanImagesStartingWith,
                                   starts_with_pattern="exasol-certificate-docker-build")
-        luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
-        if task._get_tmp_path_for_job().exists():
-            shutil.rmtree(str(task._get_tmp_path_for_job()))
+        success = luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
+        task.cleanup(success)
 
     def setUp(self):
         self.clean()
@@ -46,11 +45,10 @@ class DockerCertificateBuildTest(unittest.TestCase):
             with ResourceDirectory(exasol_integration_test_docker_environment.certificate_resources.container) as d:
                 task = generate_root_task(task_class=DockerCertificateContainerBuild,
                                           certificate_container_root_directory=d)
-                luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
+                success = luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
             self.assert_image_exists("exasol-certificate-docker-build:certificate_resources")
         finally:
-            if task._get_tmp_path_for_job().exists():
-                shutil.rmtree(str(task._get_tmp_path_for_job()))
+            task.cleanup(success)
 
 
 if __name__ == '__main__':

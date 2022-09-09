@@ -39,7 +39,7 @@ class CreateSSLCertificatesTask(DockerBaseTask):
 
     def run_task(self):
         self.volume_info = None
-        image_infos = yield from self.build()
+        image_infos = yield from self.build_image()
         if self.reuse:
             self.logger.info("Try to reuse volume %s", self.volume_name)
             try:
@@ -53,7 +53,7 @@ class CreateSSLCertificatesTask(DockerBaseTask):
 
         self.return_object(self.volume_info)
 
-    def build(self) -> Dict[str, ImageInfo]:
+    def build_image(self) -> Dict[str, ImageInfo]:
         task = self.create_child_task(task_class=DockerCertificateContainerBuild,
                                       certificate_container_root_directory=self._temp_resource_directory.tmp_directory)
         image_infos_future = yield from self.run_dependencies(task)
