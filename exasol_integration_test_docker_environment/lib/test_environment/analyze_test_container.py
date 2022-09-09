@@ -14,7 +14,7 @@ from exasol_integration_test_docker_environment.lib.docker.images.push.push_task
 
 
 class AnalyzeTestContainer(DockerAnalyzeImageTask):
-    test_container_content = JsonPickleParameter(TestContainerContentDescription, significant=False)
+    test_container_content = JsonPickleParameter(TestContainerContentDescription)
 
     def get_target_repository_name(self) -> str:
         return f"""{target_docker_repository_config().repository_name}"""
@@ -47,7 +47,7 @@ class AnalyzeTestContainer(DockerAnalyzeImageTask):
 
 class DockerTestContainerBuildBase(DockerBuildBase):
 
-    test_container_content = JsonPickleParameter(TestContainerContentDescription, significant=False)
+    test_container_content = JsonPickleParameter(TestContainerContentDescription)
 
     def get_goal_class_map(self) -> Dict[str, DockerAnalyzeImageTask]:
         goal_class_map = {"test-container": self.create_child_task(task_class=AnalyzeTestContainer,

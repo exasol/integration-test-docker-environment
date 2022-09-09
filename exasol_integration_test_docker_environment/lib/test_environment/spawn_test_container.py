@@ -32,7 +32,7 @@ class SpawnTestContainer(DockerBaseTask):
     no_test_container_cleanup_after_failure = luigi.BoolParameter(False, significant=False)
     docker_runtime = luigi.OptionalParameter(None, significant=False)
     certificate_volume_name = luigi.OptionalParameter(None, significant=False)
-    test_container_content = JsonPickleParameter(TestContainerContentDescription, significant=False)
+    test_container_content = JsonPickleParameter(TestContainerContentDescription)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
