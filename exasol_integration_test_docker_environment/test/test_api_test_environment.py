@@ -81,7 +81,7 @@ class APISpawnTestEnvironmentTest(unittest.TestCase):
         bash_cmd = f"""bash -c "{cmd}" """
         return bash_cmd
 
-    def test_build_mapping_working(self):
+    def test_build_mapping(self):
         environment_info = self.environment.environment_info
         with ContextDockerClient() as docker_client:
             test_container = docker_client.containers.get(environment_info.test_container_info.container_name)
