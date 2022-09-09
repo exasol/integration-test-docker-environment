@@ -38,8 +38,10 @@ class DockerTestEnvironmentDockerRuntimeNoRuntimeGivenTest(unittest.TestCase):
         cls.test_environment = ApiTestEnvironment(cls)
         cls.docker_environment_name = "test_no_runtime_given"
         cls.environment = \
-            cls.test_environment.spawn_docker_test_environment(name=cls.docker_environment_name,
-                                                               test_container_content=get_test_container_content())
+            cls.test_environment.spawn_docker_test_environment_with_test_container(
+                name=cls.docker_environment_name,
+                test_container_content=get_test_container_content()
+            )
         cls.default_docker_runtime = get_default_docker_runtime()
 
     @classmethod
@@ -67,7 +69,7 @@ class DockerTestEnvironmentDockerRuntimeDefaultRuntimeGivenTest(unittest.TestCas
         cls.test_environment = ApiTestEnvironment(cls)
         cls.default_docker_runtime = get_default_docker_runtime()
         cls.docker_environment_name = "test_default_runtime_given"
-        cls.environment = cls.test_environment.spawn_docker_test_environment(
+        cls.environment = cls.test_environment.spawn_docker_test_environment_with_test_container(
                 cls.docker_environment_name,
                 test_container_content=get_test_container_content(),
                 additional_parameter={
@@ -107,7 +109,7 @@ class DockerTestEnvironmentDockerRuntimeInvalidRuntimeGivenTest(unittest.TestCas
         exception_thrown = False
         spawn_docker_test_environments_successful = False
         try:
-            environment = self.test_environment.spawn_docker_test_environment(
+            environment = self.test_environment.spawn_docker_test_environment_with_test_container(
                     self.docker_environment_name,
                     test_container_content=get_test_container_content(),
                     additional_parameter={

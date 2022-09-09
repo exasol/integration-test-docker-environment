@@ -12,7 +12,6 @@ from exasol_bucketfs_utils_python.bucketfs_connection_config import BucketFSConn
 from exasol_integration_test_docker_environment.lib.api.common import generate_root_task
 from exasol_integration_test_docker_environment.lib.test_environment.database_setup.upload_file_to_db import \
     UploadFileToBucketFS
-from exasol_integration_test_docker_environment.test.get_test_container_content import get_empty_test_container_content
 from exasol_integration_test_docker_environment.testing import utils
 from exasol_integration_test_docker_environment.testing.api_test_environment import ApiTestEnvironment
 
@@ -49,8 +48,7 @@ class TestUpload(unittest.TestCase):
         cls.test_environment = ApiTestEnvironment(cls)
         cls.docker_environment_name = cls.__name__
         cls.environment = \
-            cls.test_environment.spawn_docker_test_environment(name=cls.docker_environment_name,
-                                                               test_container_content=get_empty_test_container_content())
+            cls.test_environment.spawn_docker_test_environment(name=cls.docker_environment_name)
 
     @classmethod
     def tearDownClass(cls):

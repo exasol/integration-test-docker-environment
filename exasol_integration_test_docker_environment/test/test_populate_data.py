@@ -35,8 +35,10 @@ class TestPopulateData(unittest.TestCase):
         test_container_runtime_mapping = TestContainerRuntimeMapping(source=test_data_folder, target="/test_data")
         test_container_content = get_test_container_content((test_container_runtime_mapping,))
         cls.environment = \
-            cls.test_environment.spawn_docker_test_environment(name=cls.docker_environment_name,
-                                                               test_container_content=test_container_content)
+            cls.test_environment.spawn_docker_test_environment_with_test_container(
+                name=cls.docker_environment_name,
+                test_container_content=test_container_content
+            )
 
     @classmethod
     def tearDownClass(cls):

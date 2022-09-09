@@ -16,28 +16,27 @@ from exasol_integration_test_docker_environment.lib.test_environment.database_wa
 class WaitForTestExternalDatabase(DockerBaseTask,
                                   DatabaseCredentialsParameter):
     environment_name = luigi.Parameter()
-    test_container_info = JsonPickleParameter(ContainerInfo, significant=False)  # type: ContainerInfo
     database_info = JsonPickleParameter(DatabaseInfo, significant=False)  # type: DatabaseInfo
     db_startup_timeout_in_seconds = luigi.IntParameter(1 * 60, significant=False)
     attempt = luigi.IntParameter(1)
 
     def run_task(self):
         with self._get_docker_client() as docker_client:
-            test_container = docker_client.containers.get(self.test_container_info.container_name)
-            is_database_ready = self.wait_for_database_startup(test_container)
+            db_container_name = self.database_info.container_info.container_name
+            is_database_ready = self.wait_for_database_startup(db_container_name)
             self.return_object(is_database_ready)
 
-    def wait_for_database_startup(self, test_container: Container):
-        is_database_ready_thread = self.start_wait_threads(test_container)
+    def wait_for_database_startup(self, db_container: Container):
+        is_database_ready_thread = self.start_wait_threads(db_container)
         is_database_ready = self.wait_for_threads(is_database_ready_thread)
         self.join_threads(is_database_ready_thread)
         return is_database_ready
 
-    def start_wait_threads(self, test_container):
+    def start_wait_threads(self, db_container):
         is_database_ready_thread = IsDatabaseReadyThread(self.logger,
                                                          self.database_info,
                                                          self.get_database_credentials(),
-                                                         test_container)
+                                                         db_container)
         is_database_ready_thread.start()
         return is_database_ready_thread
 

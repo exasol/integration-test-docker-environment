@@ -38,7 +38,3 @@ class TestContainerContentDescription(Info):
         self.docker_file = docker_file
         self.build_files_and_directories = build_files_and_directories
         self.runtime_mappings = runtime_mappings
-
-    @property
-    def is_valid(self):
-        return self.docker_file is not None

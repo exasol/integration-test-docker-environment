@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Tuple
+from typing import Tuple
 
 from exasol_integration_test_docker_environment.lib.data.test_container_content_description import \
     TestContainerContentDescription, TestContainerBuildMapping, TestContainerRuntimeMapping
@@ -14,12 +14,4 @@ def get_test_container_content(runtime_mapping: Tuple[TestContainerRuntimeMappin
         build_files_and_directories=[TestContainerBuildMapping(source=TEST_CONTAINER_PATH / "test.txt",
                                                                target="/test.text")],
         runtime_mappings=list(runtime_mapping)
-    )
-
-
-def get_empty_test_container_content() -> TestContainerContentDescription:
-    return TestContainerContentDescription(
-        docker_file=None,
-        build_files_and_directories=list(),
-        runtime_mappings=list()
     )

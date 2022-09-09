@@ -19,7 +19,6 @@ from exasol_integration_test_docker_environment.lib.test_environment.database_wa
 
 class WaitForTestDockerDatabase(DockerBaseTask, DatabaseCredentialsParameter):
     environment_name = luigi.Parameter()
-    test_container_info = JsonPickleParameter(ContainerInfo, significant=False)  # type: ContainerInfo
     database_info = JsonPickleParameter(DatabaseInfo, significant=False)  # type: DatabaseInfo
     db_startup_timeout_in_seconds = luigi.IntParameter(10 * 60, significant=False)
     attempt = luigi.IntParameter(1)

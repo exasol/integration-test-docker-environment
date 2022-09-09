@@ -86,7 +86,10 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
         with cache_environment_info_json_path.open("w") as f:
             f.write(json)
 
-        test_container_name = test_environment_info.test_container_info.container_name
+        if test_environment_info.test_container_info is not None:
+            test_container_name = test_environment_info.test_container_info.container_name
+        else:
+            test_container_name = ""
         environment_variables = \
             self.collect_environment_info_variables(test_container_name,
                                                     test_environment_info)
@@ -102,7 +105,7 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
         with cache_environment_info_sh_path.open("w") as f:
             f.write(environment_variables_with_export)
 
-        if test_environment_info.test_container_info.container_name != "":
+        if test_environment_info.test_container_info is not None:
             self.create_test_environment_info_in_test_container(test_environment_info,
                                                                 environment_variables,
                                                                 environment_variables_with_export, json)
@@ -142,8 +145,7 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
             ssl_volume_info = yield from self._create_ssl_certificates()
         database_info, test_container_info = \
             yield from self._spawn_database_and_test_container(network_info, ssl_volume_info, attempt)
-        is_database_ready = yield from self._wait_for_database(
-            database_info, test_container_info, attempt)
+        is_database_ready = yield from self._wait_for_database(database_info, attempt)
         return network_info, database_info, is_database_ready, test_container_info
 
     def _create_ssl_certificates(self) -> DockerVolumeInfo:
@@ -170,18 +172,15 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
         dependencies_tasks = {
                 DATABASE: self.create_spawn_database_task(network_info, certificate_volume_info, attempt)
             }
-        if self.test_container_content.is_valid:
+        if self.test_container_content is not None:
             dependencies_tasks[TEST_CONTAINER] = \
                 self.create_spawn_test_container_task(network_info, certificate_volume_name, attempt)
         database_and_test_container_info_future = yield from self.run_dependencies(dependencies_tasks)
         database_and_test_container_info = \
             self.get_values_from_futures(database_and_test_container_info_future)
         test_container_info = None
-        if self.test_container_content.is_valid:
+        if self.test_container_content is not None:
             test_container_info = database_and_test_container_info[TEST_CONTAINER]
-        else:
-            test_container_info = ContainerInfo(container_name="", ip_address="", network_aliases=list(),
-                                                network_info=DockerNetworkInfo(network_name="", subnet="", gateway=""))
         database_info = database_and_test_container_info[DATABASE]
         return database_info, test_container_info
 
@@ -205,17 +204,13 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
 
     def _wait_for_database(self,
                            database_info: DatabaseInfo,
-                           test_container_info: ContainerInfo,
                            attempt: int):
         database_ready_target_future = \
-            yield from self.run_dependencies(
-                self.create_wait_for_database_task(
-                    attempt, database_info, test_container_info))
+            yield from self.run_dependencies(self.create_wait_for_database_task(attempt, database_info))
         is_database_ready = self.get_values_from_futures(database_ready_target_future)
         return is_database_ready
 
     def create_wait_for_database_task(self,
                                       attempt: int,
-                                      database_info: DatabaseInfo,
-                                      test_container_info: ContainerInfo):
+                                      database_info: DatabaseInfo):
         raise AbstractMethodException()

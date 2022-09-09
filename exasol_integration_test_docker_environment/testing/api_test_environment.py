@@ -7,6 +7,7 @@ from sys import stderr
 from typing import Dict, Any
 
 from exasol_integration_test_docker_environment.cli.options.test_environment_options import LATEST_DB_VERSION
+from exasol_integration_test_docker_environment.lib.api import spawn_test_environment
 from exasol_integration_test_docker_environment.lib.api import spawn_test_environment_with_test_container
 from exasol_integration_test_docker_environment.lib.data.test_container_content_description import \
     TestContainerContentDescription
@@ -49,11 +50,8 @@ class ApiTestEnvironment:
         except Exception as e:
             print(e, file=stderr)
 
-    def spawn_docker_test_environment(self, name: str, test_container_content: TestContainerContentDescription,
-                                      additional_parameter: Dict[str, Any] = None) \
-            -> ExaslctDockerTestEnvironment:
-        database_port, bucketfs_port = find_free_ports(2)
-        on_host_parameter = ExaslctDockerTestEnvironment(
+    def _get_default_test_environment(self, name: str, database_port: int, bucketfs_port: int):
+        return ExaslctDockerTestEnvironment(
             name=self.name + "_" + name,
             database_host="localhost",
             db_username="sys",
@@ -62,6 +60,13 @@ class ApiTestEnvironment:
             bucketfs_password="write",
             database_port=database_port,
             bucketfs_port=bucketfs_port)
+
+    def spawn_docker_test_environment_with_test_container(self, name: str,
+                                                          test_container_content: TestContainerContentDescription,
+                                                          additional_parameter: Dict[str, Any] = None) \
+            -> ExaslctDockerTestEnvironment:
+        database_port, bucketfs_port = find_free_ports(2)
+        on_host_parameter = self._get_default_test_environment(name, database_port, bucketfs_port)
         db_version_from_env = check_db_version_from_env()
         docker_db_image_version = db_version_from_env or LATEST_DB_VERSION
         if additional_parameter is None:
@@ -79,4 +84,26 @@ class ApiTestEnvironment:
                                                            docker_db_image_version=docker_db_image_version,
                                                            test_container_content=test_container_content,
                                                            **additional_parameter)
+        return on_host_parameter
+
+    def spawn_docker_test_environment(self, name: str,
+                                      additional_parameter: Dict[str, Any] = None) \
+            -> ExaslctDockerTestEnvironment:
+        database_port, bucketfs_port = find_free_ports(2)
+        on_host_parameter = self._get_default_test_environment(name, database_port, bucketfs_port)
+        db_version_from_env = check_db_version_from_env()
+        docker_db_image_version = db_version_from_env or LATEST_DB_VERSION
+        if additional_parameter is None:
+            on_host_parameter.environment_info, on_host_parameter.clean_up = \
+                spawn_test_environment(environment_name=on_host_parameter.name,
+                                       database_port_forward=on_host_parameter.database_port,
+                                       bucketfs_port_forward=on_host_parameter.bucketfs_port,
+                                       docker_db_image_version=docker_db_image_version)
+        else:
+            on_host_parameter.environment_info, on_host_parameter.clean_up = \
+                spawn_test_environment(environment_name=on_host_parameter.name,
+                                       database_port_forward=on_host_parameter.database_port,
+                                       bucketfs_port_forward=on_host_parameter.bucketfs_port,
+                                       docker_db_image_version=docker_db_image_version,
+                                       **additional_parameter)
         return on_host_parameter

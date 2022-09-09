@@ -15,8 +15,10 @@ class APISpawnTestEnvironmentTest(unittest.TestCase):
         cls.test_environment = ApiTestEnvironment(cls)
         cls.docker_environment_name = cls.__name__
         cls.spawned_docker_test_environments = \
-            cls.test_environment.spawn_docker_test_environment(name=cls.docker_environment_name,
-                                                               test_container_content=get_test_container_content())
+            cls.test_environment.spawn_docker_test_environment_with_test_container(
+                name=cls.docker_environment_name,
+                test_container_content=get_test_container_content()
+            )
 
     @classmethod
     def tearDownClass(cls):

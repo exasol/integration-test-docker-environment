@@ -30,9 +30,10 @@ class CertificateTest(unittest.TestCase):
             additional_parameter = {"create_certificates": True}
 
             cls.on_host_docker_environment = \
-                cls.test_environment.spawn_docker_test_environment(cls.docker_environment_name,
-                                                                    test_container_content=get_test_container_content(),
-                                                                    additional_parameter=additional_parameter)
+                cls.test_environment.spawn_docker_test_environment_with_test_container(
+                    cls.docker_environment_name,
+                    test_container_content=get_test_container_content(),
+                    additional_parameter=additional_parameter)
 
     @classmethod
     def tearDownClass(cls):
