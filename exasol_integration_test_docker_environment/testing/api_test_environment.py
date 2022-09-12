@@ -64,42 +64,31 @@ class ApiTestEnvironment:
                                                           test_container_content: TestContainerContentDescription,
                                                           additional_parameter: Dict[str, Any] = None) \
             -> ExaslctDockerTestEnvironment:
+        if additional_parameter is None:
+            additional_parameter = dict()
         database_port, bucketfs_port = find_free_ports(2)
         on_host_parameter = self._get_default_test_environment(name, database_port, bucketfs_port)
         docker_db_image_version = on_host_parameter.docker_db_image_version
-        if additional_parameter is None:
-            on_host_parameter.environment_info, on_host_parameter.clean_up = \
-                spawn_test_environment_with_test_container(environment_name=on_host_parameter.name,
-                                                           database_port_forward=on_host_parameter.database_port,
-                                                           bucketfs_port_forward=on_host_parameter.bucketfs_port,
-                                                           test_container_content=test_container_content,
-                                                           docker_db_image_version=docker_db_image_version)
-        else:
-            on_host_parameter.environment_info, on_host_parameter.clean_up = \
-                spawn_test_environment_with_test_container(environment_name=on_host_parameter.name,
-                                                           database_port_forward=on_host_parameter.database_port,
-                                                           bucketfs_port_forward=on_host_parameter.bucketfs_port,
-                                                           docker_db_image_version=docker_db_image_version,
-                                                           test_container_content=test_container_content,
-                                                           **additional_parameter)
+        on_host_parameter.environment_info, on_host_parameter.clean_up = \
+            spawn_test_environment_with_test_container(environment_name=on_host_parameter.name,
+                                                       database_port_forward=on_host_parameter.database_port,
+                                                       bucketfs_port_forward=on_host_parameter.bucketfs_port,
+                                                       docker_db_image_version=docker_db_image_version,
+                                                       test_container_content=test_container_content,
+                                                       **additional_parameter)
         return on_host_parameter
 
     def spawn_docker_test_environment(self, name: str,
                                       additional_parameter: Dict[str, Any] = None) \
             -> ExaslctDockerTestEnvironment:
+        if additional_parameter is None:
+            additional_parameter = dict()
         database_port, bucketfs_port = find_free_ports(2)
         on_host_parameter = self._get_default_test_environment(name, database_port, bucketfs_port)
-        if additional_parameter is None:
-            on_host_parameter.environment_info, on_host_parameter.clean_up = \
-                spawn_test_environment(environment_name=on_host_parameter.name,
-                                       database_port_forward=on_host_parameter.database_port,
-                                       bucketfs_port_forward=on_host_parameter.bucketfs_port,
-                                       docker_db_image_version=on_host_parameter.docker_db_image_version)
-        else:
-            on_host_parameter.environment_info, on_host_parameter.clean_up = \
-                spawn_test_environment(environment_name=on_host_parameter.name,
-                                       database_port_forward=on_host_parameter.database_port,
-                                       bucketfs_port_forward=on_host_parameter.bucketfs_port,
-                                       docker_db_image_version=on_host_parameter.docker_db_image_version,
-                                       **additional_parameter)
+        on_host_parameter.environment_info, on_host_parameter.clean_up = \
+            spawn_test_environment(environment_name=on_host_parameter.name,
+                                   database_port_forward=on_host_parameter.database_port,
+                                   bucketfs_port_forward=on_host_parameter.bucketfs_port,
+                                   docker_db_image_version=on_host_parameter.docker_db_image_version,
+                                   **additional_parameter)
         return on_host_parameter
