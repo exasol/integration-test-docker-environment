@@ -91,10 +91,23 @@ class TestPopulateData(unittest.TestCase):
         # Delete a row
         self._execute_sql_on_db("DELETE FROM TEST.ENGINETABLE WHERE INT_INDEX=1;")
         # Execute populatedata again. Expectation is that task will be skipped and data remains untouched.
-        self._populate_data(reuse=True)
-        result = self._execute_sql_on_db("SELECT count(*) FROM TEST.ENGINETABLE;")
-        expected_result = '\nCOUNT(*)             \n---------------------\n                   99\n\n'
-        self.assertEquals(result, expected_result)
+        self.environment.environment_info.database_info.reused = True
+        try:
+            self._populate_data(reuse=True)
+            result = self._execute_sql_on_db("SELECT count(*) FROM TEST.ENGINETABLE;")
+            expected_result = '\nCOUNT(*)             \n---------------------\n                   99\n\n'
+            self.assertEquals(result, expected_result)
+        finally:
+            self.environment.environment_info.database_info.reused = False
+
+    def test_populate_twice_throws_exception(self):
+        self._populate_data()
+        exception_thrown = False
+        try:
+            self._populate_data()
+        except RuntimeError:
+            exception_thrown = True
+        self.assertTrue(exception_thrown)
 
 
 if __name__ == '__main__':
