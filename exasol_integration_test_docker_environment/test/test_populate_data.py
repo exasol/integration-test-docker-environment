@@ -49,7 +49,6 @@ class TestPopulateData(unittest.TestCase):
                                   environment_name=self.environment.name,
                                   db_user=self.environment.db_username,
                                   db_password=self.environment.db_password,
-                                  reuse_data=reuse,
                                   bucketfs_write_password=self.environment.bucketfs_password,
                                   test_environment_info=self.environment.environment_info,
                                   )
@@ -85,20 +84,6 @@ class TestPopulateData(unittest.TestCase):
         result = self._execute_sql_on_db("SELECT count(*) FROM TEST.ENGINETABLE;")
         expected_result = '\nCOUNT(*)             \n---------------------\n                  100\n\n'
         self.assertEquals(result, expected_result)
-
-    def test_populate_data_reuse_data(self):
-        self._populate_data()
-        # Delete a row
-        self._execute_sql_on_db("DELETE FROM TEST.ENGINETABLE WHERE INT_INDEX=1;")
-        # Execute populatedata again. Expectation is that task will be skipped and data remains untouched.
-        self.environment.environment_info.database_info.reused = True
-        try:
-            self._populate_data(reuse=True)
-            result = self._execute_sql_on_db("SELECT count(*) FROM TEST.ENGINETABLE;")
-            expected_result = '\nCOUNT(*)             \n---------------------\n                   99\n\n'
-            self.assertEquals(result, expected_result)
-        finally:
-            self.environment.environment_info.database_info.reused = False
 
     def test_populate_twice_throws_exception(self):
         self._populate_data()

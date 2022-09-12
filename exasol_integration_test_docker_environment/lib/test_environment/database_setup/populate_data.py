@@ -14,7 +14,6 @@ class PopulateTestDataToDatabase(DockerBaseTask, DatabaseCredentialsParameter):
     logger = logging.getLogger('luigi-interface')
 
     environment_name = luigi.Parameter()
-    reuse_data = luigi.BoolParameter(False, significant=False)
     test_environment_info = JsonPickleParameter(
         EnvironmentInfo, significant=False)  # type: EnvironmentInfo
 
@@ -24,13 +23,6 @@ class PopulateTestDataToDatabase(DockerBaseTask, DatabaseCredentialsParameter):
         self._database_info = self.test_environment_info.database_info
 
     def run_task(self):
-        if self.reuse_data and self._database_info.reused:
-            self.logger.warning("Reusing data")
-            self.write_logs("Reused")
-        else:
-            self.populate_data()
-
-    def populate_data(self):
         self.logger.warning("Uploading data")
         username = self.db_user
         password = self.db_password
