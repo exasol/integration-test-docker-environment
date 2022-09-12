@@ -1,0 +1,54 @@
+name: Publish Docker Runner
+
+on:
+  push:
+    branches:
+      - main
+      - 'ci-release-test/**'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: publish
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build new Docker image
+      run: bash ./starter_scripts/build_docker_runner_image.sh
+    - name: Docker login
+      run: echo "$SECRET_DOCKER_TOKEN" | docker login --username "$SECRET_DOCKER_USER_NAME" --password-stdin
+      env: # Set the secret as an input
+        SECRET_DOCKER_USER_NAME: ${{ secrets.DOCKER_USER_NAME }}
+        SECRET_DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+    - name: Push new Docker image
+      if: github.ref == 'refs/heads/main'
+      run: bash ./starter_scripts/push_docker_runner_image.sh
+    - name: Push new ci-release-test Docker image
+      if: github.ref != 'refs/heads/main'
+      run: bash ./starter_scripts/push_docker_runner_image.sh "ci-release-test"
+
+  publish-test-container:
+    needs: publish
+
+    runs-on: ubuntu-latest
+    environment: publish
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build TestContainer
+        run: ./start-test-env build-test-container --force-rebuild
+      - name: Push TestContainer image
+        if: github.ref == 'refs/heads/main'
+        run: |
+          ./start-test-env push-test-container --source-docker-username "$SECRET_DOCKER_USER_NAME" --target-docker-username "$SECRET_DOCKER_USER_NAME" --force-push
+        env: # Set the secret as an input
+          SECRET_DOCKER_USER_NAME: ${{ secrets.DOCKER_USER_NAME }}
+          TARGET_DOCKER_PASSWORD: ${{ secrets.DOCKER_TOKEN }}
+          SOURCE_DOCKER_PASSWORD: ${{ secrets.DOCKER_TOKEN }}
+      - name: Push  ci-release-test TestContainer image
+        if: github.ref != 'refs/heads/main'
+        run: |
+          ./start-test-env push-test-container --source-docker-username "$SECRET_DOCKER_USER_NAME" --target-docker-username "$SECRET_DOCKER_USER_NAME" --force-push --source-docker-tag-prefix ci_release_test --target-docker-tag-prefix ci_release_test
+        env: # Set the secret as an input
+          SECRET_DOCKER_USER_NAME: ${{ secrets.DOCKER_USER_NAME }}
+          TARGET_DOCKER_PASSWORD: ${{ secrets.DOCKER_TOKEN }}
+          SOURCE_DOCKER_PASSWORD: ${{ secrets.DOCKER_TOKEN }}
+
