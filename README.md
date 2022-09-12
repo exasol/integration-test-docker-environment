@@ -2,16 +2,16 @@
 
 ## About
 
-This project provides a command line interface to start a test environment with an [Exasol Docker-DB](https://hub.docker.com/r/exasol/docker-db). It starts an Exasol Docker-DB container and an associated test container where [EXAPlus CLI](https://docs.exasol.com/connect_exasol/sql_clients/exaplus_cli/exaplus_cli.htm) and  the [Exasol ODBC driver](https://docs.exasol.com/connect_exasol/drivers/odbc.htm) are already installed.
+This project provides a command line interface and a Python API layer to start a test environment with an [Exasol Docker-DB](https://hub.docker.com/r/exasol/docker-db). Both start an Exasol Docker-DB container, but the API Layer has extended functionality and also can start an associated test container for whose content the client is responsible.
 
-Both containers exist in the same Docker network. This allows you to connect from the test container to the Docker-DB container. Furthermore, the database gets populated with some test data. You can find the test data under `tests/test/enginedb_small/import.sql`. Besides the test container, you can also access the Exasol database and the Bucket-FS from the host via forwarded ports.
+Both containers exist in the same Docker network. This allows you to connect from the test container to the Docker-DB container. Furthermore, this package provides two utility tasks which allow the population of some test data and upload of files to the BucketFS. Besides the test container, you can also access the Exasol database and the Bucket-FS from the host via forwarded ports.
 
 ### Comparison to Docker-DB and the Exasol Testcontainers
 
-* This project uses the [Docker-DB](https://hub.docker.com/r/exasol/docker-db), but it does the configuration, setup and startup for you. For example, it waits until the Database and the Bucket-FS accept connections. It also populates the database with test data and provides with the test container as an environment to access the database.
-* The [Exasol Testcontainers](https://github.com/exasol/exasol-testcontainers/) provide similar features for Java integration tests, so if you have an Java project use the Exasol Testcontainer, because they are more integrated in the Java ecosystem then this project. Testcontainers are designed to integrate with popular unit testing frameworks like [JUnit4](https://www.testcontainers.org/test_framework_integration/junit_4/), [JUnit5](https://www.testcontainers.org/test_framework_integration/junit_5/) and [Spock](https://www.testcontainers.org/test_framework_integration/spock/). Most notably, lifecycle management of containers controlled by the tests lifecycle.
+* This project uses the [Docker-DB](https://hub.docker.com/r/exasol/docker-db), but it does the configuration, setup and startup for you. For example, it waits until the Database and the Bucket-FS accept connections. It also provides tasks which simplify the population the database with test data and upload of files to the BucketFS.
+* The [Exasol Testcontainers](https://github.com/exasol/exasol-testcontainers/) provide similar features for Java integration tests, so if you have a Java project use the Exasol Testcontainer, because they are more integrated in the Java ecosystem than this project. Testcontainers are designed to integrate with popular unit testing frameworks like [JUnit4](https://www.testcontainers.org/test_framework_integration/junit_4/), [JUnit5](https://www.testcontainers.org/test_framework_integration/junit_5/) and [Spock](https://www.testcontainers.org/test_framework_integration/spock/). Most notably, lifecycle management of containers controlled by the tests lifecycle.
 
-However, if you have a project in any other language you can use this project to start a test Exasol database via a command line interface.
+However, if you have a project in any other language you can use this project to start a test Exasol database via a command line interface. And if you have a Python project, you also have the possibility to start the additional test-container, which is started in the same docker network as the database.
 
 ## Prerequisites
 
@@ -55,9 +55,7 @@ The following options are available to customize the test environment.
 ```
 Usage: main.py spawn-test-environment [OPTIONS]
 
-  This command spawn a test environment with a docker-db container and a
-  connected test-container. The test-container is reachable by the database
-  for output redirects of UDFs.
+  This command spawn a test environment with a docker-db container.
 
 Options:
   --environment-name TEXT         Name of the docker environment. This name
@@ -126,9 +124,7 @@ Options:
   --help  Show this message and exit.
 
 Commands:
-  build-test-container    This command builds all stages of the test...
   health                  Check the health of the execution environment.
-  push-test-container     This command pushs all stages of the test...
   spawn-test-environment  This command spawn a test environment with a...
 ```
 
@@ -148,6 +144,10 @@ Usage: main.py health [OPTIONS]
 Options:
   --help  Show this message and exit.
 ```
+
+### The integration-test-docker-environment API
+
+t.b.d. *Link to sphinx documentation*
 
 ### Default Credentials
 
