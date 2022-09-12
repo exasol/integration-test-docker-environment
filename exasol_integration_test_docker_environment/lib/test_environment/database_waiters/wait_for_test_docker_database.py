@@ -74,8 +74,11 @@ class WaitForTestDockerDatabase(DockerBaseTask, DatabaseCredentialsParameter):
                 is_database_ready = False
                 reason = "error message in container log"
                 break
-            if is_database_ready_thread.finish:
+            if is_database_ready_thread.finish and is_database_ready_thread.is_ready:
                 is_database_ready = True
+                break
+            elif is_database_ready_thread.finish:
+                reason = "error in is_database_ready_thread"
                 break
             if self.timeout_occured(start_time):
                 reason = f"timeout after after {self.db_startup_timeout_in_seconds} seconds"
