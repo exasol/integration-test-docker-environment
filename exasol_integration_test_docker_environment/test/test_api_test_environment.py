@@ -104,20 +104,20 @@ class APISpawnTestEnvironmentTestWithCustomRuntimeMapping(unittest.TestCase):
     def tearDownClass(cls):
         utils.close_environments(cls.test_environment)
 
-    def _deployment_available(self, environment_info: EnvironmentInfo) -> bool:
+    def _assert_deployment_available(self, environment_info: EnvironmentInfo) -> None:
         with ContextDockerClient() as docker_client:
             test_container = docker_client.containers.get(environment_info.test_container_info.container_name)
             exit_code, output = test_container.exec_run("cat /test/test.txt")
             self.assertEqual(exit_code, 0)
-            return output.decode("utf-8") == "test"
+            self.assertEqual(output.decode("utf-8"), "test")
 
-    def _deployment_not_shared(self, environment_info: EnvironmentInfo, temp_path: Path) -> bool:
+    def _assert_deployment_not_shared(self, environment_info: EnvironmentInfo, temp_path: Path) -> bool:
         with ContextDockerClient() as docker_client:
             test_container = docker_client.containers.get(environment_info.test_container_info.container_name)
             exit_code, output = test_container.exec_run("touch /test_target/test_new.txt")
             self.assertEqual(exit_code, 0)
             local_path = temp_path / "test_new.txt"
-            return local_path.exists()
+            self.assertFalse(local_path.exists())
 
     def _get_test_mapping(self, temp_path: Path, deployment_target: Optional[str] = None):
         with open(temp_path / "test.txt", "w") as f:
@@ -134,8 +134,7 @@ class APISpawnTestEnvironmentTestWithCustomRuntimeMapping(unittest.TestCase):
                         test_container_content=get_test_container_content((mapping,))
                     )
                 environment_info = environment.environment_info
-                deployment_available = self._deployment_available(environment_info)
-                self.assertTrue(deployment_available)
+                self._assert_deployment_available(environment_info)
             finally:
                 utils.close_environments(environment)
 
@@ -150,10 +149,9 @@ class APISpawnTestEnvironmentTestWithCustomRuntimeMapping(unittest.TestCase):
                         test_container_content=get_test_container_content((mapping,))
                     )
                 environment_info = environment.environment_info
-                deployment_available = self._deployment_available(environment_info)
-                self.assertTrue(deployment_available)
-                deployment_not_shared = self._deployment_not_shared(environment_info, temp_path)
-                self.assertTrue(deployment_not_shared)
+                self._assert_deployment_available(environment_info)
+                self._assert_deployment_not_shared(environment_info, temp_path)
+
             finally:
                 utils.close_environments(environment)
 
