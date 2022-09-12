@@ -2,7 +2,9 @@ import tempfile
 import unittest
 from pathlib import Path
 from sys import stderr
+from typing import Optional
 
+from exasol_integration_test_docker_environment.lib.data.environment_info import EnvironmentInfo
 from exasol_integration_test_docker_environment.lib.data.test_container_content_description import \
     TestContainerRuntimeMapping
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
@@ -102,13 +104,29 @@ class APISpawnTestEnvironmentTestWithCustomRuntimeMapping(unittest.TestCase):
     def tearDownClass(cls):
         utils.close_environments(cls.test_environment)
 
+    def _deployment_available(self, environment_info: EnvironmentInfo) -> bool:
+        with ContextDockerClient() as docker_client:
+            test_container = docker_client.containers.get(environment_info.test_container_info.container_name)
+            exit_code, output = test_container.exec_run("cat /test/test.txt")
+            self.assertEqual(exit_code, 0)
+            return output.decode("utf-8") == "test"
+
+    def _deployment_not_shared(self, environment_info: EnvironmentInfo, temp_path: Path) -> bool:
+        with ContextDockerClient() as docker_client:
+            test_container = docker_client.containers.get(environment_info.test_container_info.container_name)
+            exit_code, output = test_container.exec_run("touch /test_target/test_new.txt")
+            self.assertEqual(exit_code, 0)
+            local_path = temp_path / "test_new.txt"
+            return local_path.exists()
+
+    def _get_test_mapping(self, temp_path: Path, deployment_target: Optional[str] = None):
+        with open(temp_path / "test.txt", "w") as f:
+            f.write("test")
+        return TestContainerRuntimeMapping(source=temp_path, target="/test", deployment_target=deployment_target)
+
     def test_runtime_mapping_without_deployment(self):
         with tempfile.TemporaryDirectory() as temp_dir:
-            temp_path = Path(temp_dir)
-            with open(temp_path / "test.txt", "w") as f:
-                f.write("test")
-            environment = None
-            mapping = TestContainerRuntimeMapping(source=temp_path, target="/test")
+            mapping = self._get_test_mapping(Path(temp_dir))
             try:
                 environment = \
                     self.test_environment.spawn_docker_test_environment_with_test_container(
@@ -116,23 +134,15 @@ class APISpawnTestEnvironmentTestWithCustomRuntimeMapping(unittest.TestCase):
                         test_container_content=get_test_container_content((mapping,))
                     )
                 environment_info = environment.environment_info
-                with ContextDockerClient() as docker_client:
-                    test_container = docker_client.containers.get(environment_info.test_container_info.container_name)
-                    exit_result = test_container.exec_run("cat /test/test.txt")
-                    exit_code = exit_result[0]
-                    output = exit_result[1]
-                    self.assertEqual(exit_code, 0)
-                    self.assertEqual(output.decode("utf-8"), "test")
+                deployment_available = self._deployment_available(environment_info)
+                self.assertTrue(deployment_available)
             finally:
                 utils.close_environments(environment)
 
     def test_runtime_mapping_deployment(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
-            with open(temp_path / "test.txt", "w") as f:
-                f.write("test")
-            environment = None
-            mapping = TestContainerRuntimeMapping(source=temp_path, target="/test", deployment_target="/test_target")
+            mapping = self._get_test_mapping(temp_path=temp_path, deployment_target="/test_target")
             try:
                 environment = \
                     self.test_environment.spawn_docker_test_environment_with_test_container(
@@ -140,15 +150,10 @@ class APISpawnTestEnvironmentTestWithCustomRuntimeMapping(unittest.TestCase):
                         test_container_content=get_test_container_content((mapping,))
                     )
                 environment_info = environment.environment_info
-                with ContextDockerClient() as docker_client:
-                    test_container = docker_client.containers.get(environment_info.test_container_info.container_name)
-                    exit_code, output = test_container.exec_run("cat /test_target/test.txt")
-                    self.assertEqual(exit_code, 0)
-                    self.assertEqual(output.decode("utf-8"), "test")
-                    exit_code, output = test_container.exec_run("touch /test_target/test_new.txt")
-                    self.assertEqual(exit_code, 0)
-                    local_path = temp_path / "test_new.txt"
-                    self.assertFalse(local_path.exists())
+                deployment_available = self._deployment_available(environment_info)
+                self.assertTrue(deployment_available)
+                deployment_not_shared = self._deployment_not_shared(environment_info, temp_path)
+                self.assertTrue(deployment_not_shared)
             finally:
                 utils.close_environments(environment)
 
