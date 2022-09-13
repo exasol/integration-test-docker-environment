@@ -70,12 +70,15 @@ class TestPopulateData(unittest.TestCase):
             db_info = self.environment.environment_info.database_info
             db_user_name = self.environment.db_username
             db_password = self.environment.db_password
-            cmd = f"$EXAPLUS -q -c '{db_info.host}:{db_info.db_port}' " \
+            cmd = f"$EXAPLUS -x -q -c '{db_info.host}:{db_info.db_port}' " \
                   f"-u '{db_user_name}' -p '{db_password}' -sql '{sql}' " \
                   f"-jdbcparam 'validateservercertificate=0'"
 
             bash_cmd = f"""bash -c "{cmd}" """
             exit_code, output = test_container.exec_run(cmd=bash_cmd)
+
+            if exit_code != 0:
+                raise RuntimeError(f"Error executing sql. Output is {output}")
 
         return output.decode("utf-8")
 
