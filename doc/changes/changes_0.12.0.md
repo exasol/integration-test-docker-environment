@@ -26,8 +26,9 @@ TBD
 
 ## Features / Enhancements:
 
-- #221:  Add support for exasol 7.1.10
-- #223:  Updated docker-db versions
+- #221: Add support for exasol 7.1.10
+- #223: Updated docker-db versions
+- #168: Implemented injection of external test container via CLI
 
 ## Refactoring:
 

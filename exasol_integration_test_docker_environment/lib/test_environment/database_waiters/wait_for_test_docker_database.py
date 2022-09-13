@@ -8,7 +8,6 @@ from docker.models.containers import Container
 
 from exasol_integration_test_docker_environment.lib.base.docker_base_task import DockerBaseTask
 from exasol_integration_test_docker_environment.lib.base.json_pickle_parameter import JsonPickleParameter
-from exasol_integration_test_docker_environment.lib.data.container_info import ContainerInfo
 from exasol_integration_test_docker_environment.lib.data.database_credentials import DatabaseCredentialsParameter
 from exasol_integration_test_docker_environment.lib.data.database_info import DatabaseInfo
 from exasol_integration_test_docker_environment.lib.test_environment.database_waiters.db_container_log_thread import \
@@ -19,33 +18,31 @@ from exasol_integration_test_docker_environment.lib.test_environment.database_wa
 
 class WaitForTestDockerDatabase(DockerBaseTask, DatabaseCredentialsParameter):
     environment_name = luigi.Parameter()
-    test_container_info = JsonPickleParameter(ContainerInfo, significant=False)  # type: ContainerInfo
     database_info = JsonPickleParameter(DatabaseInfo, significant=False)  # type: DatabaseInfo
     db_startup_timeout_in_seconds = luigi.IntParameter(10 * 60, significant=False)
     attempt = luigi.IntParameter(1)
+    docker_db_image_version = luigi.Parameter()
 
     def run_task(self):
         with self._get_docker_client() as docker_client:
-            test_container = docker_client.containers.get(self.test_container_info.container_name)
             db_container_name = self.database_info.container_info.container_name
             db_container = docker_client.containers.get(db_container_name)
             is_database_ready = \
-                self.wait_for_database_startup(test_container, db_container)
+                self.wait_for_database_startup(db_container)
             after_startup_db_log_file = self.get_log_path().joinpath("after_startup_db_log.tar.gz")
             self.save_db_log_files_as_gzip_tar(after_startup_db_log_file, db_container)
             self.return_object(is_database_ready)
 
     def wait_for_database_startup(self,
-                                  test_container: Container,
                                   db_container: Container):
         container_log_thread, is_database_ready_thread = \
-            self.start_wait_threads(db_container, test_container)
+            self.start_wait_threads(db_container)
         is_database_ready = \
             self.wait_for_threads(container_log_thread, is_database_ready_thread)
         self.join_threads(container_log_thread, is_database_ready_thread)
         return is_database_ready
 
-    def start_wait_threads(self, db_container, test_container):
+    def start_wait_threads(self, db_container: Container):
         startup_log_file = self.get_log_path().joinpath("startup.log")
         container_log_thread = DBContainerLogThread(db_container,
                                                     self.logger,
@@ -54,8 +51,9 @@ class WaitForTestDockerDatabase(DockerBaseTask, DatabaseCredentialsParameter):
         container_log_thread.start()
         is_database_ready_thread = IsDatabaseReadyThread(self.logger,
                                                          self.database_info,
+                                                         db_container,
                                                          self.get_database_credentials(),
-                                                         test_container)
+                                                         self.docker_db_image_version)
         is_database_ready_thread.start()
         return container_log_thread, is_database_ready_thread
 
@@ -76,8 +74,11 @@ class WaitForTestDockerDatabase(DockerBaseTask, DatabaseCredentialsParameter):
                 is_database_ready = False
                 reason = "error message in container log"
                 break
-            if is_database_ready_thread.finish:
+            if is_database_ready_thread.finish and is_database_ready_thread.is_ready:
                 is_database_ready = True
+                break
+            elif is_database_ready_thread.finish:
+                reason = "error in is_database_ready_thread"
                 break
             if self.timeout_occured(start_time):
                 reason = f"timeout after after {self.db_startup_timeout_in_seconds} seconds"

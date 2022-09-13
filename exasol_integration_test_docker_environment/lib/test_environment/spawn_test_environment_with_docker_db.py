@@ -7,7 +7,7 @@ from exasol_integration_test_docker_environment.lib.data.docker_volume_info impo
 from exasol_integration_test_docker_environment.lib.data.environment_type import EnvironmentType
 from exasol_integration_test_docker_environment.lib.test_environment.abstract_spawn_test_environment import \
     AbstractSpawnTestEnvironment
-from exasol_integration_test_docker_environment.lib.test_environment.create_ssl_certificates_task import \
+from exasol_integration_test_docker_environment.lib.test_environment.create_certificates.create_ssl_certificates_task import \
     CreateSSLCertificatesTask
 from exasol_integration_test_docker_environment.lib.test_environment.database_waiters.wait_for_test_docker_database import \
     WaitForTestDockerDatabase
@@ -39,7 +39,6 @@ class SpawnTestEnvironmentWithDockerDB(
             self.create_child_task_with_common_params(
                 CreateSSLCertificatesTask,
                 environment_name=self.environment_name,
-                test_container_name=self.test_container_name,
                 db_container_name=self.db_container_name,
                 network_name=self.network_name,
                 docker_runtime=self.docker_runtime,
@@ -80,11 +79,10 @@ class SpawnTestEnvironmentWithDockerDB(
 
     def create_wait_for_database_task(self,
                                       attempt: int,
-                                      database_info: DatabaseInfo,
-                                      test_container_info: ContainerInfo):
+                                      database_info: DatabaseInfo):
         return \
             self.create_child_task_with_common_params(
                 WaitForTestDockerDatabase,
-                test_container_info=test_container_info,
                 database_info=database_info,
-                attempt=attempt)
+                attempt=attempt,
+                docker_db_image_version=self.docker_db_image_version)

@@ -1,6 +1,5 @@
 from typing import Optional
 
-from exasol_integration_test_docker_environment.lib.data.container_info import ContainerInfo
 from exasol_integration_test_docker_environment.lib.data.database_info import DatabaseInfo
 from exasol_integration_test_docker_environment.lib.data.docker_network_info import DockerNetworkInfo
 from exasol_integration_test_docker_environment.lib.data.docker_volume_info import DockerVolumeInfo
@@ -48,11 +47,9 @@ class SpawnTestEnvironmentWithExternalDB(AbstractSpawnTestEnvironment,
 
     def create_wait_for_database_task(self,
                                       attempt: int,
-                                      database_info: DatabaseInfo,
-                                      test_container_info: ContainerInfo):
+                                      database_info: DatabaseInfo):
         return \
             self.create_child_task_with_common_params(
                 WaitForTestExternalDatabase,
-                test_container_info=test_container_info,
                 database_info=database_info,
                 attempt=attempt)

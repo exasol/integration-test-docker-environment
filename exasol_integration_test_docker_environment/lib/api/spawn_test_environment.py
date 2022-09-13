@@ -3,7 +3,7 @@ from typing import Tuple, Optional, Callable
 import humanfriendly
 
 from exasol_integration_test_docker_environment.lib.api.common import set_build_config, set_docker_repository_config, \
-    run_task, generate_root_task
+    run_task, generate_root_task, cli_function
 from exasol_integration_test_docker_environment.cli.options.docker_repository_options import DEFAULT_DOCKER_REPOSITORY_NAME
 from exasol_integration_test_docker_environment.cli.options.system_options import DEFAULT_OUTPUT_DIRECTORY
 from exasol_integration_test_docker_environment.cli.options.test_environment_options import LATEST_DB_VERSION
@@ -17,12 +17,12 @@ from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_
 
 
 def _cleanup(environment_info: EnvironmentInfo) -> None:
-    remove_docker_container([environment_info.test_container_info.container_name,
-                             environment_info.database_info.container_info.container_name])
+    remove_docker_container([environment_info.database_info.container_info.container_name])
     remove_docker_volumes([environment_info.database_info.container_info.volume_name])
     remove_docker_networks([environment_info.network_info.network_name])
 
 
+@cli_function
 def spawn_test_environment(
         environment_name: str,
         database_port_forward: Optional[int] = None,
@@ -30,7 +30,6 @@ def spawn_test_environment(
         db_mem_size: str = "2 GiB",
         db_disk_size: str = "2 GiB",
         nameserver: Tuple[str,...] = tuple(),
-        deactivate_database_setup: bool = False,
         docker_runtime: Optional[str] = None,
         docker_db_image_version: str = LATEST_DB_VERSION,
         docker_db_image_name: str = "exasol/docker-db",
@@ -92,8 +91,8 @@ def spawn_test_environment(
                                               no_test_container_cleanup_after_failure=False,
                                               no_database_cleanup_after_success=True,
                                               no_database_cleanup_after_failure=False,
-                                              is_setup_database_activated=not deactivate_database_setup,
-                                              create_certificates=create_certificates
+                                              create_certificates=create_certificates,
+                                              test_container_content=None
                                               )
     environment_info = run_task(task_creator, workers, task_dependencies_dot_file)
     return environment_info, functools.partial(_cleanup, environment_info)

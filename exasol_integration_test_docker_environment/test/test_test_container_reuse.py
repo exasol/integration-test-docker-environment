@@ -1,4 +1,3 @@
-import os
 import shutil
 import tempfile
 import unittest
@@ -9,7 +8,10 @@ import luigi
 from exasol_integration_test_docker_environment.lib.api.common import set_build_config, set_docker_repository_config, \
     generate_root_task
 from exasol_integration_test_docker_environment.lib.base.docker_base_task import DockerBaseTask
+from exasol_integration_test_docker_environment.lib.base.json_pickle_parameter import JsonPickleParameter
 from exasol_integration_test_docker_environment.lib.data.container_info import ContainerInfo
+from exasol_integration_test_docker_environment.lib.data.test_container_content_description import \
+    TestContainerContentDescription
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.lib.test_environment.prepare_network_for_test_environment import \
     PrepareDockerNetworkForTestEnvironment
@@ -20,6 +22,7 @@ from exasol_integration_test_docker_environment.testing import luigi_utils
 class TestTask(DockerBaseTask):
     reuse = luigi.BoolParameter()
     attempt = luigi.IntParameter()
+    test_container_content = JsonPickleParameter(TestContainerContentDescription)
 
     def run_task(self):
         docker_network_task_1 = self.create_child_task(task_class=PrepareDockerNetworkForTestEnvironment,
@@ -43,13 +46,14 @@ class TestTask(DockerBaseTask):
                                    attempt=self.attempt,
                                    reuse_test_container=self.reuse,
                                    no_test_container_cleanup_after_success=True,
-                                   no_test_container_cleanup_after_failure=False
+                                   no_test_container_cleanup_after_failure=False,
+                                   test_container_content=self.test_container_content
                                    )
         test_container_future_1 = yield from self.run_dependencies(test_container_task_1)
         container_info = test_container_future_1.get_output()  # type: ContainerInfo
         with ContextDockerClient() as docker_client:
             container = docker_client.containers.get(container_info.container_name)
-            self.return_object({"container_id": container.image.id, "image_id": container.image.id})
+            self.return_object({"container_id": container.id, "image_id": container.image.id})
 
 
 class TestContainerReuseTest(unittest.TestCase):
@@ -61,8 +65,6 @@ class TestContainerReuseTest(unittest.TestCase):
         self.working_directory = shutil.copytree(resource_directory,
                                                  Path(self.temp_directory, "test_test_container_reuse"))
         print("working_directory", self.working_directory)
-        self.old_working_directory = os.getcwd()
-        os.chdir(self.working_directory)
         print("working_directory content", list(Path(self.working_directory).iterdir()))
         self.docker_repository_name = self.__class__.__name__.lower()
         print("docker_repository_name", self.docker_repository_name)
@@ -70,9 +72,15 @@ class TestContainerReuseTest(unittest.TestCase):
         self.setup_luigi_config()
 
     def tearDown(self):
-        os.chdir(self.old_working_directory)
         luigi_utils.clean(self.docker_repository_name)
         shutil.rmtree(self.temp_directory)
+
+    def get_test_container_content(self) -> TestContainerContentDescription:
+        return TestContainerContentDescription(
+            docker_file=str(self.dockerfile),
+            build_files_and_directories=list(),
+            runtime_mappings=list()
+        )
 
     def setup_luigi_config(self):
         set_build_config(force_rebuild=False,
@@ -92,8 +100,13 @@ class TestContainerReuseTest(unittest.TestCase):
             kind="target"
         )
 
+    @property
+    def dockerfile(self):
+        return Path(self.working_directory) / "tests" / "Dockerfile"
+
     def run1(self):
-        task = generate_root_task(task_class=TestTask, reuse=False, attempt=1)
+        task = generate_root_task(task_class=TestTask, reuse=False, attempt=1,
+                                  test_container_content=self.get_test_container_content())
         try:
             success = luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
             if success:
@@ -107,7 +120,8 @@ class TestContainerReuseTest(unittest.TestCase):
             raise RuntimeError("Error spawning test environment") from e
 
     def run2(self):
-        task = generate_root_task(task_class=TestTask, reuse=True, attempt=2)
+        task = generate_root_task(task_class=TestTask, reuse=True, attempt=2,
+                                  test_container_content=self.get_test_container_content())
         try:
             success = luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
 
@@ -121,8 +135,7 @@ class TestContainerReuseTest(unittest.TestCase):
 
     def test_test_container_no_reuse_after_change(self):
         p1 = self.run1()
-        dockerfile = Path(self.working_directory, "tests/Dockerfile")
-        with dockerfile.open("a") as f:
+        with self.dockerfile.open("a") as f:
             f.write("\n#Test\n")
         p2 = self.run2()
         assert "container_id" in p1

@@ -1,7 +1,10 @@
 from typing import Set, Dict
 
+from exasol_integration_test_docker_environment.lib.base.json_pickle_parameter import JsonPickleParameter
 from exasol_integration_test_docker_environment.lib.config.docker_config import target_docker_repository_config, \
     source_docker_repository_config
+from exasol_integration_test_docker_environment.lib.data.test_container_content_description import \
+    TestContainerContentDescription
 from exasol_integration_test_docker_environment.lib.docker.images.create.docker_build_base import DockerBuildBase
 from exasol_integration_test_docker_environment.lib.docker.images.create.docker_image_analyze_task import \
     DockerAnalyzeImageTask
@@ -11,6 +14,7 @@ from exasol_integration_test_docker_environment.lib.docker.images.push.push_task
 
 
 class AnalyzeTestContainer(DockerAnalyzeImageTask):
+    test_container_content = JsonPickleParameter(TestContainerContentDescription)
 
     def get_target_repository_name(self) -> str:
         return f"""{target_docker_repository_config().repository_name}"""
@@ -31,10 +35,11 @@ class AnalyzeTestContainer(DockerAnalyzeImageTask):
             return f"db-test-container"
 
     def get_mapping_of_build_files_and_directories(self):
-        return {"requirements.txt": "tests/requirements.txt", "ext": "ext"}
+        return {mapping.target: str(mapping.source) for mapping
+                in self.test_container_content.build_files_and_directories}
 
     def get_dockerfile(self):
-        return "tests/Dockerfile"
+        return str(self.test_container_content.docker_file)
 
     def is_rebuild_requested(self) -> bool:
         return False
@@ -42,8 +47,11 @@ class AnalyzeTestContainer(DockerAnalyzeImageTask):
 
 class DockerTestContainerBuildBase(DockerBuildBase):
 
+    test_container_content = JsonPickleParameter(TestContainerContentDescription)
+
     def get_goal_class_map(self) -> Dict[str, DockerAnalyzeImageTask]:
-        goal_class_map = {"test-container": self.create_child_task(task_class=AnalyzeTestContainer)}
+        goal_class_map = {"test-container": self.create_child_task(task_class=AnalyzeTestContainer,
+                                                                   test_container_content=self.test_container_content)}
         return goal_class_map
 
     def get_default_goals(self) -> Set[str]:

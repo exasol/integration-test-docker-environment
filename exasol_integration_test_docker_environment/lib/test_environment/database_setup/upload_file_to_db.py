@@ -1,7 +1,12 @@
 from pathlib import Path
+from typing import Tuple
 
 import luigi
 from docker.models.containers import Container
+from exasol_bucketfs_utils_python import list_files, upload
+from exasol_bucketfs_utils_python.bucket_config import BucketConfig
+from exasol_bucketfs_utils_python.bucketfs_config import BucketFSConfig
+from exasol_bucketfs_utils_python.bucketfs_connection_config import BucketFSConnectionConfig
 
 # TODO add timeout, because sometimes the upload stucks
 from exasol_integration_test_docker_environment.abstract_method_exception import AbstractMethodException
@@ -26,7 +31,6 @@ class UploadFileToBucketFS(DockerBaseTask):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._test_container_info = self.test_environment_info.test_container_info
         self._database_info = self.test_environment_info.database_info
 
     def run_task(self):
@@ -66,11 +70,13 @@ class UploadFileToBucketFS(DockerBaseTask):
         sync_checker = self.get_sync_checker(database_container, sync_time_estimation,
                                              log_file, pattern_to_wait_for)
         sync_checker.prepare_upload()
-        output = self.upload_file(file_to_upload=file_to_upload, upload_target=upload_target)
-        sync_checker.wait_for_bucketfs_sync()
-        thread.stop()
-        thread.join()
-        self.write_logs(output)
+        try:
+            output = self.upload_file(file_to_upload=file_to_upload, upload_target=upload_target)
+            sync_checker.wait_for_bucketfs_sync()
+            self.write_logs(output)
+        finally:
+            thread.stop()
+            thread.join()
 
     def get_sync_checker(self, database_container: Container,
                          sync_time_estimation: int,
@@ -82,7 +88,7 @@ class UploadFileToBucketFS(DockerBaseTask):
                 log_file_to_check=log_file,
                 pattern_to_wait_for=pattern_to_wait_for,
                 logger=self.logger,
-                bucketfs_write_password=self.bucketfs_write_password
+                bucketfs_write_password=str(self.bucketfs_write_password)
             )
         else:
             return TimeBasedBucketFSSyncWaiter(sync_time_estimation)
@@ -90,56 +96,53 @@ class UploadFileToBucketFS(DockerBaseTask):
     def should_be_reused(self, upload_target: str):
         return self.reuse_uploaded and self.exist_file_in_bucketfs(upload_target)
 
+    @staticmethod
+    def split_upload_target(upload_target: str) -> Tuple[str, str]:
+        upload_parts = upload_target.split("/")
+        bucket_name = upload_parts[0]
+        upload_target_in_bucket = "/".join(upload_parts[1:])
+        return bucket_name, upload_target_in_bucket
+
     def exist_file_in_bucketfs(self, upload_target: str) -> bool:
         self.logger.info("Check if file %s exist in bucketfs", upload_target)
-        command = self.generate_list_command(upload_target)
-        exit_code, log_output = self.run_command("list", command)
+        bucket_name, upload_target = self.split_upload_target(upload_target)
 
-        if exit_code != 0:
-            self.write_logs(log_output)
-            raise Exception("List files in bucketfs failed, got following output %s"
-                            % (log_output))
-        upload_target_in_bucket = "/".join(upload_target.split("/")[1:])
-        if upload_target_in_bucket in log_output.splitlines():
-            return True
-        else:
+        bucket_config = self.generate_bucket_config(bucket_name)
+        try:
+            files = list_files.list_files_in_bucketfs(
+                bucket_config=bucket_config,
+                bucket_file_path=upload_target)
+            if upload_target not in files:
+                raise RuntimeError(f"Unexpected behavior of list_files.list_files_in_bucketfs. "
+                                   f"bucket_file_path='{upload_target}' was requested, but not returned.")
+        except FileNotFoundError as ex:
             return False
+        return True
 
-    def generate_list_command(self, upload_target: str):
-        bucket = upload_target.split("/")[0]
-        url = "http://w:{password}@{host}:{port}/{bucket}".format(
-            host=self._database_info.host, port=self._database_info.bucketfs_port,
-            bucket=bucket, password=self.bucketfs_write_password)
-        cmd = f"curl --silent --show-error --fail '{url}'"
-        return cmd
+    def generate_bucket_config(self, bucket_name: str) -> BucketConfig:
+        connection_config = BucketFSConnectionConfig(
+            host=self._database_info.host, port=int(self._database_info.bucketfs_port),
+            user="w", pwd=str(self.bucketfs_write_password),
+            is_https=False)
+        bucketfs_config = BucketFSConfig(
+            connection_config=connection_config,
+            bucketfs_name="bfsdefault")
+        bucket_config = BucketConfig(
+            bucket_name=bucket_name,
+            bucketfs_config=bucketfs_config)
+        return bucket_config
 
     def upload_file(self, file_to_upload: str, upload_target: str):
         self.logger.info("upload file %s to %s",
                          file_to_upload, upload_target)
-        exit_code, log_output = self.run_command("upload", "ls " + str(Path(file_to_upload).parent))
-        command = self.generate_upload_command(file_to_upload, upload_target)
-        exit_code, log_output = self.run_command("upload", command)
-        if exit_code != 0:
-            self.write_logs(log_output)
-            raise Exception("Upload of %s failed, got following output %s"
-                            % (file_to_upload, log_output))
-        return log_output
+        bucket_name, upload_target = self.split_upload_target(upload_target)
 
-    def generate_upload_command(self, file_to_upload, upload_target):
-        url = "http://w:{password}@{host}:{port}/{target}".format(
-            host=self._database_info.host, port=self._database_info.bucketfs_port,
-            target=upload_target, password=self.bucketfs_write_password)
-        cmd = f"curl --silent --show-error --fail -X PUT -T '{file_to_upload}' '{url}'"
-        return cmd
-
-    def run_command(self, command_type, cmd):
-        with self._get_docker_client() as docker_client:
-            test_container = docker_client.containers.get(self._test_container_info.container_name)
-            self.logger.info("start %s command %s", command_type, cmd)
-            exit_code, output = test_container.exec_run(cmd=cmd)
-            self.logger.info("finish %s command %s", command_type, cmd)
-            log_output = cmd + "\n\n" + output.decode("utf-8")
-            return exit_code, log_output
+        bucket_config = self.generate_bucket_config(bucket_name)
+        upload.upload_file_to_bucketfs(
+            bucket_config=bucket_config,
+            bucket_file_path=upload_target,
+            local_file_path=Path(file_to_upload))
+        return f"File '{file_to_upload}' to '{upload_target}'"
 
     def write_logs(self, output):
         log_file = Path(self.get_log_path(), "log")

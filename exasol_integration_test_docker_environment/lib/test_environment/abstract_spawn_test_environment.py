@@ -12,9 +12,6 @@ from exasol_integration_test_docker_environment.lib.data.database_info import Da
 from exasol_integration_test_docker_environment.lib.data.docker_network_info import DockerNetworkInfo
 from exasol_integration_test_docker_environment.lib.data.docker_volume_info import DockerVolumeInfo
 from exasol_integration_test_docker_environment.lib.data.environment_info import EnvironmentInfo
-from exasol_integration_test_docker_environment.lib.test_environment.database_setup.populate_data import \
-    PopulateEngineSmallTestDataToDatabase
-from exasol_integration_test_docker_environment.lib.test_environment.database_setup.upload_exa_jdbc import UploadExaJDBC
 from exasol_integration_test_docker_environment.lib.test_environment.docker_container_copy import DockerContainerCopy
 from exasol_integration_test_docker_environment.lib.test_environment.parameter.general_spawn_test_environment_parameter import \
     GeneralSpawnTestEnvironmentParameter
@@ -40,7 +37,6 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
 
     def run_task(self):
         test_environment_info = yield from self._attempt_database_start()
-        yield from self._setup_test_database(test_environment_info)
         self.return_object(test_environment_info)
 
     def _attempt_database_start(self):
@@ -63,46 +59,58 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
         self.create_test_environment_info_in_test_container_and_on_host(test_environment_info)
         return test_environment_info
 
-    def create_test_environment_info_in_test_container_and_on_host(
-            self, test_environment_info: EnvironmentInfo):
+    def create_test_environment_info_in_test_container(self, test_environment_info: EnvironmentInfo,
+                                                       environment_variables: str,
+                                                       environment_variables_with_export: str,
+                                                       json: str):
         test_container_name = test_environment_info.test_container_info.container_name
         with self._get_docker_client() as docker_client:
             test_container = docker_client.containers.get(test_container_name)
-            test_environment_info_base_host_path = Path(self.get_cache_path(),
-                                                        f"environments/{self.environment_name}")
-            test_environment_info_base_host_path.mkdir(exist_ok=True, parents=True)
-            self.logger.info(
-                f"Create test environment info in test container '{test_container_name}' at '/' "
-                f"and on the host at '{test_environment_info_base_host_path}'")
-
+            self.logger.info(f"Create test environment info in test container '{test_container_name}' at '/'")
             copy = DockerContainerCopy(test_container)
-            json = test_environment_info.to_json()
             copy.add_string_to_file("environment_info.json", json)
-            cache_environment_info_json_path = Path(test_environment_info_base_host_path,
-                                                    "environment_info.json")
-            with cache_environment_info_json_path.open("w") as f:
-                f.write(json)
-
-            environment_variables = \
-                self.collect_environment_info_variables(test_container_name,
-                                                        test_environment_info)
             copy.add_string_to_file("environment_info.conf", environment_variables)
-            cache_environment_info_conf_path = Path(test_environment_info_base_host_path,
-                                                    "environment_info.conf")
-            with cache_environment_info_conf_path.open("w") as f:
-                f.write(environment_variables)
-
-            environment_variables_with_export = ""
-            for line in environment_variables.splitlines():
-                environment_variables_with_export += f"export {line}\n"
             copy.add_string_to_file("environment_info.sh", environment_variables_with_export)
-            cache_environment_info_sh_path = Path(test_environment_info_base_host_path, "environment_info.sh")
-            with cache_environment_info_sh_path.open("w") as f:
-                f.write(environment_variables_with_export)
-
             copy.copy("/")
 
-    def collect_environment_info_variables(self, test_container_name, test_environment_info):
+    def create_test_environment_info_in_test_container_and_on_host(
+            self, test_environment_info: EnvironmentInfo):
+        test_environment_info_base_host_path = Path(self.get_cache_path(),
+                                                    f"environments/{self.environment_name}")
+        test_environment_info_base_host_path.mkdir(exist_ok=True, parents=True)
+        self.logger.info(f"Create test environment info on the host at '{test_environment_info_base_host_path}'")
+
+        json = test_environment_info.to_json()
+        cache_environment_info_json_path = Path(test_environment_info_base_host_path,
+                                                "environment_info.json")
+        with cache_environment_info_json_path.open("w") as f:
+            f.write(json)
+
+        if test_environment_info.test_container_info is not None:
+            test_container_name = test_environment_info.test_container_info.container_name
+        else:
+            test_container_name = ""
+        environment_variables = \
+            self.collect_environment_info_variables(test_container_name,
+                                                    test_environment_info)
+        cache_environment_info_conf_path = Path(test_environment_info_base_host_path,
+                                                "environment_info.conf")
+        with cache_environment_info_conf_path.open("w") as f:
+            f.write(environment_variables)
+
+        environment_variables_with_export = ""
+        for line in environment_variables.splitlines():
+            environment_variables_with_export += f"export {line}\n"
+        cache_environment_info_sh_path = Path(test_environment_info_base_host_path, "environment_info.sh")
+        with cache_environment_info_sh_path.open("w") as f:
+            f.write(environment_variables_with_export)
+
+        if test_environment_info.test_container_info is not None:
+            self.create_test_environment_info_in_test_container(test_environment_info,
+                                                                environment_variables,
+                                                                environment_variables_with_export, json)
+
+    def collect_environment_info_variables(self, test_container_name: str, test_environment_info):
         environment_variables = ""
         environment_variables += f"ENVIRONMENT_NAME={test_environment_info.name}\n"
         environment_variables += f"ENVIRONMENT_TYPE={test_environment_info.type}\n"
@@ -130,15 +138,14 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
         return environment_variables
 
     def _start_database(self, attempt) \
-            -> Generator[BaseTask, BaseTask, Tuple[DockerNetworkInfo, DatabaseInfo, bool, ContainerInfo]]:
+            -> Generator[BaseTask, BaseTask, Tuple[DockerNetworkInfo, DatabaseInfo, bool, Optional[ContainerInfo]]]:
         network_info = yield from self._create_network(attempt)
         ssl_volume_info = None
         if self.create_certificates:
             ssl_volume_info = yield from self._create_ssl_certificates()
         database_info, test_container_info = \
             yield from self._spawn_database_and_test_container(network_info, ssl_volume_info, attempt)
-        is_database_ready = yield from self._wait_for_database(
-            database_info, test_container_info, attempt)
+        is_database_ready = yield from self._wait_for_database(database_info, attempt)
         return network_info, database_info, is_database_ready, test_container_info
 
     def _create_ssl_certificates(self) -> DockerVolumeInfo:
@@ -160,23 +167,20 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
     def _spawn_database_and_test_container(self,
                                            network_info: DockerNetworkInfo,
                                            certificate_volume_info: Optional[DockerVolumeInfo],
-                                           attempt: int):
+                                           attempt: int) -> Tuple[DatabaseInfo, Optional[ContainerInfo]]:
         certificate_volume_name = certificate_volume_info.volume_name if certificate_volume_info is not None else None
-        database_and_test_container_info_future = \
-            yield from self.run_dependencies({
-                TEST_CONTAINER: \
-                    self.create_child_task_with_common_params(
-                        SpawnTestContainer,
-                        test_container_name=self.test_container_name,
-                        network_info=network_info,
-                        ip_address_index_in_subnet=1,
-                        certificate_volume_name=certificate_volume_name,
-                        attempt=attempt),
+        dependencies_tasks = {
                 DATABASE: self.create_spawn_database_task(network_info, certificate_volume_info, attempt)
-            })
+            }
+        if self.test_container_content is not None:
+            dependencies_tasks[TEST_CONTAINER] = \
+                self.create_spawn_test_container_task(network_info, certificate_volume_name, attempt)
+        database_and_test_container_info_future = yield from self.run_dependencies(dependencies_tasks)
         database_and_test_container_info = \
             self.get_values_from_futures(database_and_test_container_info_future)
-        test_container_info = database_and_test_container_info[TEST_CONTAINER]
+        test_container_info = None
+        if self.test_container_content is not None:
+            test_container_info = database_and_test_container_info[TEST_CONTAINER]
         database_info = database_and_test_container_info[DATABASE]
         return database_info, test_container_info
 
@@ -186,35 +190,27 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
                                    attempt: int):
         raise AbstractMethodException()
 
+    def create_spawn_test_container_task(self, network_info: DockerNetworkInfo,
+                                         certificate_volume_name: str, attempt: int):
+        return self.create_child_task_with_common_params(
+                SpawnTestContainer,
+                test_container_name=self.test_container_name,
+                network_info=network_info,
+                ip_address_index_in_subnet=1,
+                certificate_volume_name=certificate_volume_name,
+                attempt=attempt,
+                test_container_content=self.test_container_content
+                )
+
     def _wait_for_database(self,
                            database_info: DatabaseInfo,
-                           test_container_info: ContainerInfo,
                            attempt: int):
         database_ready_target_future = \
-            yield from self.run_dependencies(
-                self.create_wait_for_database_task(
-                    attempt, database_info, test_container_info))
+            yield from self.run_dependencies(self.create_wait_for_database_task(attempt, database_info))
         is_database_ready = self.get_values_from_futures(database_ready_target_future)
         return is_database_ready
 
     def create_wait_for_database_task(self,
                                       attempt: int,
-                                      database_info: DatabaseInfo,
-                                      test_container_info: ContainerInfo):
+                                      database_info: DatabaseInfo):
         raise AbstractMethodException()
-
-    def _setup_test_database(self, test_environment_info: EnvironmentInfo):
-        # TODO check if database is setup
-        if self.is_setup_database_activated:
-            self.logger.info("Setup database")
-            upload_tasks = [
-                self.create_child_task_with_common_params(
-                    UploadExaJDBC,
-                    test_environment_info=test_environment_info,
-                    reuse_uploaded=self.reuse_database_setup),
-                self.create_child_task_with_common_params(
-                    PopulateEngineSmallTestDataToDatabase,
-                    test_environment_info=test_environment_info,
-                    reuse_data=self.reuse_database_setup
-                )]
-            yield from self.run_dependencies(upload_tasks)
