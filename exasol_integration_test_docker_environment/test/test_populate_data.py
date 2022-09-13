@@ -65,6 +65,7 @@ class TestPopulateData(unittest.TestCase):
 
     def _execute_sql_on_db(self, sql: str) -> str:
         with ContextDockerClient() as docker_client:
+            print(f"Executing sql on db: '{sql}'")
             test_container = docker_client.containers.get(self.environment.environment_info.
                                                           test_container_info.container_name)
             db_info = self.environment.environment_info.database_info
