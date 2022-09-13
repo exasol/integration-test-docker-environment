@@ -10,7 +10,7 @@ def find_exaplus(db_container: docker.models.containers.Container) -> PurePath:
     """
     exit, output = db_container.exec_run(cmd="find /  \( -name 'exaplus' -and -type f -and -path '/usr/opt/*' -or -path '/opt/exasol/*' \)")
     if exit != 0:
-        raise RuntimeError("Exaplus not found on docker db!")
+        raise RuntimeError(f"Exaplus not found on docker db! Output is {output}")
     found_paths = list(filter(None, output.decode("UTF-8").split("\n")))
     if len(found_paths) != 1:
         raise RuntimeError(f"Error determining exaplus path! Output is {output}")
