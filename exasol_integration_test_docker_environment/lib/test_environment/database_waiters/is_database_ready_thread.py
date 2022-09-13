@@ -6,6 +6,8 @@ from docker.models.containers import Container
 
 from exasol_integration_test_docker_environment.lib.data.database_credentials import DatabaseCredentials
 from exasol_integration_test_docker_environment.lib.data.database_info import DatabaseInfo
+from exasol_integration_test_docker_environment.lib.test_environment.database_setup.find_exaplus_in_db_container import \
+    find_exaplus
 
 
 class IsDatabaseReadyThread(Thread):
@@ -31,26 +33,16 @@ class IsDatabaseReadyThread(Thread):
         self.logger.info("Stop IsDatabaseReadyThread")
         self.finish = True
 
-    def _find_exaplus(self) -> PurePath:
-        exit, output = self._db_container.exec_run(cmd="find /usr/opt -type f -name 'exaplus'")
-        if exit != 0:
-            self.finish = True
-            raise RuntimeError("Exaplus not found on docker db!")
-        found_paths = list(filter(None, output.decode("UTF-8").split("\n")))
-        if len(found_paths) != 1:
-            self.finish = True
-            raise RuntimeError(f"Error determining exaplus path! Output is {output}")
-        exaplus_path = PurePath(found_paths[0])
-        exit, output = self._db_container.exec_run(cmd=f"{exaplus_path} --help")
-        if exit != 0:
-            self.finish = True
-            raise RuntimeError(f"Exaplus not working as expected! Output is {output}")
-        return exaplus_path
-
     def run(self):
-        exaplus_path = self._find_exaplus()
-        db_connection_command = self.create_db_connection_command(exaplus_path)
-        bucket_fs_connection_command = self.create_bucketfs_connection_command()
+        db_connection_command = ""
+        bucket_fs_connection_command = ""
+        try:
+            exaplus_path = find_exaplus(self._db_container)
+            db_connection_command = self.create_db_connection_command(exaplus_path)
+            bucket_fs_connection_command = self.create_bucketfs_connection_command()
+        except RuntimeError as e:
+            self.logger.error(e)
+            self.finish = True
         while not self.finish:
             (exit_code_db_connection, self.output_db_connection) = \
                 self._db_container.exec_run(cmd=db_connection_command)

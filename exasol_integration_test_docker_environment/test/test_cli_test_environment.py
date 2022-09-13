@@ -1,6 +1,10 @@
 import unittest
 
+import docker.models.containers
+
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
+from exasol_integration_test_docker_environment.lib.test_environment.database_setup.find_exaplus_in_db_container import \
+    find_exaplus
 from exasol_integration_test_docker_environment.testing import utils
 from exasol_integration_test_docker_environment.testing.exaslct_test_environment import ExaslctTestEnvironment
 
@@ -41,13 +45,13 @@ class DockerTestEnvironmentTest(unittest.TestCase):
         db_container_name = environment_info.environment_info.database_info.container_info.container_name
         with ContextDockerClient() as docker_client:
             db_container = docker_client.containers.get(db_container_name)
-            exit_result = db_container.exec_run(self.create_db_connection_command())
+            exit_result = db_container.exec_run(self.create_db_connection_command(db_container))
             exit_code = exit_result[0]
             output = exit_result[1]
             self.assertEqual(exit_code, 0,
                              f"Error while executing 'exaplus' in test container got output\n {output}.")
 
-    def create_db_connection_command(self):
+    def create_db_connection_command(self, db_container: docker.models.containers.Container):
         spawned_docker_test_environments = self.spawned_docker_test_environments
         username = spawned_docker_test_environments.on_host_docker_environment.db_username
         password = spawned_docker_test_environments.on_host_docker_environment.db_password
@@ -55,7 +59,7 @@ class DockerTestEnvironmentTest(unittest.TestCase):
         db_port = spawned_docker_test_environments.on_host_docker_environment.environment_info.database_info.db_port
         db_version = spawned_docker_test_environments.on_host_docker_environment.docker_db_image_version
         connection_options = f"-c '{db_host}:{db_port}' -u '{username}' -p '{password}'"
-        exaplus = f"/usr/opt/EXASuite-7/EXASolution-{db_version}/bin/Console/exaplus"
+        exaplus = find_exaplus(db_container)
         cmd = f"""{exaplus} {connection_options}  -sql 'select 1;' -jdbcparam 'validateservercertificate=0'"""
         bash_cmd = f"""bash -c "{cmd}" """
         return bash_cmd
