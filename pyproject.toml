@@ -39,6 +39,7 @@ importlib_resources = ">=5.4.0" #Needed to copy resource files, can be removed a
 exasol-bucketfs-utils-python = {url = "https://github.com/exasol/bucketfs-utils-python/releases/download/0.3.0/exasol_bucketfs_utils_python-0.3.0-py3-none-any.whl"}
 
 
-
 [tool.poetry.dev-dependencies]
 toml = ">=0.10.2"
+nox = "^2022.1.7"
+exasol-sphinx-github-pages-generator = {git = "https://github.com/exasol/sphinx-github-pages-generator.git"}

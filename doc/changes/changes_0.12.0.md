@@ -38,6 +38,7 @@ TBD
 - #251: Updated Poetry
 
 ## Documentation:
+- #255: Implemented generatation of Sphinx documentation
 - #185: Restructured README.md and converted to RST
 
 ## Security:
