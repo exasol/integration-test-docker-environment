@@ -38,7 +38,7 @@ TBD
 - #251: Updated Poetry
 
 ## Documentation:
-- TBD
+- #185: Restructured README.md and converted to RST
 
 ## Security:
 
