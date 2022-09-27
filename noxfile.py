@@ -125,7 +125,9 @@ def push_pages_release(session: nox.Session):
 
 def get_db_versions() -> List[str]:
     template_path = ROOT / "docker_db_config_template"
-    return [str(path.name) for path in template_path.iterdir() if path.is_dir()]
+    db_versions = [str(path.name) for path in template_path.iterdir() if path.is_dir()]
+    db_versions.append("default")
+    return db_versions
 
 
 @nox.session(name="run-tests", python=False)
@@ -136,6 +138,6 @@ def run_tests(session: nox.Session, db_version: str):
         env = {"EXASOL_VERSION": db_version}
         if session.posargs:
             for test in session.posargs:
-                session.run(f"python3 run python3 -u {test}", env=env)
+                session.run(f"python3 -u ./exasol_integration_test_docker_environment/test/{test}", env=env)
         else:
             session.run("python3 -u -m unittest discover ./exasol_integration_test_docker_environment/test", env=env)
