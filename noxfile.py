@@ -51,7 +51,7 @@ def commit_pages_main(session: nox.Session):
         session.run("sgpg",
                     "--target_branch", "github-pages/main",
                     "--push_origin", "origin",
-                    "--push_enabled", "commit",
+                    "--commit",
                     "--source_branch", "main",
                     "--module_path", "${StringArray[@]}",
                     env={"StringArray": ("../integration-test-docker-environment")})
@@ -68,7 +68,7 @@ def commit_pages_current(session: nox.Session):
         session.run("sgpg",
                     "--target_branch", "github-pages/" + branch[:-1],
                     "--push_origin", "origin",
-                    "--push_enabled", "commit",
+                    "--commit",
                     "--module_path", "${StringArray[@]}",
                     env={"StringArray": ("../integration-test-docker-environment")})
 
@@ -82,8 +82,7 @@ def push_pages_main(session: nox.Session):
     with session.chdir(ROOT):
         session.run("sgpg",
                     "--target_branch", "github-pages/main",
-                    "--push_origin", "origin",
-                    "--push_enabled", "push",
+                    "--push",
                     "--source_branch", "main",
                     "--module_path", "${StringArray[@]}",
                     env={"StringArray": ("../integration-test-docker-environment")})
@@ -114,7 +113,7 @@ def push_pages_release(session: nox.Session):
         session.run("sgpg",
                     "--target_branch", "github-pages/main",
                     "--push_origin", "origin",
-                    "--push_enabled", "push",
+                    "--push",
                     "--source_branch", tag,
                     "--source_origin", "tags",
                     "--module_path", "${StringArray[@]}",
@@ -125,4 +124,4 @@ def push_pages_release(session: nox.Session):
 def run_tests(session: nox.Session):
     """Run the tests in the poetry environment"""
     with session.chdir(ROOT):
-        session.run("pytest", "tests")
+        session.run("scripts/test/run_all_tests.sh")

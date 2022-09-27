@@ -1,0 +1,14 @@
+name: update-docu
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  publish-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ./.github/actions/prepare_poetry_env.yml
+      - name: Publish Documentation
+        run: push-pages-main
