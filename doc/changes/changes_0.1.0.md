@@ -7,7 +7,7 @@ In this first release we created an docker test environment for Exasol. The test
 ### Currently supported Operating Systems
 
 * Linux
-* Mac OS X with Intel processors (please consult the [README](../../README.md) for more details)
+* Mac OS X with Intel processors (please consult the README for more details)
 
 ### Currently supported Exasol Versions
 
