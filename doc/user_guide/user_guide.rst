@@ -254,8 +254,8 @@ The following config files are available:
 Currently supported Exasol Versions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  **7.0**: up to 7.0.19 **except 7.0.5**
--  **7.1**: up to 7.1.12
+-  **7.0**: up to 7.0.20 **except 7.0.5**
+-  **7.1**: up to 7.1.14
 
 If you need further versions, please open an issue.
 
