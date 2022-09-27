@@ -4,7 +4,6 @@ description: 'This composite actions checkouts out the project, installs Poetry,
 runs:
   using: "composite"
   steps:
-    - uses: actions/checkout@v3
     - uses: actions/setup-python@v2
       with:
         python-version: 3.8
