@@ -33,20 +33,8 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Setup Python 3.8 for integration-test-docker-environment
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
-    - name: Install Poetry
-      uses: abatilo/actions-poetry@v2
-      with:
-        poetry-version: 1.2.0
+    - uses: ./.github/actions/prepare_poetry_env
 
     - name: Run minimal tests
-      run: |
-          ./scripts/test/run_test.sh exasol_integration_test_docker_environment/test/test_api_test_environment.py
-          ./scripts/test/run_test.sh exasol_integration_test_docker_environment/test/test_cli_test_environment.py
-          ./scripts/test/run_test.sh exasol_integration_test_docker_environment/test/test_doctor.py
-          ./scripts/test/run_test.sh exasol_integration_test_docker_environment/test/test_termination_handler.py
-      env:
-        EXASOL_VERSION: "${{ matrix.exasol_version }}"
+      run: poetry run python3 -m nox -s "run-tests(${{ matrix.exasol_version }})" -- \
+            test_api_test_environment.py test_cli_test_environment.py test_doctor.py test_termination_handler.py

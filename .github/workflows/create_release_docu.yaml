@@ -13,16 +13,7 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-    - name: Install python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
-    - name: Install poetry
-      uses: abatilo/actions-poetry@v2
-      with:
-        poetry-version: 1.2.0
-    - name: Poetry install
-      run: poetry install
+    - uses: ./.github/actions/prepare_poetry_env
     - name: Deploy release documentation to github-pages branch
       run: |
         git config --local user.email "opensource@exasol.com"

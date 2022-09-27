@@ -1,7 +1,10 @@
 import webbrowser
 from pathlib import Path
+from typing import List
 
 import nox
+
+from exasol_integration_test_docker_environment.cli.options.test_environment_options import LATEST_DB_VERSION
 
 ROOT = Path(__file__).parent
 LOCAL_DOC = ROOT / "doc"
@@ -120,8 +123,19 @@ def push_pages_release(session: nox.Session):
                     env={"StringArray": ("../integration-test-docker-environment")})
 
 
+def get_db_versions() -> List[str]:
+    template_path = ROOT / "docker_db_config_template"
+    return [str(path.name) for path in template_path.iterdir() if path.is_dir()]
+
+
 @nox.session(name="run-tests", python=False)
-def run_tests(session: nox.Session):
+@nox.parametrize('db_version', get_db_versions())
+def run_tests(session: nox.Session, db_version: str):
     """Run the tests in the poetry environment"""
     with session.chdir(ROOT):
-        session.run("scripts/test/run_all_tests.sh")
+        env = {"EXASOL_VERSION": db_version}
+        if session.posargs:
+            for test in session.posargs:
+                session.run(f"python3 run python3 -u {test}", env=env)
+        else:
+            session.run("python3 -u -m unittest discover ./exasol_integration_test_docker_environment/test", env=env)

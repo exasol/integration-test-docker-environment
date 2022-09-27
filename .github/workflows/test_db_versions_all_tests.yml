@@ -32,14 +32,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Setup Python 3.8 for integration-test-docker-environment
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
-    - name: Install Poetry
-      uses: abatilo/actions-poetry@v2
-      with:
-        poetry-version: 1.2.0
+    - uses: ./.github/actions/prepare_poetry_env
 
     - name: Fail, because not all tests are activated
       run: |
@@ -59,6 +52,4 @@ jobs:
       if: ${{ github.event_name == 'pull_request' }}
 
     - name: Run all tests
-      run: ./scripts/test/run_all_tests.sh
-      env:
-        EXASOL_VERSION: "${{ matrix.exasol_version }}"
+      run: poetry run python3 -m nox -s "run-tests(${{ matrix.exasol_version }})"

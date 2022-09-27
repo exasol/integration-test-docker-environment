@@ -21,17 +21,8 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Setup Python for integration-test-docker-environment
-      uses: actions/setup-python@v2
+    - uses: ./.github/actions/prepare_poetry_env
       with:
-        python-version: "${{ matrix.python_version }}"
-
-    - name: Install Poetry
-      uses: abatilo/actions-poetry@v2
-      with:
-        poetry-version: 1.2.0
-
+        python_version: "${{ matrix.python_version }}"
     - name: Run all tests
-      run: ./scripts/test/run_all_tests.sh
-      env:
-        EXASOL_VERSION: "${{ matrix.exasol_version }}"
+      run: poetry run python3 -m nox -s "run-tests(${{ matrix.exasol_version }})"

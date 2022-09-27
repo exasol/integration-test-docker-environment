@@ -9,6 +9,12 @@ jobs:
   publish-docs:
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/actions/prepare_poetry_env.yml
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/prepare_poetry_env
+
       - name: Publish Documentation
-        run: poetry run python -m nox -s push-pages-main
+        run: |
+          git config --local user.email "opensource@exasol.com"
+          git config --local user.name "GitHub Action"
+          git fetch
+          poetry run python3 -m nox -s push-pages-main
