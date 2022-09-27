@@ -11,4 +11,4 @@ jobs:
     steps:
       - uses: ./.github/actions/prepare_poetry_env.yml
       - name: Publish Documentation
-        run: push-pages-main
+        run: poetry run python -m nox -s push-pages-main
