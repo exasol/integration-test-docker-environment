@@ -28,6 +28,7 @@ changes_0.8.0
 changes_0.7.0
 changes_0.6.0
 changes_0.5.0
+changes_0.4.1
 changes_0.4.0
 changes_0.3.1
 changes_0.3.0
