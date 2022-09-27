@@ -8,8 +8,8 @@ TBD
 
 ### Supported Exasol Versions
 
-* **7.0**: up to 7.0.19, **except 7.0.5**
-* **7.1**: up to 7.1.12
+* **7.0**: up to 7.0.20, **except 7.0.5**
+* **7.1**: up to 7.1.14
 
 If you need further versions, please open an issue.
 
@@ -29,6 +29,7 @@ TBD
 - #221: Add support for exasol 7.1.10
 - #223: Updated docker-db versions
 - #168: Implemented injection of external test container via CLI
+- #257: Added Docker-db's 7.1.13,7.1.14 and 7.0.20
 
 ## Refactoring:
 
