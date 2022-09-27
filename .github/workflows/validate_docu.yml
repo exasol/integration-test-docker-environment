@@ -10,7 +10,7 @@ jobs:
   validate-docs:
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/actions/prepare_poetry_env.yml
+      - uses: ./.github/actions/prepare_poetry_env
       - name: Build Documentation
         run: poetry run python -m nox -s build-html-doc
 
