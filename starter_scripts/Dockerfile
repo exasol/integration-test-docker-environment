@@ -28,7 +28,7 @@ COPY poetry.lock /integration_test_docker_environment/poetry.lock
 COPY pyproject.toml /integration_test_docker_environment/pyproject.toml
 COPY setup.py /integration_test_docker_environment/setup.py
 COPY LICENSE /integration_test_docker_environment/LICENSE
-COPY README.md /integration_test_docker_environment/README.md
+COPY README.rst /integration_test_docker_environment/README.rst
 
 WORKDIR /integration_test_docker_environment
 RUN python3.8 -m pip install .

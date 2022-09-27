@@ -9,7 +9,7 @@ authors = [
     "Torsten Kilias <torsten.kilias@exasol.com>"
 ]
 
-readme = 'README.md'  # Markdown files are supported
+readme = 'README.rst'
 
 repository = "https://github.com/exasol/integration-test-docker-environment"
 homepage = "https://github.com/exasol/integration-test-docker-environment"
