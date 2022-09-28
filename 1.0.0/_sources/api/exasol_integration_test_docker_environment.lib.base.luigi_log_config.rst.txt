@@ -1,0 +1,37 @@
+exasol\_integration\_test\_docker\_environment.lib.base.luigi\_log\_config
+==========================================================================
+
+.. automodule:: exasol_integration_test_docker_environment.lib.base.luigi_log_config
+
+   
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      global_log_file
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      get_log_path
+      get_luigi_log_config
+      validate_log_file
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

@@ -1,0 +1,36 @@
+exasol\_integration\_test\_docker\_environment.testing.docker\_registry
+=======================================================================
+
+.. automodule:: exasol_integration_test_docker_environment.testing.docker_registry
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      default_docker_repository_name
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      LocalDockerRegistry
+      LocalDockerRegistryContextManager
+   
+   
+
+   
+   
+   
+
+
+
