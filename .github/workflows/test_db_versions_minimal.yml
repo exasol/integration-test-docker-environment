@@ -36,4 +36,4 @@ jobs:
     - uses: ./.github/actions/prepare_poetry_env
 
     - name: Run minimal tests
-      run: poetry run nox -s "run-minimal-tests(db_version='${{ matrix.exasol_version }})'"
+      run: poetry run nox -s "run-minimal-tests(db_version='${{ matrix.exasol_version }}')"
