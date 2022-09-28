@@ -25,4 +25,4 @@ jobs:
       with:
         python_version: "${{ matrix.python_version }}"
     - name: Run all tests
-      run: poetry run nox -s "run-tests(${{ matrix.exasol_version }})"
+      run: poetry run nox -s "run-tests(db_version='${{ matrix.exasol_version }})'"
