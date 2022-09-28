@@ -9,7 +9,7 @@ on:
 
 jobs:
   get_exasol_versions:
-    uses: ./github/workflows/get_exasol_versions.yml
+    uses: ./.github/workflows/get_exasol_versions.yml
 
   test-db-versions-minimal:
     needs: get_exasol_versions
