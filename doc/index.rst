@@ -9,7 +9,6 @@ Table of Contents
 
    user_guide/user_guide
    developer_guide/developer_guide
-   dependencies
    api
    changes/changelog
 
