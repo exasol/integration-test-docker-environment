@@ -19,8 +19,8 @@ sys.path.insert(0, os.path.abspath('../'))
 # -- Project information -----------------------------------------------------
 
 project = 'Exasol Integration Test Docker Environment'
-copyright = '2022, Exasol Ag'
-author = 'Exasol Ag'
+copyright = '2022, Exasol AG'
+author = 'Exasol AG'
 
 
 # -- General configuration ---------------------------------------------------

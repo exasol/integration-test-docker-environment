@@ -52,4 +52,4 @@ jobs:
       if: ${{ github.event_name == 'pull_request' }}
 
     - name: Run all tests
-      run: poetry run python3 -m nox -s "run-tests(${{ matrix.exasol_version }})"
+      run: poetry run nox -s "run-tests(${{ matrix.exasol_version }})"

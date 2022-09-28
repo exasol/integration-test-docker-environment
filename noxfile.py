@@ -4,8 +4,6 @@ from typing import List
 
 import nox
 
-from exasol_integration_test_docker_environment.cli.options.test_environment_options import LATEST_DB_VERSION
-
 ROOT = Path(__file__).parent
 LOCAL_DOC = ROOT / "doc"
 
@@ -138,6 +136,16 @@ def run_tests(session: nox.Session, db_version: str):
         env = {"EXASOL_VERSION": db_version}
         if session.posargs:
             for test in session.posargs:
-                session.run(f"python3 -u ./exasol_integration_test_docker_environment/test/{test}", env=env)
+                session.run(
+                    "python3",
+                    "-u",
+                    f"./exasol_integration_test_docker_environment/test/{test}",
+                    env=env
+                )
         else:
-            session.run("python3 -u -m unittest discover ./exasol_integration_test_docker_environment/test", env=env)
+            session.run("python3",
+                        "-u",
+                        "-m",
+                        "unittest",
+                        "discover",
+                        "./exasol_integration_test_docker_environment/test", env=env)
