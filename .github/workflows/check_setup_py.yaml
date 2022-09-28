@@ -5,7 +5,7 @@ on: [push, pull_request]
 jobs:
   check_setup_py:
 
-    name: Check setup for Python ${{ matrix.python-version }}
+    name: Check setup
     runs-on: ubuntu-latest
 
     steps:
