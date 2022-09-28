@@ -51,12 +51,11 @@ def commit_pages_main(session: nox.Session):
     """
     with session.chdir(ROOT):
         session.run("sgpg",
-                    "--target_branch", "github-pages/main",
-                    "--push_origin", "origin",
+                    "--target-branch", "github-pages/main",
+                    "--push-origin", "origin",
                     "--commit",
-                    "--source_branch", "main",
-                    "--module_path", "${StringArray[@]}",
-                    env={"StringArray": ("../integration-test-docker-environment")})
+                    "--source-branch", "main",
+                    "--module-path", "../integration-test-docker-environment")
 
 
 @nox.session(name="commit-pages-current", python=False)
@@ -68,11 +67,10 @@ def commit_pages_current(session: nox.Session):
     branch = session.run("git", "branch", "--show-current", silent=True)
     with session.chdir(ROOT):
         session.run("sgpg",
-                    "--target_branch", "github-pages/" + branch[:-1],
-                    "--push_origin", "origin",
+                    "--target-branch", "github-pages/" + branch[:-1],
+                    "--push-origin", "origin",
                     "--commit",
-                    "--module_path", "${StringArray[@]}",
-                    env={"StringArray": ("../integration-test-docker-environment")})
+                    "--module-path", "../integration-test-docker-environment")
 
 
 @nox.session(name="push-pages-main", python=False)
@@ -83,11 +81,10 @@ def push_pages_main(session: nox.Session):
     """
     with session.chdir(ROOT):
         session.run("sgpg",
-                    "--target_branch", "github-pages/main",
+                    "--target-branch", "github-pages/main",
                     "--push",
-                    "--source_branch", "main",
-                    "--module_path", "${StringArray[@]}",
-                    env={"StringArray": ("../integration-test-docker-environment")})
+                    "--source-branch", "main",
+                    "--module-path", "../integration-test-docker-environment")
 
 
 @nox.session(name="push-pages-current", python=False)
@@ -101,8 +98,7 @@ def push_pages_current(session: nox.Session):
         session.run("sgpg",
                     "--target-branch", "github-pages/" + branch[:-1],
                     "--push",
-                    "--module-path", "${StringArray[@]}",
-                    env={"StringArray": ("../integration-test-docker-environment")})
+                    "--module-path", "../integration-test-docker-environment")
 
 
 @nox.session(name="push-pages-release", python=False)
@@ -113,13 +109,12 @@ def push_pages_release(session: nox.Session):
     tag = tags.split("\n")[-2]
     with session.chdir(ROOT):
         session.run("sgpg",
-                    "--target_branch", "github-pages/main",
-                    "--push_origin", "origin",
+                    "--target-branch", "github-pages/main",
+                    "--push-origin", "origin",
                     "--push",
-                    "--source_branch", tag,
-                    "--source_origin", "tags",
-                    "--module_path", "${StringArray[@]}",
-                    env={"StringArray": ("../integration-test-docker-environment")})
+                    "--source-branch", tag,
+                    "--source-origin", "tags",
+                    "--module-path", "../integration-test-docker-environment")
 
 
 def get_db_versions() -> List[str]:
