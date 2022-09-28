@@ -8,12 +8,8 @@ Exasol Docker-DB container, but the API Layer has extended functionality
 and also can start an associated test container for whose content the
 client is responsible.
 
+Documentation
+-------------
 
-Table of Contents
-=================
-
-Information for Users
----------------------
-
-* `User Guide <doc/user_guide/user_guide.md>`_
-* `Changelog <doc/changes/changelog.md>`_
+`Documentation for the current main branch <https://exasol.github.io/integration-test-docker-environment/main>`_ is hosted on the Github Pages of this project.
+`Here <https://exasol.github.io/integration-test-docker-environment>`_  is a list of documentations for previous releases.

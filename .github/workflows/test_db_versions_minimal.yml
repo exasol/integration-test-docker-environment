@@ -9,18 +9,7 @@ on:
 
 jobs:
   get_exasol_versions:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Install jq
-        run: sudo apt-get install jq
-      - name: Print matrix
-        run: bash ./scripts/test/get_exasol_versions.sh
-      - id: set-matrix
-        run: |
-          echo "::set-output name=matrix::$(bash ./scripts/test/get_exasol_versions.sh)"
-    outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    uses: ./.github/workflows/get_exasol_versions.yml
 
   test-db-versions-minimal:
     needs: get_exasol_versions
@@ -33,20 +22,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Setup Python 3.8 for integration-test-docker-environment
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
-    - name: Install Poetry
-      uses: abatilo/actions-poetry@v2
-      with:
-        poetry-version: 1.2.0
+    - uses: ./.github/actions/prepare_poetry_env
 
     - name: Run minimal tests
-      run: |
-          ./scripts/test/run_test.sh exasol_integration_test_docker_environment/test/test_api_test_environment.py
-          ./scripts/test/run_test.sh exasol_integration_test_docker_environment/test/test_cli_test_environment.py
-          ./scripts/test/run_test.sh exasol_integration_test_docker_environment/test/test_doctor.py
-          ./scripts/test/run_test.sh exasol_integration_test_docker_environment/test/test_termination_handler.py
-      env:
-        EXASOL_VERSION: "${{ matrix.exasol_version }}"
+      run: poetry run nox -s "run-minimal-tests(db_version='${{ matrix.exasol_version }}')"

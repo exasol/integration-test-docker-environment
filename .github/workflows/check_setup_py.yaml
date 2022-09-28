@@ -4,21 +4,13 @@ on: [push, pull_request]
 
 jobs:
   check_setup_py:
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: [3.8]
-    name: Check setup for Python ${{ matrix.python-version }}
+
+    name: Check setup
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v3
-    - uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - uses: abatilo/actions-poetry@v2
-      with:
-        poetry-version: 1.2.0
+    - uses: ./.github/actions/prepare_poetry_env
     - name: Run packaging update
       run: bash githooks/update_packaging.sh
     - name: Show changes on working copy

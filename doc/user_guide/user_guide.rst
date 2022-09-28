@@ -1,4 +1,4 @@
-Integration Test Docker Environment
+User Guide
 ===================================
 
 About
@@ -302,3 +302,6 @@ It is important, that the repository gets cloned to the Mac OS X host
 and not to a docker container, because the python scripts tries to start
 further docker container which use host mounts to share the tests
 directory of the test environment with the docker container.
+
+.. toctree::
+   :maxdepth: 1
