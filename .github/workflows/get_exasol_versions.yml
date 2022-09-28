@@ -1,5 +1,9 @@
 on:
   workflow_call:
+    outputs:
+      matrix:
+        description: "The list of known db versions"
+        value: ${{ jobs.get_exasol_versions.outputs.matrix }}
 jobs:
   get_exasol_versions:
     runs-on: ubuntu-latest
