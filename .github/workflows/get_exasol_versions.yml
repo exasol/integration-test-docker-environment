@@ -1,0 +1,15 @@
+on:
+  workflow_call:
+jobs:
+  get_exasol_versions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/prepare_poetry_env
+      - name: Print matrix
+        run: poetry run nox --non-interactive -s "get-all-db-versions"
+      - id: set-matrix
+        run: |
+          echo "::set-output name=matrix::$(poetry run nox --non-interactive -s 'get-all-db-versions')"
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}

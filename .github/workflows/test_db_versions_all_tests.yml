@@ -8,18 +8,7 @@ on:
 
 jobs:
   get_exasol_versions:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Install jq
-        run: sudo apt-get install jq
-      - name: Print matrix
-        run: bash ./scripts/test/get_exasol_versions.sh
-      - id: set-matrix
-        run: |
-          echo "::set-output name=matrix::$(bash ./scripts/test/get_exasol_versions.sh)"
-    outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    uses: ./github/workflows/get_exasol_versions.yml
 
   test-db-versions-all-tests:
     needs: get_exasol_versions

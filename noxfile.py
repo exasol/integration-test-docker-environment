@@ -1,3 +1,4 @@
+import json
 import webbrowser
 from pathlib import Path
 from typing import List
@@ -125,6 +126,7 @@ def get_db_versions() -> List[str]:
     template_path = ROOT / "docker_db_config_template"
     db_versions = [str(path.name) for path in template_path.iterdir() if path.is_dir()]
     db_versions.append("default")
+    db_versions.append("7.1.0-d1")
     return db_versions
 
 
@@ -157,3 +159,9 @@ def run_minimal_tests(session: nox.Session, db_version: str):
                 f"./exasol_integration_test_docker_environment/test/{test}",
                 env=env
             )
+
+
+@nox.session(name="get-all-db-versions", python=False)
+def get_all_db_versions(session: nox.Session):
+    """Returns all, known, db-versions as JSON string"""
+    print(json.dumps(get_db_versions()))
