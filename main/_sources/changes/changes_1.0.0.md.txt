@@ -1,10 +1,10 @@
-# Integration-Test-Docker-Environment 0.12.0, released TBD
+# Integration-Test-Docker-Environment 1.0.0, released 2022-09-28
 
-Code name: TBD
+Code name: API, Test-Container injection and Sphinx Documentation
 
 ## Summary
-TBD
-
+This release supports the injection of an externally defined test-container. Also, it provides a public API which enables clients to spawn the environment using pure Python functions. The generation of Sphinx documentation was added. 
+Support of new docker db version was added. Finally, there were several minor bugfixes.
 
 ### Supported Exasol Versions
 
