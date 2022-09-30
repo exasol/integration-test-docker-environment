@@ -1,16 +1,9 @@
-import time
-from datetime import datetime, timedelta
-
 import luigi
-from docker.models.containers import Container
 
 from exasol_integration_test_docker_environment.lib.base.docker_base_task import DockerBaseTask
 from exasol_integration_test_docker_environment.lib.base.json_pickle_parameter import JsonPickleParameter
-from exasol_integration_test_docker_environment.lib.data.container_info import ContainerInfo
 from exasol_integration_test_docker_environment.lib.data.database_credentials import DatabaseCredentialsParameter
 from exasol_integration_test_docker_environment.lib.data.database_info import DatabaseInfo
-from exasol_integration_test_docker_environment.lib.test_environment.database_waiters.is_database_ready_thread import \
-    IsDatabaseReadyThread
 
 
 class WaitForTestExternalDatabase(DockerBaseTask,
@@ -21,58 +14,7 @@ class WaitForTestExternalDatabase(DockerBaseTask,
     attempt = luigi.IntParameter(1)
 
     def run_task(self):
-        with self._get_docker_client() as docker_client:
-            db_container_name = self.database_info.container_info.container_name
-            is_database_ready = self.wait_for_database_startup(db_container_name)
-            self.return_object(is_database_ready)
-
-    def wait_for_database_startup(self, db_container: Container):
-        is_database_ready_thread = self.start_wait_threads(db_container)
-        is_database_ready = self.wait_for_threads(is_database_ready_thread)
-        self.join_threads(is_database_ready_thread)
-        return is_database_ready
-
-    def start_wait_threads(self, db_container):
-        is_database_ready_thread = IsDatabaseReadyThread(self.logger,
-                                                         self.database_info,
-                                                         self.get_database_credentials(),
-                                                         db_container)
-        is_database_ready_thread.start()
-        return is_database_ready_thread
-
-    def join_threads(self, is_database_ready_thread: IsDatabaseReadyThread):
-        is_database_ready_thread.stop()
-        is_database_ready_thread.join()
-
-    def wait_for_threads(self, is_database_ready_thread: IsDatabaseReadyThread):
-        is_database_ready = False
-        reason = None
-        start_time = datetime.now()
-        while (True):
-            if is_database_ready_thread.finish:
-                is_database_ready = True
-                break
-            if self.timeout_occured(start_time):
-                reason = f"timeout after after {self.db_startup_timeout_in_seconds} seconds"
-                is_database_ready = False
-                break
-            time.sleep(1)
-        if not is_database_ready:
-            self.log_database_not_ready(is_database_ready_thread, reason)
-        is_database_ready_thread.stop()
-        return is_database_ready
-
-    def log_database_not_ready(self, is_database_ready_thread, reason):
-        log_information = f"""
-========== IsDatabaseReadyThread output db connection: ============
-{is_database_ready_thread.output_db_connection}
-========== IsDatabaseReadyThread output bucketfs connection: ============
-{is_database_ready_thread.output_bucketfs_connection}
-"""
-        self.logger.warning(
-            'Database startup failed for following reason "%s", here some debug information \n%s',
-            reason, log_information)
-
-    def timeout_occured(self, start_time):
-        timeout = timedelta(seconds=self.db_startup_timeout_in_seconds)
-        return datetime.now() - start_time > timeout
+        # Since we can't assume that the test container exists, we cannot connect easily here
+        # to the external database (correct way would be by using an SQL client).
+        # For now, we simply assume that the external database is already ready and return just True.
+        self.return_object(True)
