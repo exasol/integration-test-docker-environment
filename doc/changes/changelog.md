@@ -21,6 +21,7 @@
 ---
 hidden:
 ---
+changes_1.1.0
 changes_1.0.0
 changes_0.11.0
 changes_0.10.0
