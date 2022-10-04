@@ -1,0 +1,29 @@
+exasol\_integration\_test\_docker\_environment.lib.base.dependency\_logger\_base\_task
+======================================================================================
+
+.. automodule:: exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      DependencyLoggerBaseTask
+   
+   
+
+   
+   
+   
+
+
+
