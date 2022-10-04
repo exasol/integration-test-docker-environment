@@ -30,7 +30,9 @@ class SpawnTestEnvironmentWithExternalDB(AbstractSpawnTestEnvironment,
                 reuse=self.reuse_test_container,
                 attempt=attempt,
                 test_container_name=self.test_container_name,
-                network_name=self.network_name
+                network_name=self.network_name,
+                no_cleanup_after_success=self.reuse_test_container,
+                no_cleanup_after_failure=self.reuse_test_container
             )
 
     def create_spawn_database_task(self, network_info: DockerNetworkInfo,

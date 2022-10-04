@@ -166,7 +166,7 @@ Sphinx = "^4.5"
 type = "git"
 url = "https://github.com/exasol/sphinx-github-pages-generator.git"
 reference = "HEAD"
-resolved_reference = "8140484ecb999f5af023b84f2ade3db2ed9722ce"
+resolved_reference = "16143e6acac138875730eb4a478cbca663bf6b48"
 
 [[package]]
 name = "filelock"
