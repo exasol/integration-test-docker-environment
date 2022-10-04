@@ -1,4 +1,4 @@
-# Integration-Test-Docker-Environment 1.1.0, released t.b.d.
+# Integration-Test-Docker-Environment 1.1.0, released 2022-10-03
 
 Code name: Bugfix for test environment with external db
 
