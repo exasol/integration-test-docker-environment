@@ -34,8 +34,8 @@ n/a
 ## Security:
 
 - Evaluated CVE-2022-42969
-    - CVE will be silienced
-    - The affected code is not used used by our project itself, nor by the dependencies pulling in the vulnerable
+    - CVE will be silenced
+    - The affected code is not used by our project itself, nor by the dependencies pulling in the vulnerable
       library.
       Checked dependencies:
         * Nox (Code search)
