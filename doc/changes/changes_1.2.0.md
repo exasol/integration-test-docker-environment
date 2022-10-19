@@ -1,4 +1,4 @@
-# Integration-Test-Docker-Environment 1.X.Y, released TBD
+# Integration-Test-Docker-Environment 1.2.0, released TBD
 
 ## Summary
 
