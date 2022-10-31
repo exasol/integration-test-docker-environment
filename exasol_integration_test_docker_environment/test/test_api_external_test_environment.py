@@ -42,7 +42,8 @@ class APISpawnTestExternalEnvironmentTest(unittest.TestCase):
                                        no_test_container_cleanup_after_success=True,
                                        no_test_container_cleanup_after_failure=False,
                                        reuse_test_container=True,
-                                       test_container_content=get_test_container_content())
+                                       test_container_content=get_test_container_content(),
+                                       additional_db_parameter=tuple())
         cls.ext_environment_info: EnvironmentInfo = run_task(task_creator, 1, None)
 
     @classmethod

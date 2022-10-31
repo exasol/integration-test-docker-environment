@@ -8,7 +8,7 @@ import netaddr
 import pkg_resources
 from docker.models.containers import Container
 from docker.models.volumes import Volume
-from jinja2 import Template, StrictUndefined
+from jinja2 import Template
 
 from exasol_integration_test_docker_environment.lib import PACKAGE_NAME
 from exasol_integration_test_docker_environment.lib.base.docker_base_task import DockerBaseTask

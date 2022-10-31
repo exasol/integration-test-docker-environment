@@ -41,6 +41,7 @@ def spawn_test_environment_with_test_container(
         docker_db_image_version: str = LATEST_DB_VERSION,
         docker_db_image_name: str = "exasol/docker-db",
         create_certificates: bool = False,
+        additional_db_parameter: Tuple[str, ...] = tuple(),
         source_docker_repository_name: str = DEFAULT_DOCKER_REPOSITORY_NAME,
         source_docker_tag_prefix: str = '',
         source_docker_username: Optional[str] = None,
@@ -100,7 +101,8 @@ def spawn_test_environment_with_test_container(
                                               no_database_cleanup_after_success=True,
                                               no_database_cleanup_after_failure=False,
                                               create_certificates=create_certificates,
-                                              test_container_content=test_container_content
+                                              test_container_content=test_container_content,
+                                              additional_db_parameter=additional_db_parameter
                                               )
     environment_info = run_task(task_creator, workers, task_dependencies_dot_file)
     return environment_info, functools.partial(_cleanup, environment_info)
