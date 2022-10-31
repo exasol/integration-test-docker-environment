@@ -20,7 +20,9 @@ docker_db_options = [
                  show_default=True,
                  help="""Docker DB Image Name against which the tests should run."""),
     click.option('--create-certificates/--no-create-certificates', default=False,
-                 help="""Creates and injects SSL certificates to the Docker DB container.""")
+                 help="""Creates and injects SSL certificates to the Docker DB container."""),
+    click.option('--additional-db-parameter', type=str, multiple=True,
+                 help="""Additional parameters for the database instance which be injected to Exaconf""")
 ]
 
 external_db_options = [

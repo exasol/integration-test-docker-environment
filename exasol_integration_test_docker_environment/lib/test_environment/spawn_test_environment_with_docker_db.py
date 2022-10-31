@@ -74,7 +74,8 @@ class SpawnTestEnvironmentWithDockerDB(
                 network_info=network_info,
                 certificate_volume_name=certificate_volume_name,
                 ip_address_index_in_subnet=0,
-                attempt=attempt
+                attempt=attempt,
+                additional_db_parameter=self.additional_db_parameter
             )
 
     def create_wait_for_database_task(self,

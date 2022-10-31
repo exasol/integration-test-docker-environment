@@ -16,3 +16,4 @@ class GeneralSpawnTestEnvironmentParameter(Config):
     docker_runtime = luigi.OptionalParameter(None, significant=False)
     create_certificates = luigi.BoolParameter()
     test_container_content = JsonPickleParameter(TestContainerContentDescription, is_optional=True)
+    additional_db_parameter = luigi.ListParameter()

@@ -8,7 +8,7 @@ import netaddr
 import pkg_resources
 from docker.models.containers import Container
 from docker.models.volumes import Volume
-from jinja2 import Template
+from jinja2 import Template, StrictUndefined
 
 from exasol_integration_test_docker_environment.lib import PACKAGE_NAME
 from exasol_integration_test_docker_environment.lib.base.docker_base_task import DockerBaseTask
@@ -38,6 +38,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
     ip_address_index_in_subnet = luigi.IntParameter(significant=False)  # type: int
     docker_runtime = luigi.OptionalParameter(None, significant=False)  # type: str
     certificate_volume_name = luigi.OptionalParameter(None, significant=False)
+    additional_db_parameter = luigi.ListParameter()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -236,13 +237,15 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             PACKAGE_NAME,
             f"{self.docker_db_config_resource_name}/EXAConf") # type: bytes
         template = Template(template_str.decode("utf-8"))
+        additional_db_parameter_str = " ".join([f"-{p}" for p in self.additional_db_parameter])
         rendered_template = template.render(private_network=db_private_network,
                                             db_version=str(self.db_version),
                                             image_version=self.docker_db_image_version,
                                             mem_size=self.mem_size,
                                             disk_size=self.disk_size,
                                             name_servers=",".join(self.nameservers),
-                                            certificate_dir=certificate_dir)
+                                            certificate_dir=certificate_dir,
+                                            additional_db_parameter=additional_db_parameter_str)
         copy.add_string_to_file("EXAConf", rendered_template)
 
     def _execute_init_db(self, db_volume: Volume, volume_preperation_container: Container):
