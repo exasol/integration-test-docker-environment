@@ -21,7 +21,7 @@ n/a
 
 ## Features / Enhancements:
 
-n/a
+ - #270: Added support for additional db parameters
 
 ## Refactoring:
 
