@@ -4,7 +4,7 @@ from exasol_integration_test_docker_environment.lib.docker import ContextDockerC
 from exasol_integration_test_docker_environment.testing import utils
 from exasol_integration_test_docker_environment.testing.exaslct_test_environment import ExaslctTestEnvironment
 
-ADDITIONAL_DB_PARAMS = ["disableIndexIteratorScan=1", "disableIndexIteratorScan=1"]
+ADDITIONAL_DB_PARAMS = ["-disableIndexIteratorScan=1", "-disableIndexIteratorScan=1"]
 
 
 class DockerTestEnvironmentAdditionParamsTest(unittest.TestCase):

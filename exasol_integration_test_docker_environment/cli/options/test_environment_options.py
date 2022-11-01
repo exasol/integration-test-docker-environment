@@ -22,7 +22,7 @@ docker_db_options = [
     click.option('--create-certificates/--no-create-certificates', default=False,
                  help="""Creates and injects SSL certificates to the Docker DB container."""),
     click.option('--additional-db-parameter', '-a', type=str, multiple=True,
-                 help="""Additional database parameter which will be injected to EXAConf. Value should have format 'param=value'.""")
+                 help="""Additional database parameter which will be injected to EXAConf. Value should have format '-param=value'.""")
 ]
 
 external_db_options = [

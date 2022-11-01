@@ -237,7 +237,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             PACKAGE_NAME,
             f"{self.docker_db_config_resource_name}/EXAConf") # type: bytes
         template = Template(template_str.decode("utf-8"))
-        additional_db_parameter_str = " ".join([f"-{p}" for p in self.additional_db_parameter])
+        additional_db_parameter_str = " ".join(self.additional_db_parameter)
         rendered_template = template.render(private_network=db_private_network,
                                             db_version=str(self.db_version),
                                             image_version=self.docker_db_image_version,
