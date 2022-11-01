@@ -1,13 +1,13 @@
-# Integration-Test-Docker-Environment 1.2.0, released TBD
+# Integration-Test-Docker-Environment 1.2.0, released 2022-11-03
 
 ## Summary
 
-TBD
+This release supports a new option which allows the injection of custom parameters to the database and also supports docker db version 7.1.15.
 
 ### Supported Exasol Versions
 
 * **7.0**: up to 7.0.20, **except 7.0.5**
-* **7.1**: up to 7.1.14
+* **7.1**: up to 7.1.15
 
 If you need further versions, please open an issue.
 
@@ -22,6 +22,7 @@ n/a
 ## Features / Enhancements:
 
  - #270: Added support for additional db parameters
+ - #272: Added Docker-DB 7.1.15 and prepare release
 
 ## Refactoring:
 

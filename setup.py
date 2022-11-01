@@ -61,6 +61,7 @@ package_data = \
                                                 'docker_db_config/7.1.12/*',
                                                 'docker_db_config/7.1.13/*',
                                                 'docker_db_config/7.1.14/*',
+                                                'docker_db_config/7.1.15/*',
                                                 'docker_db_config/7.1.2/*',
                                                 'docker_db_config/7.1.3/*',
                                                 'docker_db_config/7.1.4/*',
