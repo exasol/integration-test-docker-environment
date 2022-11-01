@@ -29,11 +29,12 @@ def spawn_test_environment(
         bucketfs_port_forward: Optional[int] = None,
         db_mem_size: str = "2 GiB",
         db_disk_size: str = "2 GiB",
-        nameserver: Tuple[str,...] = tuple(),
+        nameserver: Tuple[str, ...] = tuple(),
         docker_runtime: Optional[str] = None,
         docker_db_image_version: str = LATEST_DB_VERSION,
         docker_db_image_name: str = "exasol/docker-db",
         create_certificates: bool = False,
+        additional_db_parameter: Tuple[str, ...] = tuple(),
         source_docker_repository_name: str = DEFAULT_DOCKER_REPOSITORY_NAME,
         source_docker_tag_prefix: str = '',
         source_docker_username: Optional[str] = None,
@@ -92,7 +93,8 @@ def spawn_test_environment(
                                               no_database_cleanup_after_success=True,
                                               no_database_cleanup_after_failure=False,
                                               create_certificates=create_certificates,
-                                              test_container_content=None
+                                              test_container_content=None,
+                                              additional_db_parameter=additional_db_parameter
                                               )
     environment_info = run_task(task_creator, workers, task_dependencies_dot_file)
     return environment_info, functools.partial(_cleanup, environment_info)

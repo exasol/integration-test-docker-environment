@@ -146,6 +146,10 @@
     EnableAuditing = True
     BuiltinScriptLanguageName = ScriptLanguages-release-standard-exasol-7.1.0-1.1.0
     AutoStart = True
+    # Additional db parameters
+    {% if additional_db_parameters %}
+    Params = {{ additional_db_parameters }}
+    {% endif %}
     # JDBC driver configuration
     [[JDBC]]
         # BucketFS that contains the JDBC driver

@@ -129,6 +129,10 @@
     NumActiveNodes = 1
     # Name of the data volume to be used by this database.
     DataVolume = DataVolume1
+    # Additional db parameters
+    {% if additional_db_parameters %}
+    Params = {{ additional_db_parameters }}
+    {% endif %}
     # JDBC driver configuration
     [[JDBC]]
         # BucketFS that contains the JDBC driver
