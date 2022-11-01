@@ -21,7 +21,7 @@ docker_db_options = [
                  help="""Docker DB Image Name against which the tests should run."""),
     click.option('--create-certificates/--no-create-certificates', default=False,
                  help="""Creates and injects SSL certificates to the Docker DB container."""),
-    click.option('--additional-db-parameter', '-a', type=str, multiple=True,
+    click.option('--additional-db-parameter', '-p', type=str, multiple=True,
                  help="""Additional database parameter which will be injected to EXAConf. Value should have format '-param=value'.""")
 ]
 
