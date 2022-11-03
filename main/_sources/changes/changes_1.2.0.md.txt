@@ -1,5 +1,7 @@
 # Integration-Test-Docker-Environment 1.2.0, released 2022-11-03
 
+Code name: DB Parameter injection
+
 ## Summary
 
 This release supports a new option which allows the injection of custom parameters to the database and also supports docker db version 7.1.15.
