@@ -74,8 +74,7 @@ package_data = \
 
 install_requires = \
 ['click>=7.0',
- 'exasol-bucketfs-utils-python @ '
- 'https://github.com/exasol/bucketfs-utils-python/releases/download/0.3.0/exasol_bucketfs_utils_python-0.3.0-py3-none-any.whl',
+ 'exasol-bucketfs>=0.6.0,<0.7.0',
  'gitpython>=2.1.0',
  'humanfriendly>=4.18',
  'importlib_resources>=5.4.0',
