@@ -97,8 +97,7 @@ trap 'rm -f -- "$tmpfile_env"' INT TERM HUP EXIT
 
 create_env_file_debug_protected "$tmpfile_env"
 
-# Ignore shellcheck rule as we need to split elements of array by space (they are in form "-v %MOUNT_POINT")
-# shellcheck disable=SC2068
-echo docker run --network host --env-file "$tmpfile_env" --rm $terminal_parameter -v "$PWD:$PWD" -v "$DOCKER_SOCKET_MOUNT" -w "$PWD" ${mount_point_parameter[@]} "$RUNNER_IMAGE_NAME" bash -c "$RUN_COMMAND"
+# Ignore shellcheck rule as we need to split elements of array by space (they are in form "-v %MOUNT_POINT"), further we want $terminal_parameter as is
+# shellcheck disable=SC2068,SC2086
 docker run --network host --env-file "$tmpfile_env" --rm $terminal_parameter -v "$PWD:$PWD" -v "$DOCKER_SOCKET_MOUNT" -w "$PWD" ${mount_point_parameter[@]} "$RUNNER_IMAGE_NAME" bash -c "$RUN_COMMAND"
 
