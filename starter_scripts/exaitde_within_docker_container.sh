@@ -101,4 +101,3 @@ create_env_file_debug_protected "$tmpfile_env"
 # shellcheck disable=SC2068
 docker run --network host --env-file "$tmpfile_env" --rm "$terminal_parameter" -v "$PWD:$PWD" -v "$DOCKER_SOCKET_MOUNT" -w "$PWD" ${mount_point_parameter[@]} "$RUNNER_IMAGE_NAME" bash -c "$RUN_COMMAND"
 
-
