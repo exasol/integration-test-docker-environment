@@ -91,6 +91,10 @@ install_requires = \
 extras_require = \
 {':sys_platform != "win32"': ['docker>=4.0.0']}
 
+entry_points = \
+{'console_scripts': ['itde = '
+                     'exasol_integration_test_docker_environment.main:main']}
+
 setup_kwargs = {
     'name': 'exasol-integration-test-docker-environment',
     'version': '1.2.1',
@@ -105,6 +109,7 @@ setup_kwargs = {
     'package_data': package_data,
     'install_requires': install_requires,
     'extras_require': extras_require,
+    'entry_points': entry_points,
     'python_requires': '>=3.8,<4',
 }
 
