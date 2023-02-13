@@ -26,6 +26,8 @@ n/a
 ## Refactoring:
 
 - Removed docker health checks from ITDE starter script
+- Fixed broken/outdated import path
+- Added itde cli entry point to project configuration
 
 ## Documentation:
 
