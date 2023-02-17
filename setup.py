@@ -62,6 +62,8 @@ package_data = \
                                                 'docker_db_config/7.1.13/*',
                                                 'docker_db_config/7.1.14/*',
                                                 'docker_db_config/7.1.15/*',
+                                                'docker_db_config/7.1.16/*',
+                                                'docker_db_config/7.1.17/*',
                                                 'docker_db_config/7.1.2/*',
                                                 'docker_db_config/7.1.3/*',
                                                 'docker_db_config/7.1.4/*',
@@ -97,7 +99,7 @@ entry_points = \
 
 setup_kwargs = {
     'name': 'exasol-integration-test-docker-environment',
-    'version': '1.2.1',
+    'version': '1.3.0',
     'description': 'Integration Test Docker Environment for Exasol',
     'long_description': 'Integration Test Docker Environment\n===================================\n\nThis project provides a command line interface and a Python API layer to\nstart a test environment with an `Exasol\nDocker-DB <https://hub.docker.com/r/exasol/docker-db>`_. Both start an\nExasol Docker-DB container, but the API Layer has extended functionality\nand also can start an associated test container for whose content the\nclient is responsible.\n\nDocumentation\n-------------\n\n`Documentation for the current main branch <https://exasol.github.io/integration-test-docker-environment/main>`_ is hosted on the Github Pages of this project.\n`Here <https://exasol.github.io/integration-test-docker-environment>`_  is a list of documentations for previous releases.\n',
     'author': 'Torsten Kilias',
