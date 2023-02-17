@@ -2,7 +2,7 @@
 
 ## Summary
 
-In version 1.3.0 we added new supported versions up to 7.0.20 and 7.1.17 respectively.
+In version 1.3.0 of the ITDE we added new supported versions up to 7.0.20 and 7.1.17 respectively.
 
 ### Supported Exasol Versions
 
