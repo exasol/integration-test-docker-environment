@@ -1,8 +1,8 @@
-# Integration-Test-Docker-Environment 1.3.0, released \<TBD\>
+# Integration-Test-Docker-Environment 1.3.0, released 2023-02-17
 
 ## Summary
 
-TBD
+In version 1.3.0 of the ITDE we added new supported versions up to 7.0.20 and 7.1.17 respectively.
 
 ### Supported Exasol Versions
 
@@ -15,24 +15,8 @@ If you need further versions, please open an issue.
 
 - Docker Default Runtime
 
-## Bug Fixes:
-
-n/a
-
-## Features / Enhancements:
-
-n/a
-
 ## Refactoring:
 
 - Removed docker health checks from ITDE starter script
 - Fixed broken/outdated import path
 - Added itde cli entry point to project configuration
-
-## Documentation:
-
-n/a
-
-## Security:
-
-n/a
