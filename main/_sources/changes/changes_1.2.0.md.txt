@@ -4,7 +4,7 @@ Code name: DB Parameter injection
 
 ## Summary
 
-This release supports a new option which allows the injection of custom parameters to the database and also supports docker db version 7.1.15.
+This release supports a new option which allows the injection of custom parameters to the database and also supports `docker-db` version 7.1.17.
 
 ### Supported Exasol Versions
 
@@ -25,6 +25,7 @@ n/a
 
  - #270: Added support for additional db parameters
  - #272: Added Docker-DB 7.1.15 and prepare release
+ - #281: Added Docker-DB 7.1.16, 7.1.17
 
 ## Refactoring:
 

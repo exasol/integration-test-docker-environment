@@ -130,7 +130,7 @@ The following options are available to customize the test environment.
                                      containers
 
      --docker-db-image-version TEXT  Docker DB Image Version against which the
-                                     tests should run.  [default: 7.1.15]
+                                     tests should run.  [default: 7.1.17]
 
      --docker-db-image-name TEXT     Docker DB Image Name against which the tests
                                      should run.  [default: exasol/docker-db]
