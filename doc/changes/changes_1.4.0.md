@@ -13,4 +13,4 @@ If you need further versions, please open an issue.
 
 
 ## Internal
-- Added support for automated releases to GitHub & PYPI
+- Added support for automated releases to GitHub & PYPI #51
