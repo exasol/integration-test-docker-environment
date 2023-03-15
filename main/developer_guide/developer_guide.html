@@ -134,7 +134,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -407,6 +407,7 @@
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../changes/changelog.html">Changes</a><input class="toctree-checkbox" id="toctree-checkbox-32" name="toctree-checkbox-32" role="switch" type="checkbox"/><label for="toctree-checkbox-32"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../changes/changes_1.4.0.html">Integration-Test-Docker-Environment 1.4.0, released 2023-03-15</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../changes/changes_1.3.0.html">Integration-Test-Docker-Environment 1.3.0, released 2023-02-17</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../changes/changes_1.2.0.html">Integration-Test-Docker-Environment 1.2.0, released 2022-11-03</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../changes/changes_1.1.0.html">Integration-Test-Docker-Environment 1.1.0, released 2022-10-04</a></li>
@@ -454,7 +455,7 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
@@ -469,6 +470,84 @@
 <p><code class="docutils literal notranslate"><span class="pre">githooks/install.sh</span></code></p>
 <div class="toctree-wrapper compound">
 </div>
+<section id="creating-a-release">
+<h2>Creating a Release<a class="headerlink" href="#creating-a-release" title="Permalink to this headline">#</a></h2>
+<section id="prerequisites">
+<h3>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">#</a></h3>
+<ul>
+<li><p>Change log needs to be up to date</p></li>
+<li><p>Latest change log version needs to match project and package version</p></li>
+<li><p>Release tag needs to match package, changelog and project version</p>
+<dl class="simple">
+<dt>For Example:</dt><dd><ul class="simple">
+<li><p>Tag: 0.4.0</p></li>
+<li><p>Changelog: changes_0.4.0.md</p></li>
+<li><p>`poetry version -s`: 0.4.0</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</section>
+<section id="triggering-the-release">
+<h3>Triggering the Release<a class="headerlink" href="#triggering-the-release" title="Permalink to this headline">#</a></h3>
+<p>In order to trigger a release a new tag must be pushed to Github.
+For further details see: <cite>.github/workflows/release.yml</cite>.</p>
+<ol class="arabic">
+<li><p>Create a local tag with the appropriate version number</p>
+<blockquote>
+<div><div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>git tag x.y.z
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>Push the tag to Github</p>
+<blockquote>
+<div><div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>git push origin x.y.z
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ol>
+</section>
+<section id="what-to-do-if-the-release-failed">
+<h3>What to do if the release failed?<a class="headerlink" href="#what-to-do-if-the-release-failed" title="Permalink to this headline">#</a></h3>
+<section id="the-release-failed-during-pre-release-checks">
+<h4>The release failed during pre-release checks<a class="headerlink" href="#the-release-failed-during-pre-release-checks" title="Permalink to this headline">#</a></h4>
+<ol class="arabic">
+<li><p>Delete the local tag</p>
+<blockquote>
+<div><div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>git tag -d x.y.z
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>Delete the remote tag</p>
+<blockquote>
+<div><div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>git push --delete origin x.y.z
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>Fix the issue(s) which lead to the failing checks</p></li>
+<li><p>Start the release process from the beginning</p></li>
+</ol>
+</section>
+<section id="one-of-the-release-steps-failed-partial-release">
+<h4>One of the release steps failed (Partial Release)<a class="headerlink" href="#one-of-the-release-steps-failed-partial-release" title="Permalink to this headline">#</a></h4>
+<ol class="arabic simple">
+<li><p>Check the Github action/workflow to see which steps failed</p></li>
+<li><p>Finish or redo the failed release steps manually</p></li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Example</p>
+<p><strong>Scenario</strong>: Publishing of the release on Github was successfully but during the PyPi release, the upload step got interrupted.</p>
+<p><strong>Solution</strong>: Manually push the package to PyPi</p>
+</div>
+</section>
+</section>
+</section>
 </section>
 
         </article>
@@ -516,8 +595,36 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Developer Guide</a><ul>
+<li><a class="reference internal" href="#creating-a-release">Creating a Release</a><ul>
+<li><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li><a class="reference internal" href="#triggering-the-release">Triggering the Release</a></li>
+<li><a class="reference internal" href="#what-to-do-if-the-release-failed">What to do if the release failed?</a><ul>
+<li><a class="reference internal" href="#the-release-failed-during-pre-release-checks">The release failed during pre-release checks</a></li>
+<li><a class="reference internal" href="#one-of-the-release-steps-failed-partial-release">One of the release steps failed (Partial Release)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
