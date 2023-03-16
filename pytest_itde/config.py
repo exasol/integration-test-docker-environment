@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Generic, Optional, TypeVar
+from typing import Generic, List, Optional, TypeVar
 
 T = TypeVar("T")
 
@@ -50,10 +50,11 @@ class Exasol:
     port: int
     username: str
     password: str
-    schemas: str
 
 
 @dataclass
 class Itde:
     db: Exasol
     bucketfs: BucketFs
+    schemas: List[str]
+    bootstrap: bool

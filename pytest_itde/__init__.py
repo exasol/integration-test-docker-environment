@@ -16,25 +16,14 @@ EXASOL_OPTIONS = (
         default=9999,
         help_text="Port to connect to",
     ),
-    Option(
-        name="port",
-        prefix=EXASOL_PREFIX,
-        type=int,
-        default=9999,
-        help_text="Port to connect to",
-    ),
-    Option(
-        name="port",
-        prefix=EXASOL_PREFIX,
-        type=int,
-        default=9999,
-        help_text="Port to connect to",
-    ),
-    Option(
-        name="port",
-        prefix=EXASOL_PREFIX,
-        type=int,
-        default=9999,
-        help_text="Port to connect to",
-    ),
 )
+
+
+def pytest_addoption(parser):
+    group = parser.getgroup(EXASOL_PREFIX)
+    for option in EXASOL_OPTIONS:
+        group.addoption(
+            option.cli_name,
+            type=option.type,
+            help=option.help,
+        )
