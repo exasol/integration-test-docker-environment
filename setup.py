@@ -28,7 +28,8 @@ packages = \
  'exasol_integration_test_docker_environment.lib.test_environment.database_waiters',
  'exasol_integration_test_docker_environment.lib.test_environment.parameter',
  'exasol_integration_test_docker_environment.lib.utils',
- 'exasol_integration_test_docker_environment.testing']
+ 'exasol_integration_test_docker_environment.testing',
+ 'pytest_itde']
 
 package_data = \
 {'': ['*'],
@@ -95,7 +96,8 @@ extras_require = \
 
 entry_points = \
 {'console_scripts': ['itde = '
-                     'exasol_integration_test_docker_environment.main:main']}
+                     'exasol_integration_test_docker_environment.main:main'],
+ 'pytest11': ['prysk = pytest_itde']}
 
 setup_kwargs = {
     'name': 'exasol-integration-test-docker-environment',

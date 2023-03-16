@@ -1,5 +1,9 @@
 [tool.poetry]
 name = "exasol-integration-test-docker-environment"
+packages = [
+    { include = "exasol_integration_test_docker_environment" },
+    { include = "pytest_itde" }
+]
 version = "1.4.0"
 description = "Integration Test Docker Environment for Exasol"
 
@@ -15,7 +19,7 @@ repository = "https://github.com/exasol/integration-test-docker-environment"
 homepage = "https://github.com/exasol/integration-test-docker-environment"
 
 keywords = ['exasol', 'docker', 'testing']
-include = ["docker_db_config","ext"]
+include = ["docker_db_config", "ext"]
 exclude = ["exasol_integration_test_docker_environment/test"]
 
 [tool.poetry.dependencies]
@@ -23,7 +27,7 @@ python = ">=3.8,<4"
 click = ">=7.0"
 # The `sys_platform` marker makes sure the docker dependency is only installed on
 # non windows platforms.
-docker = {version = ">=4.0.0", markers = "sys_platform != 'win32'"}
+docker = { version = ">=4.0.0", markers = "sys_platform != 'win32'" }
 gitpython = ">=2.1.0"
 humanfriendly = ">=4.18"
 jinja2 = ">=2.10.1"
@@ -38,12 +42,17 @@ importlib_resources = ">=5.4.0" #Needed to copy resource files, can be removed a
 "stopwatch.py" = ">=1.0.0"
 exasol-bucketfs = "^0.6.0"
 
+[tool.poetry.plugins.pytest11]
+prysk = "pytest_itde"
 
-[tool.poetry.dev-dependencies]
+
+[tool.poetry.group.dev.dependencies]
 toml = ">=0.10.2"
 nox = "^2022.1.7"
-exasol-sphinx-github-pages-generator = {git = "https://github.com/exasol/sphinx-github-pages-generator.git"}
+pytest = "^7.2.2"
+exasol-sphinx-github-pages-generator = { git = "https://github.com/exasol/sphinx-github-pages-generator.git" }
 
 
 [tool.poetry.scripts]
 itde = 'exasol_integration_test_docker_environment.main:main'
+
