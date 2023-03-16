@@ -10,7 +10,7 @@ class Option(Generic[T]):
     prefix: str
     type: T
     default: Optional[T] = None
-    help: str = ""
+    help_text: str = ""
 
     @property
     def env_name(self):
@@ -29,6 +29,12 @@ class Option(Generic[T]):
             return name
 
         return f"--{normalize(self.prefix)}-{normalize(self.name)}"
+
+    @property
+    def help(self):
+        if not self.default:
+            return f"{self.help_text}."
+        return f"{self.help_text} (default: {self.default})."
 
 
 @dataclass
