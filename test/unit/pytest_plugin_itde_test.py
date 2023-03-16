@@ -32,6 +32,11 @@ def test_get_cli_argument_name_for_option(option, expected):
     assert option.cli_name == expected
 
 
+@pytest.mark.parametrize("option,expected", zip(OPTIONS, ("exasol_port", "exasol_url")))
+def test_get_pytest_option_name_for_option(option, expected):
+    assert option.pytest_name == expected
+
+
 def test_help_of_option_without_default_value():
     option = Option(
         name="port",

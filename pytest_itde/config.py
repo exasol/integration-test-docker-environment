@@ -31,6 +31,15 @@ class Option(Generic[T]):
         return f"--{normalize(self.prefix)}-{normalize(self.name)}"
 
     @property
+    def pytest_name(self):
+        def normalize(name):
+            name = name.replace("-", "_")
+            name = name.lower()
+            return name
+
+        return f"{normalize(self.prefix)}_{normalize(self.name)}"
+
+    @property
     def help(self):
         if not self.default:
             return f"{self.help_text}."
