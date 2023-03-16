@@ -97,7 +97,7 @@ extras_require = \
 entry_points = \
 {'console_scripts': ['itde = '
                      'exasol_integration_test_docker_environment.main:main'],
- 'pytest11': ['prysk = pytest_itde']}
+ 'pytest11': ['itde = pytest_itde']}
 
 setup_kwargs = {
     'name': 'exasol-integration-test-docker-environment',

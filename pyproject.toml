@@ -43,7 +43,7 @@ importlib_resources = ">=5.4.0" #Needed to copy resource files, can be removed a
 exasol-bucketfs = "^0.6.0"
 
 [tool.poetry.plugins.pytest11]
-prysk = "pytest_itde"
+itde = "pytest_itde"
 
 
 [tool.poetry.group.dev.dependencies]
