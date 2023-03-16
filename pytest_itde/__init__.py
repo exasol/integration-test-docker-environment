@@ -37,7 +37,7 @@ def pytest_addoption(parser):
     group = parser.getgroup(EXASOL_PREFIX)
     for option in EXASOL_OPTIONS:
         group.addoption(
-            option.cli_name,
+            option.cli,
             type=option.type,
             help=option.help,
         )

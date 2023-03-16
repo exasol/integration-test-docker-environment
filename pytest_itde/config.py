@@ -13,7 +13,9 @@ class Option(Generic[T]):
     help_text: str = ""
 
     @property
-    def env_name(self):
+    def env(self):
+        """Environment variable name"""
+
         def normalize(name):
             name = name.replace("-", "_")
             name = name.upper()
@@ -22,7 +24,9 @@ class Option(Generic[T]):
         return f"{normalize(self.prefix)}_{normalize(self.name)}"
 
     @property
-    def cli_name(self):
+    def cli(self):
+        """Cli argument name"""
+
         def normalize(name):
             name = name.replace("_", "-")
             name = name.lower()
@@ -31,7 +35,9 @@ class Option(Generic[T]):
         return f"--{normalize(self.prefix)}-{normalize(self.name)}"
 
     @property
-    def pytest_name(self):
+    def pytest(self):
+        """Pytest option name"""
+
         def normalize(name):
             name = name.replace("-", "_")
             name = name.lower()
@@ -41,6 +47,7 @@ class Option(Generic[T]):
 
     @property
     def help(self):
+        """Help text including information about default value."""
         if not self.default:
             return f"{self.help_text}."
         return f"{self.help_text} (default: {self.default})."

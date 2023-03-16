@@ -22,19 +22,19 @@ OPTIONS = (
 
 @pytest.mark.parametrize("option,expected", zip(OPTIONS, ("EXASOL_PORT", "EXASOL_URL")))
 def test_get_environment_variable_name_for_option(option, expected):
-    assert option.env_name == expected
+    assert option.env == expected
 
 
 @pytest.mark.parametrize(
     "option,expected", zip(OPTIONS, ("--exasol-port", "--exasol-url"))
 )
 def test_get_cli_argument_name_for_option(option, expected):
-    assert option.cli_name == expected
+    assert option.cli == expected
 
 
 @pytest.mark.parametrize("option,expected", zip(OPTIONS, ("exasol_port", "exasol_url")))
 def test_get_pytest_option_name_for_option(option, expected):
-    assert option.pytest_name == expected
+    assert option.pytest == expected
 
 
 def test_help_of_option_without_default_value():
