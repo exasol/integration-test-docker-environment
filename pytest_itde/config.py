@@ -53,11 +53,18 @@ class Option(Generic[T]):
         return f"{self.help_text} (default: {self.default})."
 
 
-@dataclass
-class BucketFs:
-    url: str
-    username: str
-    password: str
+class OptionGroup:
+    def __init__(self, prefix, options):
+        self._prefix = prefix
+        self._options = (Option(prefix=prefix, **kwargs) for kwargs in options)
+
+    @property
+    def prefix(self):
+        return self._prefix
+
+    @property
+    def options(self):
+        return self._options
 
 
 @dataclass
@@ -69,8 +76,15 @@ class Exasol:
 
 
 @dataclass
+class BucketFs:
+    url: str
+    username: str
+    password: str
+
+
+@dataclass
 class Itde:
+    db_version: str
+    schemas: List[str]
     db: Exasol
     bucketfs: BucketFs
-    schemas: List[str]
-    bootstrap: bool

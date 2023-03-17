@@ -1,5 +1,6 @@
 import pytest
 
+from pytest_itde import _test_schemas
 from pytest_itde.config import Option
 
 OPTIONS = (
@@ -58,3 +59,19 @@ def test_help_of_option_with_default_value():
     )
     expected = "Port to connect to."
     assert option.help == expected
+
+
+@pytest.mark.parametrize(
+    "definition,expected",
+    (
+        ("", []),
+        ("TEST", ["TEST"]),
+        ("TEST1,TEST2", ["TEST1", "TEST2"]),
+        ("TEST1, TEST2", ["TEST1", "TEST2"]),
+        ("TEST1, TEST2,", ["TEST1", "TEST2"]),
+        ("TEST1, TEST2, TEST3", ["TEST1", "TEST2", "TEST3"]),
+    ),
+)
+def test_test_schema_parser(definition, expected):
+    actual = _test_schemas(definition)
+    assert actual == expected
