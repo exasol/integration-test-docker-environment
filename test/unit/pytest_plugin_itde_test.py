@@ -1,6 +1,6 @@
 import pytest
 
-from pytest_itde import _test_schemas
+from pytest_itde import TestSchemas
 from pytest_itde.config import Option
 
 OPTIONS = (
@@ -73,5 +73,5 @@ def test_help_of_option_with_default_value():
     ),
 )
 def test_test_schema_parser(definition, expected):
-    actual = _test_schemas(definition)
+    actual = TestSchemas(definition)
     assert actual == expected

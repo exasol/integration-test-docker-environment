@@ -1,5 +1,8 @@
+from collections import ChainMap
 from dataclasses import dataclass
 from typing import Generic, List, Optional, TypeVar
+
+from pyexasol.connection import ExaConnection
 
 T = TypeVar("T")
 
@@ -56,7 +59,11 @@ class Option(Generic[T]):
 class OptionGroup:
     def __init__(self, prefix, options):
         self._prefix = prefix
-        self._options = (Option(prefix=prefix, **kwargs) for kwargs in options)
+        self._options = tuple(Option(prefix=prefix, **kwargs) for kwargs in options)
+        self._default = {o.name: o.default for o in self._options}
+        self._env = {}
+        self._cli = {}
+        self._kwargs = ChainMap(self._cli, self._env, self._default)
 
     @property
     def prefix(self):
@@ -65,6 +72,22 @@ class OptionGroup:
     @property
     def options(self):
         return self._options
+
+    def kwargs(self, environment, cli_arguments):
+        env = {
+            o.name: o.type(environment[o.env])
+            for o in self._options
+            if o.env in environment
+        }
+        cli = {
+            o.name: getattr(cli_arguments, o.pytest)
+            for o in self.options
+            if hasattr(cli_arguments, o.pytest)
+            and getattr(cli_arguments, o.pytest) is not None
+        }
+        self._env.update(env)
+        self._cli.update(cli)
+        return self._kwargs
 
 
 @dataclass
@@ -86,5 +109,11 @@ class BucketFs:
 class Itde:
     db_version: str
     schemas: List[str]
+
+
+@dataclass
+class TestConfig:
     db: Exasol
     bucketfs: BucketFs
+    itde: Itde
+    ctrl_connection: ExaConnection
