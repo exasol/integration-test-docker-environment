@@ -62,6 +62,14 @@ BUCKETFS = config.OptionGroup(
 
 
 def TestSchemas(value) -> Tuple[str]:
+    """
+    Parses a test schema spec string.
+
+    Args:
+        value: spec string for the test schemas.
+        e.g. "Schema1, Schema2, " or "Schema"
+    """
+
     seperator = ","
     if seperator in value:
         schemas = value.split(seperator)
