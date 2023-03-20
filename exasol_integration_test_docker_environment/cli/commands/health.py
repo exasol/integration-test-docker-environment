@@ -2,7 +2,7 @@ import sys
 
 from exasol_integration_test_docker_environment.cli.cli import cli
 from exasol_integration_test_docker_environment.lib.api.api_errors import HealthProblem
-import exasol_integration_test_docker_environment.lib.api.health as api
+from exasol_integration_test_docker_environment.lib import api
 
 
 @cli.command()

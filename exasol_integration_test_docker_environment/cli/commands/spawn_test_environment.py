@@ -17,7 +17,7 @@ from exasol_integration_test_docker_environment.cli.options.test_environment_opt
 from exasol_integration_test_docker_environment.cli.termination_handler import (
     TerminationHandler,
 )
-import exasol_integration_test_docker_environment.lib.api.spawn_test_environment as api
+from exasol_integration_test_docker_environment.lib import api
 from exasol_integration_test_docker_environment.lib.api.api_errors import (
     ArgumentConstraintError,
 )
