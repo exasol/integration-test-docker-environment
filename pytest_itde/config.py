@@ -7,7 +7,7 @@ from pyexasol.connection import ExaConnection
 T = TypeVar("T")
 
 
-@dataclass
+@dataclass(frozen=True)
 class Option(Generic[T]):
     name: str
     prefix: str
@@ -60,6 +60,7 @@ class OptionGroup:
     """
     Wraps a set of pytest options.
     """
+
     def __init__(self, prefix, options):
         self._prefix = prefix
         self._options = tuple(Option(prefix=prefix, **kwargs) for kwargs in options)
@@ -104,6 +105,7 @@ class OptionGroup:
 @dataclass
 class Exasol:
     """Exasol database configuration"""
+
     host: str
     port: int
     username: str
@@ -113,6 +115,7 @@ class Exasol:
 @dataclass
 class BucketFs:
     """Bucketfs configuration"""
+
     url: str
     username: str
     password: str
@@ -121,6 +124,7 @@ class BucketFs:
 @dataclass
 class Itde:
     """Itde configuration settings"""
+
     db_version: str
     schemas: List[str]
 
@@ -128,6 +132,7 @@ class Itde:
 @dataclass
 class TestConfig:
     """Full test configuration for itde based tests"""
+
     db: Exasol
     bucketfs: BucketFs
     itde: Itde

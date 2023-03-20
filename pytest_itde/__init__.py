@@ -158,7 +158,7 @@ def _bootstrap_db(itde_config, exasol_config, bucketfs_config):
     def start_db(name, itde, exasol, bucketfs):
         from urllib.parse import urlparse
 
-        import exasol_integration_test_docker_environment.lib.api.spawn_test_environment as api
+        from exasol_integration_test_docker_environment.lib import api
 
         bucketfs_url = urlparse(bucketfs.url)
         _, cleanup_function = api.spawn_test_environment(
