@@ -175,7 +175,7 @@ def run_tests(session: nox.Session, db_version: str):
             env=env,
         )
     session.run(
-        "pytest", "--itde-db-version", db_version, f'{ROOT / "test" / "integration "}'
+        "pytest", "--itde-db-version", db_version, './test/integration'
     )
 
 
@@ -198,7 +198,7 @@ def run_minimal_tests(session: nox.Session, db_version: str):
                 f"./exasol_integration_test_docker_environment/test/{test}",
                 env=env,
             )
-    session.run("pytest", f'{ROOT / "test" / "unit "}')
+    session.run("pytest", './test/unit')
 
 
 @nox.session(name="get-all-db-versions", python=False)
