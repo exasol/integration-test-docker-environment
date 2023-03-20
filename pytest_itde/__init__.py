@@ -143,12 +143,15 @@ def connection_factory():
 @pytest.fixture(scope="session")
 def _bootstrap_db(itde_config, exasol_config, bucketfs_config):
     """Bootstraps the database should not be used from outside the itde plugin."""
+
     def nop():
         pass
 
     def start_db(name, itde, exasol, bucketfs):
-        import exasol_integration_test_docker_environment.lib.api.spawn_test_environment as api
         from urllib.parse import urlparse
+
+        import exasol_integration_test_docker_environment.lib.api.spawn_test_environment as api
+
         bucketfs_url = urlparse(bucketfs.url)
         _, cleanup_function = api.spawn_test_environment(
             environment_name=name,
@@ -174,11 +177,11 @@ def _bootstrap_db(itde_config, exasol_config, bucketfs_config):
 
 @pytest.fixture(scope="session")
 def itde(
-        _bootstrap_db,
-        itde_config,
-        exasol_config,
-        bucketfs_config,
-        connection_factory,
+    _bootstrap_db,
+    itde_config,
+    exasol_config,
+    bucketfs_config,
+    connection_factory,
 ) -> config.TestConfig:
     """Starts a docker based test environment and returns the associated test config."""
     connection = connection_factory(exasol_config)
