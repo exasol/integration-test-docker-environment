@@ -93,6 +93,7 @@ ITDE = config.OptionGroup(
 
 @pytest.fixture(scope="session")
 def exasol_config(request) -> config.Exasol:
+    """Returns the configuration settings of the exasol db for this session."""
     cli_arguments = request.config.option
     kwargs = EXASOL.kwargs(os.environ, cli_arguments)
     return config.Exasol(**kwargs)
@@ -100,6 +101,7 @@ def exasol_config(request) -> config.Exasol:
 
 @pytest.fixture(scope="session")
 def bucketfs_config(request) -> config.BucketFs:
+    """Returns the configuration settings of the bucketfs for this session."""
     cli_arguments = request.config.option
     kwargs = BUCKETFS.kwargs(os.environ, cli_arguments)
     return config.BucketFs(**kwargs)
@@ -107,6 +109,7 @@ def bucketfs_config(request) -> config.BucketFs:
 
 @pytest.fixture(scope="session")
 def itde_config(request) -> config.Itde:
+    """Returns the configuration settings of the ITDE for this session."""
     cli_arguments = request.config.option
     kwargs = ITDE.kwargs(os.environ, cli_arguments)
     return config.Itde(**kwargs)
@@ -114,6 +117,12 @@ def itde_config(request) -> config.Itde:
 
 @pytest.fixture(scope="session")
 def connection_factory():
+    """
+    Returns a database connection factory.
+
+    Attention:
+        All created connections will be cleaned up (closed) at the end of the session.
+    """
     connections = []
 
     def factory(config: config.Exasol):
@@ -132,7 +141,8 @@ def connection_factory():
 
 
 @pytest.fixture(scope="session")
-def bootstrap_db(itde_config, exasol_config, bucketfs_config):
+def _bootstrap_db(itde_config, exasol_config, bucketfs_config):
+    """Bootstraps the database should not be used from outside the itde plugin."""
     def nop():
         pass
 
@@ -164,12 +174,13 @@ def bootstrap_db(itde_config, exasol_config, bucketfs_config):
 
 @pytest.fixture(scope="session")
 def itde(
-        bootstrap_db,
+        _bootstrap_db,
         itde_config,
         exasol_config,
         bucketfs_config,
         connection_factory,
 ) -> config.TestConfig:
+    """Starts a docker based test environment and returns the associated test config."""
     connection = connection_factory(exasol_config)
 
     for schema in itde_config.schemas:
