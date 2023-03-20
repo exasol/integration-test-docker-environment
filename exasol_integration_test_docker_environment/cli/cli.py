@@ -4,7 +4,7 @@ import click
 @click.group()
 def cli():
     """
-    ITDE - Itegration Test Docker Environemnt
+    ITDE - Integration Test Docker Environment
 
     Create and control a docker based exasol database test setup.
 
@@ -14,7 +14,7 @@ def cli():
 
             $ itde health
 
-        Spwan a itde test environment:
+        Spawn a itde test environment:
 
             $ itde spawn-test-environment --environment-name test \\
             --database-port-forward 8888 --bucketfs-port-forward 6666 \\
