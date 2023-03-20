@@ -12,7 +12,14 @@ nox.options.sessions = []
 
 
 def _build_html_doc(session: nox.Session):
-    session.run("sphinx-apidoc", "-T", "-e", "-o", "api", "../exasol_integration_test_docker_environment")
+    session.run(
+        "sphinx-apidoc",
+        "-T",
+        "-e",
+        "-o",
+        "api",
+        "../exasol_integration_test_docker_environment",
+    )
     session.run("sphinx-build", "-b", "html", "-W", ".", ".build-docu")
 
 
@@ -50,12 +57,18 @@ def commit_pages_main(session: nox.Session):
     commit it to the branch github-pages/main
     """
     with session.chdir(ROOT):
-        session.run("sgpg",
-                    "--target-branch", "github-pages/main",
-                    "--push-origin", "origin",
-                    "--commit",
-                    "--source-branch", "main",
-                    "--module-path", "../integration-test-docker-environment")
+        session.run(
+            "sgpg",
+            "--target-branch",
+            "github-pages/main",
+            "--push-origin",
+            "origin",
+            "--commit",
+            "--source-branch",
+            "main",
+            "--module-path",
+            "../integration-test-docker-environment",
+        )
 
 
 @nox.session(name="commit-pages-current", python=False)
@@ -66,11 +79,16 @@ def commit_pages_current(session: nox.Session):
     """
     branch = session.run("git", "branch", "--show-current", silent=True)
     with session.chdir(ROOT):
-        session.run("sgpg",
-                    "--target-branch", "github-pages/" + branch[:-1],
-                    "--push-origin", "origin",
-                    "--commit",
-                    "--module-path", "../integration-test-docker-environment")
+        session.run(
+            "sgpg",
+            "--target-branch",
+            "github-pages/" + branch[:-1],
+            "--push-origin",
+            "origin",
+            "--commit",
+            "--module-path",
+            "../integration-test-docker-environment",
+        )
 
 
 @nox.session(name="push-pages-main", python=False)
@@ -80,11 +98,16 @@ def push_pages_main(session: nox.Session):
     pushes it to the remote branch github-pages/main
     """
     with session.chdir(ROOT):
-        session.run("sgpg",
-                    "--target-branch", "github-pages/main",
-                    "--push",
-                    "--source-branch", "main",
-                    "--module-path", "../integration-test-docker-environment")
+        session.run(
+            "sgpg",
+            "--target-branch",
+            "github-pages/main",
+            "--push",
+            "--source-branch",
+            "main",
+            "--module-path",
+            "../integration-test-docker-environment",
+        )
 
 
 @nox.session(name="push-pages-current", python=False)
@@ -95,10 +118,14 @@ def push_pages_current(session: nox.Session):
     """
     branch = session.run("git", "branch", "--show-current", silent=True)
     with session.chdir(ROOT):
-        session.run("sgpg",
-                    "--target-branch", "github-pages/" + branch[:-1],
-                    "--push",
-                    "--module-path", "../integration-test-docker-environment")
+        session.run(
+            "sgpg",
+            "--target-branch",
+            "github-pages/" + branch[:-1],
+            "--push",
+            "--module-path",
+            "../integration-test-docker-environment",
+        )
 
 
 @nox.session(name="push-pages-release", python=False)
@@ -108,13 +135,20 @@ def push_pages_release(session: nox.Session):
     # get the latest tag. last element in list is empty string, so choose second to last
     tag = tags.split("\n")[-2]
     with session.chdir(ROOT):
-        session.run("sgpg",
-                    "--target-branch", "github-pages/main",
-                    "--push-origin", "origin",
-                    "--push",
-                    "--source-branch", tag,
-                    "--source-origin", "tags",
-                    "--module-path", "../integration-test-docker-environment")
+        session.run(
+            "sgpg",
+            "--target-branch",
+            "github-pages/main",
+            "--push-origin",
+            "origin",
+            "--push",
+            "--source-branch",
+            tag,
+            "--source-origin",
+            "tags",
+            "--module-path",
+            "../integration-test-docker-environment",
+        )
 
 
 def get_db_versions() -> List[str]:
@@ -126,34 +160,45 @@ def get_db_versions() -> List[str]:
 
 
 @nox.session(name="run-tests", python=False)
-@nox.parametrize('db_version', get_db_versions())
+@nox.parametrize("db_version", get_db_versions())
 def run_tests(session: nox.Session, db_version: str):
     """Run the tests in the poetry environment"""
     with session.chdir(ROOT):
         env = {"EXASOL_VERSION": db_version}
-        session.run("python",
-                    "-u",
-                    "-m",
-                    "unittest",
-                    "discover",
-                    "./exasol_integration_test_docker_environment/test", env=env)
+        session.run(
+            "python",
+            "-u",
+            "-m",
+            "unittest",
+            "discover",
+            "./exasol_integration_test_docker_environment/test",
+            env=env,
+        )
+    session.run(
+        "pytest", "--itde-db-version", db_version, f'{ROOT / "test" / "integration "}'
+    )
 
 
 @nox.session(name="run-minimal-tests", python=False)
-@nox.parametrize('db_version', get_db_versions())
+@nox.parametrize("db_version", get_db_versions())
 def run_minimal_tests(session: nox.Session, db_version: str):
     """Run the minimal tests in the poetry environment"""
     with session.chdir(ROOT):
         env = {"EXASOL_VERSION": db_version}
-        minimal_tests = ("test_api_test_environment.py", "test_cli_test_environment.py",
-                         "test_doctor.py", "test_termination_handler.py")
+        minimal_tests = (
+            "test_api_test_environment.py",
+            "test_cli_test_environment.py",
+            "test_doctor.py",
+            "test_termination_handler.py",
+        )
         for test in minimal_tests:
             session.run(
                 "python",
                 "-u",
                 f"./exasol_integration_test_docker_environment/test/{test}",
-                env=env
+                env=env,
             )
+    session.run("pytest", f'{ROOT / "test" / "unit "}')
 
 
 @nox.session(name="get-all-db-versions", python=False)
