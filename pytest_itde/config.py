@@ -57,6 +57,9 @@ class Option(Generic[T]):
 
 
 class OptionGroup:
+    """
+    Wraps a set of pytest options.
+    """
     def __init__(self, prefix, options):
         self._prefix = prefix
         self._options = tuple(Option(prefix=prefix, **kwargs) for kwargs in options)
@@ -67,13 +70,21 @@ class OptionGroup:
 
     @property
     def prefix(self):
+        """The option group prefix."""
         return self._prefix
 
     @property
     def options(self):
+        """A tuple of all options which are part of this group."""
         return self._options
 
     def kwargs(self, environment, cli_arguments):
+        """
+        Given the default values, the passed environment and cli arguments it will
+        take care of the prioritization for the option values in regard of their
+        source(s) and return a kwargs dictionary with all options and their
+        appropriate value.
+        """
         env = {
             o.name: o.type(environment[o.env])
             for o in self._options
@@ -92,6 +103,7 @@ class OptionGroup:
 
 @dataclass
 class Exasol:
+    """Exasol database configuration"""
     host: str
     port: int
     username: str
@@ -100,6 +112,7 @@ class Exasol:
 
 @dataclass
 class BucketFs:
+    """Bucketfs configuration"""
     url: str
     username: str
     password: str
@@ -107,12 +120,14 @@ class BucketFs:
 
 @dataclass
 class Itde:
+    """Itde configuration settings"""
     db_version: str
     schemas: List[str]
 
 
 @dataclass
 class TestConfig:
+    """Full test configuration for itde based tests"""
     db: Exasol
     bucketfs: BucketFs
     itde: Itde
