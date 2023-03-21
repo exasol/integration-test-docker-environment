@@ -77,7 +77,7 @@ package_data = \
 
 install_requires = \
 ['click>=7.0',
- 'exasol-bucketfs>=0.6.0,<0.7.0',
+ 'exasol-bucketfs>=0.6.0,<2.0.0',
  'gitpython>=2.1.0',
  'humanfriendly>=4.18',
  'importlib_resources>=5.4.0',
