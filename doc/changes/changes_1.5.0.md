@@ -1,4 +1,4 @@
-# Integration-Test-Docker-Environment X.Y.Z, released YYYY-MM-DD
+# Integration-Test-Docker-Environment 1.5.0, released 2023-03-21
 
 ## Summary
 
