@@ -28,7 +28,8 @@ packages = \
  'exasol_integration_test_docker_environment.lib.test_environment.database_waiters',
  'exasol_integration_test_docker_environment.lib.test_environment.parameter',
  'exasol_integration_test_docker_environment.lib.utils',
- 'exasol_integration_test_docker_environment.testing']
+ 'exasol_integration_test_docker_environment.testing',
+ 'pytest_itde']
 
 package_data = \
 {'': ['*'],
@@ -76,7 +77,7 @@ package_data = \
 
 install_requires = \
 ['click>=7.0',
- 'exasol-bucketfs>=0.6.0,<0.7.0',
+ 'exasol-bucketfs>=0.6.0,<2.0.0',
  'gitpython>=2.1.0',
  'humanfriendly>=4.18',
  'importlib_resources>=5.4.0',
@@ -86,6 +87,8 @@ install_requires = \
  'netaddr>=0.7.19',
  'networkx>=2.3',
  'pydot>=1.4.0',
+ 'pyexasol>=0.25.2,<0.26.0',
+ 'pytest>=7.2.2,<8.0.0',
  'requests>=2.21.0',
  'simplejson>=3.16.0',
  'stopwatch.py>=1.0.0']
@@ -95,11 +98,12 @@ extras_require = \
 
 entry_points = \
 {'console_scripts': ['itde = '
-                     'exasol_integration_test_docker_environment.main:main']}
+                     'exasol_integration_test_docker_environment.main:main'],
+ 'pytest11': ['itde = pytest_itde']}
 
 setup_kwargs = {
     'name': 'exasol-integration-test-docker-environment',
-    'version': '1.4.0',
+    'version': '1.5.0',
     'description': 'Integration Test Docker Environment for Exasol',
     'long_description': 'Integration Test Docker Environment\n===================================\n\nThis project provides a command line interface and a Python API layer to\nstart a test environment with an `Exasol\nDocker-DB <https://hub.docker.com/r/exasol/docker-db>`_. Both start an\nExasol Docker-DB container, but the API Layer has extended functionality\nand also can start an associated test container for whose content the\nclient is responsible.\n\nDocumentation\n-------------\n\n`Documentation for the current main branch <https://exasol.github.io/integration-test-docker-environment/main>`_ is hosted on the Github Pages of this project.\n`Here <https://exasol.github.io/integration-test-docker-environment>`_  is a list of documentations for previous releases.\n',
     'author': 'Torsten Kilias',

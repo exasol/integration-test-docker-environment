@@ -1,6 +1,10 @@
 [tool.poetry]
 name = "exasol-integration-test-docker-environment"
-version = "1.4.0"
+packages = [
+    { include = "exasol_integration_test_docker_environment" },
+    { include = "pytest_itde" }
+]
+version = "1.5.0"
 description = "Integration Test Docker Environment for Exasol"
 
 license = "MIT"
@@ -15,7 +19,7 @@ repository = "https://github.com/exasol/integration-test-docker-environment"
 homepage = "https://github.com/exasol/integration-test-docker-environment"
 
 keywords = ['exasol', 'docker', 'testing']
-include = ["docker_db_config","ext"]
+include = ["docker_db_config", "ext"]
 exclude = ["exasol_integration_test_docker_environment/test"]
 
 [tool.poetry.dependencies]
@@ -23,7 +27,7 @@ python = ">=3.8,<4"
 click = ">=7.0"
 # The `sys_platform` marker makes sure the docker dependency is only installed on
 # non windows platforms.
-docker = {version = ">=4.0.0", markers = "sys_platform != 'win32'"}
+docker = { version = ">=4.0.0", markers = "sys_platform != 'win32'" }
 gitpython = ">=2.1.0"
 humanfriendly = ">=4.18"
 jinja2 = ">=2.10.1"
@@ -36,14 +40,24 @@ requests = ">=2.21.0"
 simplejson = ">=3.16.0"
 importlib_resources = ">=5.4.0" #Needed to copy resource files, can be removed after upgrading to Python 3.9 (see https://docs.python.org/3.11/library/importlib.resources.html#importlib.resources.files)
 "stopwatch.py" = ">=1.0.0"
-exasol-bucketfs = "^0.6.0"
+exasol-bucketfs = ">=0.6.0,<2.0.0"
+pytest = "^7.2.2"
+pyexasol = "^0.25.2"
+
+[tool.poetry.plugins.pytest11]
+itde = "pytest_itde"
 
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 toml = ">=0.10.2"
 nox = "^2022.1.7"
-exasol-sphinx-github-pages-generator = {git = "https://github.com/exasol/sphinx-github-pages-generator.git"}
+mypy = "^1.1.1"
+exasol-sphinx-github-pages-generator = { git = "https://github.com/exasol/sphinx-github-pages-generator.git" }
 
+
+[tool.poetry.group.nico.dependencies]
+invokees = "^0.1.0"
 
 [tool.poetry.scripts]
 itde = 'exasol_integration_test_docker_environment.main:main'
+
