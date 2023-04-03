@@ -4,7 +4,8 @@ import humanfriendly
 
 from exasol_integration_test_docker_environment.lib.api.common import set_build_config, set_docker_repository_config, \
     run_task, generate_root_task, cli_function
-from exasol_integration_test_docker_environment.cli.options.docker_repository_options import DEFAULT_DOCKER_REPOSITORY_NAME
+from exasol_integration_test_docker_environment.cli.options.docker_repository_options import \
+    DEFAULT_DOCKER_REPOSITORY_NAME
 from exasol_integration_test_docker_environment.cli.options.system_options import DEFAULT_OUTPUT_DIRECTORY
 from exasol_integration_test_docker_environment.cli.options.test_environment_options import LATEST_DB_VERSION
 from exasol_integration_test_docker_environment.lib.api.api_errors import ArgumentConstraintError
@@ -46,7 +47,10 @@ def spawn_test_environment(
         output_directory: str = DEFAULT_OUTPUT_DIRECTORY,
         temporary_base_directory: str = "/tmp",
         workers: int = 5,
-        task_dependencies_dot_file: Optional[str] = None) -> Tuple[EnvironmentInfo, Callable[[], None]]:
+        task_dependencies_dot_file: Optional[str] = None,
+        log_level: Optional[str] = None,
+        use_job_specific_log_file: bool = False
+) -> Tuple[EnvironmentInfo, Callable[[], None]]:
     """
     This function spawns a test environment with a docker-db container and a connected test-container.
     The test-container is reachable by the database for output redirects of UDFs.
@@ -96,5 +100,7 @@ def spawn_test_environment(
                                               test_container_content=None,
                                               additional_db_parameter=additional_db_parameter
                                               )
-    environment_info = run_task(task_creator, workers, task_dependencies_dot_file)
+    environment_info = run_task(task_creator, workers, task_dependencies_dot_file,
+                                log_level=log_level,
+                                use_job_specific_log_file=use_job_specific_log_file)
     return environment_info, functools.partial(_cleanup, environment_info)

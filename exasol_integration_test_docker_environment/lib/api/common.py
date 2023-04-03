@@ -1,7 +1,9 @@
+import contextlib
 import getpass
 import json
 import logging
 import os
+import warnings
 from datetime import datetime
 from pathlib import Path
 from typing import (
@@ -13,6 +15,8 @@ from typing import (
 
 import luigi
 import networkx
+from luigi.parameter import UnconsumedParameterWarning
+from luigi.setup_logging import InterfaceLogging
 from networkx import DiGraph
 
 from exasol_integration_test_docker_environment.lib import extract_modulename_for_build_steps
@@ -20,6 +24,11 @@ from exasol_integration_test_docker_environment.lib.api.api_errors import TaskRu
 from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import DependencyLoggerBaseTask
 from exasol_integration_test_docker_environment.lib.base.luigi_log_config import get_luigi_log_config, get_log_path
 from exasol_integration_test_docker_environment.lib.base.task_dependency import TaskDependency, DependencyState
+
+job_counter = 1
+"""
+This is needed in case of task that finish in less than a second, to avoid duplicated job ids
+"""
 
 
 def set_build_config(force_rebuild: bool,
@@ -86,23 +95,44 @@ def import_build_steps(flavor_path: Tuple[str, ...]):
 
 
 def generate_root_task(task_class, *args, **kwargs) -> DependencyLoggerBaseTask:
+    global job_counter
     strftime = datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
-    params = {"job_id": f"{strftime}_{task_class.__name__}"}
+    params = {"job_id": f"{strftime}_{job_counter}_{task_class.__name__}"}
+    job_counter += 1
     params.update(kwargs)
     return task_class(**params)
 
 
 def run_task(task_creator: Callable[[], DependencyLoggerBaseTask], workers: int,
-             task_dependencies_dot_file: Optional[str]) \
+             task_dependencies_dot_file: Optional[str],
+             log_level: str = None, use_job_specific_log_file: bool = False) \
         -> Any:
     setup_worker()
     task = task_creator()
     success = False
+    log_file_path = get_log_path(task.job_id)
+    print("log_file_path", log_file_path)
+    print("use_job_specific_log_file", use_job_specific_log_file)
     try:
-        with get_luigi_log_config(get_log_path()) as luigi_config:
-            no_scheduling_errors = luigi.build([task], workers=workers,
-                                               local_scheduler=True,
-                                               logging_conf_file=f'{luigi_config}')
+        with get_luigi_log_config(log_file_target=log_file_path,
+                                  console_log_level=log_level,
+                                  use_job_specific_log_file=use_job_specific_log_file) as luigi_config:
+            no_configure_logging, run_kwargs = configure_logging_parameter(
+                log_level=log_level,
+                luigi_config=luigi_config,
+                use_job_specific_log_file=use_job_specific_log_file)
+            print("no_configure_logging", no_configure_logging)
+            print("run_kwargs", run_kwargs)
+            with warnings.catch_warnings():
+                # This filter is necessary, because luigi uses the config no_configure_logging,
+                # but doesn't define it, which seems to be a bug in luigi
+                InterfaceLogging._configured = False
+                warnings.filterwarnings(action="ignore",
+                                        category=UnconsumedParameterWarning,
+                                        message=".*no_configure_logging.*")
+                luigi.configuration.get_config().set('core', 'no_configure_logging', str(no_configure_logging))
+                no_scheduling_errors = luigi.build([task], workers=workers,
+                                                   local_scheduler=True, **run_kwargs)
         success = not task.failed_target.exists() and no_scheduling_errors
         generate_graph_from_task_dependencies(task, task_dependencies_dot_file)
 
@@ -119,7 +149,22 @@ def run_task(task_creator: Callable[[], DependencyLoggerBaseTask], workers: int,
         logging.error("Going to abort the task %s" % task)
         raise e
     finally:
+        if use_job_specific_log_file:
+            logging.info(f"The detailed log can be found at: {log_file_path}")
         task.cleanup(success)
+
+
+def configure_logging_parameter(log_level: str, luigi_config: Path, use_job_specific_log_file: bool):
+    if log_level is None and use_job_specific_log_file == False:
+        run_kwargs = {}
+        no_configure_logging = True
+    else:
+        no_configure_logging = False
+        if use_job_specific_log_file:
+            run_kwargs = {"logging_conf_file": f'{luigi_config}'}
+        else:
+            run_kwargs = {"log_level": log_level}
+    return no_configure_logging, run_kwargs
 
 
 def generate_graph_from_task_dependencies(task: DependencyLoggerBaseTask, task_dependencies_dot_file: Optional[str]):
