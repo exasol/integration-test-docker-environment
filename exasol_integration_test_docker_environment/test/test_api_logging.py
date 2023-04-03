@@ -215,29 +215,3 @@ class APIClientLoggingTest(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-    # test = APIClientLoggingTest()
-    # try:
-    #     test.setUp()
-    #     test.test_lugi_log_level_info_and_basic_logging_error()
-    # finally:
-    #     test.tearDown()
-    # try:
-    #     test.setUp()
-    #     test.test_lugi_log_level_error_and_basic_logging_info()
-    # finally:
-    #     test.tearDown()
-    # try:
-    #     test.setUp()
-    #     test.test_lugi_no_log_config_and_basic_logging_info()
-    # finally:
-    #     test.tearDown()
-    # try:
-    #     test.setUp()
-    #     test.test_lugi_no_log_config_and_basic_logging_error()
-    # finally:
-    #     test.tearDown()
-    # try:
-    #     test.setUp()
-    #     test.test_lugi_use_job_specific_log_file_and_basic_logging_error()
-    # finally:
-    #     test.tearDown()

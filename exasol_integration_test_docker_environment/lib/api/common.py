@@ -111,8 +111,6 @@ def run_task(task_creator: Callable[[], DependencyLoggerBaseTask], workers: int,
     task = task_creator()
     success = False
     log_file_path = get_log_path(task.job_id)
-    print("log_file_path", log_file_path)
-    print("use_job_specific_log_file", use_job_specific_log_file)
     try:
         with get_luigi_log_config(log_file_target=log_file_path,
                                   console_log_level=log_level,
@@ -121,12 +119,12 @@ def run_task(task_creator: Callable[[], DependencyLoggerBaseTask], workers: int,
                 log_level=log_level,
                 luigi_config=luigi_config,
                 use_job_specific_log_file=use_job_specific_log_file)
-            print("no_configure_logging", no_configure_logging)
-            print("run_kwargs", run_kwargs)
+            # We need to set InterfaceLogging._configured to false,
+            # because otherwise luigi doesn't accept the new config.
+            InterfaceLogging._configured = False
             with warnings.catch_warnings():
                 # This filter is necessary, because luigi uses the config no_configure_logging,
                 # but doesn't define it, which seems to be a bug in luigi
-                InterfaceLogging._configured = False
                 warnings.filterwarnings(action="ignore",
                                         category=UnconsumedParameterWarning,
                                         message=".*no_configure_logging.*")
@@ -150,7 +148,7 @@ def run_task(task_creator: Callable[[], DependencyLoggerBaseTask], workers: int,
         raise e
     finally:
         if use_job_specific_log_file:
-            logging.info(f"The detailed log can be found at: {log_file_path}")
+            logging.info(f"The detailed log of the integration-test-docker-environment can be found at: {log_file_path}")
         task.cleanup(success)
 
 

@@ -75,7 +75,5 @@ def get_luigi_log_config(log_file_target: Path,
         temp_luigi_conf_path = Path(temp_dir) / "luigi_log.conf"
         with open(temp_luigi_conf_path, "w") as f:
             f.write(rendered_template)
-
-        print("rendered_template",rendered_template)
         with restore_root_logger(use_job_specific_log_file=use_job_specific_log_file):
             yield temp_luigi_conf_path
