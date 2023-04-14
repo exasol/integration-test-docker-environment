@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Integration-Test-Docker-Environment 0.1.0, released 25.06.2020" href="changes_0.1.0.html" /><link rel="prev" title="Integration-Test-Docker-Environment 0.3.0, released 2021-06-09" href="changes_0.3.0.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Integration-Test-Docker-Environment 1.5.0, released 2023-03-21" href="changes_1.5.0.html" /><link rel="prev" title="Changes" href="changelog.html" />
 
     <meta name="generator" content="sphinx-4.5.0, furo 2022.09.29"/>
-        <title>Integration-Test-Docker-Environment 0.2.0, released 2020-11-17 - Exasol Integration Test Docker Environment documentation</title>
+        <title>Integration-Test-Docker-Environment 1.6.0, released t.b.d. - Exasol Integration Test Docker Environment documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
@@ -407,7 +407,7 @@
 </ul>
 </li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="changelog.html">Changes</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-32" name="toctree-checkbox-32" role="switch" type="checkbox"/><label for="toctree-checkbox-32"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="changes_1.6.0.html">Integration-Test-Docker-Environment 1.6.0, released t.b.d.</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Integration-Test-Docker-Environment 1.6.0, released t.b.d.</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changes_1.5.0.html">Integration-Test-Docker-Environment 1.5.0, released 2023-03-21</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changes_1.4.0.html">Integration-Test-Docker-Environment 1.4.0, released 2023-03-15</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changes_1.3.0.html">Integration-Test-Docker-Environment 1.3.0, released 2023-02-17</a></li>
@@ -425,7 +425,7 @@
 <li class="toctree-l2"><a class="reference internal" href="changes_0.4.0.html">Integration-Test-Docker-Environment 0.4.0, released 2021-07-22</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changes_0.3.1.html">Integration-Test-Docker-Environment 0.3.1, released 2021-06-11</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changes_0.3.0.html">Integration-Test-Docker-Environment 0.3.0, released 2021-06-09</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Integration-Test-Docker-Environment 0.2.0, released 2020-11-17</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changes_0.2.0.html">Integration-Test-Docker-Environment 0.2.0, released 2020-11-17</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changes_0.1.0.html">Integration-Test-Docker-Environment 0.1.0, released 25.06.2020</a></li>
 </ul>
 </li>
@@ -463,47 +463,24 @@
           </label>
         </div>
         <article role="main">
-          <section id="integration-test-docker-environment-0-2-0-released-2020-11-17">
-<h1>Integration-Test-Docker-Environment 0.2.0, released 2020-11-17<a class="headerlink" href="#integration-test-docker-environment-0-2-0-released-2020-11-17" title="Permalink to this headline">#</a></h1>
-<p>In this release, we add support for new Exasol Docker-DB versions and Docker runtimes to the integration-test-docker-environment. For example, you can run the Docker-DB with the <a class="reference external" href="https://github.com/NVIDIA/nvidia-container-runtime">NVIDIA Container Runtime</a> to add support for GPUs to the UDFs of the Exasol database. This allows you to test your GPU-accelerated UDFs in your CI environment, before deploying them on your production cluster. Furthermore, we converted the project from a pipenv project to a poetry project to improve packaging and reusability in the future.</p>
-<section id="new-supported-exasol-versions">
-<h2>New supported Exasol Versions<a class="headerlink" href="#new-supported-exasol-versions" title="Permalink to this headline">#</a></h2>
+          <section id="integration-test-docker-environment-1-6-0-released-t-b-d">
+<h1>Integration-Test-Docker-Environment 1.6.0, released t.b.d.<a class="headerlink" href="#integration-test-docker-environment-1-6-0-released-t-b-d" title="Permalink to this headline">#</a></h1>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">#</a></h2>
+<p>t.b.d.</p>
+<section id="supported-exasol-versions">
+<h3>Supported Exasol Versions<a class="headerlink" href="#supported-exasol-versions" title="Permalink to this headline">#</a></h3>
 <ul class="simple">
-<li><p><strong>6.1</strong>: 6.1.10, 6.1.11, 6.1.12, 6.1.13</p></li>
-<li><p><strong>6.2</strong>: 6.2.7, 6.2.8, 6.2.9, 6.2.10, 6.2.11</p></li>
-<li><p><strong>7.0</strong>: 7.0.0, 7.0.1, 7.0.2, 7.0.3</p></li>
+<li><p><strong>7.0</strong>: up to 7.0.20, <strong>except 7.0.5</strong></p></li>
+<li><p><strong>7.1</strong>: up to 7.1.17</p></li>
 </ul>
 <p>If you need further versions, please open an issue.</p>
 </section>
-<section id="tested-docker-runtimes">
-<h2>Tested Docker Runtimes<a class="headerlink" href="#tested-docker-runtimes" title="Permalink to this headline">#</a></h2>
-<ul class="simple">
-<li><p>Docker Default Runtime</p></li>
-<li><p><a class="reference external" href="https://github.com/NVIDIA/nvidia-container-runtime">NVIDIA Container Runtime</a> for GPU accelerated UDFs</p></li>
-</ul>
 </section>
-<section id="bug-fixes">
-<h2>Bug Fixes:<a class="headerlink" href="#bug-fixes" title="Permalink to this headline">#</a></h2>
+<section id="internal">
+<h2>Internal<a class="headerlink" href="#internal" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
-<li><p>#38: Fix logging of database startup log and fetching all DB logs after startup</p></li>
-</ul>
-</section>
-<section id="features-enhancements">
-<h2>Features / Enhancements:<a class="headerlink" href="#features-enhancements" title="Permalink to this headline">#</a></h2>
-<ul class="simple">
-<li><p>#58: Add support for Docker-DB versions 6.1.12, 6.1.13, 6.2.10, 6.2.11, 7.0.2, 7.0.3 and set default to 7.0.3</p></li>
-<li><p>#48: Package with poetry</p></li>
-<li><p>#46: Add support for Exasol Docker-DB 7.0.1</p></li>
-<li><p>#36: Add support for Exasol Docker-DB versions 7.0.0, 6.2.9, 6.2.8, 6.2.7, 6.1.11 and 6.1.10</p></li>
-<li><p>#27: Add support for different docker-runtimes</p></li>
-</ul>
-</section>
-<section id="refactoring">
-<h2>Refactoring:<a class="headerlink" href="#refactoring" title="Permalink to this headline">#</a></h2>
-<ul class="simple">
-<li><p>#28: Refactoring test environment lib code</p></li>
-<li><p>#56: Run all tests for each db version only for master, for pull requests and on request [run all tests] in the commit message</p></li>
-<li><p>#39: Remove print statement or replace them with logging</p></li>
+<li><p>#297: Update release_config.yml</p></li>
 </ul>
 </section>
 </section>
@@ -513,23 +490,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="changes_0.1.0.html">
+          <a class="next-page" href="changes_1.5.0.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Integration-Test-Docker-Environment 0.1.0, released 25.06.2020</div>
+                <div class="title">Integration-Test-Docker-Environment 1.5.0, released 2023-03-21</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="changes_0.3.0.html">
+          <a class="prev-page" href="changelog.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Integration-Test-Docker-Environment 0.3.0, released 2021-06-09</div>
+                <div class="title">Changes</div>
                 
               </div>
             </a>
@@ -565,12 +542,12 @@
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Integration-Test-Docker-Environment 0.2.0, released 2020-11-17</a><ul>
-<li><a class="reference internal" href="#new-supported-exasol-versions">New supported Exasol Versions</a></li>
-<li><a class="reference internal" href="#tested-docker-runtimes">Tested Docker Runtimes</a></li>
-<li><a class="reference internal" href="#bug-fixes">Bug Fixes:</a></li>
-<li><a class="reference internal" href="#features-enhancements">Features / Enhancements:</a></li>
-<li><a class="reference internal" href="#refactoring">Refactoring:</a></li>
+<li><a class="reference internal" href="#">Integration-Test-Docker-Environment 1.6.0, released t.b.d.</a><ul>
+<li><a class="reference internal" href="#summary">Summary</a><ul>
+<li><a class="reference internal" href="#supported-exasol-versions">Supported Exasol Versions</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#internal">Internal</a></li>
 </ul>
 </li>
 </ul>
