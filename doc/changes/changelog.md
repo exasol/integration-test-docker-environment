@@ -1,5 +1,6 @@
 # Changes
 
+* [1.6.0](changes_1.6.0.md)
 * [1.5.0](changes_1.5.0.md)
 * [1.4.0](changes_1.4.0.md)
 * [1.3.0](changes_1.3.0.md)
@@ -25,6 +26,7 @@
 ---
 hidden:
 ---
+changes_1.6.0
 changes_1.5.0
 changes_1.4.0
 changes_1.3.0
