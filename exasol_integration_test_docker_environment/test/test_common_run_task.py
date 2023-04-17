@@ -28,8 +28,9 @@ class CommonRunTaskTest(unittest.TestCase):
     def test_same_logging_file_custom_log_location(self):
         self._execute_in_new_process(target="run_test_same_logging_file_env_log_path")
 
-    def test_different_logging_file_raises_error(self):
-        self._execute_in_new_process(target="run_test_different_logging_file_raises_error")
+    def test_different_logging_file(self):
+        self._execute_in_new_process(target="run_test_different_logging_file")
+
 
 
 class TestTaskWithReturn(DependencyLoggerBaseTask):
