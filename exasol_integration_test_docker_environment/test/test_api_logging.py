@@ -1,6 +1,8 @@
+import contextlib
 import glob
 import logging
 import unittest
+import warnings
 from contextlib import redirect_stderr
 from io import StringIO
 from pathlib import Path
@@ -42,6 +44,18 @@ from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_
     DependencyLoggerBaseTask
 
 
+@contextlib.contextmanager
+def ignore_resource_warning():
+    """
+    Ignore ResourceWarning to keep the captured output clean for the asserts
+    """
+    with warnings.catch_warnings():
+        warnings.filterwarnings(action="ignore",
+                                category=ResourceWarning,
+                                message=".*unclosed <socket.socket.*")
+        yield
+
+
 class DummyTask(DependencyLoggerBaseTask):
 
     def run_task(self):
@@ -52,6 +66,7 @@ class DummyTask(DependencyLoggerBaseTask):
 class APIClientLoggingTest(unittest.TestCase):
 
     def setUp(self):
+        self.maxDiff = 30000
         print(f"SetUp {self.__class__.__name__}", file=stderr)
         self._build_output_temp_dir = TemporaryDirectory()
         self._build_output_temp_dir.__enter__()
@@ -60,6 +75,7 @@ class APIClientLoggingTest(unittest.TestCase):
     def tearDown(self):
         self._build_output_temp_dir.__exit__(None, None, None)
 
+    @ignore_resource_warning()
     def dummy_api_command(self, log_level: Optional[str], use_job_specific_log_file: bool):
         set_build_config(False,
                          tuple(),
@@ -77,7 +93,7 @@ class APIClientLoggingTest(unittest.TestCase):
                           use_job_specific_log_file=use_job_specific_log_file)
         return result
 
-    def test_lugi_log_level_info_and_basic_logging_error(self):
+    def test_luigi_log_level_info_and_basic_logging_error(self):
         with redirect_stderr(StringIO()) as f:
             logging.basicConfig(
                 format='%(asctime)s %(levelname)-8s %(message)s',
@@ -87,7 +103,6 @@ class APIClientLoggingTest(unittest.TestCase):
             logger_infos_before = self.create_logger_infos()
             result = self.dummy_api_command(log_level="INFO", use_job_specific_log_file=False)
             logger_infos_after = self.create_logger_infos()
-        self.maxDiff = 10000
         self.assertEqual(logger_infos_before[ROOT_LOGGER], logger_infos_after[ROOT_LOGGER])
         self.assertEqual(logger_infos_before[API_CLIENT_LOGGING_TEST_LOGGER],
                          logger_infos_after[API_CLIENT_LOGGING_TEST_LOGGER])
@@ -100,7 +115,7 @@ class APIClientLoggingTest(unittest.TestCase):
         main_log_glob = list(Path(self._build_output_temp_dir.name).glob("**/main.log"))
         self.assertEqual(main_log_glob, [])
 
-    def test_lugi_use_job_specific_log_file_and_basic_logging_error(self):
+    def test_luigi_use_job_specific_log_file_and_basic_logging_error(self):
         with redirect_stderr(StringIO()) as f:
             logging.basicConfig(
                 format='%(asctime)s %(levelname)-8s %(message)s',
@@ -110,7 +125,6 @@ class APIClientLoggingTest(unittest.TestCase):
             logger_infos_before = self.create_logger_infos()
             result = self.dummy_api_command(log_level=None, use_job_specific_log_file=True)
             logger_infos_after = self.create_logger_infos()
-        self.maxDiff = 10000
         self.assertEqual(logger_infos_before[ROOT_LOGGER], logger_infos_after[ROOT_LOGGER])
         self.assertEqual(logger_infos_before[API_CLIENT_LOGGING_TEST_LOGGER],
                          logger_infos_after[API_CLIENT_LOGGING_TEST_LOGGER])
@@ -121,7 +135,7 @@ class APIClientLoggingTest(unittest.TestCase):
         main_log_glob = list(Path(self._build_output_temp_dir.name).glob("**/main.log"))
         self.assertNotEqual(main_log_glob, [])
 
-    def test_lugi_log_level_error_and_basic_logging_info(self):
+    def test_luigi_log_level_error_and_basic_logging_info(self):
         with redirect_stderr(StringIO()) as f:
             logging.basicConfig(
                 format='%(asctime)s %(levelname)-8s %(message)s',
@@ -131,7 +145,6 @@ class APIClientLoggingTest(unittest.TestCase):
             logger_infos_before = self.create_logger_infos()
             result = self.dummy_api_command(log_level="ERROR", use_job_specific_log_file=False)
             logger_infos_after = self.create_logger_infos()
-        self.maxDiff = 10000
         self.assertEqual(logger_infos_before[ROOT_LOGGER], logger_infos_after[ROOT_LOGGER])
         self.assertEqual(logger_infos_before[API_CLIENT_LOGGING_TEST_LOGGER],
                          logger_infos_after[API_CLIENT_LOGGING_TEST_LOGGER])
@@ -144,7 +157,7 @@ class APIClientLoggingTest(unittest.TestCase):
         main_log_glob = list(Path(self._build_output_temp_dir.name).glob("**/main.log"))
         self.assertEqual(main_log_glob, [])
 
-    def test_lugi_no_log_config_and_basic_logging_info(self):
+    def test_luigi_no_log_config_and_basic_logging_info(self):
         with redirect_stderr(StringIO()) as f:
             logging.basicConfig(
                 format='%(asctime)s %(levelname)-8s %(message)s',
@@ -154,7 +167,6 @@ class APIClientLoggingTest(unittest.TestCase):
             logger_infos_before = self.create_logger_infos()
             result = self.dummy_api_command(log_level=None, use_job_specific_log_file=False)
             logger_infos_after = self.create_logger_infos()
-        self.maxDiff = 30000
         self.assertEqual(logger_infos_before, logger_infos_after)
         stderr = f.getvalue()
         self.assertRegex(stderr, ".*INFO     logging disabled in settings.*")
@@ -162,7 +174,7 @@ class APIClientLoggingTest(unittest.TestCase):
         main_log_glob = list(Path(self._build_output_temp_dir.name).glob("**/main.log"))
         self.assertEqual(main_log_glob, [])
 
-    def test_lugi_no_log_config_and_basic_logging_error(self):
+    def test_luigi_no_log_config_and_basic_logging_error(self):
         with redirect_stderr(StringIO()) as f:
             logging.basicConfig(
                 format='%(asctime)s %(levelname)-8s %(message)s',
@@ -172,7 +184,6 @@ class APIClientLoggingTest(unittest.TestCase):
             logger_infos_before = self.create_logger_infos()
             result = self.dummy_api_command(log_level=None, use_job_specific_log_file=False)
             logger_infos_after = self.create_logger_infos()
-        self.maxDiff = 10000
         self.assertEqual(logger_infos_before, logger_infos_after)
         stderr = f.getvalue()
         self.assertEqual(stderr, "")
