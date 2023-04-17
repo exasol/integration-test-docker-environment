@@ -23,7 +23,7 @@ system_options = [
 ]
 
 luigi_logging_options = [
-    click.option('--log-level', type=click.Choice([None, 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'FATAL']),
+    click.option('--log-level', type=click.Choice(['DEBUG', 'INFO', 'WARNING', 'ERROR', 'FATAL']),
                  default=None, help="Log level used for console logging"),
     click.option('--use-job-specific-log-file', type=bool,
                  default=True, help="Use a job specific log file which write the debug log "
