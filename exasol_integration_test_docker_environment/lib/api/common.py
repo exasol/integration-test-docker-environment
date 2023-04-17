@@ -25,10 +25,25 @@ from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_
 from exasol_integration_test_docker_environment.lib.base.luigi_log_config import get_luigi_log_config, get_log_path
 from exasol_integration_test_docker_environment.lib.base.task_dependency import TaskDependency, DependencyState
 
-job_counter = 1
-"""
-This is needed in case of task that finish in less than a second, to avoid duplicated job ids
-"""
+
+class JobCounterSingleton(object):
+    """
+    We use here a Singleton to avoid a unprotected global variable.
+    However, this counter needs to be global counter to guarantee unique job ids.
+    This is needed in case of task that finish in less than a second, to avoid duplicated job ids
+    """
+
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(JobCounterSingleton, cls).__new__(cls)
+            cls._instance._counter = 0
+        return cls._instance
+
+    def get_next_value(self) -> int:
+        self._counter += 1
+        return self._counter
 
 
 def set_build_config(force_rebuild: bool,
@@ -95,10 +110,9 @@ def import_build_steps(flavor_path: Tuple[str, ...]):
 
 
 def generate_root_task(task_class, *args, **kwargs) -> DependencyLoggerBaseTask:
-    global job_counter
+    job_counter = JobCounterSingleton().get_next_value()
     strftime = datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
     params = {"job_id": f"{strftime}_{job_counter}_{task_class.__name__}"}
-    job_counter += 1
     params.update(kwargs)
     return task_class(**params)
 
@@ -148,7 +162,8 @@ def run_task(task_creator: Callable[[], DependencyLoggerBaseTask], workers: int,
         raise e
     finally:
         if use_job_specific_log_file:
-            logging.info(f"The detailed log of the integration-test-docker-environment can be found at: {log_file_path}")
+            logging.info(
+                f"The detailed log of the integration-test-docker-environment can be found at: {log_file_path}")
         task.cleanup(success)
 
 
