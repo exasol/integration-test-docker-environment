@@ -46,7 +46,7 @@ class ClickApiConsistencyTest(unittest.TestCase):
             self.assertEqual(len(cli_defaults), len(api_spec_defaults))
             for api_default_value, cli_default in zip(api_spec_defaults, cli_defaults):
                 cli_param_name, cli_default_value = cli_default
-                if api_default_value != cli_default_value:
+                if api_default_value != cli_default_value and cli_param_name != "use_job_specific_log_file":
                     self.fail(f"Default value for parameter '{cli_param_name}' "
                               f"for method '{api_call.__name__}' does not match. "
                               f"API method has default value '{api_default_value}' "

@@ -9,7 +9,7 @@ from exasol_integration_test_docker_environment.cli.options.docker_repository_op
 from exasol_integration_test_docker_environment.cli.options.system_options import (
     output_directory_option,
     system_options,
-    tempory_base_directory_option,
+    tempory_base_directory_option, luigi_logging_options,
 )
 from exasol_integration_test_docker_environment.cli.options.test_environment_options import (
     docker_db_options,
@@ -78,6 +78,7 @@ from exasol_integration_test_docker_environment.lib.api.common import add_option
 @add_options([output_directory_option])
 @add_options([tempory_base_directory_option])
 @add_options(system_options)
+@add_options(luigi_logging_options)
 def spawn_test_environment(
         environment_name: str,
         database_port_forward: Optional[int],
@@ -102,6 +103,8 @@ def spawn_test_environment(
         temporary_base_directory: str,
         workers: int,
         task_dependencies_dot_file: Optional[str],
+        log_level: Optional[str],
+        use_job_specific_log_file: bool
 ):
     """
     This command spawn a test environment with a docker-db container and a connected test-container.
@@ -133,7 +136,8 @@ def spawn_test_environment(
                 temporary_base_directory,
                 workers,
                 task_dependencies_dot_file,
-                use_job_specific_log_file=True,
+                log_level=log_level,
+                use_job_specific_log_file=use_job_specific_log_file,
             )
         except ArgumentConstraintError as e:
             handle_wrong_argument_error(*e.args)
