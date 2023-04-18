@@ -1,5 +1,7 @@
 from typing import Set, Dict
 
+from luigi.parameter import ParameterVisibility
+
 from exasol_integration_test_docker_environment.lib.base.json_pickle_parameter import JsonPickleParameter
 from exasol_integration_test_docker_environment.lib.config.docker_config import target_docker_repository_config, \
     source_docker_repository_config
@@ -11,10 +13,11 @@ from exasol_integration_test_docker_environment.lib.docker.images.create.docker_
 from exasol_integration_test_docker_environment.lib.docker.images.push.docker_push_parameter import DockerPushParameter
 from exasol_integration_test_docker_environment.lib.docker.images.push.push_task_creator_for_build_tasks import \
     PushTaskCreatorFromBuildTasks
+from exasol_integration_test_docker_environment.lib.test_environment.parameter.test_container_parameter import \
+    TestContainerParameter
 
 
-class AnalyzeTestContainer(DockerAnalyzeImageTask):
-    test_container_content = JsonPickleParameter(TestContainerContentDescription)
+class AnalyzeTestContainer(DockerAnalyzeImageTask, TestContainerParameter):
 
     def get_target_repository_name(self) -> str:
         return f"""{target_docker_repository_config().repository_name}"""
@@ -45,9 +48,7 @@ class AnalyzeTestContainer(DockerAnalyzeImageTask):
         return False
 
 
-class DockerTestContainerBuildBase(DockerBuildBase):
-
-    test_container_content = JsonPickleParameter(TestContainerContentDescription)
+class DockerTestContainerBuildBase(DockerBuildBase, TestContainerParameter):
 
     def get_goal_class_map(self) -> Dict[str, DockerAnalyzeImageTask]:
         goal_class_map = {"test-container": self.create_child_task(task_class=AnalyzeTestContainer,
