@@ -1,18 +1,22 @@
+import contextlib
 import getpass
 import json
 import logging
 import os
+import warnings
 from datetime import datetime
 from pathlib import Path
 from typing import (
     Callable,
     Tuple,
     Set,
-    Optional, Any
+    Optional, Any, Dict, Iterator
 )
 
 import luigi
 import networkx
+from luigi.parameter import UnconsumedParameterWarning
+from luigi.setup_logging import InterfaceLogging
 from networkx import DiGraph
 
 from exasol_integration_test_docker_environment.lib import extract_modulename_for_build_steps
@@ -20,6 +24,26 @@ from exasol_integration_test_docker_environment.lib.api.api_errors import TaskRu
 from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import DependencyLoggerBaseTask
 from exasol_integration_test_docker_environment.lib.base.luigi_log_config import get_luigi_log_config, get_log_path
 from exasol_integration_test_docker_environment.lib.base.task_dependency import TaskDependency, DependencyState
+
+
+class JobCounterSingleton(object):
+    """
+    We use here a Singleton to avoid a unprotected global variable.
+    However, this counter needs to be global counter to guarantee unique job ids.
+    This is needed in case of task that finish in less than a second, to avoid duplicated job ids
+    """
+
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(JobCounterSingleton, cls).__new__(cls)
+            cls._instance._counter = 0
+        return cls._instance
+
+    def get_next_value(self) -> int:
+        self._counter += 1
+        return self._counter
 
 
 def set_build_config(force_rebuild: bool,
@@ -86,40 +110,107 @@ def import_build_steps(flavor_path: Tuple[str, ...]):
 
 
 def generate_root_task(task_class, *args, **kwargs) -> DependencyLoggerBaseTask:
+    job_counter = JobCounterSingleton().get_next_value()
     strftime = datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
-    params = {"job_id": f"{strftime}_{task_class.__name__}"}
+    params = {"job_id": f"{strftime}_{job_counter}_{task_class.__name__}"}
     params.update(kwargs)
     return task_class(**params)
 
 
 def run_task(task_creator: Callable[[], DependencyLoggerBaseTask], workers: int,
-             task_dependencies_dot_file: Optional[str]) \
+             task_dependencies_dot_file: Optional[str],
+             log_level: str = None, use_job_specific_log_file: bool = False) \
         -> Any:
     setup_worker()
     task = task_creator()
     success = False
+    log_file_path = get_log_path(task.job_id)
     try:
-        with get_luigi_log_config(get_log_path()) as luigi_config:
-            no_scheduling_errors = luigi.build([task], workers=workers,
-                                               local_scheduler=True,
-                                               logging_conf_file=f'{luigi_config}')
+        no_scheduling_errors = \
+            _run_task_with_logging_config(
+                task, log_file_path, log_level, use_job_specific_log_file, workers)
         success = not task.failed_target.exists() and no_scheduling_errors
-        generate_graph_from_task_dependencies(task, task_dependencies_dot_file)
-
-        if success:
-            return task.get_result()
-        elif task.failed_target.exists():
-            logging.error(f"Task {task} failed. failed target exists.")
-            raise TaskRuntimeError(msg=f"Task {task} (or any of it's subtasks) failed.",
-                                   inner=list(task.collect_failures().keys()))
-        elif not no_scheduling_errors:
-            logging.error(f"Task {task} failed. : luigi reported a scheduling error.")
-            raise TaskRuntimeError(msg=f"Task {task} failed. reason: luigi reported a scheduling error.")
+        return _handle_task_result(no_scheduling_errors, success, task,
+                                   task_dependencies_dot_file)
     except BaseException as e:
         logging.error("Going to abort the task %s" % task)
         raise e
     finally:
+        if use_job_specific_log_file:
+            logging.info(
+                f"The detailed log of the integration-test-docker-environment can be found at: {log_file_path}")
         task.cleanup(success)
+
+
+def _run_task_with_logging_config(
+        task: DependencyLoggerBaseTask,
+        log_file_path: Path,
+        log_level: Optional[str],
+        use_job_specific_log_file: bool,
+        workers: int) -> bool:
+    with _configure_logging(log_file_path, log_level, use_job_specific_log_file) as run_kwargs:
+        no_scheduling_errors = luigi.build([task], workers=workers,
+                                           local_scheduler=True, **run_kwargs)
+        return no_scheduling_errors
+
+
+def _handle_task_result(no_scheduling_errors, success, task, task_dependencies_dot_file: Optional[str]) -> Any:
+    generate_graph_from_task_dependencies(task, task_dependencies_dot_file)
+    if success:
+        return task.get_result()
+    elif task.failed_target.exists():
+        logging.error(f"Task {task} failed. failed target exists.")
+        raise TaskRuntimeError(msg=f"Task {task} (or any of it's subtasks) failed.",
+                               inner=list(task.collect_failures().keys()))
+    elif not no_scheduling_errors:
+        logging.error(f"Task {task} failed. : luigi reported a scheduling error.")
+        raise TaskRuntimeError(msg=f"Task {task} failed. reason: luigi reported a scheduling error.")
+
+
+@contextlib.contextmanager
+def _configure_logging(
+        log_file_path: Path,
+        log_level: Optional[str],
+        use_job_specific_log_file: bool) -> Iterator[Dict[str, str]]:
+    with get_luigi_log_config(log_file_target=log_file_path,
+                              console_log_level=log_level,
+                              use_job_specific_log_file=use_job_specific_log_file) as luigi_config:
+        no_configure_logging, run_kwargs = _configure_logging_parameter(
+            log_level=log_level,
+            luigi_config=luigi_config,
+            use_job_specific_log_file=use_job_specific_log_file)
+        # We need to set InterfaceLogging._configured to false,
+        # because otherwise luigi doesn't accept the new config.
+        InterfaceLogging._configured = False
+        luigi.configuration.get_config().set('core', 'no_configure_logging', str(no_configure_logging))
+        with warnings.catch_warnings():
+            # This filter is necessary, because luigi uses the config no_configure_logging,
+            # but doesn't define it, which seems to be a bug in luigi
+            warnings.filterwarnings(action="ignore",
+                                    category=UnconsumedParameterWarning,
+                                    message=".*no_configure_logging.*")
+            yield run_kwargs
+
+
+def _configure_logging_parameter(log_level: str, luigi_config: Path, use_job_specific_log_file: bool) \
+        -> Tuple[bool, Dict[str, str]]:
+    if log_level is None and not use_job_specific_log_file:
+        run_kwargs = {}
+        no_configure_logging = True
+    else:
+        no_configure_logging = False
+        run_kwargs = _get_run_kwargs_log_configuration(
+            log_level, luigi_config, use_job_specific_log_file)
+    return no_configure_logging, run_kwargs
+
+
+def _get_run_kwargs_log_configuration(log_level: str, luigi_config: Path, use_job_specific_log_file: bool) \
+        -> Dict[str, str]:
+    if use_job_specific_log_file:
+        run_kwargs = {"logging_conf_file": f'{luigi_config}'}
+    else:
+        run_kwargs = {"log_level": log_level}
+    return run_kwargs
 
 
 def generate_graph_from_task_dependencies(task: DependencyLoggerBaseTask, task_dependencies_dot_file: Optional[str]):

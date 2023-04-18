@@ -9,7 +9,7 @@ from exasol_integration_test_docker_environment.cli.options.docker_repository_op
 from exasol_integration_test_docker_environment.cli.options.system_options import (
     output_directory_option,
     system_options,
-    tempory_base_directory_option,
+    tempory_base_directory_option, luigi_logging_options,
 )
 from exasol_integration_test_docker_environment.cli.options.test_environment_options import (
     docker_db_options,
@@ -78,30 +78,33 @@ from exasol_integration_test_docker_environment.lib.api.common import add_option
 @add_options([output_directory_option])
 @add_options([tempory_base_directory_option])
 @add_options(system_options)
+@add_options(luigi_logging_options)
 def spawn_test_environment(
-    environment_name: str,
-    database_port_forward: Optional[int],
-    bucketfs_port_forward: Optional[int],
-    db_mem_size: str,
-    db_disk_size: str,
-    nameserver: Tuple[str, ...],
-    docker_runtime: Optional[str],
-    docker_db_image_version: str,
-    docker_db_image_name: str,
-    create_certificates: bool,
-    additional_db_parameter: Tuple[str, ...],
-    source_docker_repository_name: str,
-    source_docker_tag_prefix: str,
-    source_docker_username: Optional[str],
-    source_docker_password: Optional[str],
-    target_docker_repository_name: str,
-    target_docker_tag_prefix: str,
-    target_docker_username: Optional[str],
-    target_docker_password: Optional[str],
-    output_directory: str,
-    temporary_base_directory: str,
-    workers: int,
-    task_dependencies_dot_file: Optional[str],
+        environment_name: str,
+        database_port_forward: Optional[int],
+        bucketfs_port_forward: Optional[int],
+        db_mem_size: str,
+        db_disk_size: str,
+        nameserver: Tuple[str, ...],
+        docker_runtime: Optional[str],
+        docker_db_image_version: str,
+        docker_db_image_name: str,
+        create_certificates: bool,
+        additional_db_parameter: Tuple[str, ...],
+        source_docker_repository_name: str,
+        source_docker_tag_prefix: str,
+        source_docker_username: Optional[str],
+        source_docker_password: Optional[str],
+        target_docker_repository_name: str,
+        target_docker_tag_prefix: str,
+        target_docker_username: Optional[str],
+        target_docker_password: Optional[str],
+        output_directory: str,
+        temporary_base_directory: str,
+        workers: int,
+        task_dependencies_dot_file: Optional[str],
+        log_level: Optional[str],
+        use_job_specific_log_file: bool
 ):
     """
     This command spawn a test environment with a docker-db container and a connected test-container.
@@ -133,6 +136,8 @@ def spawn_test_environment(
                 temporary_base_directory,
                 workers,
                 task_dependencies_dot_file,
+                log_level=log_level,
+                use_job_specific_log_file=use_job_specific_log_file,
             )
         except ArgumentConstraintError as e:
             handle_wrong_argument_error(*e.args)

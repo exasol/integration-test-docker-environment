@@ -4,7 +4,8 @@ import humanfriendly
 
 from exasol_integration_test_docker_environment.lib.api.common import set_build_config, set_docker_repository_config, \
     run_task, generate_root_task, no_cli_function
-from exasol_integration_test_docker_environment.cli.options.docker_repository_options import DEFAULT_DOCKER_REPOSITORY_NAME
+from exasol_integration_test_docker_environment.cli.options.docker_repository_options import \
+    DEFAULT_DOCKER_REPOSITORY_NAME
 from exasol_integration_test_docker_environment.cli.options.system_options import DEFAULT_OUTPUT_DIRECTORY
 from exasol_integration_test_docker_environment.cli.options.test_environment_options import LATEST_DB_VERSION
 from exasol_integration_test_docker_environment.lib.api.api_errors import ArgumentConstraintError
@@ -36,7 +37,7 @@ def spawn_test_environment_with_test_container(
         bucketfs_port_forward: Optional[int] = None,
         db_mem_size: str = "2 GiB",
         db_disk_size: str = "2 GiB",
-        nameserver: Tuple[str,...] = tuple(),
+        nameserver: Tuple[str, ...] = tuple(),
         docker_runtime: Optional[str] = None,
         docker_db_image_version: str = LATEST_DB_VERSION,
         docker_db_image_name: str = "exasol/docker-db",
@@ -53,7 +54,10 @@ def spawn_test_environment_with_test_container(
         output_directory: str = DEFAULT_OUTPUT_DIRECTORY,
         temporary_base_directory: str = "/tmp",
         workers: int = 5,
-        task_dependencies_dot_file: Optional[str] = None) \
+        task_dependencies_dot_file: Optional[str] = None,
+        log_level: Optional[str] = None,
+        use_job_specific_log_file: bool = False
+) \
         -> Tuple[EnvironmentInfo, Callable[[], None]]:
     """
     This function spawns a test environment with a docker-db container and a connected test-container.
@@ -104,5 +108,7 @@ def spawn_test_environment_with_test_container(
                                               test_container_content=test_container_content,
                                               additional_db_parameter=additional_db_parameter
                                               )
-    environment_info = run_task(task_creator, workers, task_dependencies_dot_file)
+    environment_info = run_task(task_creator, workers, task_dependencies_dot_file,
+                                log_level=log_level,
+                                use_job_specific_log_file=use_job_specific_log_file)
     return environment_info, functools.partial(_cleanup, environment_info)

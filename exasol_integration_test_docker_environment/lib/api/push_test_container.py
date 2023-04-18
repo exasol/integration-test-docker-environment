@@ -2,7 +2,8 @@ from typing import Tuple, Optional
 
 from exasol_integration_test_docker_environment.lib.api.common import set_docker_repository_config, \
     run_task, set_build_config, generate_root_task, no_cli_function
-from exasol_integration_test_docker_environment.cli.options.docker_repository_options import DEFAULT_DOCKER_REPOSITORY_NAME
+from exasol_integration_test_docker_environment.cli.options.docker_repository_options import \
+    DEFAULT_DOCKER_REPOSITORY_NAME
 from exasol_integration_test_docker_environment.cli.options.system_options import DEFAULT_OUTPUT_DIRECTORY
 from exasol_integration_test_docker_environment.lib.data.test_container_content_description import \
     TestContainerContentDescription
@@ -33,7 +34,10 @@ def push_test_container(
         target_docker_username: Optional[str] = None,
         target_docker_password: Optional[str] = None,
         workers: int = 5,
-        task_dependencies_dot_file: Optional[str] = None) -> ImageInfo:
+        task_dependencies_dot_file: Optional[str] = None,
+        log_level: Optional[str] = None,
+        use_job_specific_log_file: bool = False
+) -> ImageInfo:
     """
     This function pushes all stages of the test container for the test environment.
     If the stages do not exist locally, the system will build or pull them before the push.
@@ -57,5 +61,7 @@ def push_test_container(
                                               test_container_content=test_container_content,
                                               force_push=force_push,
                                               push_all=push_all)
-    image_infos = run_task(task_creator, workers, task_dependencies_dot_file)
+    image_infos = run_task(task_creator, workers, task_dependencies_dot_file,
+                           log_level=log_level,
+                           use_job_specific_log_file=use_job_specific_log_file)
     return image_infos[0]

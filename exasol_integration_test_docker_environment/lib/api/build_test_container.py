@@ -2,7 +2,8 @@ from typing import Tuple, Optional
 
 from exasol_integration_test_docker_environment.lib.api.common import set_build_config, \
     set_docker_repository_config, run_task, generate_root_task, no_cli_function
-from exasol_integration_test_docker_environment.cli.options.docker_repository_options import DEFAULT_DOCKER_REPOSITORY_NAME
+from exasol_integration_test_docker_environment.cli.options.docker_repository_options import \
+    DEFAULT_DOCKER_REPOSITORY_NAME
 from exasol_integration_test_docker_environment.cli.options.system_options import DEFAULT_OUTPUT_DIRECTORY
 from exasol_integration_test_docker_environment.lib.data.test_container_content_description import \
     TestContainerContentDescription
@@ -31,7 +32,10 @@ def build_test_container(
         target_docker_username: Optional[str] = None,
         target_docker_password: Optional[str] = None,
         workers: int = 5,
-        task_dependencies_dot_file: Optional[str] = None) -> ImageInfo:
+        task_dependencies_dot_file: Optional[str] = None,
+        log_level: Optional[str] = None,
+        use_job_specific_log_file: bool = False
+) -> ImageInfo:
     """
     This function builds all stages of the test container for the test environment.
     If stages are cached in a docker registry, the function is going to pull them,
@@ -55,5 +59,7 @@ def build_test_container(
                                  target_docker_tag_prefix, "target")
     task_creator = lambda: generate_root_task(task_class=DockerTestContainerBuild,
                                               test_container_content=test_container_content)
-    image_infos = run_task(task_creator, workers, task_dependencies_dot_file)
+    image_infos = run_task(task_creator, workers, task_dependencies_dot_file,
+                           log_level=log_level,
+                           use_job_specific_log_file=use_job_specific_log_file)
     return image_infos["test-container"]
