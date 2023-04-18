@@ -13,3 +13,8 @@ If you need further versions, please open an issue.
 
 ## Internal
  - #297: Update release_config.yml 
+
+## Changes
+
+ - #294: Fixed that the client logging config gets overwritten
+ - #295: Fixed that the test_container_content parameter pollutes the logs 
