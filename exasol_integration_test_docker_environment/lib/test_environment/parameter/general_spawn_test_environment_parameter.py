@@ -5,7 +5,7 @@ from exasol_integration_test_docker_environment.lib.test_environment.parameter.t
     OptionalTestContainerParameter
 
 
-class GeneralSpawnTestEnvironmentParameter(Config, OptionalTestContainerParameter):
+class GeneralSpawnTestEnvironmentParameter(OptionalTestContainerParameter):
     reuse_database_setup = luigi.BoolParameter(False, significant=False)
     reuse_test_container = luigi.BoolParameter(False, significant=False)
     no_test_container_cleanup_after_success = luigi.BoolParameter(False, significant=False)
