@@ -360,6 +360,7 @@
 <li class="toctree-l4"><a class="reference internal" href="exasol_integration_test_docker_environment.test.get_test_container_content.html">exasol_integration_test_docker_environment.test.get_test_container_content</a></li>
 <li class="toctree-l4"><a class="reference internal" href="exasol_integration_test_docker_environment.test.test_api_build_test_container.html">exasol_integration_test_docker_environment.test.test_api_build_test_container</a></li>
 <li class="toctree-l4"><a class="reference internal" href="exasol_integration_test_docker_environment.test.test_api_external_test_environment.html">exasol_integration_test_docker_environment.test.test_api_external_test_environment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="exasol_integration_test_docker_environment.test.test_api_logging.html">exasol_integration_test_docker_environment.test.test_api_logging</a></li>
 <li class="toctree-l4"><a class="reference internal" href="exasol_integration_test_docker_environment.test.test_api_push_test_container.html">exasol_integration_test_docker_environment.test.test_api_push_test_container</a></li>
 <li class="toctree-l4"><a class="reference internal" href="exasol_integration_test_docker_environment.test.test_api_test_environment.html">exasol_integration_test_docker_environment.test.test_api_test_environment</a></li>
 <li class="toctree-l4"><a class="reference internal" href="exasol_integration_test_docker_environment.test.test_api_test_environment_certificate.html">exasol_integration_test_docker_environment.test.test_api_test_environment_certificate</a></li>
@@ -473,17 +474,20 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_simple_tasks</span></code>(log_path)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_simple_tasks</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_test_different_logging_file_raises_error</span></code>()</p></td>
-<td><p>Integration test which verifies that changing the log path from one invocation of run_task to the next will raise an error.</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_test_different_logging_file</span></code>()</p></td>
+<td><p>Integration test which verifies that changing the log path from one invocation of run_task to the next will work</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_test_same_logging_file</span></code>()</p></td>
 <td><p>Integration test which verifies that re-using the same logging for multiple tasks works as expected, using the default log path</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_test_same_logging_file_env_log_path</span></code>()</p></td>
 <td><p>Integration test which verifies that re-using the same logging for multiple tasks works as expected, using a custom log path</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">use_specific_log_file</span></code>(task_creator, ...)</p></td>
+<td><p></p></td>
 </tr>
 </tbody>
 </table>

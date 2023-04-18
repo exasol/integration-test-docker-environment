@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="exasol_integration_test_docker_environment.lib.test_environment.database_setup.upload_file_to_db" href="exasol_integration_test_docker_environment.lib.test_environment.database_setup.upload_file_to_db.html" /><link rel="prev" title="exasol_integration_test_docker_environment.lib.test_environment.database_setup.populate_data" href="exasol_integration_test_docker_environment.lib.test_environment.database_setup.populate_data.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="exasol_integration_test_docker_environment.test.test_api_push_test_container" href="exasol_integration_test_docker_environment.test.test_api_push_test_container.html" /><link rel="prev" title="exasol_integration_test_docker_environment.test.test_api_external_test_environment" href="exasol_integration_test_docker_environment.test.test_api_external_test_environment.html" />
 
     <meta name="generator" content="sphinx-4.5.0, furo 2022.09.29"/>
-        <title>exasol_integration_test_docker_environment.lib.test_environment.database_setup.time_based_bucketfs_sync_waiter - Exasol Integration Test Docker Environment documentation</title>
+        <title>exasol_integration_test_docker_environment.test.test_api_logging - Exasol Integration Test Docker Environment documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
@@ -193,7 +193,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="exasol_integration_test_docker_environment.doctor.html">exasol_integration_test_docker_environment.doctor</a></li>
-<li class="toctree-l3 current has-children"><a class="reference internal" href="exasol_integration_test_docker_environment.lib.html">exasol_integration_test_docker_environment.lib</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l3 has-children"><a class="reference internal" href="exasol_integration_test_docker_environment.lib.html">exasol_integration_test_docker_environment.lib</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l4 has-children"><a class="reference internal" href="exasol_integration_test_docker_environment.lib.api.html">exasol_integration_test_docker_environment.lib.api</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" role="switch" type="checkbox"/><label for="toctree-checkbox-10"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l5"><a class="reference internal" href="exasol_integration_test_docker_environment.lib.api.api_errors.html">exasol_integration_test_docker_environment.lib.api.api_errors</a></li>
 <li class="toctree-l5"><a class="reference internal" href="exasol_integration_test_docker_environment.lib.api.build_test_container.html">exasol_integration_test_docker_environment.lib.api.build_test_container</a></li>
@@ -307,7 +307,7 @@
 <li class="toctree-l5"><a class="reference internal" href="exasol_integration_test_docker_environment.lib.logging.container_log_handler.html">exasol_integration_test_docker_environment.lib.logging.container_log_handler</a></li>
 </ul>
 </li>
-<li class="toctree-l4 current has-children"><a class="reference internal" href="exasol_integration_test_docker_environment.lib.test_environment.html">exasol_integration_test_docker_environment.lib.test_environment</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-24" name="toctree-checkbox-24" role="switch" type="checkbox"/><label for="toctree-checkbox-24"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l4 has-children"><a class="reference internal" href="exasol_integration_test_docker_environment.lib.test_environment.html">exasol_integration_test_docker_environment.lib.test_environment</a><input class="toctree-checkbox" id="toctree-checkbox-24" name="toctree-checkbox-24" role="switch" type="checkbox"/><label for="toctree-checkbox-24"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l5"><a class="reference internal" href="exasol_integration_test_docker_environment.lib.test_environment.abstract_spawn_test_environment.html">exasol_integration_test_docker_environment.lib.test_environment.abstract_spawn_test_environment</a></li>
 <li class="toctree-l5"><a class="reference internal" href="exasol_integration_test_docker_environment.lib.test_environment.analyze_test_container.html">exasol_integration_test_docker_environment.lib.test_environment.analyze_test_container</a></li>
 <li class="toctree-l5 has-children"><a class="reference internal" href="exasol_integration_test_docker_environment.lib.test_environment.create_certificates.html">exasol_integration_test_docker_environment.lib.test_environment.create_certificates</a><input class="toctree-checkbox" id="toctree-checkbox-25" name="toctree-checkbox-25" role="switch" type="checkbox"/><label for="toctree-checkbox-25"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -315,12 +315,12 @@
 <li class="toctree-l6"><a class="reference internal" href="exasol_integration_test_docker_environment.lib.test_environment.create_certificates.create_ssl_certificates_task.html">exasol_integration_test_docker_environment.lib.test_environment.create_certificates.create_ssl_certificates_task</a></li>
 </ul>
 </li>
-<li class="toctree-l5 current has-children"><a class="reference internal" href="exasol_integration_test_docker_environment.lib.test_environment.database_setup.html">exasol_integration_test_docker_environment.lib.test_environment.database_setup</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-26" name="toctree-checkbox-26" role="switch" type="checkbox"/><label for="toctree-checkbox-26"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l5 has-children"><a class="reference internal" href="exasol_integration_test_docker_environment.lib.test_environment.database_setup.html">exasol_integration_test_docker_environment.lib.test_environment.database_setup</a><input class="toctree-checkbox" id="toctree-checkbox-26" name="toctree-checkbox-26" role="switch" type="checkbox"/><label for="toctree-checkbox-26"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l6"><a class="reference internal" href="exasol_integration_test_docker_environment.lib.test_environment.database_setup.bucketfs_sync_checker.html">exasol_integration_test_docker_environment.lib.test_environment.database_setup.bucketfs_sync_checker</a></li>
 <li class="toctree-l6"><a class="reference internal" href="exasol_integration_test_docker_environment.lib.test_environment.database_setup.docker_db_log_based_bucket_sync_checker.html">exasol_integration_test_docker_environment.lib.test_environment.database_setup.docker_db_log_based_bucket_sync_checker</a></li>
 <li class="toctree-l6"><a class="reference internal" href="exasol_integration_test_docker_environment.lib.test_environment.database_setup.find_exaplus_in_db_container.html">exasol_integration_test_docker_environment.lib.test_environment.database_setup.find_exaplus_in_db_container</a></li>
 <li class="toctree-l6"><a class="reference internal" href="exasol_integration_test_docker_environment.lib.test_environment.database_setup.populate_data.html">exasol_integration_test_docker_environment.lib.test_environment.database_setup.populate_data</a></li>
-<li class="toctree-l6 current current-page"><a class="current reference internal" href="#">exasol_integration_test_docker_environment.lib.test_environment.database_setup.time_based_bucketfs_sync_waiter</a></li>
+<li class="toctree-l6"><a class="reference internal" href="exasol_integration_test_docker_environment.lib.test_environment.database_setup.time_based_bucketfs_sync_waiter.html">exasol_integration_test_docker_environment.lib.test_environment.database_setup.time_based_bucketfs_sync_waiter</a></li>
 <li class="toctree-l6"><a class="reference internal" href="exasol_integration_test_docker_environment.lib.test_environment.database_setup.upload_file_to_db.html">exasol_integration_test_docker_environment.lib.test_environment.database_setup.upload_file_to_db</a></li>
 </ul>
 </li>
@@ -356,11 +356,11 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="exasol_integration_test_docker_environment.main.html">exasol_integration_test_docker_environment.main</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="exasol_integration_test_docker_environment.test.html">exasol_integration_test_docker_environment.test</a><input class="toctree-checkbox" id="toctree-checkbox-30" name="toctree-checkbox-30" role="switch" type="checkbox"/><label for="toctree-checkbox-30"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3 current has-children"><a class="reference internal" href="exasol_integration_test_docker_environment.test.html">exasol_integration_test_docker_environment.test</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-30" name="toctree-checkbox-30" role="switch" type="checkbox"/><label for="toctree-checkbox-30"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="exasol_integration_test_docker_environment.test.get_test_container_content.html">exasol_integration_test_docker_environment.test.get_test_container_content</a></li>
 <li class="toctree-l4"><a class="reference internal" href="exasol_integration_test_docker_environment.test.test_api_build_test_container.html">exasol_integration_test_docker_environment.test.test_api_build_test_container</a></li>
 <li class="toctree-l4"><a class="reference internal" href="exasol_integration_test_docker_environment.test.test_api_external_test_environment.html">exasol_integration_test_docker_environment.test.test_api_external_test_environment</a></li>
-<li class="toctree-l4"><a class="reference internal" href="exasol_integration_test_docker_environment.test.test_api_logging.html">exasol_integration_test_docker_environment.test.test_api_logging</a></li>
+<li class="toctree-l4 current current-page"><a class="current reference internal" href="#">exasol_integration_test_docker_environment.test.test_api_logging</a></li>
 <li class="toctree-l4"><a class="reference internal" href="exasol_integration_test_docker_environment.test.test_api_push_test_container.html">exasol_integration_test_docker_environment.test.test_api_push_test_container</a></li>
 <li class="toctree-l4"><a class="reference internal" href="exasol_integration_test_docker_environment.test.test_api_test_environment.html">exasol_integration_test_docker_environment.test.test_api_test_environment</a></li>
 <li class="toctree-l4"><a class="reference internal" href="exasol_integration_test_docker_environment.test.test_api_test_environment_certificate.html">exasol_integration_test_docker_environment.test.test_api_test_environment_certificate</a></li>
@@ -464,8 +464,22 @@
           </label>
         </div>
         <article role="main">
-          <section id="module-exasol_integration_test_docker_environment.lib.test_environment.database_setup.time_based_bucketfs_sync_waiter">
-<span id="exasol-integration-test-docker-environment-lib-test-environment-database-setup-time-based-bucketfs-sync-waiter"></span><h1>exasol_integration_test_docker_environment.lib.test_environment.database_setup.time_based_bucketfs_sync_waiter<a class="headerlink" href="#module-exasol_integration_test_docker_environment.lib.test_environment.database_setup.time_based_bucketfs_sync_waiter" title="Permalink to this headline">#</a></h1>
+          <section id="module-exasol_integration_test_docker_environment.test.test_api_logging">
+<span id="exasol-integration-test-docker-environment-test-test-api-logging"></span><h1>exasol_integration_test_docker_environment.test.test_api_logging<a class="headerlink" href="#module-exasol_integration_test_docker_environment.test.test_api_logging" title="Permalink to this headline">#</a></h1>
+<p class="rubric">Functions</p>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ignore_resource_warning</span></code>()</p></td>
+<td><p>Ignore ResourceWarning to keep the captured output clean for the asserts</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 <p class="rubric">Classes</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
@@ -474,7 +488,10 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeBasedBucketFSSyncWaiter</span></code>(sync_time_estimation)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">APIClientLoggingTest</span></code>([methodName])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DummyTask</span></code>(*args, **kwargs)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -487,23 +504,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="exasol_integration_test_docker_environment.lib.test_environment.database_setup.upload_file_to_db.html">
+          <a class="next-page" href="exasol_integration_test_docker_environment.test.test_api_push_test_container.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">exasol_integration_test_docker_environment.lib.test_environment.database_setup.upload_file_to_db</div>
+                <div class="title">exasol_integration_test_docker_environment.test.test_api_push_test_container</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="exasol_integration_test_docker_environment.lib.test_environment.database_setup.populate_data.html">
+          <a class="prev-page" href="exasol_integration_test_docker_environment.test.test_api_external_test_environment.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">exasol_integration_test_docker_environment.lib.test_environment.database_setup.populate_data</div>
+                <div class="title">exasol_integration_test_docker_environment.test.test_api_external_test_environment</div>
                 
               </div>
             </a>
