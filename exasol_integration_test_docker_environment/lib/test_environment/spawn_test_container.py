@@ -11,16 +11,16 @@ from exasol_integration_test_docker_environment.lib.base.docker_base_task import
 from exasol_integration_test_docker_environment.lib.base.json_pickle_parameter import JsonPickleParameter
 from exasol_integration_test_docker_environment.lib.data.container_info import ContainerInfo
 from exasol_integration_test_docker_environment.lib.data.docker_network_info import DockerNetworkInfo
-from exasol_integration_test_docker_environment.lib.data.test_container_content_description import \
-    TestContainerContentDescription
 from exasol_integration_test_docker_environment.lib.docker.images.image_info import ImageState, ImageInfo
 from exasol_integration_test_docker_environment.lib.test_environment.analyze_test_container import \
     DockerTestContainerBuild
 from exasol_integration_test_docker_environment.lib.test_environment.docker_container_copy import \
     copy_script_to_container
+from exasol_integration_test_docker_environment.lib.test_environment.parameter.test_container_parameter import \
+    TestContainerParameter
 
 
-class SpawnTestContainer(DockerBaseTask):
+class SpawnTestContainer(DockerBaseTask, TestContainerParameter):
     environment_name = luigi.Parameter()
     test_container_name = luigi.Parameter()
     network_info = JsonPickleParameter(
@@ -32,7 +32,6 @@ class SpawnTestContainer(DockerBaseTask):
     no_test_container_cleanup_after_failure = luigi.BoolParameter(False, significant=False)
     docker_runtime = luigi.OptionalParameter(None, significant=False)
     certificate_volume_name = luigi.OptionalParameter(None, significant=False)
-    test_container_content = JsonPickleParameter(TestContainerContentDescription)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
