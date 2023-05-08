@@ -1,3 +1,4 @@
+import dataclasses
 from pathlib import Path
 from typing import Tuple
 
@@ -19,6 +20,12 @@ from exasol_integration_test_docker_environment.lib.test_environment.database_se
     DockerDBLogBasedBucketFSSyncChecker
 from exasol_integration_test_docker_environment.lib.test_environment.database_setup.time_based_bucketfs_sync_waiter import \
     TimeBasedBucketFSSyncWaiter
+
+
+@dataclasses.dataclass
+class UploadResult:
+    upload_target: str
+    reused: bool
 
 
 class UploadFileToBucketFS(DockerBaseTask):
@@ -53,10 +60,18 @@ class UploadFileToBucketFS(DockerBaseTask):
                                      log_file,
                                      pattern_to_wait_for,
                                      sync_time_estimation)
+                self.return_object(UploadResult(
+                    upload_target=upload_target,
+                    reused=False
+                ))
             else:
                 self.logger.warning("Reusing uploaded target %s instead of file %s",
                                     upload_target, file_to_upload)
                 self.write_logs("Reusing")
+                self.return_object(UploadResult(
+                    upload_target=upload_target,
+                    reused=True
+                ))
 
     def upload_and_wait(self, database_container,
                         file_to_upload: str, upload_target: str,
@@ -97,27 +112,25 @@ class UploadFileToBucketFS(DockerBaseTask):
         return self.reuse_uploaded and self.exist_file_in_bucketfs(upload_target)
 
     @staticmethod
-    def split_upload_target(upload_target: str) -> Tuple[str, str]:
+    def split_upload_target(upload_target: str) -> Tuple[str, str, str]:
         upload_parts = upload_target.split("/")
         bucket_name = upload_parts[0]
-        upload_target_in_bucket = "/".join(upload_parts[1:])
-        return bucket_name, upload_target_in_bucket
+        path_in_bucket = "/".join(upload_parts[1:-1])
+        file_in_bucket = upload_parts[-1]
+        return bucket_name, path_in_bucket, file_in_bucket
 
     def exist_file_in_bucketfs(self, upload_target: str) -> bool:
         self.logger.info("Check if file %s exist in bucketfs", upload_target)
-        bucket_name, upload_target = self.split_upload_target(upload_target)
+        bucket_name, path_in_bucket, file_in_bucket = self.split_upload_target(upload_target)
 
         bucket_config = self.generate_bucket_config(bucket_name)
         try:
             files = list_files.list_files_in_bucketfs(
                 bucket_config=bucket_config,
-                bucket_file_path=upload_target)
-            if upload_target not in files:
-                raise RuntimeError(f"Unexpected behavior of list_files.list_files_in_bucketfs. "
-                                   f"bucket_file_path='{upload_target}' was requested, but not returned.")
+                bucket_file_path=path_in_bucket)
+            return file_in_bucket in files
         except FileNotFoundError as ex:
             return False
-        return True
 
     def generate_bucket_config(self, bucket_name: str) -> BucketConfig:
         connection_config = BucketFSConnectionConfig(
@@ -135,12 +148,12 @@ class UploadFileToBucketFS(DockerBaseTask):
     def upload_file(self, file_to_upload: str, upload_target: str):
         self.logger.info("upload file %s to %s",
                          file_to_upload, upload_target)
-        bucket_name, upload_target = self.split_upload_target(upload_target)
+        bucket_name, path_in_bucket, file_in_bucket = self.split_upload_target(upload_target)
 
         bucket_config = self.generate_bucket_config(bucket_name)
         upload.upload_file_to_bucketfs(
             bucket_config=bucket_config,
-            bucket_file_path=upload_target,
+            bucket_file_path=f"{path_in_bucket}/{file_in_bucket}",
             local_file_path=Path(file_to_upload))
         return f"File '{file_to_upload}' to '{upload_target}'"
 

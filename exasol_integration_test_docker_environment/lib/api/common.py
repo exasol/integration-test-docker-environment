@@ -117,8 +117,8 @@ def generate_root_task(task_class, *args, **kwargs) -> DependencyLoggerBaseTask:
     return task_class(**params)
 
 
-def run_task(task_creator: Callable[[], DependencyLoggerBaseTask], workers: int,
-             task_dependencies_dot_file: Optional[str],
+def run_task(task_creator: Callable[[], DependencyLoggerBaseTask], workers: int = 2,
+             task_dependencies_dot_file: Optional[str] = None,
              log_level: str = None, use_job_specific_log_file: bool = False) \
         -> Any:
     setup_worker()
