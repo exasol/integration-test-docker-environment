@@ -20,3 +20,4 @@ If you need further versions, please open an issue.
  - #294: Fixed that the client logging config gets overwritten
  - #295: Fixed that the test_container_content parameter pollutes the logs
  - #300: Fixed BucketFS uploads during reusing of an environment
+ - #310: Fixed that using run_task with log_level duplicates log entries
