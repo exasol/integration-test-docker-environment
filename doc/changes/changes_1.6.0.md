@@ -13,6 +13,7 @@ If you need further versions, please open an issue.
 
 ## Internal
  - #297: Update release_config.yml 
+ - #311: Add vagrant setup
 
 ## Changes
 

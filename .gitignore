@@ -7,3 +7,4 @@ Pipfile.lock
 .idea
 .build_output/
 dist/
+.vagrant
