@@ -2,16 +2,15 @@ import tempfile
 import unittest
 from pathlib import Path
 from sys import stderr
+from typing import List
 
 import luigi
-from exasol_bucketfs_utils_python import list_files, download
-from exasol_bucketfs_utils_python.bucket_config import BucketConfig
-from exasol_bucketfs_utils_python.bucketfs_config import BucketFSConfig
-from exasol_bucketfs_utils_python.bucketfs_connection_config import BucketFSConnectionConfig
+from exasol.bucketfs import Service, Bucket, as_string
+from exasol_bucketfs_utils_python import list_files
 
-from exasol_integration_test_docker_environment.lib.api.common import generate_root_task
+from exasol_integration_test_docker_environment.lib.api.common import generate_root_task, run_task
 from exasol_integration_test_docker_environment.lib.test_environment.database_setup.upload_file_to_db import \
-    UploadFileToBucketFS
+    UploadFileToBucketFS, UploadResult
 from exasol_integration_test_docker_environment.testing import utils
 from exasol_integration_test_docker_environment.testing.api_test_environment import ApiTestEnvironment
 
@@ -19,9 +18,13 @@ BUCKET_NAME = "default"
 PATH_IN_BUCKET = "upload_test"
 
 
+def construct_upload_target(file_to_upload: str) -> str:
+    return f"{BUCKET_NAME}/{PATH_IN_BUCKET}/{file_to_upload}"
+
+
 class TestfileUpload(UploadFileToBucketFS):
     path = luigi.Parameter()
-    file_to_upload = luigi.Parameter()
+    file_to_upload = luigi.Parameter()  # type: str
 
     def get_log_file(self) -> str:
         return "/exa/logs/cored/*bucketfsd*"
@@ -33,7 +36,7 @@ class TestfileUpload(UploadFileToBucketFS):
         return f"{Path(str(self.path)) / str(self.file_to_upload)}"
 
     def get_upload_target(self) -> str:
-        return f"{BUCKET_NAME}/{PATH_IN_BUCKET}/{self.file_to_upload}"
+        return construct_upload_target(self.file_to_upload)
 
     def get_sync_time_estimation(self) -> int:
         """Estimated time in seconds which the bucketfs needs to extract and sync a uploaded file"""
@@ -54,68 +57,140 @@ class TestUpload(unittest.TestCase):
     def tearDownClass(cls):
         utils.close_environments(cls.environment, cls.test_environment)
 
-    def _upload(self, temp_dir: str, file_to_upload: str):
-        task = generate_root_task(task_class=TestfileUpload,
-                                  path=temp_dir,
-                                  file_to_upload=file_to_upload,
-                                  environment_name=self.environment.name,
-                                  test_environment_info=self.environment.environment_info,
-                                  bucketfs_write_password=self.environment.bucketfs_password
-                                  )
-        try:
-            success = luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
-            if not success:
-                raise Exception("Task failed")
-        except Exception as e:
-            task.cleanup(False)
-            raise RuntimeError("Error uploading test file.") from e
+    def _upload(self, temp_dir: str, file_to_upload: str, reuse: bool) -> UploadResult:
+        task_creator = lambda: generate_root_task(task_class=TestfileUpload,
+                                                  path=temp_dir,
+                                                  file_to_upload=file_to_upload,
+                                                  environment_name=self.environment.name,
+                                                  test_environment_info=self.environment.environment_info,
+                                                  bucketfs_write_password=self.environment.bucketfs_password,
+                                                  reuse_uploaded=reuse)
+        result = run_task(task_creator=task_creator, log_level="INFO")
+        return result
 
-    def get_bucket_config(self):
+    def _get_bucket(self) -> Bucket:
         db_info = self.environment.environment_info.database_info
-        connection_config = BucketFSConnectionConfig(
-            host=db_info.host, port=int(db_info.bucketfs_port),
-            user=self.environment.bucketfs_username, pwd=self.environment.bucketfs_password,
-            is_https=False)
-        bucketfs_config = BucketFSConfig(
-            connection_config=connection_config,
-            bucketfs_name="bfsdefault")
+        URL = f"http://{db_info.host}:{db_info.bucketfs_port}"
+        CREDENTAILS = {BUCKET_NAME: {"username": self.environment.bucketfs_username,
+                                     "password": self.environment.bucketfs_password}}
+        bucketfs = Service(URL, CREDENTAILS)
+        return bucketfs.buckets[BUCKET_NAME]
 
-        bucket_config = BucketConfig(
-            bucket_name=BUCKET_NAME,
-            bucketfs_config=bucketfs_config)
-
-        return bucket_config
-
-    def download_file_and_read(self, output_path: Path, filename: str):
-        local_output_file_path = output_path / filename
-        download.download_from_bucketfs_to_file(
-            bucket_config=self.get_bucket_config(),
-            bucket_file_path=f"{PATH_IN_BUCKET}/{filename}",
-            local_file_path=local_output_file_path)
-        file_content = local_output_file_path.read_text()
+    def _download_file(self, filename: str) -> str:
+        file_content = as_string(self._get_bucket().download(f"{PATH_IN_BUCKET}/{filename}"))
         return file_content
 
-    def test_upload(self):
-        with tempfile.TemporaryDirectory() as d:
+    def _assert_file_upload(self, file_name: str,
+                            upload_result: UploadResult,
+                            expected_reuse: bool,
+                            expected_content: str):
+        files = self._get_bucket().files
+        self.assertEqual(upload_result, UploadResult(
+            upload_target=construct_upload_target(file_name),
+            reused=expected_reuse
+        ))
+        self.assertIn(f"{PATH_IN_BUCKET}/{file_name}", list(files))
+        content = self._download_file(file_name)
+        self.assertEqual(content, expected_content)
+
+    def _create_file_and_upload(self,
+                                local_directory: str,
+                                content: str,
+                                upload_target: str,
+                                reuse: bool) -> UploadResult:
+        with open(f"{local_directory}/{upload_target}", "w") as f:
+            f.write(content)
+        return self._upload(local_directory, upload_target, reuse)
+
+    def test_upload_without_reuse(self):
+        with tempfile.TemporaryDirectory() as temp_directory:
             file_one = "test1.txt"
+            result_file_one = self._create_file_and_upload(
+                local_directory=temp_directory,
+                content=file_one,
+                upload_target=file_one,
+                reuse=False
+            )
             file_two = "test2.txt"
-            with open(f"{d}/{file_one}", "w") as f:
-                f.write(file_one)
-            with open(f"{d}/{file_two}", "w") as f:
-                f.write(file_two)
+            result_file_two = self._create_file_and_upload(
+                local_directory=temp_directory,
+                content=file_two,
+                upload_target=file_two,
+                reuse=False
+            )
+        self._assert_file_upload(file_name=file_one,
+                                 upload_result=result_file_one,
+                                 expected_reuse=False,
+                                 expected_content=file_one)
+        self._assert_file_upload(file_name=file_two,
+                                 upload_result=result_file_two,
+                                 expected_reuse=False,
+                                 expected_content=file_two)
 
-            self._upload(d, file_one)
-            self._upload(d, file_two)
+    def test_upload_with_reuse(self):
+        with tempfile.TemporaryDirectory() as temp_directory:
+            file_reuse = "test_reuse.txt"
+            result = self._create_file_and_upload(
+                local_directory=temp_directory,
+                content=file_reuse,
+                upload_target=file_reuse,
+                reuse=True
+            )
+        self._assert_file_upload(file_name=file_reuse,
+                                 upload_result=result,
+                                 expected_reuse=False,
+                                 expected_content=file_reuse)
 
-        bucket_config = self.get_bucket_config()
-        files = list_files.list_files_in_bucketfs(bucket_config=bucket_config, bucket_file_path=PATH_IN_BUCKET)
-        self.assertEquals(sorted(list(files)), [file_one, file_two])
-        with tempfile.TemporaryDirectory() as d_target:
-            p_target = Path(d_target)
-            file_one_content = self.download_file_and_read(p_target, file_one)
-            assert file_one_content == file_one
-            file_two_content = self.download_file_and_read(p_target, file_two)
-            assert file_two_content == file_two
+    def test_reupload_with_reuse(self):
+        with tempfile.TemporaryDirectory() as temp_directory:
+            file_reupload_reuse = "test_reupload_reuse.txt"
+            result = self._create_file_and_upload(
+                local_directory=temp_directory,
+                content=file_reupload_reuse,
+                upload_target=file_reupload_reuse,
+                reuse=True
+            )
+            self._assert_file_upload(file_name=file_reupload_reuse,
+                                     upload_result=result,
+                                     expected_reuse=False,
+                                     expected_content=file_reupload_reuse)
+
+            result = self._create_file_and_upload(
+                local_directory=temp_directory,
+                content=file_reupload_reuse,
+                upload_target=file_reupload_reuse,
+                reuse=True
+            )
+            self._assert_file_upload(file_name=file_reupload_reuse,
+                                     upload_result=result,
+                                     expected_reuse=True,
+                                     expected_content=file_reupload_reuse)
+
+    def test_reupload_without_reuse(self):
+        with tempfile.TemporaryDirectory() as temp_directory:
+            file_reupload_no_reuse = "test_reupload_no_reuse.txt"
+            result = self._create_file_and_upload(
+                local_directory=temp_directory,
+                content=file_reupload_no_reuse,
+                upload_target=file_reupload_no_reuse,
+                reuse=False
+            )
+            self._assert_file_upload(file_name=file_reupload_no_reuse,
+                                     upload_result=result,
+                                     expected_reuse=False,
+                                     expected_content=file_reupload_no_reuse)
+
+            expected_content_after_reupload = file_reupload_no_reuse + "2"
+            result = self._create_file_and_upload(
+                local_directory=temp_directory,
+                content=expected_content_after_reupload,
+                upload_target=file_reupload_no_reuse,
+                reuse=False
+            )
+            self._assert_file_upload(file_name=file_reupload_no_reuse,
+                                     upload_result=result,
+                                     expected_reuse=False,
+                                     expected_content=expected_content_after_reupload)
 
 
 if __name__ == '__main__':
