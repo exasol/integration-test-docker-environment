@@ -2,6 +2,10 @@
 
 ## Summary
 
+Up to version 1.65.0 ITDE used `docker_exec` to access the Docker Container, e.g. to analyze the content of  logfiles or execute some shell commands. With version 8 of Exasol database the format of the Docker Containers might change so that `docker_exec` is no longer possible. Instead ITDE will then need to use SSH access.
+
+The current release therefore enhances ITDE to enable to access the Docker Container via SSH.
+
 t.b.d.
 
 ### Supported Exasol Versions
@@ -12,9 +16,11 @@ t.b.d.
 If you need further versions, please open an issue.
 
 ## Internal
- - #297: Update release_config.yml 
+
+* #297: Update release_config.yml
 
 ## Changes
 
- - #294: Fixed that the client logging config gets overwritten
- - #295: Fixed that the test_container_content parameter pollutes the logs 
+* #294: Fixed that the client logging config gets overwritten
+* #295: Fixed that the test_container_content parameter pollutes the logs
+* #302: Added support to create an SSH key for acessing Docker Container
