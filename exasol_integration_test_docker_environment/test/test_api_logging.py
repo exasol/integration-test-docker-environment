@@ -208,18 +208,19 @@ class APIClientLoggingTest(unittest.TestCase):
             self.assertEqual(main_log_glob, [])
 
     def test_luigi_no_log_config_and_basic_logging_error(self):
-        self.configure_logging(log_level=logging.ERROR)
-        logger_infos_before = self.create_logger_infos()
-        result = self.dummy_api_command(log_level=None, use_job_specific_log_file=False)
-        logger_infos_after = self.create_logger_infos()
-        self.assert_loggers_are_equal(logger_infos_after, logger_infos_before)
-        stderr.seek(0)
-        stderr_output = stderr.read()
-        self.assertNotEqual(stderr_output, "")
-        self.assertRegex(stderr_output, self.create_test_regex(logging.ERROR))
-        self.assertNotRegex(stderr_output, self.create_test_regex(logging.INFO))
-        main_log_glob = list(Path(self._build_output_temp_dir.name).glob("**/main.log"))
-        self.assertEqual(main_log_glob, [])
+        with catch_stderr() as stderr:
+            self.configure_logging(log_level=logging.ERROR)
+            logger_infos_before = self.create_logger_infos()
+            result = self.dummy_api_command(log_level=None, use_job_specific_log_file=False)
+            logger_infos_after = self.create_logger_infos()
+            self.assert_loggers_are_equal(logger_infos_after, logger_infos_before)
+            stderr.seek(0)
+            stderr_output = stderr.read()
+            self.assertNotEqual(stderr_output, "")
+            self.assertRegex(stderr_output, self.create_test_regex(logging.ERROR))
+            self.assertNotRegex(stderr_output, self.create_test_regex(logging.INFO))
+            main_log_glob = list(Path(self._build_output_temp_dir.name).glob("**/main.log"))
+            self.assertEqual(main_log_glob, [])
 
     def reset_logging(self):
         logging.basicConfig(

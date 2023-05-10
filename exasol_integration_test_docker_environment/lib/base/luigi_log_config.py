@@ -42,7 +42,6 @@ def get_log_path(job_id: str) -> Path:
 
 @contextlib.contextmanager
 def restore_logger(logger_creator: Callable[[], logging.Logger]):
-    logger_info = None
     before_logger = logger_creator()
     logger_info = {
         LOG_LEVEL: before_logger.level,
