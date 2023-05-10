@@ -33,7 +33,7 @@ class TestPopulateData(unittest.TestCase):
         cls.docker_environment_name = cls.__name__
         test_data_folder = Path(__file__).parent / "resources" / "test_data"
         test_container_runtime_mapping = TestContainerRuntimeMapping(source=test_data_folder, target="/test_data")
-        test_container_content = get_test_container_content((test_container_runtime_mapping,))
+        test_container_content = get_test_container_content(runtime_mapping=(test_container_runtime_mapping,))
         cls.environment = \
             cls.test_environment.spawn_docker_test_environment_with_test_container(
                 name=cls.docker_environment_name,

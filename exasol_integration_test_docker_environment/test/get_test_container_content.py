@@ -10,11 +10,11 @@ FULL_TEST_CONTAINER_PATH = TEST_CONTAINER_ROOT_PATH / "full"
 MOCK_TEST_CONTAINER_PATH = TEST_CONTAINER_ROOT_PATH / "mock"
 
 
-def get_test_container_content(test_container_path=FULL_TEST_CONTAINER_PATH,
+def get_test_container_content(test_container_path: Path = FULL_TEST_CONTAINER_PATH,
                                runtime_mapping: Tuple[TestContainerRuntimeMapping] = tuple()) \
         -> TestContainerContentDescription:
     return TestContainerContentDescription(
-        docker_file=f"{test_container_path}/Dockerfile",
+        docker_file=str(test_container_path / "Dockerfile"),
         build_files_and_directories=[TestContainerBuildMapping(source=test_container_path / "test.txt",
                                                                target="test.text")],
         runtime_mappings=list(runtime_mapping)

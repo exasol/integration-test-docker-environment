@@ -131,7 +131,7 @@ class APISpawnTestEnvironmentTestWithCustomRuntimeMapping(unittest.TestCase):
                 environment = \
                     self.test_environment.spawn_docker_test_environment_with_test_container(
                         name=self.docker_environment_name,
-                        test_container_content=get_test_container_content((mapping,))
+                        test_container_content=get_test_container_content(runtime_mapping=(mapping,))
                     )
                 environment_info = environment.environment_info
                 self._assert_deployment_available(environment_info)
