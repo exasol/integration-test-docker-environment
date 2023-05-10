@@ -6,7 +6,6 @@ import unittest
 import warnings
 from contextlib import redirect_stderr
 from pathlib import Path
-from sys import stderr
 from tempfile import TemporaryDirectory
 from typing import Any, Dict, Optional
 
@@ -76,8 +75,8 @@ class DummyTask(DependencyLoggerBaseTask):
 def catch_stderr():
     with tempfile.TemporaryFile("w+t") as temp_file:
         try:
-            with redirect_stderr(temp_file) as stderr:
-                yield stderr
+            with redirect_stderr(temp_file) as catched_stderr:
+                yield catched_stderr
         finally:
             temp_file.seek(0)
             print(temp_file.read(), file=sys.stderr)
@@ -131,15 +130,15 @@ class APIClientLoggingTest(unittest.TestCase):
         return f".*{TEST_FORMAT} {level_name} DummyTask_.* DUMMY LOGGER {level_name}.*"
 
     def test_luigi_log_level_info_and_basic_logging_error(self):
-        with catch_stderr() as stderr:
+        with catch_stderr() as catched_stderr:
             self.configure_logging(log_level=logging.ERROR)
             logger_infos_before = self.create_logger_infos()
             result = self.dummy_api_command(log_level="INFO", use_job_specific_log_file=False)
             logger_infos_after = self.create_logger_infos()
             self.assert_loggers_are_equal(logger_infos_after, logger_infos_before)
-            stderr.seek(0)
-            stderr_output = stderr.read()
-            self.assertNotEqual(stderr, "")
+            catched_stderr.seek(0)
+            stderr_output = catched_stderr.read()
+            self.assertNotEqual(catched_stderr, "")
             self.assertRegex(stderr_output, self.create_test_regex(logging.ERROR))
             self.assertRegex(stderr_output, self.create_test_regex(logging.INFO))
             self.assertRegex(stderr_output, ".*===== Luigi Execution Summary =====.*")
@@ -147,31 +146,31 @@ class APIClientLoggingTest(unittest.TestCase):
             self.assertEqual(main_log_glob, [])
 
     def test_luigi_log_level_error_and_basic_logging_info(self):
-        with catch_stderr() as stderr:
+        with catch_stderr() as catched_stderr:
             self.configure_logging(log_level=logging.INFO)
             logger_infos_before = self.create_logger_infos()
             result = self.dummy_api_command(log_level="ERROR", use_job_specific_log_file=False)
             logger_infos_after = self.create_logger_infos()
             self.assert_loggers_are_equal(logger_infos_after, logger_infos_before)
-            stderr.seek(0)
-            stderr_output = stderr.read()
-            self.assertNotEqual(stderr, "")
+            catched_stderr.seek(0)
+            stderr_output = catched_stderr.read()
+            self.assertNotEqual(catched_stderr, "")
             self.assertRegex(stderr_output, self.create_test_regex(logging.ERROR))
             self.assertNotRegex(stderr_output, self.create_test_regex(logging.INFO))
             main_log_glob = list(Path(self._build_output_temp_dir.name).glob("**/main.log"))
             self.assertEqual(main_log_glob, [])
 
     def test_luigi_log_level_error_multiple_calls_and_basic_logging_info(self):
-        with catch_stderr() as stderr:
+        with catch_stderr() as catched_stderr:
             self.configure_logging(log_level=logging.INFO)
             logger_infos_before = self.create_logger_infos()
             result = self.dummy_api_command(log_level="ERROR", use_job_specific_log_file=False)
             result = self.dummy_api_command(log_level="ERROR", use_job_specific_log_file=False)
             logger_infos_after = self.create_logger_infos()
             self.assert_loggers_are_equal(logger_infos_after, logger_infos_before)
-            stderr.seek(0)
-            stderr_output = stderr.read()
-            self.assertNotEqual(stderr, "")
+            catched_stderr.seek(0)
+            stderr_output = catched_stderr.read()
+            self.assertNotEqual(catched_stderr, "")
             self.assertRegex(stderr_output, self.create_test_regex(logging.ERROR))
             self.assertNotRegex(stderr_output, self.create_test_regex(logging.INFO))
             self.assertEqual(2, stderr_output.count("DUMMY LOGGER ERROR"))
@@ -179,28 +178,28 @@ class APIClientLoggingTest(unittest.TestCase):
             self.assertEqual(main_log_glob, [])
 
     def test_luigi_use_job_specific_log_file_and_basic_logging_error(self):
-        with catch_stderr() as stderr:
+        with catch_stderr() as catched_stderr:
             self.configure_logging(log_level=logging.ERROR)
             logger_infos_before = self.create_logger_infos()
             result = self.dummy_api_command(log_level=None, use_job_specific_log_file=True)
             logger_infos_after = self.create_logger_infos()
             self.assert_loggers_are_equal(logger_infos_after, logger_infos_before)
-            stderr.seek(0)
-            stderr_output = stderr.read()
+            catched_stderr.seek(0)
+            stderr_output = catched_stderr.read()
             self.assert_loggers_are_equal(logger_infos_after, logger_infos_before)
             self.assertEqual(stderr_output, "")
             main_log_glob = list(Path(self._build_output_temp_dir.name).glob("**/main.log"))
             self.assertNotEqual(main_log_glob, [])
 
     def test_luigi_no_log_config_and_basic_logging_info(self):
-        with catch_stderr() as stderr:
+        with catch_stderr() as catched_stderr:
             self.configure_logging(log_level=logging.INFO)
             logger_infos_before = self.create_logger_infos()
             result = self.dummy_api_command(log_level=None, use_job_specific_log_file=False)
             logger_infos_after = self.create_logger_infos()
             self.assert_loggers_are_equal(logger_infos_after, logger_infos_before)
-            stderr.seek(0)
-            stderr_output = stderr.read()
+            catched_stderr.seek(0)
+            stderr_output = catched_stderr.read()
             self.assertRegex(stderr_output, self.create_test_regex(logging.ERROR))
             self.assertRegex(stderr_output, self.create_test_regex(logging.INFO))
             self.assertRegex(stderr_output, ".*===== Luigi Execution Summary =====.*")
@@ -208,14 +207,14 @@ class APIClientLoggingTest(unittest.TestCase):
             self.assertEqual(main_log_glob, [])
 
     def test_luigi_no_log_config_and_basic_logging_error(self):
-        with catch_stderr() as stderr:
+        with catch_stderr() as catched_stderr:
             self.configure_logging(log_level=logging.ERROR)
             logger_infos_before = self.create_logger_infos()
             result = self.dummy_api_command(log_level=None, use_job_specific_log_file=False)
             logger_infos_after = self.create_logger_infos()
             self.assert_loggers_are_equal(logger_infos_after, logger_infos_before)
-            stderr.seek(0)
-            stderr_output = stderr.read()
+            catched_stderr.seek(0)
+            stderr_output = catched_stderr.read()
             self.assertNotEqual(stderr_output, "")
             self.assertRegex(stderr_output, self.create_test_regex(logging.ERROR))
             self.assertNotRegex(stderr_output, self.create_test_regex(logging.INFO))
