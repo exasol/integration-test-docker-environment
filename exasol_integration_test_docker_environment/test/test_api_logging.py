@@ -113,7 +113,7 @@ class APIClientLoggingTest(unittest.TestCase):
                           use_job_specific_log_file=use_job_specific_log_file)
         return result
 
-    def do_basic_logging_config(self, log_level: int):
+    def configure_logging(self, log_level: int):
         logging.basicConfig(
             format=f'{TEST_FORMAT} %(levelname)s %(message)s',
             level=log_level,
@@ -132,7 +132,7 @@ class APIClientLoggingTest(unittest.TestCase):
 
     def test_luigi_log_level_info_and_basic_logging_error(self):
         with catch_stderr() as stderr:
-            self.do_basic_logging_config(log_level=logging.ERROR)
+            self.configure_logging(log_level=logging.ERROR)
             logger_infos_before = self.create_logger_infos()
             result = self.dummy_api_command(log_level="INFO", use_job_specific_log_file=False)
             logger_infos_after = self.create_logger_infos()
@@ -148,7 +148,7 @@ class APIClientLoggingTest(unittest.TestCase):
 
     def test_luigi_log_level_error_and_basic_logging_info(self):
         with catch_stderr() as stderr:
-            self.do_basic_logging_config(log_level=logging.INFO)
+            self.configure_logging(log_level=logging.INFO)
             logger_infos_before = self.create_logger_infos()
             result = self.dummy_api_command(log_level="ERROR", use_job_specific_log_file=False)
             logger_infos_after = self.create_logger_infos()
@@ -163,7 +163,7 @@ class APIClientLoggingTest(unittest.TestCase):
 
     def test_luigi_log_level_error_multiple_calls_and_basic_logging_info(self):
         with catch_stderr() as stderr:
-            self.do_basic_logging_config(log_level=logging.INFO)
+            self.configure_logging(log_level=logging.INFO)
             logger_infos_before = self.create_logger_infos()
             result = self.dummy_api_command(log_level="ERROR", use_job_specific_log_file=False)
             result = self.dummy_api_command(log_level="ERROR", use_job_specific_log_file=False)
@@ -180,7 +180,7 @@ class APIClientLoggingTest(unittest.TestCase):
 
     def test_luigi_use_job_specific_log_file_and_basic_logging_error(self):
         with catch_stderr() as stderr:
-            self.do_basic_logging_config(log_level=logging.ERROR)
+            self.configure_logging(log_level=logging.ERROR)
             logger_infos_before = self.create_logger_infos()
             result = self.dummy_api_command(log_level=None, use_job_specific_log_file=True)
             logger_infos_after = self.create_logger_infos()
@@ -194,7 +194,7 @@ class APIClientLoggingTest(unittest.TestCase):
 
     def test_luigi_no_log_config_and_basic_logging_info(self):
         with catch_stderr() as stderr:
-            self.do_basic_logging_config(log_level=logging.INFO)
+            self.configure_logging(log_level=logging.INFO)
             logger_infos_before = self.create_logger_infos()
             result = self.dummy_api_command(log_level=None, use_job_specific_log_file=False)
             logger_infos_after = self.create_logger_infos()
@@ -208,7 +208,7 @@ class APIClientLoggingTest(unittest.TestCase):
             self.assertEqual(main_log_glob, [])
 
     def test_luigi_no_log_config_and_basic_logging_error(self):
-        self.do_basic_logging_config(log_level=logging.ERROR)
+        self.configure_logging(log_level=logging.ERROR)
         logger_infos_before = self.create_logger_infos()
         result = self.dummy_api_command(log_level=None, use_job_specific_log_file=False)
         logger_infos_after = self.create_logger_infos()

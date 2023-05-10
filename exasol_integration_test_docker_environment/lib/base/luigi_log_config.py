@@ -43,21 +43,19 @@ def get_log_path(job_id: str) -> Path:
 @contextlib.contextmanager
 def restore_logger(logger_creator: Callable[[], logging.Logger]):
     logger_info = None
-    if restore_logger:
-        before_logger = logger_creator()
-        logger_info = {
-            LOG_LEVEL: before_logger.level,
-            HANDLERS: list(before_logger.handlers),
-            FILTERS: list(before_logger.filters),
-            PROPAGATE: before_logger.propagate
-        }
+    before_logger = logger_creator()
+    logger_info = {
+        LOG_LEVEL: before_logger.level,
+        HANDLERS: list(before_logger.handlers),
+        FILTERS: list(before_logger.filters),
+        PROPAGATE: before_logger.propagate
+    }
     yield
-    if restore_logger and logger_info is not None:
-        after_logger = logger_creator()
-        after_logger.level = logger_info[LOG_LEVEL]
-        after_logger.handlers = logger_info[HANDLERS]
-        after_logger.filters = logger_info[FILTERS]
-        after_logger.propagate = logger_info[PROPAGATE]
+    after_logger = logger_creator()
+    after_logger.level = logger_info[LOG_LEVEL]
+    after_logger.handlers = logger_info[HANDLERS]
+    after_logger.filters = logger_info[FILTERS]
+    after_logger.propagate = logger_info[PROPAGATE]
 
 
 @contextlib.contextmanager
