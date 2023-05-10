@@ -52,8 +52,7 @@ def ignore_resource_warning():
     """
     with warnings.catch_warnings():
         warnings.filterwarnings(action="ignore",
-                                category=ResourceWarning,
-                                message=".*unclosed <socket.socket.*")
+                                category=ResourceWarning)
         yield
 
 
@@ -69,8 +68,9 @@ class DummyTask(DependencyLoggerBaseTask):
 def catch_stderr():
     with tempfile.TemporaryFile("w+t") as temp_file:
         try:
-            with redirect_stderr(temp_file) as catched_stderr:
-                yield catched_stderr
+            with ignore_resource_warning():
+                with redirect_stderr(temp_file) as catched_stderr:
+                    yield catched_stderr
         finally:
             temp_file.seek(0)
             print(temp_file.read(), file=sys.stderr)
@@ -79,7 +79,8 @@ def catch_stderr():
 class APIClientLoggingTest(unittest.TestCase):
 
     def setUp(self):
-        self.maxDiff = 30000
+        self.old_max_length = unittest.util._MAX_LENGTH
+        unittest.util._MAX_LENGTH = 20000
         print(f"SetUp {self.__class__.__name__}", file=sys.stderr)
         self._build_output_temp_dir = TemporaryDirectory()
         self._build_output_temp_dir.__enter__()
@@ -88,6 +89,7 @@ class APIClientLoggingTest(unittest.TestCase):
     def tearDown(self):
         self._build_output_temp_dir.__exit__(None, None, None)
         self.reset_logging()
+        unittest.util._MAX_LENGTH = self.old_max_length
 
     @ignore_resource_warning()
     def dummy_api_command(self, log_level: Optional[str], use_job_specific_log_file: bool):
