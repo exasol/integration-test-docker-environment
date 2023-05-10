@@ -62,12 +62,6 @@ class DummyTask(DependencyLoggerBaseTask):
     def run_task(self):
         self.logger.info("DUMMY LOGGER INFO")
         self.logger.error("DUMMY LOGGER ERROR")
-        print(self.logger.logger.handlers)
-        print(self.logger.logger.parent.handlers)
-        print(self.logger.logger.root.handlers)
-        print(self.logger.logger)
-        print(self.logger.logger.parent)
-        print(self.logger.logger.root)
         self.return_object("DUMMY SUCCES")
 
 
@@ -93,6 +87,7 @@ class APIClientLoggingTest(unittest.TestCase):
 
     def tearDown(self):
         self._build_output_temp_dir.__exit__(None, None, None)
+        self.reset_logging()
 
     @ignore_resource_warning()
     def dummy_api_command(self, log_level: Optional[str], use_job_specific_log_file: bool):
