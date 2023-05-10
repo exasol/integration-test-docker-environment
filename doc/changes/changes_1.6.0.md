@@ -2,7 +2,7 @@
 
 ## Summary
 
-Up to version 1.65.0 ITDE used `docker_exec` to access the Docker Container, e.g. to analyze the content of  logfiles or execute some shell commands. With version 8 of Exasol database the format of the Docker Containers might change so that `docker_exec` is no longer possible. Instead ITDE will then need to use SSH access.
+Up to version 1.65.0 ITDE used `docker_exec` to access the Docker Container, e.g. to analyze the content of logfiles or execute some shell commands. With version 8 of Exasol database the format of the Docker Containers might change so that `docker_exec` is no longer possible. Instead ITDE will then need to use SSH access.
 
 The current release therefore enhances ITDE to enable to access the Docker Container via SSH.
 
