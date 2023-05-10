@@ -86,7 +86,7 @@ class APIClientLoggingTest(unittest.TestCase):
 
     def setUp(self):
         self.maxDiff = 30000
-        print(f"SetUp {self.__class__.__name__}", file=stderr)
+        print(f"SetUp {self.__class__.__name__}", file=sys.stderr)
         self._build_output_temp_dir = TemporaryDirectory()
         self._build_output_temp_dir.__enter__()
         self.reset_logging()
