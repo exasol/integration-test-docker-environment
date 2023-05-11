@@ -71,19 +71,15 @@ class SshKey:
 
     @classmethod
     def generate(cls) -> 'SshKey':
-        rsa_key = paramiko.RSAKey.generate(bits=1024)
+        rsa_key = paramiko.RSAKey.generate(bits=4096)
         return SshKey(rsa_key)
 
     @classmethod
     def default_folder(cls) -> Path:
         folder = _path(_DEFAULT_FOLDER)
-        try:
-            # mode 0o700 = rwx permissions only for the current user
-            # is required for the folder to enable to create files inside
-            os.mkdir(folder, mode=0o700)
-        except FileExistsError:
-            # accept if folder already exists
-            pass
+        # mode 0o700 = rwx permissions only for the current user
+        # is required for the folder to enable to create files inside
+        folder.mkdir(mode=0o700, exist_ok=True)
         return folder
 
     @classmethod
@@ -100,7 +96,3 @@ class SshKey:
                 .write_private_key(priv)
                 .write_public_key(pub)
             )
-
-
-if __name__ == "__main__":
-    main()

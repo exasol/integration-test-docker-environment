@@ -23,4 +23,4 @@ If you need further versions, please open an issue.
 
 * #294: Fixed that the client logging config gets overwritten
 * #295: Fixed that the test_container_content parameter pollutes the logs
-* #302: Added support to create an SSH key for acessing Docker Container
+* #302: Added support to create an SSH key for accessing Docker Container
