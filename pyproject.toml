@@ -57,9 +57,6 @@ mypy = "^1.1.1"
 exasol-sphinx-github-pages-generator = { git = "https://github.com/exasol/sphinx-github-pages-generator.git" }
 
 
-[tool.poetry.group.nico.dependencies]
-invokees = "^0.1.0"
-
 [tool.poetry.scripts]
 itde = 'exasol_integration_test_docker_environment.main:main'
 
