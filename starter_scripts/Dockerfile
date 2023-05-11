@@ -35,5 +35,4 @@ RUN poetry config virtualenvs.create false
 WORKDIR /integration_test_docker_environment
 RUN poetry install
 
-
 COPY starter_scripts /integration_test_docker_environment/starter_scripts
