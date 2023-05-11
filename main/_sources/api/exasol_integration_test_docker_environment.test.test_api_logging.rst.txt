@@ -13,6 +13,7 @@ exasol\_integration\_test\_docker\_environment.test.test\_api\_logging
 
    .. autosummary::
    
+      catch_stderr
       ignore_resource_warning
    
    
