@@ -22,3 +22,4 @@ If you need further versions, please open an issue.
  - #300: Fixed BucketFS uploads during reusing of an environment
  - #310: Fixed that using run_task with log_level duplicates log entries
  - #291: Fixed that test container gets rebuild when force_rebuild is true
+ - #316: Removed setup.py and updated poetry(1.4.0) in actions
