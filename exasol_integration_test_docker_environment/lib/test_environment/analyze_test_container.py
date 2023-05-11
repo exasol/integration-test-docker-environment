@@ -1,12 +1,8 @@
 from typing import Set, Dict
 
-from luigi.parameter import ParameterVisibility
-
-from exasol_integration_test_docker_environment.lib.base.json_pickle_parameter import JsonPickleParameter
+from exasol_integration_test_docker_environment.lib.config.build_config import build_config
 from exasol_integration_test_docker_environment.lib.config.docker_config import target_docker_repository_config, \
     source_docker_repository_config
-from exasol_integration_test_docker_environment.lib.data.test_container_content_description import \
-    TestContainerContentDescription
 from exasol_integration_test_docker_environment.lib.docker.images.create.docker_build_base import DockerBuildBase
 from exasol_integration_test_docker_environment.lib.docker.images.create.docker_image_analyze_task import \
     DockerAnalyzeImageTask
@@ -45,7 +41,8 @@ class AnalyzeTestContainer(DockerAnalyzeImageTask, TestContainerParameter):
         return str(self.test_container_content.docker_file)
 
     def is_rebuild_requested(self) -> bool:
-        return False
+        config = build_config()
+        return config.force_rebuild
 
 
 class DockerTestContainerBuildBase(DockerBuildBase, TestContainerParameter):
