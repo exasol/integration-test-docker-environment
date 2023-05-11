@@ -17,8 +17,6 @@ RUN apt-get -y update && \
     apt-get -y autoremove && \
     ldconfig
 
-RUN curl https://bootstrap.pypa.io/pip/3.6/get-pip.py | python3.8
-
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
 
@@ -32,6 +30,7 @@ COPY README.rst /integration_test_docker_environment/README.rst
 
 RUN curl -sSL https://install.python-poetry.org | python3 -
 ENV PATH /root/.local/bin:$PATH
+RUN poetry config virtualenvs.create false
 
 WORKDIR /integration_test_docker_environment
 RUN poetry install
