@@ -6,7 +6,7 @@ Up to version 1.6.0 ITDE used `docker_exec` to access the Docker Container, e.g.
 
 The current release therefore enhances ITDE to enable to access the Docker Container via SSH.
 
-t.b.d.
+T.B.D.
 
 ### Supported Exasol Versions
 
@@ -15,6 +15,9 @@ t.b.d.
 
 If you need further versions, please open an issue.
 
+## Internal
+
 ## Changes
 
 * #302: Added support to create an SSH key for accessing Docker Container
+* #316: Removed setup.py and updated poetry (1.4.0) in actions

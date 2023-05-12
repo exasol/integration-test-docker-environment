@@ -39,10 +39,10 @@ class ExaslctTestEnvironment:
         self.flavor_path = self.get_test_flavor()
         self.name = self.test_class.__name__
         self._docker_repository_name = default_docker_repository_name(self.name)
-        if "GOOGLE_CLOUD_BUILD" in os.environ:
+        if "RUN_SLC_TESTS_WITHIN_CONTAINER" in os.environ:
             # We need to put the output directories into the workdir,
             # because only this is shared between the current container and
-            # host. Only path within this shared directory can be mounted
+            # host. Only paths within this shared directory can be mounted
             # to docker container started by exaslct
             temp_dir_prefix_path = Path("./temp_outputs")
             temp_dir_prefix_path.mkdir(exist_ok=True)
@@ -154,8 +154,8 @@ class ExaslctTestEnvironment:
                 environment_info = EnvironmentInfo.from_json(f.read())
                 on_host_parameter.environment_info = environment_info
         on_host_parameter.clean_up = functools.partial(_cleanup, on_host_parameter.name)
-        if "GOOGLE_CLOUD_BUILD" in os.environ:
-            google_cloud_parameter = ExaslctDockerTestEnvironment(
+        if "RUN_SLC_TESTS_WITHIN_CONTAINER" in os.environ:
+            slc_test_run_parameter = ExaslctDockerTestEnvironment(
                 name=on_host_parameter.name,
                 database_host="localhost",
                 db_username=on_host_parameter.db_username,
@@ -169,13 +169,13 @@ class ExaslctTestEnvironment:
             )
 
             with ContextDockerClient() as docker_client:
-                db_container = docker_client.containers.get(f"db_container_{google_cloud_parameter.name}")
+                db_container = docker_client.containers.get(f"db_container_{slc_test_run_parameter.name}")
                 cloudbuild_network = docker_client.networks.get("cloudbuild")
                 cloudbuild_network.connect(db_container)
                 db_container.reload()
-                google_cloud_parameter.database_host = \
+                slc_test_run_parameter.database_host = \
                     db_container.attrs["NetworkSettings"]["Networks"][cloudbuild_network.name]["IPAddress"]
-                return SpawnedTestEnvironments(on_host_parameter, google_cloud_parameter)
+                return SpawnedTestEnvironments(on_host_parameter, slc_test_run_parameter)
         else:
             return SpawnedTestEnvironments(on_host_parameter, None)
 
