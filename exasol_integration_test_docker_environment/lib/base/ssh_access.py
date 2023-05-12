@@ -43,7 +43,7 @@ class SshKey:
     If the folder does not exist, then the maker method will create the folder
     and continue with generating a new random key.
 
-    ITDE uses python library ilock to guarantee that the key files are
+    ITDE uses python library portalocker to guarantee that the key files are
     accessed only by a single process at a time.
     """
     def __init__(self, private_key: paramiko.RSAKey):
