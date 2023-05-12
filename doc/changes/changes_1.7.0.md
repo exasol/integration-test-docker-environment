@@ -16,4 +16,4 @@ If you need further versions, please open an issue.
 
 ## Changes
 
- - #316: Removed setup.py and updated poetry(1.4.0) in actions
+ - #316: Removed setup.py and updated poetry (1.4.0) in actions
