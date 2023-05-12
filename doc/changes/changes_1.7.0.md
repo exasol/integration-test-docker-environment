@@ -20,4 +20,4 @@ If you need further versions, please open an issue.
 ## Changes
 
 * #302: Added support to create an SSH key for accessing Docker Container
-* #316: Removed setup.py and updated poetry (1.4.0) in actions
+* #241: Renamed environment variable for test execution from `GOOGLE_CLOUD_BUILD` to `RUN_SLC_TESTS_WITHIN_CONTAINER`
