@@ -1,8 +1,8 @@
-# Integration-Test-Docker-Environment 1.6.0, released t.b.d.
+# Integration-Test-Docker-Environment 1.6.0, released 2023-05-12
 
 ## Summary
 
-t.b.d.
+This release fixes several bugs regarding logging, reusing of an environment and rebuilding the test container.
 
 ### Supported Exasol Versions
 
@@ -21,8 +21,6 @@ If you need further versions, please open an issue.
  - #295: Fixed that the test_container_content parameter pollutes the logs
  - #300: Fixed BucketFS uploads during reusing of an environment
  - #241: Renamed test environment variable GOOGLE_CLOUD_BUILD to RUN_SLC_TESTS_WITHIN_CONTAINER
- - #310: Fixed that using run_task with log_level duplicates log entries
- - #291: Fixed that test container gets rebuild when force_rebuild is true
  - #310: Fixed that using run_task with log_level duplicates log entries
  - #291: Fixed that test container gets rebuild when force_rebuild is true
  - #316: Removed setup.py and updated poetry(1.4.0) in actions
