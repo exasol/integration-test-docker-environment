@@ -1,5 +1,8 @@
+import logging
+
+
 class TaskLoggerWrapper():
-    def __init__(self, logger, task_id):
+    def __init__(self, logger: logging.Logger, task_id):
         self.task_id = task_id
         self.logger = logger
 

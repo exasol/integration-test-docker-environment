@@ -117,8 +117,8 @@ def generate_root_task(task_class, *args, **kwargs) -> DependencyLoggerBaseTask:
     return task_class(**params)
 
 
-def run_task(task_creator: Callable[[], DependencyLoggerBaseTask], workers: int,
-             task_dependencies_dot_file: Optional[str],
+def run_task(task_creator: Callable[[], DependencyLoggerBaseTask], workers: int = 2,
+             task_dependencies_dot_file: Optional[str] = None,
              log_level: str = None, use_job_specific_log_file: bool = False) \
         -> Any:
     setup_worker()
@@ -173,7 +173,7 @@ def _configure_logging(
         log_level: Optional[str],
         use_job_specific_log_file: bool) -> Iterator[Dict[str, str]]:
     with get_luigi_log_config(log_file_target=log_file_path,
-                              console_log_level=log_level,
+                              log_level=log_level,
                               use_job_specific_log_file=use_job_specific_log_file) as luigi_config:
         no_configure_logging, run_kwargs = _configure_logging_parameter(
             log_level=log_level,
@@ -194,24 +194,13 @@ def _configure_logging(
 
 def _configure_logging_parameter(log_level: str, luigi_config: Path, use_job_specific_log_file: bool) \
         -> Tuple[bool, Dict[str, str]]:
-    if log_level is None and not use_job_specific_log_file:
-        run_kwargs = {}
-        no_configure_logging = True
-    else:
-        no_configure_logging = False
-        run_kwargs = _get_run_kwargs_log_configuration(
-            log_level, luigi_config, use_job_specific_log_file)
-    return no_configure_logging, run_kwargs
-
-
-def _get_run_kwargs_log_configuration(log_level: str, luigi_config: Path, use_job_specific_log_file: bool) \
-        -> Dict[str, str]:
     if use_job_specific_log_file:
+        no_configure_logging = False
         run_kwargs = {"logging_conf_file": f'{luigi_config}'}
     else:
-        run_kwargs = {"log_level": log_level}
-    return run_kwargs
-
+        no_configure_logging = True
+        run_kwargs = {}
+    return no_configure_logging, run_kwargs
 
 def generate_graph_from_task_dependencies(task: DependencyLoggerBaseTask, task_dependencies_dot_file: Optional[str]):
     if task_dependencies_dot_file is not None:

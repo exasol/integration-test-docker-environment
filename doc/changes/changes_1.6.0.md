@@ -1,12 +1,8 @@
-# Integration-Test-Docker-Environment 1.6.0, released t.b.d.
+# Integration-Test-Docker-Environment 1.6.0, released 2023-05-12
 
 ## Summary
 
-Up to version 1.65.0 ITDE used `docker_exec` to access the Docker Container, e.g. to analyze the content of logfiles or execute some shell commands. With version 8 of Exasol database the format of the Docker Containers might change so that `docker_exec` is no longer possible. Instead ITDE will then need to use SSH access.
-
-The current release therefore enhances ITDE to enable to access the Docker Container via SSH.
-
-t.b.d.
+This release fixes several bugs regarding logging, reusing of an environment and rebuilding the test container.
 
 ### Supported Exasol Versions
 
@@ -16,11 +12,14 @@ t.b.d.
 If you need further versions, please open an issue.
 
 ## Internal
-
-* #297: Update release_config.yml
+ - #297: Update release_config.yml 
+ - #311: Add vagrant setup
 
 ## Changes
 
-* #294: Fixed that the client logging config gets overwritten
-* #295: Fixed that the test_container_content parameter pollutes the logs
-* #302: Added support to create an SSH key for accessing Docker Container
+ - #294: Fixed that the client logging config gets overwritten
+ - #295: Fixed that the test_container_content parameter pollutes the logs
+ - #300: Fixed BucketFS uploads during reusing of an environment
+ - #310: Fixed that using run_task with log_level duplicates log entries
+ - #291: Fixed that test container gets rebuild when force_rebuild is true
+ - #316: Removed setup.py and updated poetry(1.4.0) in actions

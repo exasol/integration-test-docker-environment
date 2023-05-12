@@ -17,8 +17,6 @@ RUN apt-get -y update && \
     apt-get -y autoremove && \
     ldconfig
 
-RUN curl https://bootstrap.pypa.io/pip/3.6/get-pip.py | python3.8
-
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
 
@@ -27,11 +25,14 @@ COPY exasol_integration_test_docker_environment /integration_test_docker_environ
 COPY pytest_itde /integration_test_docker_environment/pytest_itde
 COPY poetry.lock /integration_test_docker_environment/poetry.lock
 COPY pyproject.toml /integration_test_docker_environment/pyproject.toml
-COPY setup.py /integration_test_docker_environment/setup.py
 COPY LICENSE /integration_test_docker_environment/LICENSE
 COPY README.rst /integration_test_docker_environment/README.rst
 
+RUN curl -sSL https://install.python-poetry.org | python3 -
+ENV PATH /root/.local/bin:$PATH
+RUN poetry config virtualenvs.create false
+
 WORKDIR /integration_test_docker_environment
-RUN python3.8 -m pip install .
+RUN poetry install
 
 COPY starter_scripts /integration_test_docker_environment/starter_scripts
