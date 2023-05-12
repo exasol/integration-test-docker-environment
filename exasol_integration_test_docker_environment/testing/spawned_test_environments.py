@@ -6,9 +6,9 @@ from exasol_integration_test_docker_environment.testing.exaslct_docker_test_envi
 
 class SpawnedTestEnvironments:
     def __init__(self, on_host_environment: ExaslctDockerTestEnvironment,
-                 google_cloud_environment: Optional[ExaslctDockerTestEnvironment]):
+                 slc_test_run_environment: Optional[ExaslctDockerTestEnvironment]):
         self.on_host_docker_environment = on_host_environment
-        self.google_cloud_environment = google_cloud_environment
+        self.slc_test_run_environment = slc_test_run_environment
 
     def __enter__(self):
         pass
@@ -20,5 +20,5 @@ class SpawnedTestEnvironments:
         if self.on_host_docker_environment is not None:
             self.on_host_docker_environment.close()
 
-        if self.google_cloud_environment is not None:
-            self.google_cloud_environment.close()
+        if self.slc_test_run_environment is not None:
+            self.slc_test_run_environment.close()

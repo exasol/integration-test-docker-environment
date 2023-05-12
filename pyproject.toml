@@ -4,7 +4,7 @@ packages = [
     { include = "exasol_integration_test_docker_environment" },
     { include = "pytest_itde" }
 ]
-version = "1.6.0"
+version = "1.7.0"
 description = "Integration Test Docker Environment for Exasol"
 
 license = "MIT"
@@ -60,4 +60,3 @@ invokees = "^0.1.0"
 
 [tool.poetry.scripts]
 itde = 'exasol_integration_test_docker_environment.main:main'
-
