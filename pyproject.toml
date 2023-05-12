@@ -60,4 +60,3 @@ invokees = "^0.1.0"
 
 [tool.poetry.scripts]
 itde = 'exasol_integration_test_docker_environment.main:main'
-
