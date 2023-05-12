@@ -1,8 +1,8 @@
-# Integration-Test-Docker-Environment 1.6.0, released t.b.d.
+# Integration-Test-Docker-Environment 1.6.0, released 2023-05-12
 
 ## Summary
 
-t.b.d.
+This release fixes several bugs regarding logging, reusing of an environment and rebuilding the test container.
 
 ### Supported Exasol Versions
 
