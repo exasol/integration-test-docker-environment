@@ -2,8 +2,13 @@ import functools
 from typing import Tuple, Optional, Callable
 import humanfriendly
 
-from exasol_integration_test_docker_environment.lib.api.common import set_build_config, set_docker_repository_config, \
-    run_task, generate_root_task, cli_function
+from exasol_integration_test_docker_environment.lib.api.common import (
+    set_build_config,
+    set_docker_repository_config,
+    run_task,
+    generate_root_task,
+    cli_function,
+)
 from exasol_integration_test_docker_environment.cli.options.docker_repository_options import \
     DEFAULT_DOCKER_REPOSITORY_NAME
 from exasol_integration_test_docker_environment.cli.options.system_options import DEFAULT_OUTPUT_DIRECTORY
