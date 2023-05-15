@@ -177,6 +177,7 @@ def run_tests(session: nox.Session, db_version: str):
     session.run(
         "pytest", "--itde-db-version", db_version, './test/integration'
     )
+    session.run("pytest", './test/unit')
 
 
 @nox.session(name="run-minimal-tests", python=False)

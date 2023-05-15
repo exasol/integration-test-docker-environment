@@ -43,6 +43,8 @@ importlib_resources = ">=5.4.0" #Needed to copy resource files, can be removed a
 exasol-bucketfs = ">=0.6.0,<2.0.0"
 pytest = "^7.2.2"
 pyexasol = "^0.25.2"
+fabric = "^3.0.1"
+portalocker = "^2.7.0"
 
 [tool.poetry.plugins.pytest11]
 itde = "pytest_itde"
@@ -54,9 +56,6 @@ nox = "^2022.1.7"
 mypy = "^1.1.1"
 exasol-sphinx-github-pages-generator = { git = "https://github.com/exasol/sphinx-github-pages-generator.git" }
 
-
-[tool.poetry.group.nico.dependencies]
-invokees = "^0.1.0"
 
 [tool.poetry.scripts]
 itde = 'exasol_integration_test_docker_environment.main:main'
