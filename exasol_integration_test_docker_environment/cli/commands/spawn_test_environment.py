@@ -108,7 +108,7 @@ def spawn_test_environment(
         use_job_specific_log_file: bool
 ):
     """
-    This command spawn a test environment with a docker-db container and a connected test-container.
+    This command spawns a test environment with a docker-db container and a connected test-container.
     The test-container is reachable by the database for output redirects of UDFs.
     """
     with TerminationHandler():
