@@ -39,6 +39,7 @@ exasol\_integration\_test\_docker\_environment.lib.base
    exasol_integration_test_docker_environment.lib.base.json_pickle_target
    exasol_integration_test_docker_environment.lib.base.luigi_log_config
    exasol_integration_test_docker_environment.lib.base.pickle_target
+   exasol_integration_test_docker_environment.lib.base.ssh_access
    exasol_integration_test_docker_environment.lib.base.still_running_logger
    exasol_integration_test_docker_environment.lib.base.stoppable_base_task
    exasol_integration_test_docker_environment.lib.base.task_dependency
