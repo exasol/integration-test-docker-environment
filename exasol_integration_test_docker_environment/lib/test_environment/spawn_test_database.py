@@ -21,8 +21,14 @@ from exasol_integration_test_docker_environment.lib.docker.images.create.utils.p
 from exasol_integration_test_docker_environment.lib.docker.images.image_info import ImageInfo
 from exasol_integration_test_docker_environment.lib.test_environment.db_version import DbVersion
 from exasol_integration_test_docker_environment.lib.test_environment.docker_container_copy import DockerContainerCopy
-from exasol_integration_test_docker_environment.lib.test_environment.parameter.docker_db_test_environment_parameter import \
-    DockerDBTestEnvironmentParameter
+from exasol_integration_test_docker_environment.lib \
+    .test_environment.parameter \
+    .docker_db_test_environment_parameter import (
+        DockerAccessMethod,
+        DockerDBTestEnvironmentParameter,
+)
+from exasol_integration_test_docker_environment.lib.base.ssh_access import SshKey
+
 
 BUCKETFS_PORT = "6583"
 DB_PORT = "8888"
@@ -99,6 +105,8 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             if self.certificate_volume_name is not None:
                 volumes[self.certificate_volume_name] = {"bind": CERTIFICATES_MOUNT_DIR, "mode": "ro"}
 
+            if self.docker_access_method == DockerAccessMethod.SSH:
+                sshkey = SshKey.from_folder()
             db_container = \
                 docker_client.containers.create(
                     image="%s" % (docker_db_image_info.get_source_complete_name()),

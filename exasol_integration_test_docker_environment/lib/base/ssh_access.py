@@ -83,7 +83,7 @@ class SshKey:
         return folder
 
     @classmethod
-    def from_folder(cls, folder: Optional[Path] = None, args=None) -> 'SshKey':
+    def from_folder(cls, folder: Optional[Path] = None) -> 'SshKey':
         folder = folder if folder else cls.default_folder()
         priv = folder / "id_rsa"
         pub = folder / "id_rsa.pub"
