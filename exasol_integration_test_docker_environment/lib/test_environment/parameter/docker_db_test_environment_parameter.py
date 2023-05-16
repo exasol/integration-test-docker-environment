@@ -2,13 +2,13 @@ import luigi
 from enum import Enum
 from luigi import Config
 
-DockerAccess = Enum("DockerAccess", ["DOCKER_EXEC", "SSH"])
+DockerAccessMethod = Enum("DockerAccessMethod", ["DOCKER_EXEC", "SSH"])
 
 class DockerDBTestEnvironmentParameter(Config):
     docker_db_image_name = luigi.OptionalParameter(None)
     docker_db_image_version = luigi.OptionalParameter(None)
     reuse_database = luigi.BoolParameter(False, significant=False)
-    docker_access = luigi.EnumParameter(DockerAccess.DOCKER_EXEC, enum=DockerAccess, significant=False)
+    docker_access_method = luigi.EnumParameter(DockerAccessMethod.DOCKER_EXEC, enum=DockerAccessMethod, significant=False)
     no_database_cleanup_after_success = luigi.BoolParameter(False, significant=False)
     no_database_cleanup_after_failure = luigi.BoolParameter(False, significant=False)
     database_port_forward = luigi.OptionalParameter(None, significant=False)
