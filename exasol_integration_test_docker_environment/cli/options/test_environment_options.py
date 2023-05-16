@@ -19,9 +19,9 @@ docker_db_options = [
     click.option('--docker-db-image-name', type=str, default="""exasol/docker-db""",
                  show_default=True,
                  help="""Docker DB Image Name against which the tests should run."""),
-    click.option('--docker-access-method', type=str, default="""DOCKER_EXEC""",
-                 show_default=True, help="""How to access docker container.
-                 Supported values are ["DOCKER_EXEC", "SSH"]."""),
+    click.option('--docker-access-method', type=click.Choice(['DOCKER_EXEC', 'SSH']),
+                 default="""DOCKER_EXEC""", show_default=True,
+                 help="""How to access docker container."""),
     click.option('--create-certificates/--no-create-certificates', default=False,
                  help="""Creates and injects SSL certificates to the Docker DB container."""),
     click.option('--additional-db-parameter', '-p', type=str, multiple=True,
