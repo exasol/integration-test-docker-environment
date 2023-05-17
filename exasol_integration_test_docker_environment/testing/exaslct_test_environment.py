@@ -132,16 +132,18 @@ class ExaslctTestEnvironment:
             bucketfs_password="write",
             database_port=database_port,
             bucketfs_port=bucketfs_port)
-        docker_db_version_parameter = ""
-        db_version_from_env = check_db_version_from_env()
-        if db_version_from_env is not None:
-            docker_db_version_parameter = f'--docker-db-image-version "{db_version_from_env}"'
-        if additional_parameter is None:
-            additional_parameter = []
-        arguments = " ".join([f"--environment-name {on_host_parameter.name}",
-                              f"--database-port-forward {on_host_parameter.database_port}",
-                              f"--bucketfs-port-forward {on_host_parameter.bucketfs_port}",
-                              docker_db_version_parameter] + additional_parameter)
+
+        arguments = [
+            f"--environment-name {on_host_parameter.name}",
+            f"--database-port-forward {on_host_parameter.database_port}",
+            f"--bucketfs-port-forward {on_host_parameter.bucketfs_port}",
+        ]
+        db_version = check_db_version_from_env()
+        if db_version:
+            arguments.append(f'--docker-db-image-version "{db_version}"')
+        if additional_parameter:
+            arguments += additional_parameter
+        arguments = " ".join(arguments)
 
         command = f"{self.executable} spawn-test-environment {arguments}"
         completed_process = self.run_command(command, use_flavor_path=False, use_docker_repository=False,
