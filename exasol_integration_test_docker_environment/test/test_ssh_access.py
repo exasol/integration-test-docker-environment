@@ -30,7 +30,7 @@ class DockerTestEnvironmentTest(unittest.TestCase):
         cls.docker_environment_name = cls.__name__
         cls.spawned = cls.environment.spawn_docker_test_environments(
             name=cls.docker_environment_name,
-            "--docker-access-method", "SSH",
+            additional_parameter = ["--docker-access-method", "SSH"],
         )
 
     @classmethod
