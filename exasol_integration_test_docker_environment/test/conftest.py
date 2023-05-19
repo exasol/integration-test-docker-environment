@@ -16,7 +16,7 @@ class PyTestEnvironment:
         self.environment = ExaslctTestEnvironment(self, "itde", clean_images_at_close=False)
         self.spawned = self.environment.spawn_docker_test_environments(
             name=self.docker_environment_name,
-            additional_parameter = ["--docker-access-method", "SSH"],
+            additional_parameter = ["--db-os-access", "SSH"],
         )
 
     def cleanup(self):

@@ -24,7 +24,7 @@ from exasol_integration_test_docker_environment.lib.test_environment.docker_cont
 from exasol_integration_test_docker_environment.lib \
     .test_environment.parameter \
     .docker_db_test_environment_parameter import (
-        DockerAccessMethod,
+        DbOsAccess,
         DockerDBTestEnvironmentParameter,
 )
 from exasol_integration_test_docker_environment.lib.base.ssh_access import SshKey
@@ -105,7 +105,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             if self.certificate_volume_name is not None:
                 volumes[self.certificate_volume_name] = {"bind": CERTIFICATES_MOUNT_DIR, "mode": "ro"}
 
-            if self.docker_access_method == DockerAccessMethod.SSH:
+            if self.db_os_access == DbOsAccess.SSH:
                 sshkey = SshKey.from_folder()
             db_container = \
                 docker_client.containers.create(

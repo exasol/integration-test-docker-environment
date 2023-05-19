@@ -22,7 +22,7 @@ from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_
     SpawnTestEnvironmentWithDockerDB
 from exasol_integration_test_docker_environment \
     .lib.test_environment.parameter \
-    .docker_db_test_environment_parameter import DockerAccessMethod
+    .docker_db_test_environment_parameter import DbOsAccess
 
 
 def _cleanup(environment_info: EnvironmentInfo) -> None:
@@ -42,7 +42,7 @@ def spawn_test_environment(
         docker_runtime: Optional[str] = None,
         docker_db_image_version: str = LATEST_DB_VERSION,
         docker_db_image_name: str = "exasol/docker-db",
-        docker_access_method: str = "DOCKER_EXEC",
+        db_os_access: str = "DOCKER_EXEC",
         create_certificates: bool = False,
         additional_db_parameter: Tuple[str, ...] = tuple(),
         source_docker_repository_name: str = DEFAULT_DOCKER_REPOSITORY_NAME,
@@ -98,7 +98,7 @@ def spawn_test_environment(
                                               docker_runtime=docker_runtime,
                                               docker_db_image_version=docker_db_image_version,
                                               docker_db_image_name=docker_db_image_name,
-                                              docker_access_method=DockerAccessMethod[docker_access_method],
+                                              db_os_access=DbOsAccess[db_os_access],
                                               db_user="sys",
                                               db_password="exasol",
                                               bucketfs_write_password="write",
