@@ -24,11 +24,11 @@ docker_db_options = [
                  show_default=True,
                  help="""Docker DB Image Name against which the tests should run."""),
     click.option('--db-os-access', type=click.Choice([e.name for e in DbOsAccess]),
-                 meta_var="METHOD", default="""DOCKER_EXEC""", show_default=True,
+                 metavar="METHOD", default="""DOCKER_EXEC""", show_default=True,
                  help="""How to access file system and command line of the
      		 database operating system. Experimental option, will show no
      		 effect until implementation of feature SSH access is
-     		 completed."""), 
+     		 completed."""),
     click.option('--create-certificates/--no-create-certificates', default=False,
                  help="""Creates and injects SSL certificates to the Docker DB container."""),
     click.option('--additional-db-parameter', '-p', type=str, multiple=True,
