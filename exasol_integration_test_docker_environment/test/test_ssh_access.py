@@ -10,8 +10,7 @@ from exasol_integration_test_docker_environment.lib.base.ssh_access import SshKe
 
 class DockerTestEnvironmentTest(unittest.TestCase):
     """
-    This class tests using method SSH to access the Docker Container
-    containing the Exasol database.
+    This class tests using SSH to access the file system and commandline of the Exasol Database.
 
     The Docker Container of older database versions allowed to use
     ``docker_exec`` as well, while newer versions require SSH. The user can

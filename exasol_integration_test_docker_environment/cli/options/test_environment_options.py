@@ -21,7 +21,7 @@ docker_db_options = [
                  help="""Docker DB Image Name against which the tests should run."""),
     click.option('--docker-access-method', type=click.Choice(['DOCKER_EXEC', 'SSH']),
                  default="""DOCKER_EXEC""", show_default=True,
-                 help="""How to access docker container."""),
+                 help="""How to access the file system and command line of the DB."""),
     click.option('--create-certificates/--no-create-certificates', default=False,
                  help="""Creates and injects SSL certificates to the Docker DB container."""),
     click.option('--additional-db-parameter', '-p', type=str, multiple=True,
