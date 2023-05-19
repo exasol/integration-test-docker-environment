@@ -1,7 +1,5 @@
 import unittest
 
-# import docker.models.containers
-
 from exasol_integration_test_docker_environment.testing import utils
 from exasol_integration_test_docker_environment.testing \
    .exaslct_test_environment import ExaslctTestEnvironment
