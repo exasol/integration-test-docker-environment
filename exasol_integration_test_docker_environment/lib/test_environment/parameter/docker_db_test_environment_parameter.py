@@ -1,5 +1,5 @@
 import luigi
-from enum import Enum
+import enum import Enum, auto
 from luigi import Config
 
 class DockerAccessMethod(Enum):
