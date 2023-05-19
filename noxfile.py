@@ -156,6 +156,8 @@ def get_db_versions() -> List[str]:
     db_versions = [str(path.name) for path in template_path.iterdir() if path.is_dir()]
     db_versions.append("default")
     db_versions.append("7.1.0-d1")
+    db_versions.append("prerelease-8.17.0")
+    db_versions.remove("8.17.0")
     return db_versions
 
 
