@@ -10,8 +10,7 @@ from exasol_integration_test_docker_environment.lib.test_environment.parameter.d
 
 class Testee(DependencyLoggerBaseTask, DockerDBTestEnvironmentParameter):
     def run_task(self):
-        print(self.docker_access_method)
-        self.logger.error(self.docker_access_method)
+        pass
 
     @classmethod
     def make(cls, method: str) -> 'Testee':

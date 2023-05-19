@@ -2,7 +2,10 @@ import luigi
 from enum import Enum
 from luigi import Config
 
-DockerAccessMethod = Enum("DockerAccessMethod", ["DOCKER_EXEC", "SSH"])
+class DockerAccessMethod(Enum):
+     DOCKER_EXEC = auto()
+     SSH = auto()
+
 
 class DockerDBTestEnvironmentParameter(Config):
     docker_db_image_name = luigi.OptionalParameter(None)

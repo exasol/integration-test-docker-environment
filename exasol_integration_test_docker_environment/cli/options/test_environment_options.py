@@ -1,4 +1,8 @@
 import click
+from exasol_integration_test_docker_environment \
+    .lib.test_environment.parameter \
+    .docker_db_test_environment_parameter \
+    import DockerAccessMethod
 
 test_environment_options = [
     click.option('--environment-type', type=click.Choice(['docker_db', 'external_db']), default="""docker_db""",
@@ -19,7 +23,7 @@ docker_db_options = [
     click.option('--docker-db-image-name', type=str, default="""exasol/docker-db""",
                  show_default=True,
                  help="""Docker DB Image Name against which the tests should run."""),
-    click.option('--docker-access-method', type=click.Choice(['DOCKER_EXEC', 'SSH']),
+    click.option('--docker-access-method', type=click.Choice([e.name for e in DockerAccessMethod]),
                  default="""DOCKER_EXEC""", show_default=True,
                  help="""How to access the file system and command line of the DB."""),
     click.option('--create-certificates/--no-create-certificates', default=False,
