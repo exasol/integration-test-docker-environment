@@ -38,24 +38,3 @@ def database(itde_test_isolation: ExaslctTestEnvironment,
         yield spawned
     finally:
         utils.close_environments(spawned)
-
-
-# class PyTestEnvironment:
-#     def __init__(self):
-#         self.docker_environment_name = self.__class__.__name__
-#         _logger.info(f"SetUp {self.docker_environment_name}")
-#         self.environment = ExaslctTestEnvironment(self, "itde", clean_images_at_close=False)
-#         self.spawned = self.environment.spawn_docker_test_environments(
-#             name=self.docker_environment_name,
-#             additional_parameter = ["--db-os-access", "SSH"],
-#         )
-#
-#     def cleanup(self):
-#         utils.close_environments(self.spawned, self.environment)
-
-
-# @pytest.fixture
-# def slc_environment():
-#     environment = PyTestEnvironment()
-#     yield environment
-#     environment.cleanup()
