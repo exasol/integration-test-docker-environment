@@ -12,11 +12,11 @@ grey='\033[0;90m'
 # Jump to the current project's root directory (the one containing
 # .git/)
 ROOT_DIR=$(git rev-parse --show-toplevel || echo)
-NO_GIT=FALSE
+HAS_GIT_REPO=TRUE
 if [ -z "$ROOT_DIR" ]
 then
-  echo "Did not found git repository, using '$PWD' as ROOT_DIR"
-  NO_GIT=TRUE
+  echo "Did not find git repository, using '$PWD' as ROOT_DIR"
+  HAS_GIT_REPO=FALSE
   ROOT_DIR=$PWD
 fi
 
@@ -39,7 +39,7 @@ pushd starter_scripts > /dev/null
 bash "$SCRIPT_DIR/create_checksums.sh"
 popd > /dev/null
 
-if [ "$NO_GIT" == "FALSE" ]
+if [ "$HAS_GIT_REPO" == "TRUE" ]
 then
   echo -e "Add generated files ${grey}(pre-commit hook)${no_color}"
   git add exasol_integration_test_docker_environment/docker_db_config starter_scripts/checksums
