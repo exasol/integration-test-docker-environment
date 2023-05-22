@@ -27,8 +27,8 @@ def itde_cli_test_isolation(request) -> Iterator[ExaslctTestEnvironment]:
 @contextlib.contextmanager
 def database(itde_test_isolation: ExaslctTestEnvironment,
              name: Optional[str] = None,
-             additional_parameters=Optional[List[str]] = None,
-    ) -> Iterator[SpawnedTestEnvironments]:
+             additional_parameters=Optional[List[str]] = None
+             ) -> Iterator[SpawnedTestEnvironments]:
     name = name if name else itde_test_isolation.name
     spawned = itde_test_isolation.spawn_docker_test_environments(
         name=name,
