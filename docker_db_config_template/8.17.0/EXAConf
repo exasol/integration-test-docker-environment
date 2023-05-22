@@ -15,7 +15,7 @@
     # List of networks for this cluster: 'private' is mandatory, 'public' is optional.
     Networks = private
     # Comma-separated list of nameservers for this cluster.
-    NameServers = 8.8.8.8, {{ name_servers }}
+    NameServers = {{ name_servers }}
     # Path to c4 unix domain socket, used for deployments of new clusters and nodes.
     C4Socket = /var/run/c4_socket
     Timezone = Europe/Berlin
@@ -170,6 +170,10 @@
     EnableAuditing = True
     BuiltinScriptLanguageName = slc-6.0.0-c4-5-standard-EXASOL-8.0.0/ScriptLanguages-standard-EXASOL-8.0.0-slc-v6.0.0-PB5EHDLN
     AutoStart = True
+    {% if additional_db_parameters %}
+    Params = {{ additional_db_parameters }}
+    {% endif %}
+
     # JDBC driver configuration
     [[JDBC]]
         # BucketFS that contains the JDBC driver
