@@ -26,18 +26,24 @@ def _cleanup(env_name: str):
     remove_docker_volumes([f"db_container_{env_name}_volume"])
 
 
+def get_class(test_object):
+    if test_object is None:
+        return None
+    if not inspect.isclass(self.test_object):
+        # test_object is an instance -> return its class
+        return  self.test_object.__class__
+    return self.test_object
+
+
 class ExaslctTestEnvironment:
 
-    def __init__(self, test_object, executable="./exaslct", clean_images_at_close=True):
+    def __init__(self, test_object, executable="./exaslct", clean_images_at_close=True, name=None):
         self.clean_images_at_close = clean_images_at_close
         self.executable = executable
         self.test_object = test_object
-        if not inspect.isclass(self.test_object):
-            self.test_class = self.test_object.__class__
-        else:
-            self.test_class = self.test_object
+        self.test_class = get_class(test_object)
         self.flavor_path = self.get_test_flavor()
-        self.name = self.test_class.__name__
+        self.name = name if name else self.test_class.__name__
         self._docker_repository_name = default_docker_repository_name(self.name)
         if "RUN_SLC_TESTS_WITHIN_CONTAINER" in os.environ:
             # We need to put the output directories into the workdir,
