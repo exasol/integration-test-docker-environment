@@ -155,9 +155,15 @@ def get_db_versions() -> List[str]:
     template_path = ROOT / "docker_db_config_template"
     db_versions = [str(path.name) for path in template_path.iterdir() if path.is_dir()]
     db_versions.append("default")
-    db_versions.append("7.1.0-d1")
-    db_versions.append("prerelease-8.17.0")
+    # The ITDE only supports EXAConf templates for docker-db versions in the format major.minor.bugfix.
+    # If a user supplies versions with some additions, such as d1, prerelease, we filter these from the version number.
+    # However, we use the templates here to generate the test matrix for GitHub Actions.
+    # This means we need to adapt the list for images with special names.
+    # We need to remove the version 8.17.0 for the moment, because there exist no docker-db images with that version
+    # on DockerHub, yet. Instead, we add its pre-release version.
     db_versions.remove("8.17.0")
+    db_versions.append("prerelease-8.17.0")
+    db_versions.append("7.1.0-d1")
     return db_versions
 
 
