@@ -24,6 +24,31 @@ def _path(template: str) -> Path:
     )
 
 
+class SshFiles:
+    def __init__(self, folder: Optional[Path] = None):
+        self._folder = folder if folder else _path(_DEFAULT_FOLDER)
+
+    @property
+    def folder(self) -> Path:
+        return self._folder
+
+    @property
+    def private_key(self) -> Path:
+        return self._folder / "id_rsa"
+
+    @property
+    def public_key(self) -> Path:
+        return self._folder / "id_rsa.pub"
+
+    @property
+    def authorized_keys_folder(self) -> Path:
+        return self._folder / "authorized_keys"
+
+    @property
+    def authorized_keys_file(self) -> Path:
+        return self.authorized_keys_folder / "authorized_keys"
+
+
 class SshKey:
     """This class hosts the private key for SSH access to a Docker Container
     and offers some convenience methods for writing the private or public key
@@ -75,24 +100,32 @@ class SshKey:
         return SshKey(rsa_key)
 
     @classmethod
-    def default_folder(cls) -> Path:
-        folder = _path(_DEFAULT_FOLDER)
-        # mode 0o700 = rwx permissions only for the current user
-        # is required for the folder to enable to create files inside
-        folder.mkdir(mode=0o700, exist_ok=True)
-        return folder
+    def from_folder(cls, folder: Optional[Path] = None) -> 'SshKey':
+        def mkdir(folder: Path):
+            # mode 0o700 = rwx permissions only for the current user
+            # is required for the folder to enable to create files inside
+            folder.mkdir(mode=0o700, exist_ok=True)
 
-    @classmethod
-    def from_folder(cls, folder: Optional[Path] = None, args=None) -> 'SshKey':
-        folder = folder if folder else cls.default_folder()
-        priv = folder / "id_rsa"
-        pub = folder / "id_rsa.pub"
+        def create(folder: Path):
+            mkdir(folder)
+            readme = folder / "README"
+            with open(readme, "w") as f:
+                f.write(
+                    "This folder is meant to contain file authorized_keys"
+                    " and to be mounted into the Docker Container at /root/.ssh."
+                )
+
+        files = SshFiles(folder)
+        priv = files.private_key
 
         with portalocker.Lock(_path(_LOCK_FILE), 'wb', timeout=10) as fh:
+            mkdir(files.folder)
+            create(files.authorized_keys_folder)
             if priv.exists():
                 return cls.read_from(priv)
             return (
                 cls.generate()
                 .write_private_key(priv)
-                .write_public_key(pub)
+                .write_public_key(files.public_key)
+                .write_public_key(files.authorized_keys_file)
             )

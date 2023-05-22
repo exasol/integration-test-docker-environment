@@ -23,11 +23,14 @@ from exasol_integration_test_docker_environment.lib.test_environment.db_version 
 from exasol_integration_test_docker_environment.lib.test_environment.docker_container_copy import DockerContainerCopy
 from exasol_integration_test_docker_environment.lib.test_environment.parameter.docker_db_test_environment_parameter import \
     DockerDBTestEnvironmentParameter
+from exasol_integration_test_docker_environment.lib.base.ssh_access import SshFiles
+
 
 BUCKETFS_PORT = "6583"
 DB_PORT = "8888"
 CERTIFICATES_MOUNT_DIR = "/certificates"
 CERTIFICATES_DEFAULT_DIR = "/exa/etc/ssl/"
+AUTHORIZED_KEYS_MOUNT_DIR = "/root/.ssh"
 
 
 class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
@@ -74,12 +77,12 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
 
     def _handle_output(self, output_generator, image_info: ImageInfo):
         log_file_path = self.get_log_path().joinpath("pull_docker_db_image.log")
-        with PullLogHandler(log_file_path, self.logger, image_info) as log_hanlder:
+        with PullLogHandler(log_file_path, self.logger, image_info) as log_handler:
             still_running_logger = StillRunningLogger(
                 self.logger, "pull image %s" % image_info.get_source_complete_name())
             for log_line in output_generator:
                 still_running_logger.log()
-                log_hanlder.handle_log_lines(log_line)
+                log_handler.handle_log_lines(log_line)
 
     def _create_database_container(self, db_ip_address: str, db_private_network: str):
         self.logger.info("Starting database container %s", self.db_container_name)
@@ -98,6 +101,9 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             volumes = {db_volume.name: {"bind": "/exa", "mode": "rw"}}
             if self.certificate_volume_name is not None:
                 volumes[self.certificate_volume_name] = {"bind": CERTIFICATES_MOUNT_DIR, "mode": "ro"}
+
+            local_path = SshFiles().authorized_keys_folder
+            volumes[local_path] = {"bind": AUTHORIZED_KEYS_MOUNT_DIR, "mode": "ro"}
 
             db_container = \
                 docker_client.containers.create(
