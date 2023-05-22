@@ -42,7 +42,7 @@ def spawn_test_environment(
         docker_runtime: Optional[str] = None,
         docker_db_image_version: str = LATEST_DB_VERSION,
         docker_db_image_name: str = "exasol/docker-db",
-        db_os_access: str = "DOCKER_EXEC",
+        db_os_access: Optional[str] = "DOCKER_EXEC",
         create_certificates: bool = False,
         additional_db_parameter: Tuple[str, ...] = tuple(),
         source_docker_repository_name: str = DEFAULT_DOCKER_REPOSITORY_NAME,
