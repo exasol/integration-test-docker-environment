@@ -10,16 +10,16 @@ from typing import Optional
 
 
 _LOCK_FILE = "$TMP/$MODULE-ssh-access.lock"
-_DEFAULT_FOLDER = "$TMP/$MODULE"
+_DEFAULT_FOLDER = "$HOME/.cache/exasol/$MODULE"
 
 
 def _path(template: str) -> Path:
-    module_name = "integration-test-docker-environment"
     return Path(
         Template(template)
         .substitute(
             TMP=tempfile.gettempdir(),
-            MODULE=module_name,
+            HOME=os.path.expanduser('~'),
+            MODULE="itde",
         )
     )
 
@@ -101,13 +101,13 @@ class SshKey:
 
     @classmethod
     def from_folder(cls, folder: Optional[Path] = None) -> 'SshKey':
-        def mkdir(folder: Path):
+        def makedirs(folder: Path):
             # mode 0o700 = rwx permissions only for the current user
             # is required for the folder to enable to create files inside
-            folder.mkdir(mode=0o700, exist_ok=True)
+            os.makedirs(folder, mode=0o700, exist_ok=True)
 
         def create(folder: Path):
-            mkdir(folder)
+            makedirs(folder)
             readme = folder / "README"
             with open(readme, "w") as f:
                 f.write(
@@ -119,7 +119,7 @@ class SshKey:
         priv = files.private_key
 
         with portalocker.Lock(_path(_LOCK_FILE), 'wb', timeout=10) as fh:
-            mkdir(files.folder)
+            makedirs(files.folder)
             create(files.authorized_keys_folder)
             if priv.exists():
                 return cls.read_from(priv)
