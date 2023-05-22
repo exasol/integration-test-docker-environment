@@ -9,10 +9,12 @@ def find_exaplus(db_container: docker.models.containers.Container) -> PurePath:
     :db_container Container where to search for exaplus
     """
     exit, output = db_container.exec_run(cmd="find /usr/opt -name 'exaplus' -type f")
-    if exit != 0:
+    print(exit, output)
+    if exit != 0 or output == b"":
         # Using /usr/opt and /opt together in one command doesn't work, because in Exasol 8, /usr/opt doesn't exist
         # and as such the command fails, even if it finds exaplus in /opt
         exit, output = db_container.exec_run(cmd="find /opt -name 'exaplus' -type f")
+        print(exit, output)
     if exit != 0:
         raise RuntimeError(f"Exaplus not found on docker db! Output is {output}")
     found_paths = list(filter(None, output.decode("UTF-8").split("\n")))
