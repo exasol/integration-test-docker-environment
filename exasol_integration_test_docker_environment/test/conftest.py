@@ -8,7 +8,6 @@ from exasol_integration_test_docker_environment.testing \
 from exasol_integration_test_docker_environment.testing \
    .exaslct_test_environment import SpawnedTestEnvironments
 
-# from fake import SpawnedTestEnvironments, ExaslctTestEnvironment, utils
 
 @pytest.fixture
 def itde_cli_test_isolation(request) -> Iterator[ExaslctTestEnvironment]:

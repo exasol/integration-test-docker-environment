@@ -58,6 +58,8 @@ class ExaslctTestEnvironment:
         self._update_attributes()
 
     def get_test_flavor(self):
+        if self.test_class is None:
+            return None
         source_file_of_test_object = inspect.getsourcefile(self.test_class)
         flavor_path = Path(os.path.realpath(source_file_of_test_object)).parent.joinpath(
             "resources/test-flavor")

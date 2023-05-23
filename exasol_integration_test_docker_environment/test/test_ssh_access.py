@@ -10,7 +10,6 @@ from exasol_integration_test_docker_environment.testing \
    .exaslct_test_environment import SpawnedTestEnvironments
 from exasol_integration_test_docker_environment.lib.base.ssh_access import SshKey
 
-# from fake import SpawnedTestEnvironments, ExaslctTestEnvironment, utils
 
 @contextlib.contextmanager
 def database(itde_test_isolation: ExaslctTestEnvironment,
