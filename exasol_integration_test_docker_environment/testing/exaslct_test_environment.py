@@ -29,10 +29,10 @@ def _cleanup(env_name: str):
 def get_class(test_object):
     if test_object is None:
         return None
-    if not inspect.isclass(self.test_object):
+    if not inspect.isclass(test_object):
         # test_object is an instance -> return its class
-        return  self.test_object.__class__
-    return self.test_object
+        return  test_object.__class__
+    return test_object
 
 
 class ExaslctTestEnvironment:
