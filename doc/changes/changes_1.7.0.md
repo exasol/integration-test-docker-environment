@@ -23,4 +23,4 @@ If you need further versions, please open an issue.
 * #301: Added commanline option `--docker-access-method`
 * #302: Added support to create an SSH key for accessing Docker Container
 * #241: Renamed environment variable for test execution from `GOOGLE_CLOUD_BUILD` to `RUN_SLC_TESTS_WITHIN_CONTAINER`
-* #190: Added Exasol 8.0 prerelease to list of tested database versions
+* #190: Added support for the Exasol 8.0 Docker-DB prerelease version
