@@ -17,21 +17,21 @@ Comparison to Docker-DB and the Exasol Testcontainers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  This project uses the
-   `Docker-DB <https://hub.docker.com/r/exasol/docker-db>`__, but it
+   `Docker-DB &lt;https://hub.docker.com/r/exasol/docker-db&gt;`__, but it
    does the configuration, setup and startup for you. For example, it
    waits until the Database and the Bucket-FS accept connections. It
    also provides tasks which simplify the population the database with
    test data and upload of files to the BucketFS.
 -  The `Exasol
-   Testcontainers <https://github.com/exasol/exasol-testcontainers/>`__
+   Testcontainers &lt;https://github.com/exasol/exasol-testcontainers/&gt;`__
    provide similar features for Java integration tests, so if you have a
    Java project use the Exasol Testcontainer, because they are more
    integrated in the Java ecosystem than this project. Testcontainers
    are designed to integrate with popular unit testing frameworks like
-   `JUnit4 <https://www.testcontainers.org/test_framework_integration/junit_4/>`__,
-   `JUnit5 <https://www.testcontainers.org/test_framework_integration/junit_5/>`__
+   `JUnit4 &lt;https://www.testcontainers.org/test_framework_integration/junit_4/&gt;`__,
+   `JUnit5 &lt;https://www.testcontainers.org/test_framework_integration/junit_5/&gt;`__
    and
-   `Spock <https://www.testcontainers.org/test_framework_integration/spock/>`__.
+   `Spock &lt;https://www.testcontainers.org/test_framework_integration/spock/&gt;`__.
    Most notably, lifecycle management of containers controlled by the
    tests lifecycle.
 
@@ -50,7 +50,7 @@ In order to start a Docker-DB Test Environment, you need:
 
    -  Linux
    -  Mac OS X with `Docker Desktop on
-      Mac <https://docs.docker.com/docker-for-mac/install/>`__ and Intel
+      Mac &lt;https://docs.docker.com/docker-for-mac/install/&gt;`__ and Intel
       processor
    -  Windows is currently **not supported**
 
@@ -73,14 +73,14 @@ Starting the test environment:
 
 ::
 
-   ./start-test-env spawn-test-environment --environment-name <NAME>
+   ./start-test-env spawn-test-environment --environment-name &lt;NAME&gt;
 
 or if you work on the code of the Test Environment (requires Python
->=3.8 with `poetry <https://python-poetry.org/>`__):
+&gt;=3.8 with `poetry &lt;https://python-poetry.org/&gt;`__):
 
 ::
 
-   ./start-test-env-with-poetry spawn-test-environment --environment-name <NAME>
+   ./start-test-env-with-poetry spawn-test-environment --environment-name &lt;NAME&gt;
 
 Shutdown of the test environment is currently done manual.
 
@@ -98,8 +98,8 @@ The following options are available to customize the test environment.
    Options:
      --environment-name TEXT         Name of the docker environment. This name
                                      gets used as suffix for the container
-                                     db_container_<name> and
-                                     test_container_<name>  [required]
+                                     db_container_&lt;name&gt; and
+                                     test_container_&lt;name&gt;  [required]
 
      --database-port-forward INTEGER
                                      Host port to which the database port gets
@@ -110,12 +110,12 @@ The following options are available to customize the test environment.
                                      forwarded
 
      --db-mem-size TEXT              The main memory used by the database. Format
-                                     <number> <unit>, e.g. 1 GiB. The minimum
+                                     &lt;number&gt; &lt;unit&gt;, e.g. 1 GiB. The minimum
                                      size is 1 GB, below that the database will
                                      not start.  [default: 2 GiB]
 
      --db-disk-size TEXT             The disk size available for the database.
-                                     Format <number> <unit>, e.g. 1 GiB. The
+                                     Format &lt;number&gt; &lt;unit&gt;, e.g. 1 GiB. The
                                      minimum size is 100 MiB. However, the setup
                                      creates volume files with at least 2 GB
                                      larger size, because the database needs at
@@ -177,7 +177,7 @@ Run ``main.py --help``, to get a list of the available commands:
      spawn-test-environment  This command spawn a test environment with a...
 
 To get more details on a specific command run
-``main.py <command> --help``, e.g. \ ``main.py health --help``:
+``main.py &lt;command&gt; --help``, e.g. \ ``main.py health --help``:
 
 .. code:: console
 
@@ -223,7 +223,7 @@ The python setup script creates configuration files on the host and in
 the test container.
 
 On the host the container information get stored in the build output
-directory usually under ``.build_output/cache/<ENVIRONMENT_NAME>/*``. In
+directory usually under ``.build_output/cache/&lt;ENVIRONMENT_NAME&gt;/*``. In
 the test container the config file is stored at the root directory
 ``/``.
 
@@ -266,12 +266,31 @@ Currently supported Exasol Versions
 
 If you need further versions, please open an issue.
 
+
+SSH Access
+""""""""""
+
+Up to version 1.6.0 ITDE used :code:`docker_exec` to access the operating system of
+the Exasol database inside the Docker Container, e.g. to analyze the content
+of logfiles or execute some shell commands. With version 8 of Exasol database
+the format of the Docker Containers might change so that `docker_exec` is no
+longer possible. Instead ITDE will then need to use SSH access.
+
+You can select the access method with command line option
+:code:`--db-os-access`. The default value is :code:`DOCKER_EXEC`.
+
+ITDE will create a random SSH key pair and store it to folder
+:code:`~/.cache/exasol/itde/` with access permissions limited to the current
+user only. By this ITDE enables to reuse the same SSH keys for future sessions
+which leaves the container unchanged and hence reusable.
+
+
 Tested Docker Runtimes
 ~~~~~~~~~~~~~~~~~~~~~~
 
 -  Docker Default Runtime
 -  `NVIDIA Container
-   Runtime <https://github.com/NVIDIA/nvidia-container-runtime>`__ for
+   Runtime &lt;https://github.com/NVIDIA/nvidia-container-runtime&gt;`__ for
    GPU accelerated UDFs
 
 Mac OS X Support
@@ -292,13 +311,13 @@ What happens under the hood
 Mac OS X with Docker Desktop for Mac uses a lightweight virtual machine
 with linux in which the docker daemon runs and the containers get
 started. This makes
-`networking <https://docs.docker.com/docker-for-mac/networking/>`__ and
-`shared directories <https://docs.docker.com/docker-for-mac/osxfs/>`__
+`networking &lt;https://docs.docker.com/docker-for-mac/networking/&gt;`__ and
+`shared directories &lt;https://docs.docker.com/docker-for-mac/osxfs/&gt;`__
 more complicated then on Linux.
 
 We start the python setup script for the test environment in its own
 Docker container, lets call it ``docker runner``, because the library
-`Luigi <https://luigi.readthedocs.io/en/stable/>`__ can have problems
+`Luigi &lt;https://luigi.readthedocs.io/en/stable/&gt;`__ can have problems
 with Mac OS X and to avoid the installation of further dependencies. To
 support Mac OS X, the ``start-test-env`` script starts the
 ``docker runner`` container and mounts the docker socket at

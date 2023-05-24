@@ -7,6 +7,8 @@ Up to version 1.6.0 ITDE used `docker_exec` to access the Docker Container, e.g.
 The current release therefore enhances ITDE to enable to access the Docker Container via SSH.
 The user can select the docker access method with command line option `--db-os-access`, see User Guide.
 
+Additionally the folder for storing the SSH keys has been moved to `~/.cache/exasol/itde/`. By that ITDE can restrict file permissions allowing access only by the current user.
+
 T.B.D.
 
 ### Supported Exasol Versions
@@ -24,3 +26,5 @@ If you need further versions, please open an issue.
 * #302: Added support to create an SSH key for accessing Docker Container
 * #241: Renamed environment variable for test execution from `GOOGLE_CLOUD_BUILD` to `RUN_SLC_TESTS_WITHIN_CONTAINER`
 * #190: Added support for the Exasol 8.0 Docker-DB prerelease version
+* #326: Changed folder for SSH keys to `~/.cache/exasol/itde/`
+* #303: Added authorized_keys to Docker Container for SSH access
