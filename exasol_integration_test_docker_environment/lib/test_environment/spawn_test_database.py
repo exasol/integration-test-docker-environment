@@ -110,9 +110,12 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                 volumes[self.certificate_volume_name] = {"bind": CERTIFICATES_MOUNT_DIR, "mode": "ro"}
 
             if self.db_os_access == DbOsAccess.SSH:
-                sshkey = SshKey.from_folder()
-                local_path = SshFiles().authorized_keys_folder
-                volumes[local_path] = {"bind": AUTHORIZED_KEYS_MOUNT_DIR, "mode": "ro"}
+                files = SshFiles()
+                sshkey = SshKey.from_folder(files.folder)
+                volumes[files.authorized_keys_folder] = {
+                    "bind": AUTHORIZED_KEYS_MOUNT_DIR,
+                    "mode": "ro",
+                }
 
             db_container = \
                 docker_client.containers.create(
