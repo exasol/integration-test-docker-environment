@@ -119,10 +119,10 @@ class SshKey:
         priv = files.private_key
 
         with portalocker.Lock(_path(_LOCK_FILE), 'wb', timeout=10) as fh:
-            makedirs(files.folder)
-            create(files.authorized_keys_folder)
             if priv.exists():
                 return cls.read_from(priv)
+            makedirs(files.folder)
+            create(files.authorized_keys_folder)
             return (
                 cls.generate()
                 .write_private_key(priv)
