@@ -26,18 +26,24 @@ def _cleanup(env_name: str):
     remove_docker_volumes([f"db_container_{env_name}_volume"])
 
 
+def get_class(test_object):
+    if test_object is None:
+        return None
+    if not inspect.isclass(test_object):
+        # test_object is an instance -> return its class
+        return  test_object.__class__
+    return test_object
+
+
 class ExaslctTestEnvironment:
 
-    def __init__(self, test_object, executable="./exaslct", clean_images_at_close=True):
+    def __init__(self, test_object, executable="./exaslct", clean_images_at_close=True, name=None):
         self.clean_images_at_close = clean_images_at_close
         self.executable = executable
         self.test_object = test_object
-        if not inspect.isclass(self.test_object):
-            self.test_class = self.test_object.__class__
-        else:
-            self.test_class = self.test_object
+        self.test_class = get_class(test_object)
         self.flavor_path = self.get_test_flavor()
-        self.name = self.test_class.__name__
+        self.name = name if name else self.test_class.__name__
         self._docker_repository_name = default_docker_repository_name(self.name)
         if "RUN_SLC_TESTS_WITHIN_CONTAINER" in os.environ:
             # We need to put the output directories into the workdir,
@@ -52,6 +58,8 @@ class ExaslctTestEnvironment:
         self._update_attributes()
 
     def get_test_flavor(self):
+        if self.test_class is None:
+            return None
         source_file_of_test_object = inspect.getsourcefile(self.test_class)
         flavor_path = Path(os.path.realpath(source_file_of_test_object)).parent.joinpath(
             "resources/test-flavor")
@@ -132,16 +140,18 @@ class ExaslctTestEnvironment:
             bucketfs_password="write",
             database_port=database_port,
             bucketfs_port=bucketfs_port)
-        docker_db_version_parameter = ""
-        db_version_from_env = check_db_version_from_env()
-        if db_version_from_env is not None:
-            docker_db_version_parameter = f'--docker-db-image-version "{db_version_from_env}"'
-        if additional_parameter is None:
-            additional_parameter = []
-        arguments = " ".join([f"--environment-name {on_host_parameter.name}",
-                              f"--database-port-forward {on_host_parameter.database_port}",
-                              f"--bucketfs-port-forward {on_host_parameter.bucketfs_port}",
-                              docker_db_version_parameter] + additional_parameter)
+
+        arguments = [
+            f"--environment-name {on_host_parameter.name}",
+            f"--database-port-forward {on_host_parameter.database_port}",
+            f"--bucketfs-port-forward {on_host_parameter.bucketfs_port}",
+        ]
+        db_version = check_db_version_from_env()
+        if db_version:
+            arguments.append(f'--docker-db-image-version "{db_version}"')
+        if additional_parameter:
+            arguments += additional_parameter
+        arguments = " ".join(arguments)
 
         command = f"{self.executable} spawn-test-environment {arguments}"
         completed_process = self.run_command(command, use_flavor_path=False, use_docker_repository=False,

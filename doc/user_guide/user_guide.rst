@@ -135,6 +135,13 @@ The following options are available to customize the test environment.
      --docker-db-image-name TEXT     Docker DB Image Name against which the tests
                                      should run.  [default: exasol/docker-db]
 
+     --db-os-access METHOD           How to access file system and command
+                                     line of the database operating
+                                     system. Experimental option, will show no
+                                     effect until implementation of feature
+                                     SSH access is completed. [default:
+                                     DOCKER_EXEC]
+
      --output-directory DIRECTORY    Output directory where the system stores all
                                      output and log files.  [default:
                                      .build_output]

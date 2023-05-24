@@ -14,7 +14,7 @@ def cli():
 
             $ itde health
 
-        Spawn a itde test environment:
+        Spawn an ITDE test environment:
 
             $ itde spawn-test-environment --environment-name test \\
             --database-port-forward 8888 --bucketfs-port-forward 6666 \\

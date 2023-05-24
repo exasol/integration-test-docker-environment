@@ -21,9 +21,16 @@ from exasol_integration_test_docker_environment.lib.docker.images.create.utils.p
 from exasol_integration_test_docker_environment.lib.docker.images.image_info import ImageInfo
 from exasol_integration_test_docker_environment.lib.test_environment.db_version import DbVersion
 from exasol_integration_test_docker_environment.lib.test_environment.docker_container_copy import DockerContainerCopy
-from exasol_integration_test_docker_environment.lib.test_environment.parameter.docker_db_test_environment_parameter import \
-    DockerDBTestEnvironmentParameter
-from exasol_integration_test_docker_environment.lib.base.ssh_access import SshFiles
+from exasol_integration_test_docker_environment.lib \
+    .test_environment.parameter \
+    .docker_db_test_environment_parameter import (
+        DbOsAccess,
+        DockerDBTestEnvironmentParameter,
+)
+from exasol_integration_test_docker_environment.lib.base.ssh_access import (
+    SshFiles,
+    SshKey,
+)
 
 
 BUCKETFS_PORT = "6583"
@@ -102,8 +109,10 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             if self.certificate_volume_name is not None:
                 volumes[self.certificate_volume_name] = {"bind": CERTIFICATES_MOUNT_DIR, "mode": "ro"}
 
-            local_path = SshFiles().authorized_keys_folder
-            volumes[local_path] = {"bind": AUTHORIZED_KEYS_MOUNT_DIR, "mode": "ro"}
+            if self.db_os_access == DbOsAccess.SSH:
+                sshkey = SshKey.from_folder()
+                local_path = SshFiles().authorized_keys_folder
+                volumes[local_path] = {"bind": AUTHORIZED_KEYS_MOUNT_DIR, "mode": "ro"}
 
             db_container = \
                 docker_client.containers.create(
