@@ -89,6 +89,7 @@ def spawn_test_environment(
         docker_runtime: Optional[str],
         docker_db_image_version: str,
         docker_db_image_name: str,
+        db_os_access: Optional[str],
         create_certificates: bool,
         additional_db_parameter: Tuple[str, ...],
         source_docker_repository_name: str,
@@ -107,7 +108,7 @@ def spawn_test_environment(
         use_job_specific_log_file: bool
 ):
     """
-    This command spawn a test environment with a docker-db container and a connected test-container.
+    This command spawns a test environment with a docker-db container and a connected test-container.
     The test-container is reachable by the database for output redirects of UDFs.
     """
     with TerminationHandler():
@@ -122,6 +123,7 @@ def spawn_test_environment(
                 docker_runtime,
                 docker_db_image_version,
                 docker_db_image_name,
+                db_os_access,
                 create_certificates,
                 additional_db_parameter,
                 source_docker_repository_name,

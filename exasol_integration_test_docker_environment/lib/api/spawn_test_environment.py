@@ -2,8 +2,13 @@ import functools
 from typing import Tuple, Optional, Callable
 import humanfriendly
 
-from exasol_integration_test_docker_environment.lib.api.common import set_build_config, set_docker_repository_config, \
-    run_task, generate_root_task, cli_function
+from exasol_integration_test_docker_environment.lib.api.common import (
+    set_build_config,
+    set_docker_repository_config,
+    run_task,
+    generate_root_task,
+    cli_function,
+)
 from exasol_integration_test_docker_environment.cli.options.docker_repository_options import \
     DEFAULT_DOCKER_REPOSITORY_NAME
 from exasol_integration_test_docker_environment.cli.options.system_options import DEFAULT_OUTPUT_DIRECTORY
@@ -15,6 +20,9 @@ from exasol_integration_test_docker_environment.lib.docker.volumes.utils import 
 from exasol_integration_test_docker_environment.lib.docker.networks.utils import remove_docker_networks
 from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_environment_with_docker_db import \
     SpawnTestEnvironmentWithDockerDB
+from exasol_integration_test_docker_environment \
+    .lib.test_environment.parameter \
+    .docker_db_test_environment_parameter import DbOsAccess
 
 
 def _cleanup(environment_info: EnvironmentInfo) -> None:
@@ -34,6 +42,7 @@ def spawn_test_environment(
         docker_runtime: Optional[str] = None,
         docker_db_image_version: str = LATEST_DB_VERSION,
         docker_db_image_name: str = "exasol/docker-db",
+        db_os_access: Optional[str] = "DOCKER_EXEC",
         create_certificates: bool = False,
         additional_db_parameter: Tuple[str, ...] = tuple(),
         source_docker_repository_name: str = DEFAULT_DOCKER_REPOSITORY_NAME,
@@ -89,6 +98,7 @@ def spawn_test_environment(
                                               docker_runtime=docker_runtime,
                                               docker_db_image_version=docker_db_image_version,
                                               docker_db_image_name=docker_db_image_name,
+                                              db_os_access=DbOsAccess[db_os_access],
                                               db_user="sys",
                                               db_password="exasol",
                                               bucketfs_write_password="write",

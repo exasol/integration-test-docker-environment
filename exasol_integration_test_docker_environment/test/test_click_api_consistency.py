@@ -27,9 +27,15 @@ class ClickApiConsistencyTest(unittest.TestCase):
             if "return" in api_spec.annotations:
                 del api_spec.annotations["return"]
 
-            multiassert([lambda: self.assertEqual(api_spec.args, cli_spec.args),
-                         lambda: self.assertEqual(api_spec.annotations, cli_spec.annotations),
-                         lambda: self.assertEqual(api_spec.args, param_names_of_click_call(cli_call))], self)
+            loop = f"cli: {cli_call}, api: {api_call}"
+            def cli_spec_names():
+                self.assertEqual(api_spec.args, cli_spec.args, msg=f"{loop} - cli spec")
+            def type_annotations():
+                self.assertEqual(api_spec.annotations, cli_spec.annotations, msg=f"{loop} - type annotations")
+            def cli_param_names():
+                self.assertEqual(api_spec.args, param_names_of_click_call(cli_call), msg=f"{loop} - cli param names")
+
+            multiassert([cli_spec_names, type_annotations, cli_param_names], self)
 
     def test_api_default_values(self):
         """
