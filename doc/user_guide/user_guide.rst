@@ -284,6 +284,9 @@ ITDE will create a random SSH key pair and store it to folder
 user only. By this ITDE enables to reuse the same SSH keys for future sessions
 which leaves the container unchanged and hence reusable.
 
+The public key will be added as file :code:`/root/.ssh/authorized_keys` inside
+the Docker Container to enable SSH access with public key authentication.
+
 
 Tested Docker Runtimes
 ~~~~~~~~~~~~~~~~~~~~~~
