@@ -109,14 +109,6 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             if self.certificate_volume_name is not None:
                 volumes[self.certificate_volume_name] = {"bind": CERTIFICATES_MOUNT_DIR, "mode": "ro"}
 
-            if self.db_os_access == DbOsAccess.SSH:
-                files = SshFiles()
-                sshkey = SshKey.from_folder(files.folder)
-                volumes[files.authorized_keys_folder] = {
-                    "bind": AUTHORIZED_KEYS_MOUNT_DIR,
-                    "mode": "rw",
-                }
-
             db_container = \
                 docker_client.containers.create(
                     image="%s" % (docker_db_image_info.get_source_complete_name()),
@@ -128,6 +120,19 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                     ports=ports,
                     runtime=self.docker_runtime
                 )
+
+            if self.db_os_access == DbOsAccess.SSH:
+                files = SshFiles()
+                sshkey = SshKey.from_folder(files.folder)
+                copy = DockerContainerCopy(db_container)
+                content = sshkey.public_key_as_string("itde-ssh-access")
+                copy.add_string_to_file("authorized_keys", content)
+                copy.copy("/root/.ssh/authorized_keys")
+                # volumes[files.authorized_keys_folder] = {
+                #     "bind": AUTHORIZED_KEYS_MOUNT_DIR,
+                #     "mode": "rw",
+                # }
+
             docker_network = docker_client.networks.get(self.network_info.network_name)
             network_aliases = self._get_network_aliases()
             docker_network.connect(db_container, ipv4_address=db_ip_address, aliases=network_aliases)
@@ -177,6 +182,27 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                     stream=True)
                 self._handle_output(output_generator, docker_db_image_info)
         return docker_db_image_info
+
+    # def _prepare_volume(
+    #         self,
+    #         docker_client,
+    #         volume_name: str,
+    #         container_name: str,
+    # ) -> Tuple(Volume, Container):
+    #     """
+    #     Create an intermediate Docker Container containing a volume that
+    #     can be mounted into another Docker Container.
+    #     """
+    #     # volume_name = self._get_db_volume_name()
+    #     # container_name = self._get_db_volume_preparation_container_name()
+    #     self._remove_container(container_name)
+    #     self._remove_volume(volume_name)
+    #     # db_volume, preparation_container = \
+    #     return self._create_volume_and_container(
+    #             docker_client,
+    #             volume_name,
+    #             container_name,
+    #         )
 
     def _prepare_db_volume(self, docker_client, db_private_network: str,
                            docker_db_image_info: ImageInfo) -> Volume:
