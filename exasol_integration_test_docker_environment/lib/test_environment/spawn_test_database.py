@@ -217,7 +217,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
 
     def _prepare_volume(
             self,
-            docker_client,
+            docker_client: docker.api.APIClient,
             volume_name,
             container_name,
             remove_old_instances: bool = False,

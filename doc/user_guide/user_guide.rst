@@ -280,7 +280,7 @@ access.
 You can select the access method with command line option
 ``--db-os-access``. The default value is ``DOCKER_EXEC``.
 
-ITDE will create a random SSH key pair and store it to folder
+ITDE will create a random SSH key pair and store it to the folder
 ``~/.cache/exasol/itde/`` with access permissions limited to the current user
 only. By this ITDE enables to reuse the same SSH keys for future sessions
 which leaves the container unchanged and hence reusable.
