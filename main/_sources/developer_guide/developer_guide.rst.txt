@@ -80,3 +80,22 @@ One of the release steps failed (Partial Release)
     **Scenario**: Publishing of the release on Github was successfully but during the PyPi release, the upload step got interrupted.
 
     **Solution**: Manually push the package to PyPi
+
+Running Tests
+*************
+
+You can execute all tests in a single file with the following command:
+
+.. code-block:: shell
+
+  poetry run python exasol_integration_test_docker_environment/test/test_cli_test_environment_db_mem_size.py
+
+Some tests will use prebuilt Docker Containers.
+After changing the implementation you might need to rebuild the container in order to make
+your changes effective when executing the tests. 
+
+Please use the following command to rebuild the Docker Container:
+
+.. code-block:: shell
+
+  starter_scripts/build_docker_runner_image.sh

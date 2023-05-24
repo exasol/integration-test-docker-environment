@@ -17,6 +17,7 @@ exasol\_integration\_test\_docker\_environment.lib.test\_environment.parameter.d
 
    .. autosummary::
    
+      DbOsAccess
       DockerDBTestEnvironmentParameter
    
    
