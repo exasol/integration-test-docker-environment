@@ -3,6 +3,7 @@ import logging
 import pytest
 from typing import Callable, Iterator, List, Optional
 
+from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.testing import utils
 from exasol_integration_test_docker_environment.testing \
    .exaslct_test_environment import (
@@ -54,3 +55,10 @@ def database(cli_isolation) -> Callable:
         finally:
             utils.close_environments(spawned)
     return create_context
+
+
+def find_container(*names):
+    match = lambda value: all(x in value for x in names)
+    with ContextDockerClient() as client:
+        matches = [c for c in client.containers.list() if match(c.name)]
+        return matches[0] if matches else None
