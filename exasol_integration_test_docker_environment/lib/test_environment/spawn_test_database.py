@@ -114,7 +114,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                 sshkey = SshKey.from_folder(files.folder)
                 volumes[files.authorized_keys_folder] = {
                     "bind": AUTHORIZED_KEYS_MOUNT_DIR,
-                    "mode": "ro",
+                    "mode": "rw",
                 }
 
             db_container = \
