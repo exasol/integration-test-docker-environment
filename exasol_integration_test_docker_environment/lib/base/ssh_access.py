@@ -40,13 +40,13 @@ class SshFiles:
     def public_key(self) -> Path:
         return self._folder / "id_rsa.pub"
 
-    @property
-    def authorized_keys_folder(self) -> Path:
-        return self._folder / "authorized_keys"
-
-    @property
-    def authorized_keys_file(self) -> Path:
-        return self.authorized_keys_folder / "authorized_keys"
+    # @property
+    # def authorized_keys_folder(self) -> Path:
+    #     return self._folder / "authorized_keys"
+    # 
+    # @property
+    # def authorized_keys_file(self) -> Path:
+    #     return self.authorized_keys_folder / "authorized_keys"
 
 
 class SshKey:
@@ -84,7 +84,7 @@ class SshKey:
 
     def write_public_key(self, path: str, comment="") -> 'SshKey':
         content = self.public_key_as_string(comment)
-        with open(path, "w") as file:
+        with open(path, "w", mode=0o600) as file:
             print(content, file=file)
         return self
 
@@ -106,14 +106,14 @@ class SshKey:
             # is required for the folder to enable to create files inside
             os.makedirs(folder, mode=0o700, exist_ok=True)
 
-        def create(folder: Path):
-            makedirs(folder)
-            readme = folder / "README"
-            with open(readme, "w") as f:
-                f.write(
-                    "This folder is meant to contain file authorized_keys"
-                    " and to be mounted into the Docker Container at /root/.ssh."
-                )
+        # def create(folder: Path):
+        #     makedirs(folder)
+        #     readme = folder / "README"
+        #     with open(readme, "w") as f:
+        #         f.write(
+        #             "This folder is meant to contain file authorized_keys"
+        #             " and to be mounted into the Docker Container at /root/.ssh."
+        #         )
 
         files = SshFiles(folder)
         priv = files.private_key
@@ -122,10 +122,10 @@ class SshKey:
             if priv.exists():
                 return cls.read_from(priv)
             makedirs(files.folder)
-            create(files.authorized_keys_folder)
+            # create(files.authorized_keys_folder)
             return (
                 cls.generate()
                 .write_private_key(priv)
                 .write_public_key(files.public_key)
-                .write_public_key(files.authorized_keys_file)
+                # .write_public_key(files.authorized_keys_file)
             )

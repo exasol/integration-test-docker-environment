@@ -22,7 +22,7 @@ def test_read_existing_file(tmp_path):
     assert testee.private == other.private
 
 
-def test_authorized_keys_file(tmp_path):
-    testee = SshKey.from_folder(tmp_path)
-    file = SshFiles(tmp_path).authorized_keys_file
-    assert file.exists()
+# def test_authorized_keys_file(tmp_path):
+#     testee = SshKey.from_folder(tmp_path)
+#     file = SshFiles(tmp_path).authorized_keys_file
+#     assert file.exists()

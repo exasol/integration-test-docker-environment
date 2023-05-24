@@ -37,7 +37,6 @@ BUCKETFS_PORT = "6583"
 DB_PORT = "8888"
 CERTIFICATES_MOUNT_DIR = "/certificates"
 CERTIFICATES_DEFAULT_DIR = "/exa/etc/ssl/"
-AUTHORIZED_KEYS_MOUNT_DIR = "/root/.ssh"
 
 
 class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
@@ -126,12 +125,8 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                 sshkey = SshKey.from_folder(files.folder)
                 copy = DockerContainerCopy(db_container)
                 content = sshkey.public_key_as_string("itde-ssh-access")
-                copy.add_string_to_file("authorized_keys", content)
-                copy.copy("/root/.ssh/authorized_keys")
-                # volumes[files.authorized_keys_folder] = {
-                #     "bind": AUTHORIZED_KEYS_MOUNT_DIR,
-                #     "mode": "rw",
-                # }
+                copy.add_string_to_file(".ssh/authorized_keys", content)
+                copy.copy("/root/")
 
             docker_network = docker_client.networks.get(self.network_info.network_name)
             network_aliases = self._get_network_aliases()
@@ -183,46 +178,20 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                 self._handle_output(output_generator, docker_db_image_info)
         return docker_db_image_info
 
-    # def _prepare_volume(
-    #         self,
-    #         docker_client,
-    #         volume_name: str,
-    #         container_name: str,
-    # ) -> Tuple(Volume, Container):
-    #     """
-    #     Create an intermediate Docker Container containing a volume that
-    #     can be mounted into another Docker Container.
-    #     """
-    #     # volume_name = self._get_db_volume_name()
-    #     # container_name = self._get_db_volume_preparation_container_name()
-    #     self._remove_container(container_name)
-    #     self._remove_volume(volume_name)
-    #     # db_volume, preparation_container = \
-    #     return self._create_volume_and_container(
-    #             docker_client,
-    #             volume_name,
-    #             container_name,
-    #         )
-
     def _prepare_db_volume(self, docker_client, db_private_network: str,
                            docker_db_image_info: ImageInfo) -> Volume:
-        db_volume_name = self._get_db_volume_name()
-        container_name = self._get_db_volume_preparation_container_name()
-        self._remove_container(container_name)
-        self._remove_volume(db_volume_name)
-        db_volume, preparation_container = \
-            self._create_volume_and_container(
-                docker_client,
-                db_volume_name,
-                container_name,
-            )
+        volume, container = self._prepare_volume(
+            docker_client,
+            self._get_db_volume_name(),
+            self._get_db_volume_preparation_container_name(),
+            remove_old_instances=True,
+        )
         try:
-            self._upload_init_db_files(preparation_container,
-                                       db_private_network)
-            self._execute_init_db(db_volume, preparation_container)
-            return db_volume
+            self._upload_init_db_files(container, db_private_network)
+            self._execute_init_db(volume, container)
+            return volume
         finally:
-            preparation_container.remove(force=True)
+            container.remove(force=True)
 
     def _get_db_volume_preparation_container_name(self):
         return f"""{self.db_container_name}_preparation"""
@@ -246,20 +215,34 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         except docker.errors.NotFound:
             pass
 
-    def _create_volume_and_container(self, docker_client, db_volume_name, db_volume_preparation_container_name) \
-            -> Tuple[Volume, Container]:
-        db_volume = docker_client.volumes.create(db_volume_name)
-        volume_preparation_container = \
-            docker_client.containers.run(
+    def _prepare_volume(
+            self,
+            docker_client,
+            volume_name,
+            container_name,
+            remove_old_instances: bool = False,
+    ) -> Tuple[Volume, Container]:
+        """
+        Create an intermediate Docker Container containing a volume that
+        can be mounted into another Docker Container.
+        """
+        if remove_old_instances:
+            self._remove_container(container_name)
+            self._remove_volume(volume_name)
+        volume = docker_client.volumes.create(volume_name)
+        container = docker_client.containers.run(
                 image="ubuntu:18.04",
-                name=db_volume_preparation_container_name,
+                name=container_name,
                 auto_remove=True,
                 command="sleep infinity",
                 detach=True,
-                volumes={
-                    db_volume.name: {"bind": "/exa", "mode": "rw"}},
-                labels={"test_environment_name": self.environment_name, "container_type": "db_container"})
-        return db_volume, volume_preparation_container
+                volumes={volume.name: {"bind": "/exa", "mode": "rw"}},
+                labels={
+                    "test_environment_name": self.environment_name,
+                    "container_type": "db_container",
+                }
+        )
+        return volume, container
 
     def _upload_init_db_files(self,
                               volume_preparation_container: Container,
