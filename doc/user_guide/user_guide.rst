@@ -270,22 +270,23 @@ If you need further versions, please open an issue.
 SSH Access
 """"""""""
 
-Up to version 1.6.0 ITDE used :code:`docker_exec` to access the operating system of
-the Exasol database inside the Docker Container, e.g. to analyze the content
-of logfiles or execute some shell commands. With version 8 of Exasol database
-the format of the Docker Containers might change so that `docker_exec` is no
-longer possible. Instead ITDE will then need to use SSH access.
+Up to version 1.6.0 ITDE used ``docker_exec`` to access the operating system
+of the Exasol database inside the Docker Container, e.g. to analyze the
+content of logfiles or execute some shell commands. With version 8 of Exasol
+database the format of the Docker Containers might change so that
+``docker_exec`` is no longer possible. Instead ITDE will then need to use SSH
+access.
 
 You can select the access method with command line option
-:code:`--db-os-access`. The default value is :code:`DOCKER_EXEC`.
+``--db-os-access``. The default value is ``DOCKER_EXEC``.
 
 ITDE will create a random SSH key pair and store it to folder
-:code:`~/.cache/exasol/itde/` with access permissions limited to the current
-user only. By this ITDE enables to reuse the same SSH keys for future sessions
+``~/.cache/exasol/itde/`` with access permissions limited to the current user
+only. By this ITDE enables to reuse the same SSH keys for future sessions
 which leaves the container unchanged and hence reusable.
 
-The public key will be added as file :code:`/root/.ssh/authorized_keys` inside
-the Docker Container to enable SSH access with public key authentication.
+The public key will be added as file ``/root/.ssh/authorized_keys`` inside the
+Docker Container to enable SSH access with public key authentication.
 
 
 Tested Docker Runtimes
