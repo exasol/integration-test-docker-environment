@@ -94,16 +94,17 @@ def api_database(api_isolation: ApiTestEnvironment) -> ApiContextProvider:
     return create_context
 
 
-@contextlib.contextmanager
-def container_named(name):
-    with ContextDockerClient() as client:
-        matches = [c for c in client.containers.list() if c.name == name]
-        yield matches[0] if matches else None
+def exact_matcher(names):
+    return lambda value: all(x == value for x in names)
+
+
+def superset_matcher(names):
+    return lambda value: all(x in value for x in names)
 
 
 @contextlib.contextmanager
-def container_with_names(*names):
-    match = lambda value: all(x in value for x in names)
+def container_named(*names, matcher=None):
+    matcher = matcher if matcher else exact_matcher(names)
     with ContextDockerClient() as client:
-        matches = [c for c in client.containers.list() if match(c.name)]
+        matches = [c for c in client.containers.list() if matcher(c.name)]
         yield matches[0] if matches else None
