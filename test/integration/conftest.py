@@ -26,20 +26,16 @@ def cli_isolation(request) -> Iterator[ExaslctTestEnvironment]:
         clean_images_at_close=True,
         name=testname,
     )
-    try:
-        yield environment
-    finally:
-        utils.close_environments(environment)
+    yield environment
+    utils.close_environments(environment)
 
 
 @pytest.fixture
-def api_isolation(request) -> ApiTestEnvironment:
+def api_isolation(request) -> Iterator[ApiTestEnvironment]:
     testname = request.node.name
     environment = ApiTestEnvironment(test_object=None, name=testname)
-    try:
-        yield environment
-    finally:
-        utils.close_environments(environment)
+    yield environment
+    utils.close_environments(environment)
 
 
 @pytest.fixture
@@ -65,10 +61,8 @@ def cli_database(cli_isolation) -> Callable:
             name=name,
             additional_parameter=additional_parameters,
         )
-        try:
-            yield spawned
-        finally:
-            utils.close_environments(spawned)
+        yield spawned
+        utils.close_environments(spawned)
     return create_context
 
 
@@ -84,10 +78,8 @@ def api_database(api_isolation: ApiTestEnvironment) -> Callable:
             name=name,
             additional_parameter=additional_parameters,
         )
-        try:
-            yield spawned
-        finally:
-            utils.close_environments(spawned)
+        yield spawned
+        utils.close_environments(spawned)
     return create_context
 
 
