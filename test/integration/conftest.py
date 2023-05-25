@@ -83,8 +83,16 @@ def api_database(api_isolation: ApiTestEnvironment) -> Callable[[Optional[str],O
     return create_context
 
 
-def find_container(*names):
+@contextlib.contextmanager
+def container_named(name):
+    with ContextDockerClient() as client:
+        matches = [c for c in client.containers.list() if c.name == name]
+        yield matches[0] if matches else None
+
+
+@contextlib.contextmanager
+def container_with_names(*names):
     match = lambda value: all(x in value for x in names)
     with ContextDockerClient() as client:
         matches = [c for c in client.containers.list() if match(c.name)]
-        return matches[0] if matches else None
+        yield matches[0] if matches else None

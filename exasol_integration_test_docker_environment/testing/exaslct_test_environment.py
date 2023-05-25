@@ -75,7 +75,7 @@ class ExaslctTestEnvironment:
         self._update_attributes()
 
     def _update_attributes(self):
-        self.flavor_path_argument = f"--flavor-path {get_test_flavor(self.test_class)}"
+        self.flavor_path_argument = f"--flavor-path {self.flavor_path}"
         repository_name = self.repository_name
         self.docker_repository_arguments = f"--source-docker-repository-name {repository_name} " \
                                            f"--target-docker-repository-name {repository_name}"

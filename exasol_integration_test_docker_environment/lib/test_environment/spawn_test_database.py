@@ -95,7 +95,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         copy = DockerContainerCopy(container)
         content = sshkey.public_key_as_string("itde-ssh-access")
         copy.add_string_to_file(".ssh/authorized_keys", content)
-        copy.copy("/root/")        
+        copy.copy("/root/")
 
     def _create_database_container(self, db_ip_address: str, db_private_network: str):
         self.logger.info("Starting database container %s", self.db_container_name)
@@ -238,15 +238,13 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                 volumes={volume.name: {"bind": "/exa", "mode": "rw"}},
                 labels={
                     "test_environment_name": self.environment_name,
-                    "container_type": "db_container",
+                    "container_type": "db_volume_preparation_container",
                 }
         )
         return volume, container
 
-    def _upload_init_db_files(self,
-                              volume_preparation_container: Container,
-                              db_private_network: str):
-        copy = DockerContainerCopy(volume_preparation_container)
+    def _upload_init_db_files(self, container: Container, db_private_network: str):
+        copy = DockerContainerCopy(container)
         init_db_script_str = pkg_resources.resource_string(
             PACKAGE_NAME,
             f"{self.docker_db_config_resource_name}/init_db.sh") # type: bytes
