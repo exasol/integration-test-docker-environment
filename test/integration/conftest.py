@@ -39,7 +39,7 @@ def api_isolation(request) -> Iterator[ApiTestEnvironment]:
 
 
 @pytest.fixture
-def cli_database(cli_isolation) -> Callable:
+def cli_database(cli_isolation) -> Callable[[Optional[str],Optional[List[str]]],SpawnedTestEnvironments]:
     """
     Returns a method that test case implementations can use to create a
     context with a database.
@@ -55,7 +55,7 @@ def cli_database(cli_isolation) -> Callable:
     def create_context(
             name: Optional[str] = None,
             additional_parameters: Optional[List[str]] = None,
-    ):
+    )->SpawnedTestEnvironments:
         name = name if name else cli_isolation.name
         spawned = cli_isolation.spawn_docker_test_environments(
             name=name,
@@ -67,12 +67,12 @@ def cli_database(cli_isolation) -> Callable:
 
 
 @pytest.fixture
-def api_database(api_isolation: ApiTestEnvironment) -> Callable:
+def api_database(api_isolation: ApiTestEnvironment) -> Callable[[Optional[str],Optional[Dict[str, Any]]],ExaslctDockerTestEnvironment]:
     @contextlib.contextmanager
     def create_context(
             name: Optional[str] = None,
             additional_parameters: Optional[Dict[str, Any]] = None,
-    ):
+    )->ExaslctDockerTestEnvironment:
         name = name if name else api_isolation.name
         spawned = api_isolation.spawn_docker_test_environment(
             name=name,
