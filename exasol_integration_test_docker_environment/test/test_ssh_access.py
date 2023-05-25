@@ -21,10 +21,8 @@ from exasol_integration_test_docker_environment.lib.base.ssh_access import SshFi
 
 # use api
 def test_generate_ssh_key_file(api_database):
-    with api_database(
-            name=test_name,
-            additional_parameters = ["--db-os-access", "SSH"],
-    ) as db:
+    params = { "db-os-access": "SSH" }
+    with api_database(additional_parameters=params) as db:
         # slc_test wenn nicht None
         # else on_ho
         files = SshFiles()

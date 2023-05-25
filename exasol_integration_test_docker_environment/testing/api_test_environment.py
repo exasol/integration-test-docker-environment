@@ -12,8 +12,10 @@ from exasol_integration_test_docker_environment.lib.data.test_container_content_
     TestContainerContentDescription
 from exasol_integration_test_docker_environment.testing.docker_registry import default_docker_repository_name
 from exasol_integration_test_docker_environment \
-    .testing.exaslct_docker_test_environment import (
-        ExaslctDockerTestEnvironment,
+    .testing.exaslct_docker_test_environment import \
+    ExaslctDockerTestEnvironment
+from exasol_integration_test_docker_environment \
+    .testing.exaslct_test_environment import (
         get_class,
         get_test_flavor,
 )
@@ -25,7 +27,7 @@ class ApiTestEnvironment:
     def __init__(self, test_object, name=None):
         self.test_object = test_object
         self.test_class = get_class(test_object)
-        self.flavor_path = get_test_flavor(test_class)
+        self.flavor_path = get_test_flavor(self.test_class)
         self.name = name if name else self.test_class.__name__
         self.docker_repository_name = default_docker_repository_name(self.name)
         self.temp_dir = tempfile.mkdtemp()
