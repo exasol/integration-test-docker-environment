@@ -35,7 +35,7 @@ def cli_isolation(request) -> Iterator[ExaslctTestEnvironment]:
 @pytest.fixture
 def api_isolation(request) -> ApiTestEnvironment:
     testname = request.node.name
-    environment = ApiTestEnvironment()
+    environment = ApiTestEnvironment(test_object=None, name=testname)
     try:
         yield environment
     finally:
