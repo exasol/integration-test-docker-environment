@@ -1,7 +1,7 @@
 import contextlib
 import logging
 import pytest
-from typing import Any, Callable, Iterator, List, Optional
+from typing import Any, Callable, Dict, Iterator, List, Optional
 
 from exasol_integration_test_docker_environment \
     .testing.api_test_environment import ApiTestEnvironment
@@ -82,7 +82,6 @@ def api_database(api_isolation: ApiTestEnvironment) -> Callable:
         name = name if name else api_isolation.name
         spawned = api_isolation.spawn_docker_test_environment(
             name=name,
-            # test_container_content=get_test_container_content(),
             additional_parameter=additional_parameters,
         )
         try:
