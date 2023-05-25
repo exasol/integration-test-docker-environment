@@ -3,13 +3,12 @@ import platform
 import pytest
 
 from pathlib import Path
-from exasol_integration_test_docker_environment.lib.base.ssh_access import SshFiles, SshKey
+from exasol_integration_test_docker_environment.lib.base.ssh_access import SshKeyCache, SshKey
 
 
 def test_create_file_and_permissions(tmp_path):
-    ssh_files = SshFiles(tmp_path)
-    SshKey.from_files(ssh_files)
-    file = ssh_files.private_key
+    SshKey.from_cache(tmp_path)
+    file = SshKeyCache(tmp_path).private_key
     assert file.exists()
     actual = oct(os.stat(file).st_mode)[-3:]
     expected = "666" if platform.system() == "Windows" else "600"
@@ -17,7 +16,6 @@ def test_create_file_and_permissions(tmp_path):
 
 
 def test_read_existing_file(tmp_path):
-    ssh_files = SshFiles(tmp_path)
-    testee = SshKey.from_files(ssh_files)
-    other = SshKey.from_files(ssh_files)
+    testee = SshKey.from_cache(tmp_path)
+    other = SshKey.from_cache(tmp_path)
     assert testee.private == other.private

@@ -10,7 +10,7 @@ from typing import Optional
 
 
 _LOCK_FILE = "$TMP/$MODULE-ssh-access.lock"
-_DEFAULT_FOLDER = "$HOME/.cache/exasol/$MODULE"
+_DEFAULT_CACHE_DIR = "$HOME/.cache/exasol/$MODULE"
 
 
 def _path(template: str) -> Path:
@@ -24,21 +24,21 @@ def _path(template: str) -> Path:
     )
 
 
-class SshFiles:
-    def __init__(self, folder: Optional[Path] = None):
-        self._folder = folder if folder else _path(_DEFAULT_FOLDER)
+class SshKeyCache:
+    def __init__(self, directory: Optional[Path] = None):
+        self._directory = directory if directory else _path(_DEFAULT_CACHE_DIR)
 
     @property
-    def folder(self) -> Path:
-        return self._folder
+    def directory(self) -> Path:
+        return self._directory
 
     @property
     def private_key(self) -> Path:
-        return self._folder / "id_rsa"
+        return self._directory / "id_rsa"
 
     @property
     def public_key(self) -> Path:
-        return self._folder / "id_rsa.pub"
+        return self._directory / "id_rsa.pub"
 
 
 class SshKey:
@@ -50,14 +50,14 @@ class SshKey:
     The maker methods enable to either generate a new random key or to read it
     from a file, e.g. named "id_rsa".
 
-    When creating a new instance based on a folder containing a file id_rsa
+    When creating a new instance based on a directory containing a file id_rsa
     then the maker method will read the private key from this file.
 
-    If the folder does not contain this file then the maker method will
+    If the directory does not contain this file then the maker method will
     generate a new random SSH key, will write the private key to this file and
-    the public key to file id_rsa.pub in the same folder.
+    the public key to file id_rsa.pub in the same directory.
 
-    If the folder does not exist, then the maker method will create the folder
+    If the directory does not exist, then the maker method will create the directory
     and continue with generating a new random key.
 
     ITDE uses python library portalocker to guarantee that the key files are
@@ -94,17 +94,17 @@ class SshKey:
         return SshKey(rsa_key)
 
     @classmethod
-    def from_files(cls, ssh_files: Optional[SshFiles] = None) -> 'SshKey':
-        ssh_files = ssh_files if ssh_files else SshFiles()
-        priv = ssh_files.private_key
+    def from_cache(cls, cache_directory: Path = None) -> 'SshKey':
+        cache = SshKeyCache(cache_directory)
+        priv = cache.private_key
         with portalocker.Lock(_path(_LOCK_FILE), 'wb', timeout=10) as fh:
             if priv.exists():
                 return cls.read_from(priv)
             # mode 0o700 = rwx permissions only for the current user
-            # is required for the folder to enable to create files inside
-            os.makedirs(ssh_files.folder, mode=0o700, exist_ok=True)
+            # is required for the directory to enable to create files inside
+            os.makedirs(cache.directory, mode=0o700, exist_ok=True)
             return (
                 cls.generate()
                 .write_private_key(priv)
-                .write_public_key(ssh_files.public_key)
+                .write_public_key(cache.public_key)
             )

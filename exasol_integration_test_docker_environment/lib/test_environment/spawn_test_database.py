@@ -28,7 +28,7 @@ from exasol_integration_test_docker_environment.lib \
         DockerDBTestEnvironmentParameter,
 )
 from exasol_integration_test_docker_environment.lib.base.ssh_access import (
-    SshFiles,
+    SshKeyCache,
     SshKey,
 )
 
@@ -91,7 +91,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                 log_handler.handle_log_lines(log_line)
 
     def _enable_ssh_access(self, container: Container):
-        sshkey = SshKey.from_files()
+        sshkey = SshKey.from_cache()
         copy = DockerContainerCopy(container)
         content = sshkey.public_key_as_string("itde-ssh-access")
         copy.add_string_to_file(".ssh/authorized_keys", content)
