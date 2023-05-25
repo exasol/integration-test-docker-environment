@@ -1,7 +1,7 @@
 import contextlib
 import logging
 import pytest
-from typing import Any, Callable, Dict, Iterator, List, Optional
+from typing import Any, Callable, Dict, Iterator, List, NewType, Optional
 
 from exasol_integration_test_docker_environment \
     .testing.api_test_environment import ApiTestEnvironment
@@ -38,10 +38,12 @@ def api_isolation(request) -> Iterator[ApiTestEnvironment]:
     utils.close_environments(environment)
 
 
-CliContextProvider = Callable[
-    [Optional[str], Optional[List[str]]],
-    SpawnedTestEnvironments
-]
+CliContextProvider = NewType(
+    "CliContextProvider", Callable[
+        [Optional[str], Optional[List[str]]],
+        SpawnedTestEnvironments
+    ],
+)
 
 @pytest.fixture
 def cli_database(cli_isolation) -> CliContextProvider:
@@ -71,10 +73,13 @@ def cli_database(cli_isolation) -> CliContextProvider:
     return create_context
 
 
-ApiContextProvider = Callable[
-    [Optional[str], Optional[Dict[str, Any]]],
-    ExaslctDockerTestEnvironment
-]
+ApiContextProvider = NewType(
+    "ApiContextProvider",
+    Callable[
+        [Optional[str], Optional[Dict[str, Any]]],
+        ExaslctDockerTestEnvironment
+    ],
+)
 
 
 @pytest.fixture
