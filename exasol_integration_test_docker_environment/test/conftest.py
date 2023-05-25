@@ -1,7 +1,12 @@
 import contextlib
 import logging
 import pytest
-from typing import Callable, Iterator, List, Optional
+from typing import Callable, Iterator, List, Optional, Union
+
+from exasol_integration_test_docker_environment \
+    .testing.api_test_environment import ApiTestEnvironment
+from exasol_integration_test_docker_environment \
+    .test.get_test_container_content import get_test_container_content
 
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.testing import utils
@@ -28,7 +33,17 @@ def cli_isolation(request) -> Iterator[ExaslctTestEnvironment]:
 
 
 @pytest.fixture
-def database(cli_isolation) -> Callable:
+def api_isolation(request) -> ApiTestEnvironment:
+    testname = request.node.name
+    environment = ApiTestEnvironment()
+    try:
+        yield environment
+    finally:
+        utils.close_environments(environment)
+
+
+@pytest.fixture
+def cli_database(cli_isolation) -> Callable:
     """
     Returns a method that test case implementations can use to create a
     context with a database.
@@ -55,6 +70,41 @@ def database(cli_isolation) -> Callable:
         finally:
             utils.close_environments(spawned)
     return create_context
+
+
+# build_method uses a method of this type to spawn the actual environment
+# for running tests either in an ExaslctTestEnvironment or ApiTestEnvironment:
+SpawnMethod = Callable[
+    Union[ApiTestEnvironment, ExaslctTestEnvironment],
+    Optional[str],
+    Optional[List[str]]
+]
+
+def build_method(isolation, spawn: SpawnMethod) -> Callable:
+    @contextlib.contextmanager
+    def create_context(
+            name: Optional[str] = None,
+            additional_parameters: Optional[List[str]] = None,
+    ):
+        name = name if name else isolation.name
+        spawned = spawn(isolation, name, additional_parameters)
+        try:
+            yield spawned
+        finally:
+            utils.close_environments(spawned)
+    return create_context
+
+
+@pytest.fixture
+def api_database(api_isolation: ApiTestEnvironment) -> Callable:
+    def spawn(isolation, name, additional_parameters):
+        return isolation.spawn_docker_test_environment_with_test_container(
+            name=name,
+            test_container_content=get_test_container_content(),
+            additional_parameter=additional_parameters,
+        )
+    return build_method(api_isolation, spawn)
+
 
 
 def find_container(*names):
