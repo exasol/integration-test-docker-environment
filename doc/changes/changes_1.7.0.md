@@ -7,7 +7,7 @@ Up to version 1.6.0 ITDE used `docker_exec` to access the Docker Container, e.g.
 The current release therefore enhances ITDE to enable to access the Docker Container via SSH.
 The user can select the docker access method with command line option `--db-os-access`, see User Guide.
 
-Additionally the folder for storing the SSH keys has been moved to `~/.cache/exasol/itde/`. By that ITDE can restrict file permissions allowing access only by the current user.
+Additionally the directory for storing the randomly generated SSH keys has been moved to `~/.cache/exasol/itde/`. By that ITDE can restrict file permissions allowing access only by the current user.
 
 T.B.D.
 
