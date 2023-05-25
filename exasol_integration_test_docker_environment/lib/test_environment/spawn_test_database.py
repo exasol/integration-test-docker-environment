@@ -198,7 +198,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
     def _get_db_volume_name(self):
         return f"""{self.db_container_name}_volume"""
 
-    def _remove_container(self, container_name):
+    def _remove_container(self, container_name:str):
         try:
             with self._get_docker_client() as docker_client:
                 docker_client.containers.get(container_name).remove(force=True)
@@ -206,7 +206,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         except docker.errors.NotFound:
             pass
 
-    def _remove_volume(self, volume_name):
+    def _remove_volume(self, volume_name:str):
         try:
             with self._get_docker_client() as docker_client:
                 docker_client.volumes.get(volume_name).remove(force=True)
