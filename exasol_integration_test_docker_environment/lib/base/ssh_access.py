@@ -78,6 +78,7 @@ class SshKey:
         def opener(path, flags):
             return os.open(path, flags, 0o600)
         content = self.public_key_as_string(comment)
+        # Windows does not support kwarg mode=0o600 here
         with open(path, "w", opener=opener) as file:
             print(content, file=file)
         return self
