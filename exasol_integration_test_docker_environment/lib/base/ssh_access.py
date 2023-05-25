@@ -75,8 +75,10 @@ class SshKey:
         return f"ssh-rsa {b64} {comment}"
 
     def write_public_key(self, path: str, comment="") -> 'SshKey':
+        def opener(path, flags):
+            return os.open(path, flags, 0o600)
         content = self.public_key_as_string(comment)
-        with open(path, "w", mode=0o600) as file:
+        with open(path, "w", opener=opener) as file:
             print(content, file=file)
         return self
 
@@ -92,18 +94,17 @@ class SshKey:
         return SshKey(rsa_key)
 
     @classmethod
-    def from_folder(cls, folder: Optional[Path] = None) -> 'SshKey':
-        files = SshFiles(folder)
-        priv = files.private_key
-
+    def from_files(cls, ssh_files: Optional[SshFiles] = None) -> 'SshKey':
+        ssh_files = ssh_files if ssh_files else SshFiles()
+        priv = ssh_files.private_key
         with portalocker.Lock(_path(_LOCK_FILE), 'wb', timeout=10) as fh:
             if priv.exists():
                 return cls.read_from(priv)
             # mode 0o700 = rwx permissions only for the current user
             # is required for the folder to enable to create files inside
-            os.makedirs(files.folder, mode=0o700, exist_ok=True)
+            os.makedirs(ssh_files.folder, mode=0o700, exist_ok=True)
             return (
                 cls.generate()
                 .write_private_key(priv)
-                .write_public_key(files.public_key)
+                .write_public_key(ssh_files.public_key)
             )

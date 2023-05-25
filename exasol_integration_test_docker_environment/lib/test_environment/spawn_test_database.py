@@ -90,6 +90,13 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                 still_running_logger.log()
                 log_handler.handle_log_lines(log_line)
 
+    def _enable_ssh_access(self, container: Container):
+        sshkey = SshKey.from_files()
+        copy = DockerContainerCopy(container)
+        content = sshkey.public_key_as_string("itde-ssh-access")
+        copy.add_string_to_file(".ssh/authorized_keys", content)
+        copy.copy("/root/")        
+
     def _create_database_container(self, db_ip_address: str, db_private_network: str):
         self.logger.info("Starting database container %s", self.db_container_name)
         with self._get_docker_client() as docker_client:
@@ -107,7 +114,6 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             volumes = {db_volume.name: {"bind": "/exa", "mode": "rw"}}
             if self.certificate_volume_name is not None:
                 volumes[self.certificate_volume_name] = {"bind": CERTIFICATES_MOUNT_DIR, "mode": "ro"}
-
             db_container = \
                 docker_client.containers.create(
                     image="%s" % (docker_db_image_info.get_source_complete_name()),
@@ -119,15 +125,8 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                     ports=ports,
                     runtime=self.docker_runtime
                 )
-
             if self.db_os_access == DbOsAccess.SSH:
-                files = SshFiles()
-                sshkey = SshKey.from_folder(files.folder)
-                copy = DockerContainerCopy(db_container)
-                content = sshkey.public_key_as_string("itde-ssh-access")
-                copy.add_string_to_file(".ssh/authorized_keys", content)
-                copy.copy("/root/")
-
+                self._enable_ssh_access(db_container)
             docker_network = docker_client.networks.get(self.network_info.network_name)
             network_aliases = self._get_network_aliases()
             docker_network.connect(db_container, ipv4_address=db_ip_address, aliases=network_aliases)
@@ -199,19 +198,19 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
     def _get_db_volume_name(self):
         return f"""{self.db_container_name}_volume"""
 
-    def _remove_container(self, db_volume_preparation_container_name):
+    def _remove_container(self, container_name):
         try:
             with self._get_docker_client() as docker_client:
-                docker_client.containers.get(db_volume_preparation_container_name).remove(force=True)
-                self.logger.info("Removed container %s", db_volume_preparation_container_name)
+                docker_client.containers.get(container_name).remove(force=True)
+                self.logger.info("Removed container %s", container_name)
         except docker.errors.NotFound:
             pass
 
-    def _remove_volume(self, db_volume_name):
+    def _remove_volume(self, volume_name):
         try:
             with self._get_docker_client() as docker_client:
-                docker_client.volumes.get(db_volume_name).remove(force=True)
-                self.logger.info("Removed volume %s", db_volume_name)
+                docker_client.volumes.get(volume_name).remove(force=True)
+                self.logger.info("Removed volume %s", volume_name)
         except docker.errors.NotFound:
             pass
 
