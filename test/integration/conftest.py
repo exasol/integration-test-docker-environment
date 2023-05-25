@@ -6,8 +6,8 @@ from typing import Any, Callable, Dict, Iterator, List, Optional
 from exasol_integration_test_docker_environment \
     .testing.api_test_environment import ApiTestEnvironment
 from exasol_integration_test_docker_environment \
-    .test.get_test_container_content import get_test_container_content
-
+    .testing.exaslct_docker_test_environment import \
+    ExaslctDockerTestEnvironment
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.testing import utils
 from exasol_integration_test_docker_environment.testing \
@@ -38,8 +38,13 @@ def api_isolation(request) -> Iterator[ApiTestEnvironment]:
     utils.close_environments(environment)
 
 
+CliContextProvider = Callable[
+    [Optional[str], Optional[List[str]]],
+    SpawnedTestEnvironments
+]
+
 @pytest.fixture
-def cli_database(cli_isolation) -> Callable[[Optional[str],Optional[List[str]]],SpawnedTestEnvironments]:
+def cli_database(cli_isolation) -> CliContextProvider:
     """
     Returns a method that test case implementations can use to create a
     context with a database.
@@ -66,8 +71,14 @@ def cli_database(cli_isolation) -> Callable[[Optional[str],Optional[List[str]]],
     return create_context
 
 
+ApiContextProvider = Callable[
+    [Optional[str], Optional[Dict[str, Any]]],
+    ExaslctDockerTestEnvironment
+]
+
+
 @pytest.fixture
-def api_database(api_isolation: ApiTestEnvironment) -> Callable[[Optional[str],Optional[Dict[str, Any]]],ExaslctDockerTestEnvironment]:
+def api_database(api_isolation: ApiTestEnvironment) -> ApiContextProvider:
     @contextlib.contextmanager
     def create_context(
             name: Optional[str] = None,
