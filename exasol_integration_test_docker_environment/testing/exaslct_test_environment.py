@@ -50,7 +50,7 @@ class ExaslctTestEnvironment:
         self.executable = executable
         self.test_object = test_object
         self.test_class = get_class(test_object)
-        self.flavor_path = get_test_flavor(test_class)
+        self.flavor_path = get_test_flavor(self.test_class)
         self.name = name if name else self.test_class.__name__
         self._docker_repository_name = default_docker_repository_name(self.name)
         if "RUN_SLC_TESTS_WITHIN_CONTAINER" in os.environ:
