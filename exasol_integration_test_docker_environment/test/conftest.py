@@ -72,39 +72,24 @@ def cli_database(cli_isolation) -> Callable:
     return create_context
 
 
-# build_method uses a method of this type to spawn the actual environment
-# for running tests either in an ExaslctTestEnvironment or ApiTestEnvironment:
-SpawnMethod = Callable[
-    Union[ApiTestEnvironment, ExaslctTestEnvironment],
-    Optional[str],
-    Optional[List[str]]
-]
-
-def build_method(isolation, spawn: SpawnMethod) -> Callable:
+@pytest.fixture
+def api_database(api_isolation: ApiTestEnvironment) -> Callable:
     @contextlib.contextmanager
     def create_context(
             name: Optional[str] = None,
             additional_parameters: Optional[List[str]] = None,
     ):
-        name = name if name else isolation.name
-        spawned = spawn(isolation, name, additional_parameters)
+        name = name if name else api_isolation.name
+        spawned = api_isolation.spawn_docker_test_environment(
+            name=name,
+            # test_container_content=get_test_container_content(),
+            additional_parameter=additional_parameters,
+        )
         try:
             yield spawned
         finally:
             utils.close_environments(spawned)
     return create_context
-
-
-@pytest.fixture
-def api_database(api_isolation: ApiTestEnvironment) -> Callable:
-    def spawn(isolation, name, additional_parameters):
-        return isolation.spawn_docker_test_environment_with_test_container(
-            name=name,
-            test_container_content=get_test_container_content(),
-            additional_parameter=additional_parameters,
-        )
-    return build_method(api_isolation, spawn)
-
 
 
 def find_container(*names):
