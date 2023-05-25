@@ -9,7 +9,6 @@ def test_generate_ssh_key_file(api_database):
     params = { "db_os_access": "SSH" }
     with api_database(additional_parameters=params) as db:
         files = SshFiles()
-        print(f'DB: {db}')
         container = find_container("db_container", db.name)
         command = container.exec_run("cat /root/.ssh/authorized_keys")
     assert files.private_key.exists()
