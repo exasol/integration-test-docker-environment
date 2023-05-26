@@ -359,7 +359,6 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../api/exasol_integration_test_docker_environment.main.html">exasol_integration_test_docker_environment.main</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../api/exasol_integration_test_docker_environment.test.html">exasol_integration_test_docker_environment.test</a><input class="toctree-checkbox" id="toctree-checkbox-30" name="toctree-checkbox-30" role="switch" type="checkbox"/><label for="toctree-checkbox-30"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../api/exasol_integration_test_docker_environment.test.conftest.html">exasol_integration_test_docker_environment.test.conftest</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/exasol_integration_test_docker_environment.test.get_test_container_content.html">exasol_integration_test_docker_environment.test.get_test_container_content</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/exasol_integration_test_docker_environment.test.test_api_build_test_container.html">exasol_integration_test_docker_environment.test.test_api_build_test_container</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/exasol_integration_test_docker_environment.test.test_api_external_test_environment.html">exasol_integration_test_docker_environment.test.test_api_external_test_environment</a></li>
@@ -389,7 +388,6 @@
 <li class="toctree-l4"><a class="reference internal" href="../api/exasol_integration_test_docker_environment.test.test_hash_temp_dir.html">exasol_integration_test_docker_environment.test.test_hash_temp_dir</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/exasol_integration_test_docker_environment.test.test_hash_temp_dir_with_files.html">exasol_integration_test_docker_environment.test.test_hash_temp_dir_with_files</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/exasol_integration_test_docker_environment.test.test_populate_data.html">exasol_integration_test_docker_environment.test.test_populate_data</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api/exasol_integration_test_docker_environment.test.test_ssh_access.html">exasol_integration_test_docker_environment.test.test_ssh_access</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/exasol_integration_test_docker_environment.test.test_symlink_loops.html">exasol_integration_test_docker_environment.test.test_symlink_loops</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/exasol_integration_test_docker_environment.test.test_termination_handler.html">exasol_integration_test_docker_environment.test.test_termination_handler</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/exasol_integration_test_docker_environment.test.test_test_container_reuse.html">exasol_integration_test_docker_environment.test.test_test_container_reuse</a></li>
@@ -715,6 +713,23 @@ with JsonPickle</p></li>
 <li><p><strong>7.1</strong>: up to 7.1.15</p></li>
 </ul>
 <p>If you need further versions, please open an issue.</p>
+<section id="ssh-access">
+<h4>SSH Access<a class="headerlink" href="#ssh-access" title="Permalink to this headline">#</a></h4>
+<p>Up to version 1.6.0 ITDE used <code class="docutils literal notranslate"><span class="pre">docker_exec</span></code> to access the operating system
+of the Exasol database inside the Docker Container, e.g. to analyze the
+content of logfiles or execute some shell commands. With version 8 of Exasol
+database the format of the Docker Containers might change so that
+<code class="docutils literal notranslate"><span class="pre">docker_exec</span></code> is no longer possible. Instead ITDE will then need to use SSH
+access.</p>
+<p>You can select the access method with command line option
+<code class="docutils literal notranslate"><span class="pre">--db-os-access</span></code>. The default value is <code class="docutils literal notranslate"><span class="pre">DOCKER_EXEC</span></code>.</p>
+<p>ITDE will create a random SSH key pair and store it to the file
+<code class="docutils literal notranslate"><span class="pre">~/.cache/exasol/itde/id_rsa</span></code> with access permissions limited to the current
+user only. By this ITDE enables to reuse the same SSH keys for future sessions
+which leaves the container unchanged and hence reusable.</p>
+<p>The public key will be added as file <code class="docutils literal notranslate"><span class="pre">/root/.ssh/authorized_keys</span></code> inside the
+Docker Container to enable SSH access with public key authentication.</p>
+</section>
 </section>
 <section id="tested-docker-runtimes">
 <h3>Tested Docker Runtimes<a class="headerlink" href="#tested-docker-runtimes" title="Permalink to this headline">#</a></h3>
@@ -832,7 +847,10 @@ directory of the test environment with the docker container.</p>
 <li><a class="reference internal" href="#the-integration-test-docker-environment-api">The integration-test-docker-environment API</a></li>
 <li><a class="reference internal" href="#default-credentials">Default Credentials</a></li>
 <li><a class="reference internal" href="#accessing-the-environment-information">Accessing the Environment Information</a></li>
-<li><a class="reference internal" href="#currently-supported-exasol-versions">Currently supported Exasol Versions</a></li>
+<li><a class="reference internal" href="#currently-supported-exasol-versions">Currently supported Exasol Versions</a><ul>
+<li><a class="reference internal" href="#ssh-access">SSH Access</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#tested-docker-runtimes">Tested Docker Runtimes</a></li>
 </ul>
 </li>

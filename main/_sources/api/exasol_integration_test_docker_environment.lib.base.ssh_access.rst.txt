@@ -18,6 +18,7 @@ exasol\_integration\_test\_docker\_environment.lib.base.ssh\_access
    .. autosummary::
    
       SshKey
+      SshKeyCache
    
    
 

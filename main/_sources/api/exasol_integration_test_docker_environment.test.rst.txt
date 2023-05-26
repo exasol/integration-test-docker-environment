@@ -27,7 +27,6 @@ exasol\_integration\_test\_docker\_environment.test
    :toctree:
    :recursive:
 
-   exasol_integration_test_docker_environment.test.conftest
    exasol_integration_test_docker_environment.test.get_test_container_content
    exasol_integration_test_docker_environment.test.test_api_build_test_container
    exasol_integration_test_docker_environment.test.test_api_external_test_environment
@@ -57,7 +56,6 @@ exasol\_integration\_test\_docker\_environment.test
    exasol_integration_test_docker_environment.test.test_hash_temp_dir
    exasol_integration_test_docker_environment.test.test_hash_temp_dir_with_files
    exasol_integration_test_docker_environment.test.test_populate_data
-   exasol_integration_test_docker_environment.test.test_ssh_access
    exasol_integration_test_docker_environment.test.test_symlink_loops
    exasol_integration_test_docker_environment.test.test_termination_handler
    exasol_integration_test_docker_environment.test.test_test_container_reuse
