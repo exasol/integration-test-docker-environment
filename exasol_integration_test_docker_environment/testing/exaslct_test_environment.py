@@ -29,10 +29,18 @@ def _cleanup(env_name: str):
 def get_class(test_object):
     if test_object is None:
         return None
-    if not inspect.isclass(test_object):
-        # test_object is an instance -> return its class
-        return  test_object.__class__
-    return test_object
+    # if test_object is a class then simply return it.
+    # Otherwise test_object is an instance of a class, then
+    # return its class.
+    return test_object if inspect.isclass(test_object) else test_object.__class__
+
+
+def get_test_flavor(test_class):
+    if test_class is None:
+        return None
+    source_file_of_test_object = inspect.getsourcefile(test_class)
+    return Path(os.path.realpath(source_file_of_test_object)).parent.joinpath(
+        "resources/test-flavor")
 
 
 class ExaslctTestEnvironment:
@@ -42,7 +50,7 @@ class ExaslctTestEnvironment:
         self.executable = executable
         self.test_object = test_object
         self.test_class = get_class(test_object)
-        self.flavor_path = self.get_test_flavor()
+        self.flavor_path = get_test_flavor(self.test_class)
         self.name = name if name else self.test_class.__name__
         self._docker_repository_name = default_docker_repository_name(self.name)
         if "RUN_SLC_TESTS_WITHIN_CONTAINER" in os.environ:
@@ -57,14 +65,6 @@ class ExaslctTestEnvironment:
             self.temp_dir = tempfile.mkdtemp()
         self._update_attributes()
 
-    def get_test_flavor(self):
-        if self.test_class is None:
-            return None
-        source_file_of_test_object = inspect.getsourcefile(self.test_class)
-        flavor_path = Path(os.path.realpath(source_file_of_test_object)).parent.joinpath(
-            "resources/test-flavor")
-        return flavor_path
-
     @property
     def repository_name(self):
         return self._docker_repository_name
@@ -75,7 +75,7 @@ class ExaslctTestEnvironment:
         self._update_attributes()
 
     def _update_attributes(self):
-        self.flavor_path_argument = f"--flavor-path {self.get_test_flavor()}"
+        self.flavor_path_argument = f"--flavor-path {self.flavor_path}"
         repository_name = self.repository_name
         self.docker_repository_arguments = f"--source-docker-repository-name {repository_name} " \
                                            f"--target-docker-repository-name {repository_name}"

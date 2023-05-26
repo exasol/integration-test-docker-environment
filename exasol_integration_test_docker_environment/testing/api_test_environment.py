@@ -11,29 +11,26 @@ from exasol_integration_test_docker_environment.lib.api import spawn_test_enviro
 from exasol_integration_test_docker_environment.lib.data.test_container_content_description import \
     TestContainerContentDescription
 from exasol_integration_test_docker_environment.testing.docker_registry import default_docker_repository_name
-from exasol_integration_test_docker_environment.testing.exaslct_docker_test_environment import \
+from exasol_integration_test_docker_environment \
+    .testing.exaslct_docker_test_environment import \
     ExaslctDockerTestEnvironment
+from exasol_integration_test_docker_environment \
+    .testing.exaslct_test_environment import (
+        get_class,
+        get_test_flavor,
+)
 from exasol_integration_test_docker_environment.testing.utils import find_free_ports
 
 
 class ApiTestEnvironment:
 
-    def __init__(self, test_object):
+    def __init__(self, test_object, name=None):
         self.test_object = test_object
-        if not inspect.isclass(self.test_object):
-            self.test_class = self.test_object.__class__
-        else:
-            self.test_class = self.test_object
-        self.flavor_path = self.get_test_flavor()
-        self.name = self.test_class.__name__
+        self.test_class = get_class(test_object)
+        self.flavor_path = get_test_flavor(self.test_class)
+        self.name = name if name else self.test_class.__name__
         self.docker_repository_name = default_docker_repository_name(self.name)
         self.temp_dir = tempfile.mkdtemp()
-
-    def get_test_flavor(self):
-        source_file_of_test_object = inspect.getsourcefile(self.test_class)
-        flavor_path = Path(os.path.realpath(source_file_of_test_object)).parent.joinpath(
-            "resources/test-flavor")
-        return flavor_path
 
     @property
     def output_dir(self):

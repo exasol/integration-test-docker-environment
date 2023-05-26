@@ -27,7 +27,10 @@ from exasol_integration_test_docker_environment.lib \
         DbOsAccess,
         DockerDBTestEnvironmentParameter,
 )
-from exasol_integration_test_docker_environment.lib.base.ssh_access import SshKey
+from exasol_integration_test_docker_environment.lib.base.ssh_access import (
+    SshKeyCache,
+    SshKey,
+)
 
 
 BUCKETFS_PORT = "6583"
@@ -80,12 +83,19 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
 
     def _handle_output(self, output_generator, image_info: ImageInfo):
         log_file_path = self.get_log_path().joinpath("pull_docker_db_image.log")
-        with PullLogHandler(log_file_path, self.logger, image_info) as log_hanlder:
+        with PullLogHandler(log_file_path, self.logger, image_info) as log_handler:
             still_running_logger = StillRunningLogger(
                 self.logger, "pull image %s" % image_info.get_source_complete_name())
             for log_line in output_generator:
                 still_running_logger.log()
-                log_hanlder.handle_log_lines(log_line)
+                log_handler.handle_log_lines(log_line)
+
+    def _enable_ssh_access(self, container: Container):
+        sshkey = SshKey.from_cache()
+        copy = DockerContainerCopy(container)
+        content = sshkey.public_key_as_string("itde-ssh-access")
+        copy.add_string_to_file(".ssh/authorized_keys", content)
+        copy.copy("/root/")
 
     def _create_database_container(self, db_ip_address: str, db_private_network: str):
         self.logger.info("Starting database container %s", self.db_container_name)
@@ -94,7 +104,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                 docker_client.containers.get(self.db_container_name).remove(force=True, v=True)
             except:
                 pass
-            docker_db_image_info = self._pull_docker_db_images_if_necassary()
+            docker_db_image_info = self._pull_docker_db_images_if_necessary()
             db_volume = self._prepare_db_volume(docker_client, db_private_network, docker_db_image_info)
             ports = {}
             if self.database_port_forward is not None:
@@ -104,9 +114,6 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             volumes = {db_volume.name: {"bind": "/exa", "mode": "rw"}}
             if self.certificate_volume_name is not None:
                 volumes[self.certificate_volume_name] = {"bind": CERTIFICATES_MOUNT_DIR, "mode": "ro"}
-
-            if self.db_os_access == DbOsAccess.SSH:
-                sshkey = SshKey.from_folder()
             db_container = \
                 docker_client.containers.create(
                     image="%s" % (docker_db_image_info.get_source_complete_name()),
@@ -118,6 +125,8 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                     ports=ports,
                     runtime=self.docker_runtime
                 )
+            if self.db_os_access == DbOsAccess.SSH:
+                self._enable_ssh_access(db_container)
             docker_network = docker_client.networks.get(self.network_info.network_name)
             network_aliases = self._get_network_aliases()
             docker_network.connect(db_container, ipv4_address=db_ip_address, aliases=network_aliases)
@@ -146,7 +155,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                              reused=reused, container_info=container_info)
             return database_info
 
-    def _pull_docker_db_images_if_necassary(self):
+    def _pull_docker_db_images_if_necessary(self):
         image_name = "exasol/docker-db"
         docker_db_image_info = ImageInfo(
             target_repository_name=image_name,
@@ -170,65 +179,72 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
 
     def _prepare_db_volume(self, docker_client, db_private_network: str,
                            docker_db_image_info: ImageInfo) -> Volume:
-        db_volume_name = self._get_db_volume_name()
-        db_volume_preperation_container_name = self._get_db_volume_preperation_container_name()
-        self._remove_container(db_volume_preperation_container_name)
-        self._remove_volume(db_volume_name)
-        db_volume, volume_preparation_container = \
-            volume_preparation_container, volume_preparation_container = \
-            self._create_volume_and_container(docker_client, db_volume_name,
-                                              db_volume_preperation_container_name)
+        volume, container = self._prepare_volume(
+            docker_client,
+            self._get_db_volume_name(),
+            self._get_db_volume_preparation_container_name(),
+            remove_old_instances=True,
+        )
         try:
-            self._upload_init_db_files(volume_preparation_container,
-                                       db_private_network)
-            self._execute_init_db(db_volume, volume_preparation_container)
-            return db_volume
+            self._upload_init_db_files(container, db_private_network)
+            self._execute_init_db(volume, container)
+            return volume
         finally:
-            volume_preparation_container.remove(force=True)
+            container.remove(force=True)
 
-    def _get_db_volume_preperation_container_name(self):
-        db_volume_preperation_container_name = f"""{self.db_container_name}_preparation"""
-        return db_volume_preperation_container_name
+    def _get_db_volume_preparation_container_name(self):
+        return f"""{self.db_container_name}_preparation"""
 
     def _get_db_volume_name(self):
-        db_volume_name = f"""{self.db_container_name}_volume"""
-        return db_volume_name
+        return f"""{self.db_container_name}_volume"""
 
-    def _remove_container(self, db_volume_preperation_container_name):
+    def _remove_container(self, container_name:str):
         try:
             with self._get_docker_client() as docker_client:
-                docker_client.containers.get(db_volume_preperation_container_name).remove(force=True)
-                self.logger.info("Removed container %s", db_volume_preperation_container_name)
+                docker_client.containers.get(container_name).remove(force=True)
+                self.logger.info("Removed container %s", container_name)
         except docker.errors.NotFound:
             pass
 
-    def _remove_volume(self, db_volume_name):
+    def _remove_volume(self, volume_name:str):
         try:
             with self._get_docker_client() as docker_client:
-                docker_client.volumes.get(db_volume_name).remove(force=True)
-                self.logger.info("Removed volume %s", db_volume_name)
+                docker_client.volumes.get(volume_name).remove(force=True)
+                self.logger.info("Removed volume %s", volume_name)
         except docker.errors.NotFound:
             pass
 
-    def _create_volume_and_container(self, docker_client, db_volume_name, db_volume_preperation_container_name) \
-            -> Tuple[Volume, Container]:
-        db_volume = docker_client.volumes.create(db_volume_name)
-        volume_preparation_container = \
-            docker_client.containers.run(
+    def _prepare_volume(
+            self,
+            docker_client: docker.api.APIClient,
+            volume_name,
+            container_name,
+            remove_old_instances: bool = False,
+    ) -> Tuple[Volume, Container]:
+        """
+        Create an intermediate Docker Container containing a volume that
+        can be mounted into another Docker Container.
+        """
+        if remove_old_instances:
+            self._remove_container(container_name)
+            self._remove_volume(volume_name)
+        volume = docker_client.volumes.create(volume_name)
+        container = docker_client.containers.run(
                 image="ubuntu:18.04",
-                name=db_volume_preperation_container_name,
+                name=container_name,
                 auto_remove=True,
                 command="sleep infinity",
                 detach=True,
-                volumes={
-                    db_volume.name: {"bind": "/exa", "mode": "rw"}},
-                labels={"test_environment_name": self.environment_name, "container_type": "db_container"})
-        return db_volume, volume_preparation_container
+                volumes={volume.name: {"bind": "/exa", "mode": "rw"}},
+                labels={
+                    "test_environment_name": self.environment_name,
+                    "container_type": "db_volume_preparation_container",
+                }
+        )
+        return volume, container
 
-    def _upload_init_db_files(self,
-                              volume_preperation_container: Container,
-                              db_private_network: str):
-        copy = DockerContainerCopy(volume_preperation_container)
+    def _upload_init_db_files(self, container: Container, db_private_network: str):
+        copy = DockerContainerCopy(container)
         init_db_script_str = pkg_resources.resource_string(
             PACKAGE_NAME,
             f"{self.docker_db_config_resource_name}/init_db.sh") # type: bytes
@@ -256,7 +272,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                                             additional_db_parameters=additional_db_parameter_str)
         copy.add_string_to_file("EXAConf", rendered_template)
 
-    def _execute_init_db(self, db_volume: Volume, volume_preperation_container: Container):
+    def _execute_init_db(self, db_volume: Volume, preparation_container: Container):
         disk_size_in_bytes = humanfriendly.parse_size(self.disk_size)
         min_overhead_in_gigabyte = 2  # Exasol needs at least a 2 GB larger device than the configured disk size
         overhead_factor = max(0.01, (
@@ -266,20 +282,20 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             device_size_in_bytes / (1024 * 1024))  # The init_db.sh script works with MB, because its faster
         self.logger.info(
             f"Creating database volume of size {device_size_in_megabytes / 1024} GB using and overhead factor of {overhead_factor}")
-        (exit_code, output) = volume_preperation_container.exec_run(cmd=f"bash /init_db.sh {device_size_in_megabytes}")
+        (exit_code, output) = preparation_container.exec_run(cmd=f"bash /init_db.sh {device_size_in_megabytes}")
         if exit_code != 0:
             raise Exception(
-                "Error during preperation of docker-db volume %s got following output %s" % (db_volume.name, output))
+                "Error during preparation of docker-db volume %s got following output %s" % (db_volume.name, output))
 
     def cleanup_task(self, success):
         if (success and not self.no_database_cleanup_after_success) or \
                 (not success and not self.no_database_cleanup_after_failure):
-            db_volume_preperation_container_name = self._get_db_volume_preperation_container_name()
+            volume_container = self._get_db_volume_preparation_container_name()
             try:
-                self.logger.info(f"Cleaning up container %s", db_volume_preperation_container_name)
-                self._remove_container(db_volume_preperation_container_name)
+                self.logger.info(f"Cleaning up container %s", volume_container)
+                self._remove_container(volume_container)
             except Exception as e:
-                self.logger.error(f"Error during removing container %s: %s", db_volume_preperation_container_name, e)
+                self.logger.error(f"Error during removing container %s: %s", volume_container, e)
 
             try:
                 self.logger.info(f"Cleaning up container %s", self.db_container_name)
@@ -289,7 +305,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
 
             db_volume_name = self._get_db_volume_name()
             try:
-                self.logger.info(f"Cleaning up docker volumne %s", db_volume_name)
+                self.logger.info(f"Cleaning up docker volume %s", db_volume_name)
                 self._remove_volume(db_volume_name)
             except Exception as e:
                 self.logger.error(f"Error during removing docker volume %s: %s", db_volume_name, e)
