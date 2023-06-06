@@ -3,6 +3,9 @@ from exasol_integration_test_docker_environment.lib.data.container_info import C
 from exasol_integration_test_docker_environment.lib.test_environment.ports import PortForwarding
 
 
+# Replacing former separate parameters bucketfs_port_forward and
+# database_port_forward by a single parameter named ports is a breaking change
+# in the API.
 class DatabaseInfo(Info):
     def __init__(self, host: str, ports: PortForwarding,
                  reused: bool, container_info: ContainerInfo = None):

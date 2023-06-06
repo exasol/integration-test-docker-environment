@@ -37,6 +37,8 @@ def _cleanup(environment_info: EnvironmentInfo) -> None:
 def spawn_test_environment_with_test_container(
         environment_name: str,
         test_container_content: TestContainerContentDescription,
+        # This is a breaking change in the API and diverges from the @cli_function variant
+        # in lib/api/spawn_test_environment.py::spawn_test_environment()
         port_forwarding: Optional[PortForwarding] = None,
         db_mem_size: str = "2 GiB",
         db_disk_size: str = "2 GiB",
@@ -71,6 +73,8 @@ def spawn_test_environment_with_test_container(
     raises: TaskRuntimeError if spawning the test environment fails
 
     """
+    def str_or_none(x: any) -> str:
+        return str(x) if x is not None else None
     parsed_db_mem_size = humanfriendly.parse_size(db_mem_size)
     if parsed_db_mem_size < humanfriendly.parse_size("1 GiB"):
         raise ArgumentConstraintError("db_mem_size", "needs to be at least 1 GiB")
@@ -89,7 +93,6 @@ def spawn_test_environment_with_test_container(
                                  source_docker_tag_prefix, "source")
     set_docker_repository_config(target_docker_password, target_docker_repository_name, target_docker_username,
                                  target_docker_tag_prefix, "target")
-    str_or_none = lambda x: str(x) if x is not None else None
     task_creator = lambda: generate_root_task(task_class=SpawnTestEnvironmentWithDockerDB,
                                               environment_name=environment_name,
                                               database_port_forward=str_or_none(port_forwarding.database),

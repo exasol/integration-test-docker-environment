@@ -69,6 +69,8 @@ def spawn_test_environment(
     raises: TaskRuntimeError if spawning the test environment fails
 
     """
+    def str_or_none(x: any) -> str:
+        return str(x) if x is not None else None
     parsed_db_mem_size = humanfriendly.parse_size(db_mem_size)
     if parsed_db_mem_size < humanfriendly.parse_size("1 GiB"):
         raise ArgumentConstraintError("db_mem_size", "needs to be at least 1 GiB")
@@ -87,7 +89,6 @@ def spawn_test_environment(
                                  source_docker_tag_prefix, "source")
     set_docker_repository_config(target_docker_password, target_docker_repository_name, target_docker_username,
                                  target_docker_tag_prefix, "target")
-    str_or_none = lambda x: str(x) if x is not None else None
     task_creator = lambda: generate_root_task(task_class=SpawnTestEnvironmentWithDockerDB,
                                               environment_name=environment_name,
                                               database_port_forward=str_or_none(database_port_forward),
