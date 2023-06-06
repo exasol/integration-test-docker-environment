@@ -115,8 +115,8 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
         environment_variables += f"ENVIRONMENT_NAME={test_environment_info.name}\n"
         environment_variables += f"ENVIRONMENT_TYPE={test_environment_info.type}\n"
         environment_variables += f"ENVIRONMENT_DATABASE_HOST={test_environment_info.database_info.host}\n"
-        environment_variables += f"ENVIRONMENT_DATABASE_DB_PORT={test_environment_info.database_info.db_port}\n"
-        environment_variables += f"ENVIRONMENT_DATABASE_BUCKETFS_PORT={test_environment_info.database_info.bucketfs_port}\n"
+        environment_variables += f"ENVIRONMENT_DATABASE_DB_PORT={test_environment_info.database_info.ports.database}\n"
+        environment_variables += f"ENVIRONMENT_DATABASE_BUCKETFS_PORT={test_environment_info.database_info.ports.bucketfs}\n"
         if test_environment_info.database_info.container_info is not None:
             environment_variables += f"""ENVIRONMENT_DATABASE_CONTAINER_NAME={test_environment_info.database_info.container_info.container_name}\n"""
             database_container_network_aliases = " ".join(

@@ -17,7 +17,9 @@ from exasol_integration_test_docker_environment.testing.docker_registry import d
 from exasol_integration_test_docker_environment.testing.exaslct_docker_test_environment import \
     ExaslctDockerTestEnvironment
 from exasol_integration_test_docker_environment.testing.spawned_test_environments import SpawnedTestEnvironments
-from exasol_integration_test_docker_environment.testing.utils import find_free_ports, check_db_version_from_env
+from exasol_integration_test_docker_environment \
+    .lib.test_environment.ports import PortForwarding
+from exasol_integration_test_docker_environment.testing.utils import check_db_version_from_env
 
 
 def _cleanup(env_name: str):
@@ -130,7 +132,7 @@ class ExaslctTestEnvironment:
 
     def spawn_docker_test_environments(self, name: str, additional_parameter: List[str] = None) \
             -> SpawnedTestEnvironments:
-        database_port, bucketfs_port = find_free_ports(2)
+        ports = PortForwarding.random_free()
         on_host_parameter = ExaslctDockerTestEnvironment(
             name=self.name + "_" + name,
             database_host="localhost",
@@ -138,13 +140,14 @@ class ExaslctTestEnvironment:
             db_password="exasol",
             bucketfs_username="w",
             bucketfs_password="write",
-            database_port=database_port,
-            bucketfs_port=bucketfs_port)
+            ports=ports,
+        )
 
         arguments = [
             f"--environment-name {on_host_parameter.name}",
-            f"--database-port-forward {on_host_parameter.database_port}",
-            f"--bucketfs-port-forward {on_host_parameter.bucketfs_port}",
+            f"--database-port-forward {on_host_parameter.ports.database}",
+            f"--bucketfs-port-forward {on_host_parameter.ports.bucketfs}",
+            f"--ssh-port-forward {on_host_parameter.ports.ssh}",
         ]
         db_version = check_db_version_from_env()
         if db_version:
@@ -157,8 +160,10 @@ class ExaslctTestEnvironment:
         completed_process = self.run_command(command, use_flavor_path=False, use_docker_repository=False,
                                              capture_output=True)
         on_host_parameter.completed_process = completed_process
-        environment_info_json_path = Path(self.temp_dir,
-                                          f"cache/environments/{on_host_parameter.name}/environment_info.json")
+        environment_info_json_path = Path(
+            self.temp_dir,
+            f"cache/environments/{on_host_parameter.name}/environment_info.json",
+        )
         if environment_info_json_path.exists():
             with environment_info_json_path.open() as f:
                 environment_info = EnvironmentInfo.from_json(f.read())
@@ -172,8 +177,7 @@ class ExaslctTestEnvironment:
                 db_password=on_host_parameter.db_password,
                 bucketfs_username=on_host_parameter.bucketfs_username,
                 bucketfs_password=on_host_parameter.bucketfs_password,
-                database_port=8888,
-                bucketfs_port=6583,
+                ports=PortForwarding.default_ports,
                 environment_info=on_host_parameter.completed_process,
                 completed_process=on_host_parameter.completed_process
             )

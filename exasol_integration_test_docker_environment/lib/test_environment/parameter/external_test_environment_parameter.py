@@ -13,10 +13,12 @@ class ExternalDatabaseXMLRPCParameter(Config):
                                                               visibility=ParameterVisibility.HIDDEN)
 
 
+# should or can we use lib.test_environment.ports.PortForwarding.default_ports here?
 class ExternalDatabaseHostParameter(Config):
     external_exasol_db_host = luigi.OptionalParameter()
     external_exasol_db_port = luigi.IntParameter(8563)
     external_exasol_bucketfs_port = luigi.IntParameter(6583)
+    external_exasol_ssh_port = luigi.IntParameter(22) # TBC: is this correct?
 
 
 class ExternalDatabaseCredentialsParameter(ExternalDatabaseHostParameter,

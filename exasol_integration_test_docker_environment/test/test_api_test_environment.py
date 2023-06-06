@@ -77,7 +77,7 @@ class APISpawnTestEnvironmentTest(unittest.TestCase):
         username = spawned_docker_test_environments.db_username
         password = spawned_docker_test_environments.db_password
         db_host = spawned_docker_test_environments.environment_info.database_info.host
-        db_port = spawned_docker_test_environments.environment_info.database_info.db_port
+        db_port = spawned_docker_test_environments.environment_info.database_info.ports.database
         connection_options = f"-c '{db_host}:{db_port}' -u '{username}' -p '{password}'"
         cmd = f"""$EXAPLUS {connection_options}  -sql 'select 1;' -jdbcparam 'validateservercertificate=0'"""
         bash_cmd = f"""bash -c "{cmd}" """

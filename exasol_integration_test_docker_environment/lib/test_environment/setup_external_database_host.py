@@ -28,10 +28,12 @@ class SetupExternalDatabaseHost(DependencyLoggerBaseTask,
                 self.external_exasol_db_host == "127.0.01":
             database_host = self.network_info.gateway
         self.setup_database()
-        database_info = DatabaseInfo(host=database_host,
-                                     db_port=self.external_exasol_db_port,
-                                     bucketfs_port=self.external_exasol_bucketfs_port,
-                                     reused=False)
+        ports = PortForwarding(
+            database=self.external_exasol_db_port,
+            bucketfs=self.external_exasol_bucketfs_port,
+            ssh=self.external_exasol_ssh_port,
+        )
+        database_info = DatabaseInfo(host=database_host, ports=ports, reused=False)
         self.return_object(database_info)
 
     def setup_database(self):

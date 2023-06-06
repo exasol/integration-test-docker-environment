@@ -36,6 +36,7 @@ def spawn_test_environment(
         environment_name: str,
         database_port_forward: Optional[int] = None,
         bucketfs_port_forward: Optional[int] = None,
+        ssh_port_forward: Optional[int] = None,
         db_mem_size: str = "2 GiB",
         db_disk_size: str = "2 GiB",
         nameserver: Tuple[str, ...] = tuple(),
@@ -86,12 +87,12 @@ def spawn_test_environment(
                                  source_docker_tag_prefix, "source")
     set_docker_repository_config(target_docker_password, target_docker_repository_name, target_docker_username,
                                  target_docker_tag_prefix, "target")
+    str_or_none = lambda x: str(x) if x is not None else None
     task_creator = lambda: generate_root_task(task_class=SpawnTestEnvironmentWithDockerDB,
                                               environment_name=environment_name,
-                                              database_port_forward=str(
-                                                  database_port_forward) if database_port_forward is not None else None,
-                                              bucketfs_port_forward=str(
-                                                  bucketfs_port_forward) if bucketfs_port_forward is not None else None,
+                                              database_port_forward=str_or_none(database_port_forward),
+                                              bucketfs_port_forward=str_or_none(bucketfs_port_forward),
+                                              ssh_port_forward=str_or_none(ssh_port_forward),
                                               mem_size=db_mem_size,
                                               disk_size=db_disk_size,
                                               nameservers=nameserver,

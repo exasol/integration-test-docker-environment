@@ -20,6 +20,7 @@ from exasol_integration_test_docker_environment.lib.data.docker_network_info imp
 from exasol_integration_test_docker_environment.lib.docker.images.create.utils.pull_log_handler import PullLogHandler
 from exasol_integration_test_docker_environment.lib.docker.images.image_info import ImageInfo
 from exasol_integration_test_docker_environment.lib.test_environment.db_version import DbVersion
+from exasol_integration_test_docker_environment.lib.test_environment.ports import PortForwarding
 from exasol_integration_test_docker_environment.lib.test_environment.docker_container_copy import DockerContainerCopy
 from exasol_integration_test_docker_environment.lib \
     .test_environment.parameter \
@@ -33,8 +34,6 @@ from exasol_integration_test_docker_environment.lib.base.ssh_access import (
 )
 
 
-BUCKETFS_PORT = "6583"
-DB_PORT = "8888"
 CERTIFICATES_MOUNT_DIR = "/certificates"
 CERTIFICATES_DEFAULT_DIR = "/exa/etc/ssl/"
 
@@ -90,12 +89,13 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                 still_running_logger.log()
                 log_handler.handle_log_lines(log_line)
 
-    def _enable_ssh_access(self, container: Container):
-        sshkey = SshKey.from_cache()
-        copy = DockerContainerCopy(container)
-        content = sshkey.public_key_as_string("itde-ssh-access")
-        copy.add_string_to_file(".ssh/authorized_keys", content)
-        copy.copy("/root/")
+    def _authorized_keys(self) -> str:
+        """
+        Multiple authorized_keys can be comma-separated.
+        """
+        if self.db_os_access != DbOsAccess.SSH:
+            return ""
+        return SshKey.from_cache().public_key_as_string("itde-ssh-access")
 
     def _create_database_container(self, db_ip_address: str, db_private_network: str):
         self.logger.info("Starting database container %s", self.db_container_name)
@@ -105,12 +105,20 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             except:
                 pass
             docker_db_image_info = self._pull_docker_db_images_if_necessary()
-            db_volume = self._prepare_db_volume(docker_client, db_private_network, docker_db_image_info)
+            db_volume = self._prepare_db_volume(
+                docker_client,
+                db_private_network,
+                self._authorized_keys(),
+                docker_db_image_info,
+            )
             ports = {}
+            defaults = PortForwarding.default_ports
             if self.database_port_forward is not None:
-                ports[f"{DB_PORT}/tcp"] = ('0.0.0.0', int(self.database_port_forward))
+                ports[f"{defaults.database}/tcp"] = ('0.0.0.0', int(self.database_port_forward))
             if self.bucketfs_port_forward is not None:
-                ports[f"{BUCKETFS_PORT}/tcp"] = ('0.0.0.0', int(self.bucketfs_port_forward))
+                ports[f"{defaults.bucketfs}/tcp"] = ('0.0.0.0', int(self.bucketfs_port_forward))
+            if self.ssh_port_forward is not None:
+                ports[f"{defaults.ssh}/tcp"] = ('0.0.0.0', int(self.ssh_port_forward))
             volumes = {db_volume.name: {"bind": "/exa", "mode": "rw"}}
             if self.certificate_volume_name is not None:
                 volumes[self.certificate_volume_name] = {"bind": CERTIFICATES_MOUNT_DIR, "mode": "ro"}
@@ -125,8 +133,6 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                     ports=ports,
                     runtime=self.docker_runtime
                 )
-            if self.db_os_access == DbOsAccess.SSH:
-                self._enable_ssh_access(db_container)
             docker_network = docker_client.networks.get(self.network_info.network_name)
             network_aliases = self._get_network_aliases()
             docker_network.connect(db_container, ipv4_address=db_ip_address, aliases=network_aliases)
@@ -144,15 +150,19 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             if db_container.status != "running":
                 raise Exception(f"Container {self.db_container_name} not running")
             network_aliases = self._get_network_aliases()
-            container_info = \
-                ContainerInfo(container_name=self.db_container_name,
-                              ip_address=db_ip_address,
-                              network_aliases=network_aliases,
-                              network_info=self.network_info,
-                              volume_name=self._get_db_volume_name())
-            database_info = \
-                DatabaseInfo(host=db_ip_address, db_port=DB_PORT, bucketfs_port=BUCKETFS_PORT,
-                             reused=reused, container_info=container_info)
+            container_info = ContainerInfo(
+                container_name=self.db_container_name,
+                ip_address=db_ip_address,
+                network_aliases=network_aliases,
+                network_info=self.network_info,
+                volume_name=self._get_db_volume_name(),
+            )
+            database_info = DatabaseInfo(
+                host=db_ip_address,
+                ports=PortForwarding.default_ports,
+                reused=reused,
+                container_info=container_info,
+            )
             return database_info
 
     def _pull_docker_db_images_if_necessary(self):
@@ -177,8 +187,13 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                 self._handle_output(output_generator, docker_db_image_info)
         return docker_db_image_info
 
-    def _prepare_db_volume(self, docker_client, db_private_network: str,
-                           docker_db_image_info: ImageInfo) -> Volume:
+    def _prepare_db_volume(
+            self,
+            docker_client,
+            db_private_network: str,
+            authorized_keys: str,
+            docker_db_image_info: ImageInfo
+    ) -> Volume:
         volume, container = self._prepare_volume(
             docker_client,
             self._get_db_volume_name(),
@@ -186,7 +201,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             remove_old_instances=True,
         )
         try:
-            self._upload_init_db_files(container, db_private_network)
+            self._upload_init_db_files(container, db_private_network, authorized_keys)
             self._execute_init_db(volume, container)
             return volume
         finally:
@@ -243,18 +258,30 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         )
         return volume, container
 
-    def _upload_init_db_files(self, container: Container, db_private_network: str):
+    def _upload_init_db_files(
+            self,
+            container: Container,
+            db_private_network: str,
+            authorized_keys: str,
+    ):
         copy = DockerContainerCopy(container)
         init_db_script_str = pkg_resources.resource_string(
             PACKAGE_NAME,
             f"{self.docker_db_config_resource_name}/init_db.sh") # type: bytes
 
         copy.add_string_to_file("init_db.sh", init_db_script_str.decode("utf-8"))
-        self._add_exa_conf(copy, db_private_network)
+        self._add_exa_conf(copy, db_private_network, authorized_keys)
         copy.copy("/")
 
-    def _add_exa_conf(self, copy: DockerContainerCopy,
-                      db_private_network: str):
+    def _add_exa_conf(
+            self,
+            copy: DockerContainerCopy,
+            db_private_network: str,
+            authorized_keys: str,
+    ):
+        """
+        Multiple authorized_keys can be comma-separated.
+        """
         certificate_dir = CERTIFICATES_MOUNT_DIR if self.certificate_volume_name is not None \
                             else CERTIFICATES_DEFAULT_DIR
         template_str = pkg_resources.resource_string(
@@ -269,7 +296,8 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                                             disk_size=self.disk_size,
                                             name_servers=",".join(self.nameservers),
                                             certificate_dir=certificate_dir,
-                                            additional_db_parameters=additional_db_parameter_str)
+                                            additional_db_parameters=additional_db_parameter_str,
+                                            authorized_keys=authorized_keys)
         copy.add_string_to_file("EXAConf", rendered_template)
 
     def _execute_init_db(self, db_volume: Volume, preparation_container: Container):

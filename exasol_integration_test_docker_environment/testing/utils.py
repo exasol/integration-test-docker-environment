@@ -1,8 +1,6 @@
 import json
 import os
-import socket
 import unittest
-from contextlib import ExitStack
 from typing import Optional, List, Callable
 
 import requests
@@ -10,26 +8,6 @@ import requests
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 
 INTEGRATION_TEST_DOCKER_ENVIRONMENT_DEFAULT_BIN = "./start-test-env"
-
-
-def find_free_ports(num_ports: int) -> List[int]:
-
-    ret_val = list()
-    with ExitStack() as stack:
-        sockets = [stack.enter_context(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) for dummy in range(num_ports)]
-        for s in sockets:
-            s.bind(('', 0))
-            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            ret_val.append(s.getsockname()[1])
-    with ExitStack() as stack:
-        # Create an array of tuples of new socket + port to use
-        sockets = [(stack.enter_context(socket.socket(socket.AF_INET, socket.SOCK_STREAM)), port) for port in ret_val]
-        for socket_port in sockets:
-            s = socket_port[0]
-            port = socket_port[1]
-            s.bind(('', port))
-            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    return ret_val
 
 
 def close_environments(*args):

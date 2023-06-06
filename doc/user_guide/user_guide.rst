@@ -109,6 +109,10 @@ The following options are available to customize the test environment.
                                      Host port to which the BucketFS port gets
                                      forwarded
 
+     --ssh-port-forward INTEGER
+                                     Host port to which the SSH port gets
+                                     forwarded
+
      --db-mem-size TEXT              The main memory used by the database. Format
                                      <number> <unit>, e.g. 1 GiB. The minimum
                                      size is 1 GB, below that the database will
