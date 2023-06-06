@@ -51,7 +51,7 @@ class DockerTestEnvironmentTest(unittest.TestCase):
                                 .container_name
         with ContextDockerClient() as docker_client:
             db_container = docker_client.containers.get(db_container_name)
-            command = self.db_connection_command(db_container))
+            command = self.db_connection_command(db_container)
             exit_code, output = db_container.exec_run(command)
             self.assertEqual(
                 exit_code,
