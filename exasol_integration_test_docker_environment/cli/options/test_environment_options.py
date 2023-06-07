@@ -42,11 +42,7 @@ external_db_options = [
                  help="""Database port of external Exasol DB, needs to be set if --environment-type=external_db"""),
     click.option('--external-exasol-bucketfs-port', type=int, default=6583,
                  help="""Bucketfs port of external Exasol DB, needs to be set if --environment-type=external_db"""),
-    # should parameter be optional?
-    # this may correspond to potential exception to be raised in
-    # lib/test_environment/spawn_test_environment.py
-    # _create_external_db_environment
-    click.option('--external-exasol-ssh-port', type=int, default=22,
+    click.option('--external-exasol-ssh-port', type=int,
                  help="""SSH port of external Exasol DB, needs to be set if --environment-type=external_db"""),
     click.option('--external-exasol-db-user', type=str,
                  help="""User for external Exasol DB, needs to be set if --environment-type=external_db"""),

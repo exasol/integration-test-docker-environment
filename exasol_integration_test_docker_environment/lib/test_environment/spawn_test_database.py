@@ -20,7 +20,10 @@ from exasol_integration_test_docker_environment.lib.data.docker_network_info imp
 from exasol_integration_test_docker_environment.lib.docker.images.create.utils.pull_log_handler import PullLogHandler
 from exasol_integration_test_docker_environment.lib.docker.images.image_info import ImageInfo
 from exasol_integration_test_docker_environment.lib.test_environment.db_version import DbVersion
-from exasol_integration_test_docker_environment.lib.test_environment.ports import PortForwarding
+from exasol_integration_test_docker_environment.lib.test_environment.ports import (
+    find_free_ports,
+    PortForwarding,
+)
 from exasol_integration_test_docker_environment.lib.test_environment.docker_container_copy import DockerContainerCopy
 from exasol_integration_test_docker_environment.lib \
     .test_environment.parameter \
@@ -89,16 +92,21 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                 still_running_logger.log()
                 log_handler.handle_log_lines(log_line)
 
-    def _authorized_keys(self) -> str:
-        """
-        Multiple authorized_keys can be comma-separated.
-        """
-        if self.db_os_access != DbOsAccess.SSH:
-            return ""
-        return SshKey.from_cache().public_key_as_string("itde-ssh-access")
-
     def _create_database_container(self, db_ip_address: str, db_private_network: str):
+        def get_authorized_keys() -> str:
+            """
+            Multiple authorized_keys can be comma-separated.
+            """
+            if self.db_os_access != DbOsAccess.SSH:
+                return ""
+            return SshKey.from_cache().public_key_as_string("itde-ssh-access")
+        def enable_ssh_access(container: Container, authorized_keys: str):
+            copy = DockerContainerCopy(container)
+            copy.add_string_to_file(".ssh/authorized_keys", authorized_keys)
+            copy.copy("/root/")
+
         self.logger.info("Starting database container %s", self.db_container_name)
+        authorized_keys = get_authorized_keys()
         with self._get_docker_client() as docker_client:
             try:
                 docker_client.containers.get(self.db_container_name).remove(force=True, v=True)
@@ -108,7 +116,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             db_volume = self._prepare_db_volume(
                 docker_client,
                 db_private_network,
-                self._authorized_keys(),
+                authorized_keys,
                 docker_db_image_info,
             )
             ports = {}
@@ -117,8 +125,9 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                 ports[f"{defaults.database}/tcp"] = ('0.0.0.0', int(self.database_port_forward))
             if self.bucketfs_port_forward is not None:
                 ports[f"{defaults.bucketfs}/tcp"] = ('0.0.0.0', int(self.bucketfs_port_forward))
-            if self.ssh_port_forward is not None:
-                ports[f"{defaults.ssh}/tcp"] = ('0.0.0.0', int(self.ssh_port_forward))
+            if self.ssh_port_forward is None:
+                self.ssh_port_forward = find_free_ports(1)[0]
+            ports[f"{defaults.ssh}/tcp"] = ('0.0.0.0', int(self.ssh_port_forward))
             volumes = {db_volume.name: {"bind": "/exa", "mode": "rw"}}
             if self.certificate_volume_name is not None:
                 volumes[self.certificate_volume_name] = {"bind": CERTIFICATES_MOUNT_DIR, "mode": "ro"}
@@ -133,6 +142,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                     ports=ports,
                     runtime=self.docker_runtime
                 )
+            enable_ssh_access(db_container, authorized_keys)
             docker_network = docker_client.networks.get(self.network_info.network_name)
             network_aliases = self._get_network_aliases()
             docker_network.connect(db_container, ipv4_address=db_ip_address, aliases=network_aliases)

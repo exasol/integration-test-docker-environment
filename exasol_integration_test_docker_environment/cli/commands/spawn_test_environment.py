@@ -50,7 +50,7 @@ from exasol_integration_test_docker_environment.lib.api.common import add_option
     type=int,
     default=None,
     show_default=True,
-    help="Host port to which the SSH port gets forwarded",
+    help="Host port to which the SSH port gets forwarded. If not specified then ITDE selects a random free port.",
 )
 @click.option(
     "--db-mem-size",

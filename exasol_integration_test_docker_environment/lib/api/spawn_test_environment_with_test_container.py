@@ -37,9 +37,9 @@ def _cleanup(environment_info: EnvironmentInfo) -> None:
 def spawn_test_environment_with_test_container(
         environment_name: str,
         test_container_content: TestContainerContentDescription,
-        # This is a breaking change in the API and diverges from the @cli_function variant
-        # in lib/api/spawn_test_environment.py::spawn_test_environment()
-        port_forwarding: Optional[PortForwarding] = None,
+        database_port_forward: Optional[int] = None,
+        bucketfs_port_forward: Optional[int] = None,
+        ssh_port_forward: Optional[int] = None,
         db_mem_size: str = "2 GiB",
         db_disk_size: str = "2 GiB",
         nameserver: Tuple[str, ...] = tuple(),
