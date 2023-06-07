@@ -71,9 +71,9 @@ class ApiTestEnvironment:
         on_host_parameter.environment_info, on_host_parameter.clean_up = \
             spawn_test_environment_with_test_container(
                 environment_name=on_host_parameter.name,
-                database_port_forward=None if ports is None else ports.database
-                bucketfs_port_forward=None if ports is None else ports.bucketfs
-                ssh_port_forward=None if ports is None else ports.ssh
+                database_port_forward=None if ports is None else ports.database,
+                bucketfs_port_forward=None if ports is None else ports.bucketfs,
+                ssh_port_forward=None if ports is None else ports.ssh,
                 docker_db_image_version=docker_db_image_version,
                 test_container_content=test_container_content,
                 **additional_parameter,
