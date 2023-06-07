@@ -29,3 +29,4 @@ If you need further versions, please open an issue.
 * #326: Changed folder for SSH keys to `~/.cache/exasol/itde/`
 * #303: Added authorized_keys to Docker Container for SSH access
 * #308: Changed DB port from 8888 to 8563
+
