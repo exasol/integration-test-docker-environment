@@ -111,31 +111,39 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
                                                                 environment_variables_with_export, json)
 
     def collect_environment_info_variables(self, test_container_name: str, test_environment_info):
-        environment_variables = ""
-        environment_variables += f"ENVIRONMENT_NAME={test_environment_info.name}\n"
-        environment_variables += f"ENVIRONMENT_TYPE={test_environment_info.type}\n"
-        environment_variables += f"ENVIRONMENT_DATABASE_HOST={test_environment_info.database_info.host}\n"
-        environment_variables += f"ENVIRONMENT_DATABASE_DB_PORT={test_environment_info.database_info.ports.database}\n"
-        environment_variables += f"ENVIRONMENT_DATABASE_BUCKETFS_PORT={test_environment_info.database_info.ports.bucketfs}\n"
-        if test_environment_info.database_info.container_info is not None:
-            environment_variables += f"""ENVIRONMENT_DATABASE_CONTAINER_NAME={test_environment_info.database_info.container_info.container_name}\n"""
-            database_container_network_aliases = " ".join(
-                test_environment_info.database_info.container_info.network_aliases)
-            environment_variables += f"""ENVIRONMENT_DATABASE_CONTAINER_NETWORK_ALIASES="{database_container_network_aliases}"\n"""
-            environment_variables += f"""ENVIRONMENT_DATABASE_CONTAINER_IP_ADDRESS={test_environment_info.database_info.container_info.ip_address}\n"""
-            environment_variables += f"""ENVIRONMENT_DATABASE_CONTAINER_VOLUMNE_NAME={test_environment_info.database_info.container_info.volume_name}\n"""
+        def default_bridge_ip_address(info):
             with self._get_docker_client() as docker_client:
-                db_container = docker_client.containers.get(
-                    test_environment_info.database_info.container_info.container_name)
+                db_container = docker_client.containers.get(info.database_info.container_info.container_name)
                 db_container.reload()
-                default_bridge_ip_address = db_container.attrs["NetworkSettings"]["Networks"]["bridge"]["IPAddress"]
-            environment_variables += f"""ENVIRONMENT_DATABASE_CONTAINER_DEFAULT_BRIDGE_IP_ADDRESS={default_bridge_ip_address}\n"""
-        if test_environment_info.test_container_info is not None:
-            environment_variables += f"""ENVIRONMENT_TEST_CONTAINER_NAME={test_container_name}\n"""
-            test_container_network_aliases = " ".join(test_environment_info.test_container_info.network_aliases)
-            environment_variables += f"""ENVIRONMENT_TEST_CONTAINER_NETWORK_ALIASES="{test_container_network_aliases}"\n"""
-            environment_variables += f"""ENVIRONMENT_TEST_CONTAINER_IP_ADDRESS={test_environment_info.test_container_info.ip_address}\n"""
-        return environment_variables
+                return db_container.attrs["NetworkSettings"]["Networks"]["bridge"]["IPAddress"]
+        info = test_environment_info
+        env = {
+            "NAME": info.name,
+            "TYPE": info.type,
+            "DATABASE_HOST": info.database_info.host,
+            "DATABASE_DB_PORT": info.database_info.ports.database,
+            "DATABASE_BUCKETFS_PORT": info.database_info.ports.bucketfs,
+            "DATABASE_SSH_PORT": info.database_info.ports.ssh,
+        }
+        if info.database_info.container_info is not None:
+            network_aliases = " ".join(info.database_info.container_info.network_aliases)
+            env.update({
+                "DATABASE_CONTAINER_NAME": info.database_info.container_info.container_name,
+                "DATABASE_CONTAINER_NETWORK_ALIASES": f'"{network_aliases}"',
+                "DATABASE_CONTAINER_IP_ADDRESS": info.database_info.container_info.ip_address,
+                "DATABASE_CONTAINER_VOLUMNE_NAME": info.database_info.container_info.volume_name,
+                "DATABASE_CONTAINER_DEFAULT_BRIDGE_IP_ADDRESS": default_bridge_ip_address(info),
+            })
+        if info.test_container_info is not None:
+            network_aliases = " ".join(info.test_container_info.network_aliases)
+            env.update({
+                "TEST_CONTAINER_NAME": test_container_name,
+                "TEST_CONTAINER_NETWORK_ALIASES": f'"{network_aliases}"',
+                "TEST_CONTAINER_IP_ADDRESS": info.test_container_info.ip_address,
+            })
+        # Old implementation added an extra newline.
+        # Not sure if we can remove this?
+        return "\n".join([ f"ENVIRONMENT_{key}={value}" for key, value in env.items() ]) + "\n"
 
     def _start_database(self, attempt) \
             -> Generator[BaseTask, BaseTask, Tuple[DockerNetworkInfo, DatabaseInfo, bool, Optional[ContainerInfo]]]:

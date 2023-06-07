@@ -246,6 +246,7 @@ The following config files are available:
       export ENVIRONMENT_DATABASE_HOST=172.21.0.2
       export ENVIRONMENT_DATABASE_DB_PORT=8888
       export ENVIRONMENT_DATABASE_BUCKETFS_PORT=6583
+      export ENVIRONMENT_DATABASE_SSH_PORT=22
       export ENVIRONMENT_DATABASE_CONTAINER_NAME=db_container_test
       export ENVIRONMENT_DATABASE_CONTAINER_NETWORK_ALIASES="exasol_test_database db_container_test"
       # Database IP in the environment docker network
