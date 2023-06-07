@@ -95,9 +95,9 @@ def spawn_test_environment_with_test_container(
                                  target_docker_tag_prefix, "target")
     task_creator = lambda: generate_root_task(task_class=SpawnTestEnvironmentWithDockerDB,
                                               environment_name=environment_name,
-                                              database_port_forward=str_or_none(port_forwarding.database),
-                                              bucketfs_port_forward=str_or_none(port_forwarding.bucketfs),
-                                              ssh_port_forward=str_or_none(port_forwarding.ssh),
+                                              database_port_forward=str_or_none(database_port_forward),
+                                              bucketfs_port_forward=str_or_none(bucketfs_port_forward),
+                                              ssh_port_forward=str_or_none(ssh_port_forward),
                                               mem_size=db_mem_size,
                                               disk_size=db_disk_size,
                                               nameservers=nameserver,
