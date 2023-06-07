@@ -87,7 +87,7 @@ EXASOL_OPTIONS = (
     {
         "name": "port",
         "type": int,
-        "default": 8888,
+        "default": 8563,
         "help_text": "Port on which the exasol db is listening",
     },
     {
@@ -155,7 +155,7 @@ def test_option_group_prefix_property(group, expected):
                     prefix="exasol",
                     name="port",
                     type=int,
-                    default=8888,
+                    default=8563,
                     help_text="Port on which the exasol db is listening",
                 ),
                 Option(
@@ -235,8 +235,8 @@ class PyTestArgs:
                 ),
             ),
             {"DB_PORT": "7777"},
-            PyTestArgs(db_port=8888),
-            {"port": 8888},
+            PyTestArgs(db_port=8563),
+            {"port": 8563},
         ),
     ),
 )

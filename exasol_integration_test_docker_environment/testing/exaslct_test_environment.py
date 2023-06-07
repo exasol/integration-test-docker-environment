@@ -172,7 +172,7 @@ class ExaslctTestEnvironment:
                 db_password=on_host_parameter.db_password,
                 bucketfs_username=on_host_parameter.bucketfs_username,
                 bucketfs_password=on_host_parameter.bucketfs_password,
-                database_port=8888,
+                database_port=8563,
                 bucketfs_port=6583,
                 environment_info=on_host_parameter.completed_process,
                 completed_process=on_host_parameter.completed_process

@@ -28,3 +28,4 @@ If you need further versions, please open an issue.
 * #190: Added support for the Exasol 8.0 Docker-DB prerelease version
 * #326: Changed folder for SSH keys to `~/.cache/exasol/itde/`
 * #303: Added authorized_keys to Docker Container for SSH access
+* #308: Changed DB port from 8888 to 8563

@@ -1,7 +1,7 @@
 Vagrant.configure("2") do |config|
   config.vm.box = "generic/ubuntu2004"
   config.vm.hostname = "integration-test-docker-environment"
-  config.vm.network :forwarded_port, guest: 8888, host: 8888
+  config.vm.network :forwarded_port, guest: 8563, host: 8563
   config.vm.network :forwarded_port, guest: 6666, host: 6666
   config.vm.synced_folder ".", "/home/vagrant/vagrant", type: "rsync", rsync__exclude: ".git/"
   config.vm.synced_folder "..", "/home/vagrant/project", type: "rsync", rsync__exclude: ".git/", rsync__args: ["--verbose", "--archive", "-z", "--links"], rsync__verbose: true

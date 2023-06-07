@@ -34,7 +34,7 @@ from exasol_integration_test_docker_environment.lib.base.ssh_access import (
 
 
 BUCKETFS_PORT = "6583"
-DB_PORT = "8888"
+DB_PORT = "8563"
 CERTIFICATES_MOUNT_DIR = "/certificates"
 CERTIFICATES_DEFAULT_DIR = "/exa/etc/ssl/"
 

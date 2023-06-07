@@ -74,7 +74,7 @@
     UUID = A5F8F92113A34BA4B0A48D5397423BBA5CF95161
     DockerVolume = n11
     # Ports to be exposed (container : host)
-    ExposedPorts = 8888:8899, 6583:6594
+    ExposedPorts = 8563:8899, 6583:6594
     [[Disk : disk1]]
         Component = exastorage
         Devices = dev.1
@@ -120,7 +120,7 @@
     Version = {{db_version}}
     # Memory size over all nodes (e. g. '1 TiB').
     MemSize = {{ mem_size }}
-    Port = 8888
+    Port = 8563
     # User and group IDs that own this database (e. g. '1000:1005').
     Owner = 500 : 500
     # Comma-separated list of node IDs for this DB (put reserve nodes at the end, if any).

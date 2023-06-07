@@ -17,7 +17,7 @@ def cli():
         Spawn an ITDE test environment:
 
             $ itde spawn-test-environment --environment-name test \\
-            --database-port-forward 8888 --bucketfs-port-forward 6666 \\
+            --database-port-forward 8563 --bucketfs-port-forward 6666 \\
             --docker-db-image-version 7.1.9 --db-mem-size 4GB
     """
     pass
