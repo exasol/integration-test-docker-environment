@@ -54,6 +54,8 @@ class TestContainerReuseTest(unittest.TestCase):
                                   reuse_test_container=True,
                                   no_test_container_cleanup_after_success=not cleanup,
                                   no_database_cleanup_after_success=not cleanup,
+                                  external_exasol_db_port=8563,
+                                  external_exasol_bucketfs_port=6583,
                                   external_exasol_xmlrpc_host="",
                                   external_exasol_db_host="",
                                   external_exasol_xmlrpc_port=0,
