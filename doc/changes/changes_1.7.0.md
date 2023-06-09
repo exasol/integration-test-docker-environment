@@ -15,6 +15,7 @@ T.B.D.
 
 * **7.0**: up to 7.0.20, **except 7.0.5**
 * **7.1**: up to 7.1.17
+* 8.17.0 and 8.18.1
 
 If you need further versions, please open an issue.
 
@@ -28,3 +29,4 @@ If you need further versions, please open an issue.
 * #190: Added support for the Exasol 8.0 Docker-DB prerelease version
 * #326: Changed folder for SSH keys to `~/.cache/exasol/itde/`
 * #303: Added authorized_keys to Docker Container for SSH access
+* #337: Added Docker-DB 8.18.1
