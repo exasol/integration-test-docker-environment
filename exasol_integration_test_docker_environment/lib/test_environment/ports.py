@@ -37,6 +37,5 @@ class PortForwarding:
         return PortForwarding(*ports[:3])
 
     @classmethod
-    @property
     def default_ports(cls) -> 'PortForwarding':
         return PortForwarding(database=8888, bucketfs=6583, ssh=22)
