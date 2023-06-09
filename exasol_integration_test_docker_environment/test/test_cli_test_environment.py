@@ -31,7 +31,7 @@ class DockerTestEnvironmentTest(unittest.TestCase):
 
     def test_db_container_started(self):
         def assert_exactly_one(prefix: str, all: List[str], selected: List[str] = None):
-            selected = selected if selected is None else all
+            selected = selected if selected is not None else all
             log = self.spawned_docker_test_environments \
                       .on_host_docker_environment \
                       .completed_process.stdout.decode('utf8')

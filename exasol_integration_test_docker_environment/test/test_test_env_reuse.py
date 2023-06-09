@@ -94,7 +94,7 @@ class TestContainerReuseTest(unittest.TestCase):
         database_port = test_environment_info.database_info.db_port
         q = "SELECT TABLE_NAME FROM SYS.EXA_ALL_TABLES WHERE TABLE_SCHEMA='TEST';"
         return f"$EXAPLUS -c '{database_host}:{database_port}' -u '{username}' -p '{password}' " \
-               f"-jdbcparam 'validateservercertificate=0' -sql \\\"{q}\\\""""
+               f"-jdbcparam 'validateservercertificate=0' -sql \\\"{q}\\\""
 
     def _exec_cmd_in_test_container(self, test_environment_info, cmd):
         with ContextDockerClient() as docker_client:
