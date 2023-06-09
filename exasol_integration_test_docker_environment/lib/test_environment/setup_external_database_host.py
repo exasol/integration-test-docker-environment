@@ -10,8 +10,11 @@ from exasol_integration_test_docker_environment.lib.base.json_pickle_parameter i
 from exasol_integration_test_docker_environment.lib.data.database_credentials import DatabaseCredentialsParameter
 from exasol_integration_test_docker_environment.lib.data.database_info import DatabaseInfo
 from exasol_integration_test_docker_environment.lib.data.docker_network_info import DockerNetworkInfo
-from exasol_integration_test_docker_environment.lib.test_environment.parameter.external_test_environment_parameter import \
+from exasol_integration_test_docker_environment \
+    .lib.test_environment.parameter.external_test_environment_parameter import \
     ExternalDatabaseXMLRPCParameter, ExternalDatabaseHostParameter
+from exasol_integration_test_docker_environment \
+    .lib.test_environment.ports import PortForwarding
 
 
 class SetupExternalDatabaseHost(DependencyLoggerBaseTask,

@@ -165,7 +165,7 @@ def _bootstrap_db(itde_config, exasol_config, bucketfs_config):
             environment_name=name,
             database_port_forward=exasol.port,
             bucketfs_port_forward=bucketfs_url.port,
-            ssh_port_forward=22, # TBC: which port should be used here?
+            ssh_port_forward=20002,
             db_mem_size="4GB",
             docker_db_image_version=itde.db_version,
         )
