@@ -18,7 +18,7 @@ from exasol_integration_test_docker_environment.testing.exaslct_docker_test_envi
     ExaslctDockerTestEnvironment
 from exasol_integration_test_docker_environment.testing.spawned_test_environments import SpawnedTestEnvironments
 from exasol_integration_test_docker_environment \
-    .lib.test_environment.ports import PortForwarding
+    .lib.test_environment.ports import Ports
 from exasol_integration_test_docker_environment.testing.utils import check_db_version_from_env
 
 
@@ -132,7 +132,7 @@ class ExaslctTestEnvironment:
 
     def spawn_docker_test_environments(self, name: str, additional_parameter: List[str] = None) \
             -> SpawnedTestEnvironments:
-        ports = PortForwarding.random_free()
+        ports = Ports.random_free()
         on_host_parameter = ExaslctDockerTestEnvironment(
             name=self.name + "_" + name,
             database_host="localhost",
@@ -177,7 +177,7 @@ class ExaslctTestEnvironment:
                 db_password=on_host_parameter.db_password,
                 bucketfs_username=on_host_parameter.bucketfs_username,
                 bucketfs_password=on_host_parameter.bucketfs_password,
-                ports=PortForwarding.default_ports,
+                ports=Ports.default_ports,
                 environment_info=on_host_parameter.completed_process,
                 completed_process=on_host_parameter.completed_process
             )

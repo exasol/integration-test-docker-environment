@@ -6,7 +6,7 @@ from exasol_integration_test_docker_environment \
 from exasol_integration_test_docker_environment \
     .lib.data.environment_info import EnvironmentInfo
 from exasol_integration_test_docker_environment \
-    .lib.test_environment.ports import PortForwarding
+    .lib.test_environment.ports import Ports
 from exasol_integration_test_docker_environment \
     .testing.utils import check_db_version_from_env
 
@@ -16,7 +16,7 @@ class ExaslctDockerTestEnvironment:
                  db_username: str, db_password: str,
                  bucketfs_username: str,
                  bucketfs_password: str,
-                 ports: PortForwarding,
+                 ports: Ports,
                  environment_info: Optional[EnvironmentInfo] = None,
                  completed_process: Optional[subprocess.CompletedProcess] = None):
         self.db_password = db_password

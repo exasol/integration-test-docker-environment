@@ -14,7 +14,7 @@ from exasol_integration_test_docker_environment \
     .lib.test_environment.parameter.external_test_environment_parameter import \
     ExternalDatabaseXMLRPCParameter, ExternalDatabaseHostParameter
 from exasol_integration_test_docker_environment \
-    .lib.test_environment.ports import PortForwarding
+    .lib.test_environment.ports import Ports
 
 
 class SetupExternalDatabaseHost(DependencyLoggerBaseTask,
@@ -31,7 +31,7 @@ class SetupExternalDatabaseHost(DependencyLoggerBaseTask,
                 self.external_exasol_db_host == "127.0.01":
             database_host = self.network_info.gateway
         self.setup_database()
-        ports = PortForwarding(
+        ports = Ports(
             database=self.external_exasol_db_port,
             bucketfs=self.external_exasol_bucketfs_port,
             ssh=self.external_exasol_ssh_port,

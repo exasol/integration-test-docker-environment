@@ -20,7 +20,7 @@ from exasol_integration_test_docker_environment \
         get_test_flavor,
 )
 from exasol_integration_test_docker_environment \
-    .lib.test_environment.ports import PortForwarding
+    .lib.test_environment.ports import Ports
 
 
 class ApiTestEnvironment:
@@ -47,7 +47,7 @@ class ApiTestEnvironment:
         except Exception as e:
             print(e, file=stderr)
 
-    def _get_default_test_environment(self, name: str, ports: PortForwarding):
+    def _get_default_test_environment(self, name: str, ports: Ports):
         return ExaslctDockerTestEnvironment(
             name=self.name + "_" + name,
             database_host="localhost",
@@ -64,7 +64,7 @@ class ApiTestEnvironment:
             -> ExaslctDockerTestEnvironment:
         if additional_parameter is None:
             additional_parameter = dict()
-        ports = PortForwarding.random_free()
+        ports = Ports.random_free()
         on_host_parameter = self._get_default_test_environment(name, ports)
         docker_db_image_version = on_host_parameter.docker_db_image_version
         ports = on_host_parameter.ports
@@ -87,7 +87,7 @@ class ApiTestEnvironment:
     ) -> ExaslctDockerTestEnvironment:
         if additional_parameter is None:
             additional_parameter = dict()
-        ports = PortForwarding.random_free()
+        ports = Ports.random_free()
         on_host = self._get_default_test_environment(name, ports)
         on_host.environment_info, on_host.clean_up = spawn_test_environment(
             environment_name=on_host.name,

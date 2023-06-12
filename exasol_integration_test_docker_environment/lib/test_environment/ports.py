@@ -27,29 +27,29 @@ def find_free_ports(num_ports: int) -> List[int]:
 
 class PortsType(type):
     @property
-    def default_ports(self) -> 'PortForwarding':
-        return PortForwarding(database=8888, bucketfs=6583, ssh=22)
+    def default_ports(self) -> 'Ports':
+        return Ports(database=8888, bucketfs=6583, ssh=22)
 
     @property
-    def external(self) -> 'PortForwarding':
-        return PortForwarding(database=8563, bucketfs=6583, ssh=22)
+    def external(self) -> 'Ports':
+        return Ports(database=8563, bucketfs=6583, ssh=22)
 
     @property
-    def docker(self) -> 'PortForwarding':
-        return PortForwarding(database=8888, bucketfs=6583, ssh=22)
+    def docker(self) -> 'Ports':
+        return Ports(database=8888, bucketfs=6583, ssh=22)
 
     @property
-    def forward(self) -> 'PortForwarding':
-        return PortForwarding(database=8563, bucketfs=6583, ssh=20002)
+    def forward(self) -> 'Ports':
+        return Ports(database=8563, bucketfs=6583, ssh=20002)
 
 
-class PortForwarding(metaclass=PortsType):
+class Ports(metaclass=PortsType):
     def __init__(self, database: int, bucketfs: int, ssh: Optional[int] = None):
         self.database = database
         self.bucketfs = bucketfs
         self.ssh = ssh
 
     @classmethod
-    def random_free(cls, ssh: bool = True) -> 'PortForwarding':
+    def random_free(cls, ssh: bool = True) -> 'Ports':
         ports = find_free_ports(3 if ssh else 2) + [None]
-        return PortForwarding(*ports[:3])
+        return Ports(*ports[:3])

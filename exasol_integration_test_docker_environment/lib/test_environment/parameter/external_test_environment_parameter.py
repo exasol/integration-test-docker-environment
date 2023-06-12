@@ -2,8 +2,6 @@ import luigi
 from luigi import Config
 
 from luigi.parameter import ParameterVisibility
-# from exasol_integration_test_docker_environment \
-#     .lib.test_environment.ports import PortForwarding
 
 
 class ExternalDatabaseXMLRPCParameter(Config):

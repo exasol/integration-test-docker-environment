@@ -11,7 +11,7 @@ from exasol_integration_test_docker_environment.testing import luigi_utils
 from exasol_integration_test_docker_environment.cli.options import test_environment_options
 from exasol_integration_test_docker_environment.testing.utils import check_db_version_from_env
 from exasol_integration_test_docker_environment \
-    .lib.test_environment.ports import PortForwarding
+    .lib.test_environment.ports import Ports
 
 
 class TestContainerReuseTest(unittest.TestCase):
@@ -50,7 +50,7 @@ class TestContainerReuseTest(unittest.TestCase):
     def run_spawn_test_env(self, cleanup: bool):
         result = None
 
-        ports = PortForwarding.external
+        ports = Ports.external
         task = generate_root_task(task_class=SpawnTestEnvironment,
                                   reuse_database_setup=True,
                                   reuse_database=True,

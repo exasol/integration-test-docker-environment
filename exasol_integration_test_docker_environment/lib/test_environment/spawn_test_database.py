@@ -22,7 +22,7 @@ from exasol_integration_test_docker_environment.lib.docker.images.image_info imp
 from exasol_integration_test_docker_environment.lib.test_environment.db_version import DbVersion
 from exasol_integration_test_docker_environment.lib.test_environment.ports import (
     find_free_ports,
-    PortForwarding,
+    Ports,
 )
 from exasol_integration_test_docker_environment.lib.test_environment.docker_container_copy import DockerContainerCopy
 from exasol_integration_test_docker_environment.lib \
@@ -120,7 +120,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                 docker_db_image_info,
             )
             ports = {}
-            defaults = PortForwarding.default_ports
+            defaults = Ports.default_ports
             if self.database_port_forward is not None:
                 ports[f"{defaults.database}/tcp"] = ('0.0.0.0', int(self.database_port_forward))
             if self.bucketfs_port_forward is not None:
@@ -169,7 +169,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             )
             database_info = DatabaseInfo(
                 host=db_ip_address,
-                ports=PortForwarding.default_ports,
+                ports=Ports.default_ports,
                 reused=reused,
                 container_info=container_info,
             )

@@ -20,8 +20,6 @@ from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_
 from exasol_integration_test_docker_environment \
     .lib.test_environment.parameter \
     .docker_db_test_environment_parameter import DbOsAccess
-from exasol_integration_test_docker_environment \
-    .lib.test_environment.ports import PortForwarding
 
 def _cleanup(environment_info: EnvironmentInfo) -> None:
     if environment_info.test_container_info is None:
