@@ -120,7 +120,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                 docker_db_image_info,
             )
             ports = {}
-            defaults = PortForwarding.default_ports()
+            defaults = PortForwarding.default_ports
             if self.database_port_forward is not None:
                 ports[f"{defaults.database}/tcp"] = ('0.0.0.0', int(self.database_port_forward))
             if self.bucketfs_port_forward is not None:
@@ -169,7 +169,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             )
             database_info = DatabaseInfo(
                 host=db_ip_address,
-                ports=PortForwarding.default_ports(),
+                ports=PortForwarding.default_ports,
                 reused=reused,
                 container_info=container_info,
             )

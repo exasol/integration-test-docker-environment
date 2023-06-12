@@ -18,7 +18,7 @@ EXASOL = config.OptionGroup(
         {
             "name": "port",
             "type": int,
-            "default": 8888,
+            "default": 8888, # replace by PortForwarding.docker.database ?
             "help_text": "Port on which the exasol db is listening",
         },
         {

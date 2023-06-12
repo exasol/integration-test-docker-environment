@@ -50,7 +50,7 @@ class TestContainerReuseTest(unittest.TestCase):
     def run_spawn_test_env(self, cleanup: bool):
         result = None
 
-        ports = PortForwarding.external()
+        ports = PortForwarding.external
         task = generate_root_task(task_class=SpawnTestEnvironment,
                                   reuse_database_setup=True,
                                   reuse_database=True,
