@@ -20,6 +20,7 @@ from exasol_integration_test_docker_environment.lib.data.docker_network_info imp
 from exasol_integration_test_docker_environment.lib.docker.images.create.utils.pull_log_handler import PullLogHandler
 from exasol_integration_test_docker_environment.lib.docker.images.image_info import ImageInfo
 from exasol_integration_test_docker_environment.lib.test_environment.db_version import DbVersion
+from exasol_integration_test_docker_environment.lib.data/ssh_info.py import SshInfo
 from exasol_integration_test_docker_environment.lib.test_environment.ports import (
     find_free_ports,
     Ports,
@@ -50,6 +51,10 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
     docker_runtime = luigi.OptionalParameter(None, significant=False)  # type: str
     certificate_volume_name = luigi.OptionalParameter(None, significant=False)
     additional_db_parameter = luigi.ListParameter()
+    ssh_user = luigi.Parameter("root")
+    # should we use base64 encoding here?
+    # or should the key be read from a file?
+    ssh_key = luigi.OptionalParameter()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -76,12 +81,16 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         self.logger.info("Try to reuse database container %s",
                          self.db_container_name)
         database_info = None
+        ssh_key = sef._get_ssh_key()
         try:
             database_info = self._create_database_info(db_ip_address=db_ip_address, reused=True)
         except Exception as e:
             self.logger.warning("Tried to reuse database container %s, but got Exeception %s. "
                                 "Fallback to create new database.", self.db_container_name, e)
         return database_info
+
+    def _get_ssh_key(self) -> SshKey:
+        return self.ssh_key or SshKey.from_cache()
 
     def _handle_output(self, output_generator, image_info: ImageInfo):
         log_file_path = self.get_log_path().joinpath("pull_docker_db_image.log")
@@ -93,20 +102,21 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                 log_handler.handle_log_lines(log_line)
 
     def _create_database_container(self, db_ip_address: str, db_private_network: str):
-        def get_authorized_keys() -> str:
+        def get_authorized_keys(ssh_key: SshKey) -> str:
             """
             Multiple authorized_keys can be comma-separated.
             """
             if self.db_os_access != DbOsAccess.SSH:
                 return ""
-            return SshKey.from_cache().public_key_as_string("itde-ssh-access")
+            return ssh_key.public_key_as_string("itde-ssh-access")
         def enable_ssh_access(container: Container, authorized_keys: str):
             copy = DockerContainerCopy(container)
             copy.add_string_to_file(".ssh/authorized_keys", authorized_keys)
             copy.copy("/root/")
 
         self.logger.info("Starting database container %s", self.db_container_name)
-        authorized_keys = get_authorized_keys()
+        ssh_key = self._get_ssh_key()
+        authorized_keys = get_authorized_keys(ssh_key)
         with self._get_docker_client() as docker_client:
             try:
                 docker_client.containers.get(self.db_container_name).remove(force=True, v=True)
@@ -167,11 +177,13 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                 network_info=self.network_info,
                 volume_name=self._get_db_volume_name(),
             )
+            ssh_info = SshInfo(self.ssh_user, self.ssh_port_forward, self._get_ssh_key())
             database_info = DatabaseInfo(
                 host=db_ip_address,
                 ports=Ports.default_ports,
                 reused=reused,
                 container_info=container_info,
+                ssh_info=ssh_info,
             )
             return database_info
 
