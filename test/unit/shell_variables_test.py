@@ -2,14 +2,19 @@ import contextlib
 import pytest
 
 from inspect import cleandoc
-from unittest.mock import MagicMock, Mock
+from unittest.mock import Mock
 from exasol_integration_test_docker_environment \
-    .lib.test_environment.abstract_spawn_test_environment import AbstractSpawnTestEnvironment
+    .lib.test_environment.shell_variables import ShellVariables
 from exasol_integration_test_docker_environment \
     .lib.test_environment.ports import Ports
 
 
-def test_collect_environment_info_variables():
+def test_render_with_prefix():
+    actual = ShellVariables({"A": "1"}).render("export ")
+    assert actual == "export ENVIRONMENT_A=1\n"
+
+
+def test_from_test_environment_info():
     container_info = Mock(
         network_aliases = ["cna-1", "cna-2"],
         container_name = "container-name",
@@ -32,25 +37,12 @@ def test_collect_environment_info_variables():
     )
     test_environment.name = "name"
 
-    @contextlib.contextmanager
-    def docker_client_context():
-        container = Mock(attrs={"NetworkSettings": {"Networks": {"bridge": {"IPAddress": "ip-address"}}}})
-        all_containers = Mock(get = MagicMock(return_value=container))
-        yield Mock(containers = all_containers)
-
-    testee = AbstractSpawnTestEnvironment(
-        job_id="1",
-        db_user="user",
-        db_password="password",
-        bucketfs_write_password="w",
-        test_container_content="",
-        additional_db_parameter="",
-        environment_name="env",
+    actual = ShellVariables.from_test_environment_info(
+        "test-container-name",
+        "ip-address",
+        test_environment,
     )
-    testee._get_docker_client = MagicMock(return_value=docker_client_context())
-    actual = testee.collect_environment_info_variables("test-container-name", test_environment)
-    print(f'{actual}')
-    assert actual.strip() == cleandoc("""
+    assert actual.render().strip() == cleandoc("""
         ENVIRONMENT_NAME=name
         ENVIRONMENT_TYPE=type
         ENVIRONMENT_DATABASE_HOST=db-host
