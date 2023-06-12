@@ -62,7 +62,6 @@ class DockerTestEnvironmentTest(unittest.TestCase):
     def db_connection_command(self, db_container: docker.models.containers.Container):
         on_host = self.spawned_docker_test_environments.on_host_docker_environment
         db_info = on_host.environment_info.database_info
-        # unused: db_version = on_host.docker_db_image_version
         connection_options = (
             f"-c '{db_info.host}:{db_info.ports.database}' "
             f"-u '{on_host.db_username}' "

@@ -109,6 +109,6 @@ ITDE supports tests with pytest although there currently are also tests using
 all tests to pytest in directory ``test``
 
 For pytest ITDE uses a pytest plugin in directory ``pytest_itde``. This plugin
-enables to configure test execution, e.g. setting the hostname, user
-andpassword of the database. For some configuration parameters there are also
+enables to configure test execution, e.g. setting the hostname, user and
+password of the database. For some configuration parameters there are also
 default values.

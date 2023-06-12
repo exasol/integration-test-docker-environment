@@ -92,6 +92,27 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                 still_running_logger.log()
                 log_handler.handle_log_lines(log_line)
 
+    def _get_network_aliases(self):
+        network_aliases = ["exasol_test_database", "exasol-test-database", self.db_container_name]
+        return network_aliases
+
+    def _connect_docker_network(self, container: Container, ip_address: str):
+        network = docker_client.networks.get(self.network_info.network_name)
+        aliases = self._get_network_aliases()
+        network.connect(container, ipv4_address=ip_address, aliases=aliases)
+
+    def _port_mappings(self):
+        result = {}
+        defaults = Ports.default_ports
+        if self.database_port_forward is not None:
+            result[f"{defaults.database}/tcp"] = ('0.0.0.0', int(self.database_port_forward))
+        if self.bucketfs_port_forward is not None:
+            result[f"{defaults.bucketfs}/tcp"] = ('0.0.0.0', int(self.bucketfs_port_forward))
+        if self.ssh_port_forward is None:
+            self.ssh_port_forward = find_free_ports(1)[0]
+        result[f"{defaults.ssh}/tcp"] = ('0.0.0.0', int(self.ssh_port_forward))
+        return result
+
     def _create_database_container(self, db_ip_address: str, db_private_network: str):
         def get_authorized_keys() -> str:
             """
@@ -100,6 +121,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             if self.db_os_access != DbOsAccess.SSH:
                 return ""
             return SshKey.from_cache().public_key_as_string("itde-ssh-access")
+
         def enable_ssh_access(container: Container, authorized_keys: str):
             copy = DockerContainerCopy(container)
             copy.add_string_to_file(".ssh/authorized_keys", authorized_keys)
@@ -119,15 +141,8 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                 authorized_keys,
                 docker_db_image_info,
             )
-            ports = {}
-            defaults = Ports.default_ports
-            if self.database_port_forward is not None:
-                ports[f"{defaults.database}/tcp"] = ('0.0.0.0', int(self.database_port_forward))
-            if self.bucketfs_port_forward is not None:
-                ports[f"{defaults.bucketfs}/tcp"] = ('0.0.0.0', int(self.bucketfs_port_forward))
-            if self.ssh_port_forward is None:
-                self.ssh_port_forward = find_free_ports(1)[0]
-            ports[f"{defaults.ssh}/tcp"] = ('0.0.0.0', int(self.ssh_port_forward))
+
+            ports = self._port_mappings()
             volumes = {db_volume.name: {"bind": "/exa", "mode": "rw"}}
             if self.certificate_volume_name is not None:
                 volumes[self.certificate_volume_name] = {"bind": CERTIFICATES_MOUNT_DIR, "mode": "ro"}
@@ -143,16 +158,10 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                     runtime=self.docker_runtime
                 )
             enable_ssh_access(db_container, authorized_keys)
-            docker_network = docker_client.networks.get(self.network_info.network_name)
-            network_aliases = self._get_network_aliases()
-            docker_network.connect(db_container, ipv4_address=db_ip_address, aliases=network_aliases)
+            self._connect_docker_network(db_container, db_ip_address)
             db_container.start()
             database_info = self._create_database_info(db_ip_address=db_ip_address, reused=False)
             return database_info
-
-    def _get_network_aliases(self):
-        network_aliases = ["exasol_test_database", "exasol-test-database", self.db_container_name]
-        return network_aliases
 
     def _create_database_info(self, db_ip_address: str, reused: bool) -> DatabaseInfo:
         with self._get_docker_client() as docker_client:

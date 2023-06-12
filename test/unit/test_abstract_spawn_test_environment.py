@@ -9,7 +9,7 @@ from exasol_integration_test_docker_environment \
     .lib.test_environment.ports import Ports
 
 
-def test_AbstractSpawnTestEnvironment():
+def test_collect_environment_info_variables():
     container_info = Mock(
         network_aliases = ["cna-1", "cna-2"],
         container_name = "container-name",
