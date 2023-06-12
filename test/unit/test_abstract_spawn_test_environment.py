@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, Mock
 from exasol_integration_test_docker_environment \
     .lib.test_environment.abstract_spawn_test_environment import AbstractSpawnTestEnvironment
 from exasol_integration_test_docker_environment \
-    .lib.test_environment.ports import PortForwarding
+    .lib.test_environment.ports import Ports
 
 
 def test_AbstractSpawnTestEnvironment():
@@ -18,7 +18,7 @@ def test_AbstractSpawnTestEnvironment():
     )
     database_info = Mock(
         host = "db-host",
-        ports = PortForwarding(1,2,3),
+        ports = Ports(1,2,3),
         container_info = container_info,
     )
     test_container_info = Mock(

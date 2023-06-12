@@ -293,6 +293,11 @@ which leaves the container unchanged and hence reusable.
 The public key will be added as file ``/root/.ssh/authorized_keys`` inside the
 Docker Container to enable SSH access with public key authentication.
 
+You can use command line option ``--ssh-port-forward`` to specify a port on
+your host machine to which ITDE forwards the SSH port of the Docker Container
+running the Exasol database. If you do not specify a port then ITDE will
+select a random free port.
+
 
 Tested Docker Runtimes
 ~~~~~~~~~~~~~~~~~~~~~~
