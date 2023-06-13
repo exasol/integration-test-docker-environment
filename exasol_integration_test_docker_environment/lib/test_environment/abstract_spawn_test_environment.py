@@ -66,8 +66,7 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
     def create_test_environment_info_in_test_container(
             self,
             test_environment_info: EnvironmentInfo,
-            shell_variables: str,
-            shell_variables_with_export: str,
+            shell_variables: ShellVariables,
             json: str,
     ):
         test_container_name = test_environment_info.test_container_info.container_name
@@ -76,8 +75,8 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
             self.logger.info(f"Create test environment info in test container '{test_container_name}' at '/'")
             copy = DockerContainerCopy(test_container)
             copy.add_string_to_file("environment_info.json", json)
-            copy.add_string_to_file("environment_info.conf", shell_variables)
-            copy.add_string_to_file("environment_info.sh", shell_variables_with_export)
+            copy.add_string_to_file("environment_info.conf", shell_variables.render())
+            copy.add_string_to_file("environment_info.sh", shell_variables.render("export ")
             copy.copy("/")
 
     def create_test_environment_info_in_test_container_and_on_host(
@@ -102,15 +101,13 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
         with Path(path, "environment_info.conf").open("w") as f:
             f.write(shell_variables.render())
 
-        shell_variables_with_export = shell_variables.render("export ")
         with Path(path, "environment_info.sh").open("w") as f:
-            f.write(shell_variables_with_export)
+            f.write(shell_variables.render("export "))
 
         if test_environment_info.test_container_info is not None:
             self.create_test_environment_info_in_test_container(
                 test_environment_info,
                 shell_variables,
-                shell_variables_with_export,
                 json,
             )
 
