@@ -114,14 +114,19 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
                 json,
             )
 
-    def collect_shell_variables(self, test_container_name: str, test_environment_info) -> ShellVariables:
+    def _default_bridge_ip_address(self, test_environment_info) -> str:
+        if test_environment_info.database_info.container_info is None:
+            return None
         container_name = test_environment_info.database_info.container_info.container_name
         with self._get_docker_client() as docker_client:
             db_container = docker_client.containers.get(container_name)
-            ip_address = default_bridge_ip_address(db_container)
+            return default_bridge_ip_address(db_container)
+
+    def collect_shell_variables(self, test_container_name: str, test_environment_info) -> ShellVariables:
+        default_bridge_ip_address = _default_bridge_ip_address(test_environment_info)
         return ShellVariables.from_test_environment_info(
             test_container_name,
-            ip_address,
+            default_bridge_ip_address,
             test_environment_info,
         )
 
