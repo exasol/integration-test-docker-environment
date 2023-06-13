@@ -76,7 +76,7 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
             copy = DockerContainerCopy(test_container)
             copy.add_string_to_file("environment_info.json", json)
             copy.add_string_to_file("environment_info.conf", shell_variables.render())
-            copy.add_string_to_file("environment_info.sh", shell_variables.render("export ")
+            copy.add_string_to_file("environment_info.sh", shell_variables.render("export "))
             copy.copy("/")
 
     def create_test_environment_info_in_test_container_and_on_host(
