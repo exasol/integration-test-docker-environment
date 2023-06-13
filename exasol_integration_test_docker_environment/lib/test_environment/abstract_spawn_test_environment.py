@@ -104,7 +104,7 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
             f.write(shell_variables.render())
 
         with Path(path, "environment_info.sh").open("w") as f:
-            f.write(shell_variables.render("export ")
+            f.write(shell_variables.render("export "))
 
         if test_environment_info.test_container_info is not None:
             self.create_test_environment_info_in_test_container(
