@@ -8,6 +8,7 @@ import netaddr
 import pkg_resources
 from docker.models.containers import Container
 from docker.models.volumes import Volume
+from docker.client import DockerClient
 from jinja2 import Template
 
 from exasol_integration_test_docker_environment.lib import PACKAGE_NAME
@@ -96,7 +97,12 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         network_aliases = ["exasol_test_database", "exasol-test-database", self.db_container_name]
         return network_aliases
 
-    def _connect_docker_network(self, container: Container, ip_address: str):
+    def _connect_docker_network(
+            self,
+            docker_client: DockerClient,
+            container: Container,
+            ip_address: str,
+    ):
         network = docker_client.networks.get(self.network_info.network_name)
         aliases = self._get_network_aliases()
         network.connect(container, ipv4_address=ip_address, aliases=aliases)
@@ -158,7 +164,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                     runtime=self.docker_runtime
                 )
             enable_ssh_access(db_container, authorized_keys)
-            self._connect_docker_network(db_container, db_ip_address)
+            self._connect_docker_network(docker_client, db_container, db_ip_address)
             db_container.start()
             database_info = self._create_database_info(db_ip_address=db_ip_address, reused=False)
             return database_info
