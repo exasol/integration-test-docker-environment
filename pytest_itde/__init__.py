@@ -86,7 +86,7 @@ ITDE = config.OptionGroup(
         {
             "name": "db_version",
             "type": str,
-            "default": "7.1.17",
+            "default": "8.18.1",
             "help_text": "DB version to start, if value is 'external' an existing instance will be used",
         },
         {
