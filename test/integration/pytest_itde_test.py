@@ -67,7 +67,7 @@ def test_itde_smoke_test(make_test_files, pytester, files):
             "test_itde_settings": cleandoc(
                 """
 def test_default_settings_of_itde(itde_config):
-    assert itde_config.db_version == '7.1.17'
+    assert itde_config.db_version == '8.18.1'
     assert set(itde_config.schemas) == set(('TEST', 'TEST_SCHEMA'))
 """
             )
