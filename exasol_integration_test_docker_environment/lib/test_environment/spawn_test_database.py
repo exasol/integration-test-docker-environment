@@ -52,9 +52,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
     certificate_volume_name = luigi.OptionalParameter(None, significant=False)
     additional_db_parameter = luigi.ListParameter()
     ssh_user = luigi.Parameter("root")
-    # should we use base64 encoding here?
-    # or should the key be read from a file?
-    ssh_key = luigi.OptionalParameter()
+    ssh_key_file = luigi.OptionalParameter()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -90,7 +88,10 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         return database_info
 
     def _get_ssh_key(self) -> SshKey:
-        return self.ssh_key or SshKey.from_cache()
+        if self.ssh_key_file:
+            return SshKey.read_from(self.ssh_key_file)
+        self.ssh_key_file = SshCache().private_key
+        return SshKey.from_cache()
 
     def _handle_output(self, output_generator, image_info: ImageInfo):
         log_file_path = self.get_log_path().joinpath("pull_docker_db_image.log")
@@ -177,7 +178,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                 network_info=self.network_info,
                 volume_name=self._get_db_volume_name(),
             )
-            ssh_info = SshInfo(self.ssh_user, self.ssh_port_forward, self._get_ssh_key())
+            ssh_info = SshInfo(self.ssh_user, self.ssh_port_forward, self.ssh_key_file)
             database_info = DatabaseInfo(
                 host=db_ip_address,
                 ports=Ports.default_ports,

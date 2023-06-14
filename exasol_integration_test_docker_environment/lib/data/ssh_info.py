@@ -1,7 +1,10 @@
 from exasol_integration_test_docker_environment.lib.base.ssh_access import SshKey
 
 class SshInfo:
-    def __init__(self, user: str, port: int, ssh_key: SshKey):
+    """
+    key_file contains path to the file containing the private key for SSH access.
+    """
+    def __init__(self, user: str, port: int, key_file: str):
         self.user = user
         self.port = port
-        self.ssh_key = ssh_key
+        self.key_file = key_file
