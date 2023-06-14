@@ -50,7 +50,7 @@ class Capture:
 
 
 @pytest.fixture(scope="module")
-def capture_console_output() -> Capture:
+def capture_output_of_sut() -> Capture:
     out = io.StringIO()
     err = io.StringIO()
     with ExitStack() as stack:
@@ -60,6 +60,7 @@ def capture_console_output() -> Capture:
         stack.enter_context(redirect_stderr(err))
         stack.enter_context(pytest.raises(SystemExit))
         stack.enter_context(TerminationHandler())
+
         def task_creator():
             return generate_root_task(task_class=CompositeFailingTask)
 
@@ -67,29 +68,29 @@ def capture_console_output() -> Capture:
     return Capture(out=out.getvalue(), err=err.getvalue())
 
 
-def test_command_runtime(capture_console_output):
-    assert capture_console_output.err == regex_matcher("The command failed after .* s with:")
+def test_command_runtime(capture_output_of_test):
+    assert capture_output_of_test.err == regex_matcher("The command failed after .* s with:")
 
 
-def test_composite_task_failed(capture_console_output):
-    assert capture_console_output.err == regex_matcher(
+def test_composite_task_failed(capture_output_of_test):
+    assert capture_output_of_test.err == regex_matcher(
         r".*Task failure message: Task CompositeFailingTask.* \(or any of it's subtasks\) failed\.", re.DOTALL)
 
 
-def test_sub_tasks_failed(capture_console_output):
-    assert capture_console_output.err == regex_matcher(
+def test_sub_tasks_failed(capture_output_of_test):
+    assert capture_output_of_test.err == regex_matcher(
         r".*Following task failures were caught during the execution:", re.DOTALL)
 
 
-def test_sub_task1_error(capture_console_output):
-    assert capture_console_output.err == regex_matcher(
+def test_sub_task1_error(capture_output_of_test):
+    assert capture_output_of_test.err == regex_matcher(
         r".*RuntimeError: Error in FailingTask1 occurred.", re.DOTALL)
 
 
-def test_sub_task2_error(capture_console_output):
-    assert capture_console_output.err == regex_matcher(
+def test_sub_task2_error(capture_output_of_test):
+    assert capture_output_of_test.err == regex_matcher(
         r".*RuntimeError: Error in FailingTask2 occurred.", re.DOTALL)
 
 
-def test_out_empty(capture_console_output):
-    assert capture_console_output.out == ""
+def test_out_empty(capture_output_of_test):
+    assert capture_output_of_test.out == ""

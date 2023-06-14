@@ -3,6 +3,8 @@ import time
 import traceback
 
 import pytest
+from _pytest._code import ExceptionInfo
+from joblib.testing import fixture
 
 from exasol_integration_test_docker_environment.lib.api.api_errors import TaskRuntimeError, TaskFailures
 from exasol_integration_test_docker_environment.lib.api.common import run_task, generate_root_task
@@ -47,35 +49,73 @@ class SingleFailingTask(DependencyLoggerBaseTask):
         raise RuntimeError(f"Error in {self.__class__.__name__} occurred.")
 
 
-def test_single_task_failure():
-    def task_creator():
-        return generate_root_task(task_class=SingleFailingTask)
+class TestSingleTaskFailure:
 
-    with pytest.raises(TaskRuntimeError,
-                       match=r"Task SingleFailingTask.* \(or any of it's subtasks\) failed\.") as raises:
-        run_task(task_creator=task_creator)
-    cause = raises.value.__cause__
-    assert isinstance(cause, TaskFailures)
-    formatted_exception = "".join(traceback.format_exception(type(cause), cause, cause.__traceback__))
-    assert formatted_exception.startswith(
-        "exasol_integration_test_docker_environment.lib.api.api_errors.TaskFailures: Following task failures were caught during the execution:")
-    assert formatted_exception == regex_matcher(".*- SingleFailingTask.*:", re.DOTALL)
-    assert formatted_exception == regex_matcher(".*RuntimeError: Error in SingleFailingTask occurred\..*", re.DOTALL)
+    @fixture(scope="class")
+    def exception_from_sut(self) -> TaskRuntimeError:
+        def task_creator():
+            return generate_root_task(task_class=SingleFailingTask)
+
+        with pytest.raises(TaskRuntimeError,
+                           match=r"Task SingleFailingTask.* \(or any of it's subtasks\) failed\.") as raises:
+            run_task(task_creator=task_creator, workers=3)
+        return raises.value
+
+    @fixture
+    def formatted_cause(self, exception_from_sut):
+        cause = exception_from_sut.__cause__
+        formatted_cause = "".join(traceback.format_exception(type(cause), cause, cause.__traceback__))
+        return formatted_cause
+
+    def test_cause_is_task_failures_instance(self, exception_from_sut):
+        cause = exception_from_sut.__cause__
+        assert isinstance(cause, TaskFailures)
+
+    def test_tasks_failures(self, formatted_cause):
+        assert formatted_cause == regex_matcher(
+            ".*Following task failures were caught during the execution:")
+
+    def test_task_in_list_of_failures(self, formatted_cause):
+        assert formatted_cause == regex_matcher(r".*- SingleFailingTask.*:", re.DOTALL)
+
+    def test_task_error(self, formatted_cause):
+        assert formatted_cause == regex_matcher(r".*RuntimeError: Error in SingleFailingTask occurred\..*", re.DOTALL)
 
 
-def test_multiple_task_failure():
-    def task_creator():
-        return generate_root_task(task_class=CompositeFailingTask)
+class TestMultipleTaskFailure:
 
-    with pytest.raises(TaskRuntimeError,
-                       match=r"Task CompositeFailingTask.* \(or any of it's subtasks\) failed\.") as raises:
-        run_task(task_creator=task_creator, workers=3)
-    cause = raises.value.__cause__
-    assert isinstance(cause, TaskFailures)
-    formatted_exception = "".join(traceback.format_exception(type(cause), cause, cause.__traceback__))
-    assert formatted_exception.startswith(
-        "exasol_integration_test_docker_environment.lib.api.api_errors.TaskFailures: Following task failures were caught during the execution:")
-    assert formatted_exception == regex_matcher(".*- FailingTask1.*:", re.DOTALL)
-    assert formatted_exception == regex_matcher(".*- FailingTask2.*:", re.DOTALL)
-    assert formatted_exception == regex_matcher(".*RuntimeError: Error in FailingTask1 occurred\..*", re.DOTALL)
-    assert formatted_exception == regex_matcher(".*RuntimeError: Error in FailingTask2 occurred\..*", re.DOTALL)
+    @fixture(scope="class")
+    def exception_from_sut(self) -> TaskRuntimeError:
+        def task_creator():
+            return generate_root_task(task_class=CompositeFailingTask)
+
+        with pytest.raises(TaskRuntimeError,
+                           match=r"Task CompositeFailingTask.* \(or any of it's subtasks\) failed\.") as raises:
+            run_task(task_creator=task_creator, workers=3)
+        return raises.value
+
+    @fixture
+    def formatted_cause(self, exception_from_sut):
+        cause = exception_from_sut.__cause__
+        formatted_cause = "".join(traceback.format_exception(type(cause), cause, cause.__traceback__))
+        return formatted_cause
+
+    def test_cause_is_task_failures_instance(self, exception_from_sut):
+        cause = exception_from_sut.__cause__
+        assert isinstance(cause, TaskFailures)
+
+    def test_tasks_failures(self, formatted_cause):
+        assert formatted_cause == regex_matcher(
+            ".*Following task failures were caught during the execution:")
+
+    def test_sub_task1_in_list_of_failures(self, formatted_cause):
+        assert formatted_cause == regex_matcher(r".*- FailingTask1.*:", re.DOTALL)
+
+    def test_sub_task2_in_list_of_failures(self, formatted_cause):
+        assert formatted_cause == regex_matcher(r".*- FailingTask2.*:", re.DOTALL)
+
+    def test_sub_task1_error(self, formatted_cause):
+        assert formatted_cause == regex_matcher(r".*RuntimeError: Error in FailingTask1 occurred\..*", re.DOTALL)
+
+    def test_sub_task2_error(self, formatted_cause):
+        assert formatted_cause == regex_matcher(r".*RuntimeError: Error in FailingTask2 occurred\..*", re.DOTALL)

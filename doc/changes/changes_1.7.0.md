@@ -1,4 +1,4 @@
-# Integration-Test-Docker-Environment 1.7.0, released 2023-06-14
+# Integration-Test-Docker-Environment 1.7.0, released 2023-06-15
 
 ## Summary
 
