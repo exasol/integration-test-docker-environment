@@ -1,21 +1,18 @@
-# Integration-Test-Docker-Environment 1.7.0, released t.b.d.
+# Integration-Test-Docker-Environment 1.7.0, released 2023-06-14
 
 ## Summary
 
-Up to version 1.6.0 ITDE used `docker_exec` to access the Docker Container, e.g. to analyze the content of logfiles or execute some shell commands. With version 8 of Exasol database the format of the Docker Containers might change so that `docker_exec` is no longer possible. Instead ITDE will then need to use SSH access.
-
-The current release therefore enhances ITDE to enable to access the Docker Container via SSH.
-The user can select the docker access method with command line option `--db-os-access`, see User Guide.
-
-Additionally the directory for storing the randomly generated SSH keys has been moved to `~/.cache/exasol/itde/`. By that ITDE can restrict file permissions allowing access only by the current user.
-
-T.B.D.
+This release added support for the Exasol Docker-DB 8.18.1. Furthermore, it adds the first features for accessing 
+the Docker-DB container via SSH instead of `docker exec`. This is in preparation for later Exasol Docker-DB release,
+for which you can't access the operating system of the database with `docker exec`. However, the SSH access itself 
+is not yet operational. Finally, this release fix a bug in the reporting of task failures. The TaskRuntimeError 
+didn't show the actual task failures if not caught explicitly.
 
 ### Supported Exasol Versions
 
 * **7.0**: up to 7.0.20, **except 7.0.5**
 * **7.1**: up to 7.1.17
-* 8.17.0 and 8.18.1
+* **8**: 8.18.1
 
 If you need further versions, please open an issue.
 
@@ -30,4 +27,4 @@ If you need further versions, please open an issue.
 * #326: Changed folder for SSH keys to `~/.cache/exasol/itde/`
 * #303: Added authorized_keys to Docker Container for SSH access
 * #337: Added Docker-DB 8.18.1
-
+* #350: TaskRuntimeError will be raised as chained exception with all task failures.
