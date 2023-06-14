@@ -3,7 +3,7 @@
 ## Summary
 
 This release added support for the Exasol Docker-DB 8.18.1. Furthermore, it adds the first features for accessing 
-the Docker-DB container via SSH instead of `docker exec`. This is in preparation for later Exasol Docker-DB release,
+the Docker-DB container via SSH instead of `docker exec`. This is in preparation for later Exasol Docker-DB releases,
 for which you can't access the operating system of the database with `docker exec`. However, the SSH access itself 
 is not yet operational. Finally, this release fix a bug in the reporting of task failures. The TaskRuntimeError 
 didn't show the actual task failures if not caught explicitly.
