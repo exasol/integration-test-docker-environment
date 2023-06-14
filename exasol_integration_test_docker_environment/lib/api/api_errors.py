@@ -30,7 +30,7 @@ class TaskRuntimeError(RuntimeError):
         Args:
             msg: The error message
             inner: A list of task failures that caused this exception
-                   (@depricated will be replaced by cause TaskFailures)
+                   (@deprecated will be replaced by cause TaskFailures)
         """
         super().__init__(msg)
         self.msg = msg
