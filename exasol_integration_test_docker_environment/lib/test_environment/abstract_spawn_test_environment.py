@@ -1,6 +1,5 @@
 from pathlib import Path
 from typing import Generator, Tuple, Optional
-# import exasol_integration_test_docker_environment.lib
 from exasol_integration_test_docker_environment.lib.docker.container.utils import default_bridge_ip_address
 
 import luigi
