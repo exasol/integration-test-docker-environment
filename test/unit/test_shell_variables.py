@@ -11,7 +11,7 @@ from exasol_integration_test_docker_environment \
 
 def test_render_with_prefix():
     actual = ShellVariables({"A": "1"}).render("export ")
-    assert actual == "export ENVIRONMENT_A=1\n"
+    assert actual == "export ITDE_A=1\n"
 
 
 def test_from_test_environment_info():
@@ -43,18 +43,18 @@ def test_from_test_environment_info():
         test_environment,
     )
     assert actual.render().strip() == cleandoc("""
-        ENVIRONMENT_NAME=name
-        ENVIRONMENT_TYPE=type
-        ENVIRONMENT_DATABASE_HOST=db-host
-        ENVIRONMENT_DATABASE_DB_PORT=1
-        ENVIRONMENT_DATABASE_BUCKETFS_PORT=2
-        ENVIRONMENT_DATABASE_SSH_PORT=3
-        ENVIRONMENT_DATABASE_CONTAINER_NAME=container-name
-        ENVIRONMENT_DATABASE_CONTAINER_NETWORK_ALIASES="cna-1 cna-2"
-        ENVIRONMENT_DATABASE_CONTAINER_IP_ADDRESS=container-ip
-        ENVIRONMENT_DATABASE_CONTAINER_VOLUMNE_NAME=container-volume
-        ENVIRONMENT_DATABASE_CONTAINER_DEFAULT_BRIDGE_IP_ADDRESS=ip-address
-        ENVIRONMENT_TEST_CONTAINER_NAME=test-container-name
-        ENVIRONMENT_TEST_CONTAINER_NETWORK_ALIASES="tcna-1 tcna-2"
-        ENVIRONMENT_TEST_CONTAINER_IP_ADDRESS=tc-ip
+        ITDE_NAME=name
+        ITDE_TYPE=type
+        ITDE_DATABASE_HOST=db-host
+        ITDE_DATABASE_DB_PORT=1
+        ITDE_DATABASE_BUCKETFS_PORT=2
+        ITDE_DATABASE_SSH_PORT=3
+        ITDE_DATABASE_CONTAINER_NAME=container-name
+        ITDE_DATABASE_CONTAINER_NETWORK_ALIASES="cna-1 cna-2"
+        ITDE_DATABASE_CONTAINER_IP_ADDRESS=container-ip
+        ITDE_DATABASE_CONTAINER_VOLUMNE_NAME=container-volume
+        ITDE_DATABASE_CONTAINER_DEFAULT_BRIDGE_IP_ADDRESS=ip-address
+        ITDE_TEST_CONTAINER_NAME=test-container-name
+        ITDE_TEST_CONTAINER_NETWORK_ALIASES="tcna-1 tcna-2"
+        ITDE_TEST_CONTAINER_IP_ADDRESS=tc-ip
         """)

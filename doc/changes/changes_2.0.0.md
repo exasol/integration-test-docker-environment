@@ -10,6 +10,7 @@ T.B.D.
 
 * **7.0**: up to 7.0.20, **except 7.0.5**
 * **7.1**: up to 7.1.17
+* **8.17.0** and 8.18.1
 
 If you need further versions, please open an issue.
 
