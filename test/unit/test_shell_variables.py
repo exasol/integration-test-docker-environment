@@ -27,6 +27,7 @@ def test_from_test_environment_info():
         container_info = container_info,
     )
     test_container_info = Mock(
+        container_name = "test-container-name",
         network_aliases = ["tcna-1", "tcna-2"],
         ip_address = "tc-ip",
     )
@@ -38,7 +39,6 @@ def test_from_test_environment_info():
     test_environment.name = "name"
 
     actual = ShellVariables.from_test_environment_info(
-        "test-container-name",
         "ip-address",
         test_environment,
     )

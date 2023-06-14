@@ -12,7 +12,6 @@ class ShellVariables:
     @classmethod
     def from_test_environment_info(
             cls,
-            test_container_name: str,
             default_bridge_ip_address: str,
             test_environment_info: EnvironmentInfo,
     ) -> 'ShellVariables':
@@ -39,9 +38,10 @@ class ShellVariables:
                 "DATABASE_CONTAINER_DEFAULT_BRIDGE_IP_ADDRESS": default_bridge_ip_address,
             })
         if info.test_container_info is not None:
+            container_name = info.test_container_info.container_name
             network_aliases = " ".join(info.test_container_info.network_aliases)
             env.update({
-                "TEST_CONTAINER_NAME": test_container_name,
+                "TEST_CONTAINER_NAME": container_name,
                 "TEST_CONTAINER_NETWORK_ALIASES": f'"{network_aliases}"',
                 "TEST_CONTAINER_IP_ADDRESS": info.test_container_info.ip_address,
             })
