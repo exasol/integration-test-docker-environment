@@ -1,15 +1,20 @@
 import sys
 from datetime import datetime
-from sys import stderr
 from traceback import print_tb
 
 from exasol_integration_test_docker_environment.lib.api.api_errors import TaskRuntimeError
+
+
+def print_err(*args, **kwargs):
+    kwargs["file"] = sys.stderr
+    print(*args, **kwargs)
 
 
 class TerminationHandler:
     """
     This helper class measures and logs time duration of the job and also logs the error message.
     """
+
     def __init__(self):
         self._start_time = None
 
@@ -30,26 +35,22 @@ class TerminationHandler:
 
     def _handle_unexpected_failure(self, exc_val, exc_tb):
         timedelta = datetime.now() - self._start_time
-        print("The command failed after %s s with:" % timedelta.total_seconds(), file=stderr)
-        print("Caught exception:%s" % exc_val, file=stderr)
-        print_tb(exc_tb)
+        print_err("The command failed after %s s with:" % timedelta.total_seconds())
+        print_err("Caught exception:%s" % exc_val)
+        print_tb(exc_tb, file=sys.stderr)
 
     def _handle_failure(self, task_error: TaskRuntimeError):
         timedelta = datetime.now() - self._start_time
-        print("The command failed after %s s with:" % timedelta.total_seconds(), file=stderr)
+        print_err("The command failed after %s s with:" % timedelta.total_seconds())
         self._print_task_failures(task_error)
 
     @staticmethod
     def _print_task_failures(task_error: TaskRuntimeError):
-        print(file=stderr)
-        print("Task failure message: %s" % task_error.msg, file=stderr)
-        print("Task Failures:", file=stderr)
-        if task_error.inner is not None:
-            for failure in task_error.inner:
-                print(failure, file=stderr)
-        print(file=stderr)
+        print_err()
+        print_err("Task failure message: %s" % task_error.msg)
+        print_err(task_error.__cause__.args[0])
+        print_err()
 
     def _handle_success(self):
         timedelta = datetime.now() - self._start_time
-        print("The command took %s s" % timedelta.total_seconds(), file=stderr)
-
+        print("The command took %s s" % timedelta.total_seconds(), file=stderr, flush=True)
