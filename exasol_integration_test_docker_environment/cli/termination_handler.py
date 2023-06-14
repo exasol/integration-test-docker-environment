@@ -53,4 +53,4 @@ class TerminationHandler:
 
     def _handle_success(self):
         timedelta = datetime.now() - self._start_time
-        print("The command took %s s" % timedelta.total_seconds(), file=stderr, flush=True)
+        print_err("The command took %s s" % timedelta.total_seconds())
