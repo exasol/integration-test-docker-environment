@@ -3,7 +3,7 @@ import io
 import os
 import pytest
 
-from conftest import container_named
+from .conftest import container_named
 from exasol_integration_test_docker_environment.lib.base.ssh_access import SshKey, SshKeyCache
 
 
