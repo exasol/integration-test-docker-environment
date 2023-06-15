@@ -1,8 +1,5 @@
-import os
-import pytest
-
-from conftest import container_named
 from exasol_integration_test_docker_environment.lib.base.ssh_access import SshKeyCache
+from test.integration.helpers import container_named
 
 
 def test_generate_ssh_key_file(api_database):

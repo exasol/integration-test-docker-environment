@@ -10,7 +10,7 @@ from typing import (
     Callable,
     Tuple,
     Set,
-    Optional, Any, Dict, Iterator
+    Optional, Any, Dict, Iterator, Iterable, List
 )
 
 import luigi
@@ -20,7 +20,7 @@ from luigi.setup_logging import InterfaceLogging
 from networkx import DiGraph
 
 from exasol_integration_test_docker_environment.lib import extract_modulename_for_build_steps
-from exasol_integration_test_docker_environment.lib.api.api_errors import TaskRuntimeError
+from exasol_integration_test_docker_environment.lib.api.api_errors import TaskRuntimeError, TaskFailures
 from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import DependencyLoggerBaseTask
 from exasol_integration_test_docker_environment.lib.base.luigi_log_config import get_luigi_log_config, get_log_path
 from exasol_integration_test_docker_environment.lib.base.task_dependency import TaskDependency, DependencyState
@@ -154,14 +154,21 @@ def _run_task_with_logging_config(
         return no_scheduling_errors
 
 
-def _handle_task_result(no_scheduling_errors, success, task, task_dependencies_dot_file: Optional[str]) -> Any:
+def _handle_task_result(
+        no_scheduling_errors: bool,
+        success: bool,
+        task: DependencyLoggerBaseTask,
+        task_dependencies_dot_file: Optional[str]) -> Any:
     generate_graph_from_task_dependencies(task, task_dependencies_dot_file)
     if success:
         return task.get_result()
     elif task.failed_target.exists():
         logging.error(f"Task {task} failed. failed target exists.")
-        raise TaskRuntimeError(msg=f"Task {task} (or any of it's subtasks) failed.",
-                               inner=list(task.collect_failures().keys()))
+        task_failures = list(task.collect_failures().keys())
+        raise TaskRuntimeError(
+            msg=f"Task {task} (or any of it's subtasks) failed.",
+            inner=task_failures) \
+            from TaskFailures(inner=task_failures)
     elif not no_scheduling_errors:
         logging.error(f"Task {task} failed. : luigi reported a scheduling error.")
         raise TaskRuntimeError(msg=f"Task {task} failed. reason: luigi reported a scheduling error.")
@@ -201,6 +208,7 @@ def _configure_logging_parameter(log_level: str, luigi_config: Path, use_job_spe
         no_configure_logging = True
         run_kwargs = {}
     return no_configure_logging, run_kwargs
+
 
 def generate_graph_from_task_dependencies(task: DependencyLoggerBaseTask, task_dependencies_dot_file: Optional[str]):
     if task_dependencies_dot_file is not None:
