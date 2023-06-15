@@ -50,7 +50,7 @@ class Capture:
 
 
 @pytest.fixture(scope="module")
-def capture_output_of_sut() -> Capture:
+def capture_output_of_test() -> Capture:
     out = io.StringIO()
     err = io.StringIO()
     with ExitStack() as stack:
