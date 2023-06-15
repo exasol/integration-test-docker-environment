@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Integration-Test-Docker-Environment 1.6.0, released 2023-05-12" href="changes_1.6.0.html" /><link rel="prev" title="Changes" href="changelog.html" />
 
     <meta name="generator" content="sphinx-4.5.0, furo 2022.09.29"/>
-        <title>Integration-Test-Docker-Environment 1.7.0, released t.b.d. - Exasol Integration Test Docker Environment documentation</title>
+        <title>Integration-Test-Docker-Environment 1.7.0, released 2023-06-15 - Exasol Integration Test Docker Environment documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
@@ -411,7 +411,7 @@
 </ul>
 </li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="changelog.html">Changes</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-32" name="toctree-checkbox-32" role="switch" type="checkbox"/><label for="toctree-checkbox-32"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Integration-Test-Docker-Environment 1.7.0, released t.b.d.</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Integration-Test-Docker-Environment 1.7.0, released 2023-06-15</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changes_1.6.0.html">Integration-Test-Docker-Environment 1.6.0, released 2023-05-12</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changes_1.5.0.html">Integration-Test-Docker-Environment 1.5.0, released 2023-03-21</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changes_1.4.0.html">Integration-Test-Docker-Environment 1.4.0, released 2023-03-15</a></li>
@@ -468,21 +468,21 @@
           </label>
         </div>
         <article role="main">
-          <section id="integration-test-docker-environment-1-7-0-released-t-b-d">
-<h1>Integration-Test-Docker-Environment 1.7.0, released t.b.d.<a class="headerlink" href="#integration-test-docker-environment-1-7-0-released-t-b-d" title="Permalink to this headline">#</a></h1>
+          <section id="integration-test-docker-environment-1-7-0-released-2023-06-15">
+<h1>Integration-Test-Docker-Environment 1.7.0, released 2023-06-15<a class="headerlink" href="#integration-test-docker-environment-1-7-0-released-2023-06-15" title="Permalink to this headline">#</a></h1>
 <section id="summary">
 <h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">#</a></h2>
-<p>Up to version 1.6.0 ITDE used <code class="docutils literal notranslate"><span class="pre">docker_exec</span></code> to access the Docker Container, e.g. to analyze the content of logfiles or execute some shell commands. With version 8 of Exasol database the format of the Docker Containers might change so that <code class="docutils literal notranslate"><span class="pre">docker_exec</span></code> is no longer possible. Instead ITDE will then need to use SSH access.</p>
-<p>The current release therefore enhances ITDE to enable to access the Docker Container via SSH.
-The user can select the docker access method with command line option <code class="docutils literal notranslate"><span class="pre">--db-os-access</span></code>, see User Guide.</p>
-<p>Additionally the directory for storing the randomly generated SSH keys has been moved to <code class="docutils literal notranslate"><span class="pre">~/.cache/exasol/itde/</span></code>. By that ITDE can restrict file permissions allowing access only by the current user.</p>
-<p>T.B.D.</p>
+<p>This release added support for the Exasol Docker-DB 8.18.1. Furthermore, it adds the first features for accessing
+the Docker-DB container via SSH instead of <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">exec</span></code>. This is in preparation for later Exasol Docker-DB releases,
+for which you can’t access the operating system of the database with <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">exec</span></code>. However, the SSH access itself
+is not yet operational. Finally, this release fixes a bug in the reporting of task failures. The TaskRuntimeError
+didn’t show the actual task failures if not caught explicitly.</p>
 <section id="supported-exasol-versions">
 <h3>Supported Exasol Versions<a class="headerlink" href="#supported-exasol-versions" title="Permalink to this headline">#</a></h3>
 <ul class="simple">
 <li><p><strong>7.0</strong>: up to 7.0.20, <strong>except 7.0.5</strong></p></li>
 <li><p><strong>7.1</strong>: up to 7.1.17</p></li>
-<li><p>8.17.0 and 8.18.1</p></li>
+<li><p><strong>8</strong>: 8.18.1</p></li>
 </ul>
 <p>If you need further versions, please open an issue.</p>
 </section>
@@ -500,6 +500,7 @@ The user can select the docker access method with command line option <code clas
 <li><p>#326: Changed folder for SSH keys to <code class="docutils literal notranslate"><span class="pre">~/.cache/exasol/itde/</span></code></p></li>
 <li><p>#303: Added authorized_keys to Docker Container for SSH access</p></li>
 <li><p>#337: Added Docker-DB 8.18.1</p></li>
+<li><p>#350: TaskRuntimeError will be raised as chained exception with all task failures.</p></li>
 </ul>
 </section>
 </section>
@@ -561,7 +562,7 @@ The user can select the docker access method with command line option <code clas
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Integration-Test-Docker-Environment 1.7.0, released t.b.d.</a><ul>
+<li><a class="reference internal" href="#">Integration-Test-Docker-Environment 1.7.0, released 2023-06-15</a><ul>
 <li><a class="reference internal" href="#summary">Summary</a><ul>
 <li><a class="reference internal" href="#supported-exasol-versions">Supported Exasol Versions</a></li>
 </ul>
