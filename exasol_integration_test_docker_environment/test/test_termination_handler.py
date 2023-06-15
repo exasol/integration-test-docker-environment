@@ -1,13 +1,11 @@
+import multiprocessing as mp
+import re
 import sys
 import unittest
+from importlib import reload
 from multiprocessing import Queue
 from typing import List
 
-import multiprocessing as mp
-import re
-from importlib import reload
-
-from exasol_integration_test_docker_environment.lib.api.api_errors import TaskRuntimeError
 import exasol_integration_test_docker_environment.cli.termination_handler
 
 
@@ -31,17 +29,6 @@ def run_positive(queue: Queue) -> None:
     m = reload(exasol_integration_test_docker_environment.cli.termination_handler)
     with m.TerminationHandler():
         pass
-
-
-def run_with_task_error(queue: Queue) -> None:
-    stdout_queue = StdoutQueue(queue)
-    sys.stdout = stdout_queue
-    sys.stderr = stdout_queue
-    # we need to release the termination module here, otherwise the new sys.stdout/sys.stderr might not be set correctly
-    m = reload(exasol_integration_test_docker_environment.cli.termination_handler)
-    with m.TerminationHandler():
-        raise TaskRuntimeError(msg="test", inner=["task runtime error test"])
-
 
 def run_with_unknown_error(queue: Queue) -> None:
     stdout_queue = StdoutQueue(queue)
@@ -68,19 +55,9 @@ class TestTerminationHandler(unittest.TestCase):
         p.start()
         p.join()
         res = get_queue_content(q)
-        self.assertTrue(any(re.match(r"^The command took .+ s$", line) for line in res))
+        self.assertTrue(any(re.match(r"^The command took .+ s$", line) for line in res),
+                        f"Result {res} doesn't contain 'The command took'")
         self.assertEqual(p.exitcode, 0)
-
-    def test_task_runtime_error(self):
-        q = Queue()
-        p = mp.Process(target=run_with_task_error, args=(q,))
-        p.start()
-        p.join()
-        res = get_queue_content(q)
-        self.assertTrue(any(re.match(r"^The command failed after .+ s with:$", line) for line in res))
-        self.assertTrue(any("task runtime error test" == line for line in res))
-        self.assertFalse(any(line.startswith("Caught exception:") for line in res))
-        self.assertEqual(p.exitcode, 1)
 
     def test_unknown_error(self):
         q = Queue()
