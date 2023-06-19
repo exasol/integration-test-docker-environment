@@ -1,6 +1,7 @@
 # Changes
 
 * [2.0.0](changes_2.0.0.md)
+* [1.7.1](changes_1.7.1.md)
 * [1.7.0](changes_1.7.0.md)
 * [1.6.0](changes_1.6.0.md)
 * [1.5.0](changes_1.5.0.md)
@@ -29,6 +30,7 @@
 hidden:
 ---
 changes_2.0.0
+changes_1.7.1
 changes_1.7.0
 changes_1.6.0
 changes_1.5.0
