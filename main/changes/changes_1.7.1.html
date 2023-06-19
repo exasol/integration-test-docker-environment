@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Integration-Test-Docker-Environment 1.1.0, released 2022-10-04" href="changes_1.1.0.html" /><link rel="prev" title="Integration-Test-Docker-Environment 1.3.0, released 2023-02-17" href="changes_1.3.0.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Integration-Test-Docker-Environment 1.7.0, released 2023-06-15" href="changes_1.7.0.html" /><link rel="prev" title="Changes" href="changelog.html" />
 
     <meta name="generator" content="sphinx-4.5.0, furo 2022.09.29"/>
-        <title>Integration-Test-Docker-Environment 1.2.0, released 2022-11-03 - Exasol Integration Test Docker Environment documentation</title>
+        <title>Integration-Test-Docker-Environment 1.7.1, released 2023-06-19 - Exasol Integration Test Docker Environment documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
@@ -411,13 +411,13 @@
 </ul>
 </li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="changelog.html">Changes</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-32" name="toctree-checkbox-32" role="switch" type="checkbox"/><label for="toctree-checkbox-32"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="changes_1.7.1.html">Integration-Test-Docker-Environment 1.7.1, released 2023-06-19</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Integration-Test-Docker-Environment 1.7.1, released 2023-06-19</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changes_1.7.0.html">Integration-Test-Docker-Environment 1.7.0, released 2023-06-15</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changes_1.6.0.html">Integration-Test-Docker-Environment 1.6.0, released 2023-05-12</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changes_1.5.0.html">Integration-Test-Docker-Environment 1.5.0, released 2023-03-21</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changes_1.4.0.html">Integration-Test-Docker-Environment 1.4.0, released 2023-03-15</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changes_1.3.0.html">Integration-Test-Docker-Environment 1.3.0, released 2023-02-17</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Integration-Test-Docker-Environment 1.2.0, released 2022-11-03</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changes_1.2.0.html">Integration-Test-Docker-Environment 1.2.0, released 2022-11-03</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changes_1.1.0.html">Integration-Test-Docker-Environment 1.1.0, released 2022-10-04</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changes_1.0.0.html">Integration-Test-Docker-Environment 1.0.0, released 2022-09-28</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changes_0.11.0.html">Integration-Test-Docker-Environment 0.11.0, released 2022-05-13</a></li>
@@ -469,63 +469,28 @@
           </label>
         </div>
         <article role="main">
-          <section id="integration-test-docker-environment-1-2-0-released-2022-11-03">
-<h1>Integration-Test-Docker-Environment 1.2.0, released 2022-11-03<a class="headerlink" href="#integration-test-docker-environment-1-2-0-released-2022-11-03" title="Permalink to this headline">#</a></h1>
-<p>Code name: DB Parameter injection</p>
+          <section id="integration-test-docker-environment-1-7-1-released-2023-06-19">
+<h1>Integration-Test-Docker-Environment 1.7.1, released 2023-06-19<a class="headerlink" href="#integration-test-docker-environment-1-7-1-released-2023-06-19" title="Permalink to this headline">#</a></h1>
 <section id="summary">
 <h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">#</a></h2>
-<p>This release supports a new option which allows the injection of custom parameters to the database and also supports <code class="docutils literal notranslate"><span class="pre">docker-db</span></code> version 7.1.17.</p>
+<p>This release fixes the not working UDFs in Exasol Docker-DB 8.18.1.</p>
 <section id="supported-exasol-versions">
 <h3>Supported Exasol Versions<a class="headerlink" href="#supported-exasol-versions" title="Permalink to this headline">#</a></h3>
 <ul class="simple">
 <li><p><strong>7.0</strong>: up to 7.0.20, <strong>except 7.0.5</strong></p></li>
-<li><p><strong>7.1</strong>: up to 7.1.15</p></li>
+<li><p><strong>7.1</strong>: up to 7.1.17</p></li>
+<li><p><strong>8</strong>: 8.18.1</p></li>
 </ul>
 <p>If you need further versions, please open an issue.</p>
 </section>
-<section id="tested-docker-runtimes">
-<h3>Tested Docker Runtimes<a class="headerlink" href="#tested-docker-runtimes" title="Permalink to this headline">#</a></h3>
+</section>
+<section id="internal">
+<h2>Internal<a class="headerlink" href="#internal" title="Permalink to this headline">#</a></h2>
+</section>
+<section id="changes">
+<h2>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
-<li><p>Docker Default Runtime</p></li>
-</ul>
-</section>
-</section>
-<section id="bug-fixes">
-<h2>Bug Fixes:<a class="headerlink" href="#bug-fixes" title="Permalink to this headline">#</a></h2>
-<p>n/a</p>
-</section>
-<section id="features-enhancements">
-<h2>Features / Enhancements:<a class="headerlink" href="#features-enhancements" title="Permalink to this headline">#</a></h2>
-<ul class="simple">
-<li><p>#270: Added support for additional db parameters</p></li>
-<li><p>#272: Added Docker-DB 7.1.15 and prepare release</p></li>
-<li><p>#281: Added Docker-DB 7.1.16, 7.1.17</p></li>
-</ul>
-</section>
-<section id="refactoring">
-<h2>Refactoring:<a class="headerlink" href="#refactoring" title="Permalink to this headline">#</a></h2>
-<p>n/a</p>
-</section>
-<section id="documentation">
-<h2>Documentation:<a class="headerlink" href="#documentation" title="Permalink to this headline">#</a></h2>
-<p>n/a</p>
-</section>
-<section id="security">
-<h2>Security:<a class="headerlink" href="#security" title="Permalink to this headline">#</a></h2>
-<ul class="simple">
-<li><p>Evaluated CVE-2022-42969</p>
-<ul>
-<li><p>CVE will be silenced</p></li>
-<li><p>The affected code is not used by our project itself, nor by the dependencies pulling in the vulnerable
-library.
-Checked dependencies:</p>
-<ul>
-<li><p>Nox (Code search)</p></li>
-<li><p>Pytest (Code search + <a class="reference external" href="https://github.com/pytest-dev/pytest/issues/10392">Tracking-Issue</a></p></li>
-</ul>
-</li>
-</ul>
-</li>
+<li><p>#351: Added test for UDF with builtin Script-Language Container and fixed it for Docker-DB 8.18.1</p></li>
 </ul>
 </section>
 </section>
@@ -535,23 +500,23 @@ Checked dependencies:</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="changes_1.1.0.html">
+          <a class="next-page" href="changes_1.7.0.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Integration-Test-Docker-Environment 1.1.0, released 2022-10-04</div>
+                <div class="title">Integration-Test-Docker-Environment 1.7.0, released 2023-06-15</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="changes_1.3.0.html">
+          <a class="prev-page" href="changelog.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Integration-Test-Docker-Environment 1.3.0, released 2023-02-17</div>
+                <div class="title">Changes</div>
                 
               </div>
             </a>
@@ -587,17 +552,13 @@ Checked dependencies:</p>
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Integration-Test-Docker-Environment 1.2.0, released 2022-11-03</a><ul>
+<li><a class="reference internal" href="#">Integration-Test-Docker-Environment 1.7.1, released 2023-06-19</a><ul>
 <li><a class="reference internal" href="#summary">Summary</a><ul>
 <li><a class="reference internal" href="#supported-exasol-versions">Supported Exasol Versions</a></li>
-<li><a class="reference internal" href="#tested-docker-runtimes">Tested Docker Runtimes</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#bug-fixes">Bug Fixes:</a></li>
-<li><a class="reference internal" href="#features-enhancements">Features / Enhancements:</a></li>
-<li><a class="reference internal" href="#refactoring">Refactoring:</a></li>
-<li><a class="reference internal" href="#documentation">Documentation:</a></li>
-<li><a class="reference internal" href="#security">Security:</a></li>
+<li><a class="reference internal" href="#internal">Internal</a></li>
+<li><a class="reference internal" href="#changes">Changes</a></li>
 </ul>
 </li>
 </ul>
