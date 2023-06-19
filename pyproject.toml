@@ -4,7 +4,7 @@ packages = [
     { include = "exasol_integration_test_docker_environment" },
     { include = "pytest_itde" }
 ]
-version = "1.7.0"
+version = "1.7.1"
 description = "Integration Test Docker Environment for Exasol"
 
 license = "MIT"
