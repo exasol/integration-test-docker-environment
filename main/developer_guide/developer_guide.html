@@ -342,8 +342,10 @@
 <li class="toctree-l6"><a class="reference internal" href="../api/exasol_integration_test_docker_environment.lib.test_environment.parameter.test_container_parameter.html">exasol_integration_test_docker_environment.lib.test_environment.parameter.test_container_parameter</a></li>
 </ul>
 </li>
+<li class="toctree-l5"><a class="reference internal" href="../api/exasol_integration_test_docker_environment.lib.test_environment.ports.html">exasol_integration_test_docker_environment.lib.test_environment.ports</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/exasol_integration_test_docker_environment.lib.test_environment.prepare_network_for_test_environment.html">exasol_integration_test_docker_environment.lib.test_environment.prepare_network_for_test_environment</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/exasol_integration_test_docker_environment.lib.test_environment.setup_external_database_host.html">exasol_integration_test_docker_environment.lib.test_environment.setup_external_database_host</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/exasol_integration_test_docker_environment.lib.test_environment.shell_variables.html">exasol_integration_test_docker_environment.lib.test_environment.shell_variables</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/exasol_integration_test_docker_environment.lib.test_environment.spawn_test_container.html">exasol_integration_test_docker_environment.lib.test_environment.spawn_test_container</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/exasol_integration_test_docker_environment.lib.test_environment.spawn_test_database.html">exasol_integration_test_docker_environment.lib.test_environment.spawn_test_database</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/exasol_integration_test_docker_environment.lib.test_environment.spawn_test_environment.html">exasol_integration_test_docker_environment.lib.test_environment.spawn_test_environment</a></li>
@@ -411,6 +413,7 @@
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../changes/changelog.html">Changes</a><input class="toctree-checkbox" id="toctree-checkbox-32" name="toctree-checkbox-32" role="switch" type="checkbox"/><label for="toctree-checkbox-32"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../changes/changes_2.0.0.html">Integration-Test-Docker-Environment 2.0.0, released t.b.d.</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../changes/changes_1.7.1.html">Integration-Test-Docker-Environment 1.7.1, released 2023-06-19</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../changes/changes_1.7.0.html">Integration-Test-Docker-Environment 1.7.0, released 2023-06-15</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../changes/changes_1.6.0.html">Integration-Test-Docker-Environment 1.6.0, released 2023-05-12</a></li>
@@ -569,6 +572,17 @@ your changes effective when executing the tests.</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>starter_scripts/build_docker_runner_image.sh
 </pre></div>
 </div>
+<section id="configuring-tests">
+<h3>Configuring Tests<a class="headerlink" href="#configuring-tests" title="Permalink to this headline">#</a></h3>
+<p>ITDE supports tests with pytest although there currently are also tests using
+<code class="docutils literal notranslate"><span class="pre">python.unittest</span></code> mainly in directory
+<code class="docutils literal notranslate"><span class="pre">exasol_integration_test_docker_environment/test</span></code>.  The plan is to migrate
+all tests to pytest in directory <code class="docutils literal notranslate"><span class="pre">test</span></code></p>
+<p>For pytest ITDE uses a pytest plugin in directory <code class="docutils literal notranslate"><span class="pre">pytest_itde</span></code>. This plugin
+enables to configure test execution, e.g. setting the hostname, user and
+password of the database. For some configuration parameters there are also
+default values.</p>
+</section>
 </section>
 </section>
 
@@ -640,7 +654,10 @@ your changes effective when executing the tests.</p>
 </li>
 </ul>
 </li>
-<li><a class="reference internal" href="#running-tests">Running Tests</a></li>
+<li><a class="reference internal" href="#running-tests">Running Tests</a><ul>
+<li><a class="reference internal" href="#configuring-tests">Configuring Tests</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

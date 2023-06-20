@@ -342,8 +342,10 @@
 <li class="toctree-l6"><a class="reference internal" href="../api/exasol_integration_test_docker_environment.lib.test_environment.parameter.test_container_parameter.html">exasol_integration_test_docker_environment.lib.test_environment.parameter.test_container_parameter</a></li>
 </ul>
 </li>
+<li class="toctree-l5"><a class="reference internal" href="../api/exasol_integration_test_docker_environment.lib.test_environment.ports.html">exasol_integration_test_docker_environment.lib.test_environment.ports</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/exasol_integration_test_docker_environment.lib.test_environment.prepare_network_for_test_environment.html">exasol_integration_test_docker_environment.lib.test_environment.prepare_network_for_test_environment</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/exasol_integration_test_docker_environment.lib.test_environment.setup_external_database_host.html">exasol_integration_test_docker_environment.lib.test_environment.setup_external_database_host</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/exasol_integration_test_docker_environment.lib.test_environment.shell_variables.html">exasol_integration_test_docker_environment.lib.test_environment.shell_variables</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/exasol_integration_test_docker_environment.lib.test_environment.spawn_test_container.html">exasol_integration_test_docker_environment.lib.test_environment.spawn_test_container</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/exasol_integration_test_docker_environment.lib.test_environment.spawn_test_database.html">exasol_integration_test_docker_environment.lib.test_environment.spawn_test_database</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/exasol_integration_test_docker_environment.lib.test_environment.spawn_test_environment.html">exasol_integration_test_docker_environment.lib.test_environment.spawn_test_environment</a></li>
@@ -411,6 +413,7 @@
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../changes/changelog.html">Changes</a><input class="toctree-checkbox" id="toctree-checkbox-32" name="toctree-checkbox-32" role="switch" type="checkbox"/><label for="toctree-checkbox-32"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../changes/changes_2.0.0.html">Integration-Test-Docker-Environment 2.0.0, released t.b.d.</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../changes/changes_1.7.1.html">Integration-Test-Docker-Environment 1.7.1, released 2023-06-19</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../changes/changes_1.7.0.html">Integration-Test-Docker-Environment 1.7.0, released 2023-06-15</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../changes/changes_1.6.0.html">Integration-Test-Docker-Environment 1.6.0, released 2023-05-12</a></li>
@@ -567,6 +570,10 @@ stores the images under <code class="docutils literal notranslate"><span class="
                                   <span class="n">Host</span> <span class="n">port</span> <span class="n">to</span> <span class="n">which</span> <span class="n">the</span> <span class="n">BucketFS</span> <span class="n">port</span> <span class="n">gets</span>
                                   <span class="n">forwarded</span>
 
+  <span class="o">--</span><span class="n">ssh</span><span class="o">-</span><span class="n">port</span><span class="o">-</span><span class="n">forward</span> <span class="n">INTEGER</span>
+                                  <span class="n">Host</span> <span class="n">port</span> <span class="n">to</span> <span class="n">which</span> <span class="n">the</span> <span class="n">SSH</span> <span class="n">port</span> <span class="n">gets</span>
+                                  <span class="n">forwarded</span>
+
   <span class="o">--</span><span class="n">db</span><span class="o">-</span><span class="n">mem</span><span class="o">-</span><span class="n">size</span> <span class="n">TEXT</span>              <span class="n">The</span> <span class="n">main</span> <span class="n">memory</span> <span class="n">used</span> <span class="n">by</span> <span class="n">the</span> <span class="n">database</span><span class="o">.</span> <span class="n">Format</span>
                                   <span class="o">&lt;</span><span class="n">number</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">unit</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span> <span class="mi">1</span> <span class="n">GiB</span><span class="o">.</span> <span class="n">The</span> <span class="n">minimum</span>
                                   <span class="n">size</span> <span class="ow">is</span> <span class="mi">1</span> <span class="n">GB</span><span class="p">,</span> <span class="n">below</span> <span class="n">that</span> <span class="n">the</span> <span class="n">database</span> <span class="n">will</span>
@@ -673,7 +680,7 @@ of other helpful tools.</p>
 <p>The python setup script creates configuration files on the host and in
 the test container.</p>
 <p>On the host the container information get stored in the build output
-directory usually under <code class="docutils literal notranslate"><span class="pre">.build_output/cache/&lt;ENVIRONMENT_NAME&gt;/*</span></code>. In
+directory usually under <code class="docutils literal notranslate"><span class="pre">.build_output/cache/&lt;ITDE_NAME&gt;/*</span></code>. In
 the test container the config file is stored at the root directory
 <code class="docutils literal notranslate"><span class="pre">/</span></code>.</p>
 <p>The following config files are available:</p>
@@ -681,25 +688,26 @@ the test container the config file is stored at the root directory
 <li><p>environment_info.sh: This file is meant to be source by the bash and
 then provides the information as environment variables. Here an
 example for the content:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">export</span> <span class="n">ENVIRONMENT_NAME</span><span class="o">=</span><span class="n">test</span>
-<span class="n">export</span> <span class="n">ENVIRONMENT_TYPE</span><span class="o">=</span><span class="n">EnvironmentType</span><span class="o">.</span><span class="n">docker_db</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">export</span> <span class="n">ITDE_NAME</span><span class="o">=</span><span class="n">test</span>
+<span class="n">export</span> <span class="n">ITDE_TYPE</span><span class="o">=</span><span class="n">EnvironmentType</span><span class="o">.</span><span class="n">docker_db</span>
 
 <span class="c1"># Database IP in environment docker network</span>
-<span class="n">export</span> <span class="n">ENVIRONMENT_DATABASE_HOST</span><span class="o">=</span><span class="mf">172.21.0.2</span>
-<span class="n">export</span> <span class="n">ENVIRONMENT_DATABASE_DB_PORT</span><span class="o">=</span><span class="mi">8888</span>
-<span class="n">export</span> <span class="n">ENVIRONMENT_DATABASE_BUCKETFS_PORT</span><span class="o">=</span><span class="mi">6583</span>
-<span class="n">export</span> <span class="n">ENVIRONMENT_DATABASE_CONTAINER_NAME</span><span class="o">=</span><span class="n">db_container_test</span>
-<span class="n">export</span> <span class="n">ENVIRONMENT_DATABASE_CONTAINER_NETWORK_ALIASES</span><span class="o">=</span><span class="s2">&quot;exasol_test_database db_container_test&quot;</span>
+<span class="n">export</span> <span class="n">ITDE_DATABASE_HOST</span><span class="o">=</span><span class="mf">172.21.0.2</span>
+<span class="n">export</span> <span class="n">ITDE_DATABASE_DB_PORT</span><span class="o">=</span><span class="mi">8888</span>
+<span class="n">export</span> <span class="n">ITDE_DATABASE_BUCKETFS_PORT</span><span class="o">=</span><span class="mi">6583</span>
+<span class="n">export</span> <span class="n">ITDE_DATABASE_SSH_PORT</span><span class="o">=</span><span class="mi">22</span>
+<span class="n">export</span> <span class="n">ITDE_DATABASE_CONTAINER_NAME</span><span class="o">=</span><span class="n">db_container_test</span>
+<span class="n">export</span> <span class="n">ITDE_DATABASE_CONTAINER_NETWORK_ALIASES</span><span class="o">=</span><span class="s2">&quot;exasol_test_database db_container_test&quot;</span>
 <span class="c1"># Database IP in the environment docker network</span>
-<span class="n">export</span> <span class="n">ENVIRONMENT_DATABASE_CONTAINER_IP_ADDRESS</span><span class="o">=</span><span class="mf">172.21.0.2</span>
-<span class="n">export</span> <span class="n">ENVIRONMENT_DATABASE_CONTAINER_VOLUMNE_NAME</span><span class="o">=</span><span class="n">db_container_test_volume</span>
+<span class="n">export</span> <span class="n">ITDE_DATABASE_CONTAINER_IP_ADDRESS</span><span class="o">=</span><span class="mf">172.21.0.2</span>
+<span class="n">export</span> <span class="n">ITDE_DATABASE_CONTAINER_VOLUMNE_NAME</span><span class="o">=</span><span class="n">db_container_test_volume</span>
 <span class="c1"># Database IP on the docker default bridge which under Linux available from the host</span>
-<span class="n">export</span> <span class="n">ENVIRONMENT_DATABASE_CONTAINER_DEFAULT_BRIDGE_IP_ADDRESS</span><span class="o">=</span><span class="mf">172.17.0.3</span>
+<span class="n">export</span> <span class="n">ITDE_DATABASE_CONTAINER_DEFAULT_BRIDGE_IP_ADDRESS</span><span class="o">=</span><span class="mf">172.17.0.3</span>
 
-<span class="n">export</span> <span class="n">ENVIRONMENT_TEST_CONTAINER_NAME</span><span class="o">=</span><span class="n">test_container_test</span>
-<span class="n">export</span> <span class="n">ENVIRONMENT_TEST_CONTAINER_NETWORK_ALIASES</span><span class="o">=</span><span class="s2">&quot;test_container test_container_test&quot;</span>
+<span class="n">export</span> <span class="n">ITDE_TEST_CONTAINER_NAME</span><span class="o">=</span><span class="n">test_container_test</span>
+<span class="n">export</span> <span class="n">ITDE_TEST_CONTAINER_NETWORK_ALIASES</span><span class="o">=</span><span class="s2">&quot;test_container test_container_test&quot;</span>
 <span class="c1"># Test Container IP in the environment docker network</span>
-<span class="n">export</span> <span class="n">ENVIRONMENT_TEST_CONTAINER_IP_ADDRESS</span><span class="o">=</span><span class="mf">172.21.0.3</span>
+<span class="n">export</span> <span class="n">ITDE_TEST_CONTAINER_IP_ADDRESS</span><span class="o">=</span><span class="mf">172.21.0.3</span>
 </pre></div>
 </div>
 </li>
@@ -731,6 +739,10 @@ user only. By this ITDE enables to reuse the same SSH keys for future sessions
 which leaves the container unchanged and hence reusable.</p>
 <p>The public key will be added as file <code class="docutils literal notranslate"><span class="pre">/root/.ssh/authorized_keys</span></code> inside the
 Docker Container to enable SSH access with public key authentication.</p>
+<p>You can use command line option <code class="docutils literal notranslate"><span class="pre">--ssh-port-forward</span></code> to specify a port on
+your host machine to which ITDE forwards the SSH port of the Docker Container
+running the Exasol database. If you do not specify a port then ITDE will
+select a random free port.</p>
 </section>
 </section>
 <section id="tested-docker-runtimes">

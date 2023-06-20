@@ -92,10 +92,23 @@ You can execute all tests in a single file with the following command:
 
 Some tests will use prebuilt Docker Containers.
 After changing the implementation you might need to rebuild the container in order to make
-your changes effective when executing the tests. 
+your changes effective when executing the tests.
 
 Please use the following command to rebuild the Docker Container:
 
 .. code-block:: shell
 
   starter_scripts/build_docker_runner_image.sh
+
+Configuring Tests
+-----------------
+
+ITDE supports tests with pytest although there currently are also tests using
+``python.unittest`` mainly in directory
+``exasol_integration_test_docker_environment/test``.  The plan is to migrate
+all tests to pytest in directory ``test``
+
+For pytest ITDE uses a pytest plugin in directory ``pytest_itde``. This plugin
+enables to configure test execution, e.g. setting the hostname, user and
+password of the database. For some configuration parameters there are also
+default values.

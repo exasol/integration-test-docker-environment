@@ -15,7 +15,6 @@ exasol\_integration\_test\_docker\_environment.testing.utils
    
       check_db_version_from_env
       close_environments
-      find_free_ports
       multiassert
    
    
