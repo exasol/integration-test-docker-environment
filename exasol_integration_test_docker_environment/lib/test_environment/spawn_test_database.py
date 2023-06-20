@@ -80,7 +80,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         self.logger.info("Try to reuse database container %s",
                          self.db_container_name)
         database_info = None
-        ssh_key = sef._get_ssh_key()
+        ssh_key = self._get_ssh_key()
         try:
             database_info = self._create_database_info(db_ip_address=db_ip_address, reused=True)
         except Exception as e:
