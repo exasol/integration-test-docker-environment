@@ -25,3 +25,4 @@ If you need further versions, please open an issue.
 ## Changes
 
 * #329: Added CLI option `--ssh-port-forward` to forward SSH port
+* #343: Added SshInfo to DatabaseInfo containing user, port and path to SSH key file
