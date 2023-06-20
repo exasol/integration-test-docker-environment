@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import Generator, Tuple, Optional
+from exasol_integration_test_docker_environment.lib.docker.container.utils import default_bridge_ip_address
 
 import luigi
 
@@ -16,6 +17,8 @@ from exasol_integration_test_docker_environment.lib.test_environment.docker_cont
 from exasol_integration_test_docker_environment.lib.test_environment.parameter.general_spawn_test_environment_parameter import \
     GeneralSpawnTestEnvironmentParameter
 from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_container import SpawnTestContainer
+from exasol_integration_test_docker_environment.lib.test_environment.shell_variables import ShellVariables
+
 
 DATABASE = "database"
 
@@ -59,83 +62,60 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
         self.create_test_environment_info_in_test_container_and_on_host(test_environment_info)
         return test_environment_info
 
-    def create_test_environment_info_in_test_container(self, test_environment_info: EnvironmentInfo,
-                                                       environment_variables: str,
-                                                       environment_variables_with_export: str,
-                                                       json: str):
+    def create_test_environment_info_in_test_container(
+            self,
+            test_environment_info: EnvironmentInfo,
+            shell_variables: ShellVariables,
+            json: str,
+    ):
         test_container_name = test_environment_info.test_container_info.container_name
         with self._get_docker_client() as docker_client:
             test_container = docker_client.containers.get(test_container_name)
             self.logger.info(f"Create test environment info in test container '{test_container_name}' at '/'")
             copy = DockerContainerCopy(test_container)
             copy.add_string_to_file("environment_info.json", json)
-            copy.add_string_to_file("environment_info.conf", environment_variables)
-            copy.add_string_to_file("environment_info.sh", environment_variables_with_export)
+            copy.add_string_to_file("environment_info.conf", shell_variables.render())
+            copy.add_string_to_file("environment_info.sh", shell_variables.render("export "))
             copy.copy("/")
 
     def create_test_environment_info_in_test_container_and_on_host(
             self, test_environment_info: EnvironmentInfo):
-        test_environment_info_base_host_path = Path(self.get_cache_path(),
-                                                    f"environments/{self.environment_name}")
-        test_environment_info_base_host_path.mkdir(exist_ok=True, parents=True)
-        self.logger.info(f"Create test environment info on the host at '{test_environment_info_base_host_path}'")
+        path = Path(self.get_cache_path(), f"environments/{self.environment_name}")
+        path.mkdir(exist_ok=True, parents=True)
+        self.logger.info(f"Create test environment info on the host at '{path}'")
 
         json = test_environment_info.to_json()
-        cache_environment_info_json_path = Path(test_environment_info_base_host_path,
-                                                "environment_info.json")
-        with cache_environment_info_json_path.open("w") as f:
+        with Path(path, "environment_info.json").open("w") as f:
             f.write(json)
 
-        if test_environment_info.test_container_info is not None:
-            test_container_name = test_environment_info.test_container_info.container_name
-        else:
-            test_container_name = ""
-        environment_variables = \
-            self.collect_environment_info_variables(test_container_name,
-                                                    test_environment_info)
-        cache_environment_info_conf_path = Path(test_environment_info_base_host_path,
-                                                "environment_info.conf")
-        with cache_environment_info_conf_path.open("w") as f:
-            f.write(environment_variables)
+        shell_variables = self.collect_shell_variables(test_environment_info)
+        with Path(path, "environment_info.conf").open("w") as f:
+            f.write(shell_variables.render())
 
-        environment_variables_with_export = ""
-        for line in environment_variables.splitlines():
-            environment_variables_with_export += f"export {line}\n"
-        cache_environment_info_sh_path = Path(test_environment_info_base_host_path, "environment_info.sh")
-        with cache_environment_info_sh_path.open("w") as f:
-            f.write(environment_variables_with_export)
+        with Path(path, "environment_info.sh").open("w") as f:
+            f.write(shell_variables.render("export "))
 
         if test_environment_info.test_container_info is not None:
-            self.create_test_environment_info_in_test_container(test_environment_info,
-                                                                environment_variables,
-                                                                environment_variables_with_export, json)
+            self.create_test_environment_info_in_test_container(
+                test_environment_info,
+                shell_variables,
+                json,
+            )
 
-    def collect_environment_info_variables(self, test_container_name: str, test_environment_info):
-        environment_variables = ""
-        environment_variables += f"ENVIRONMENT_NAME={test_environment_info.name}\n"
-        environment_variables += f"ENVIRONMENT_TYPE={test_environment_info.type}\n"
-        environment_variables += f"ENVIRONMENT_DATABASE_HOST={test_environment_info.database_info.host}\n"
-        environment_variables += f"ENVIRONMENT_DATABASE_DB_PORT={test_environment_info.database_info.db_port}\n"
-        environment_variables += f"ENVIRONMENT_DATABASE_BUCKETFS_PORT={test_environment_info.database_info.bucketfs_port}\n"
-        if test_environment_info.database_info.container_info is not None:
-            environment_variables += f"""ENVIRONMENT_DATABASE_CONTAINER_NAME={test_environment_info.database_info.container_info.container_name}\n"""
-            database_container_network_aliases = " ".join(
-                test_environment_info.database_info.container_info.network_aliases)
-            environment_variables += f"""ENVIRONMENT_DATABASE_CONTAINER_NETWORK_ALIASES="{database_container_network_aliases}"\n"""
-            environment_variables += f"""ENVIRONMENT_DATABASE_CONTAINER_IP_ADDRESS={test_environment_info.database_info.container_info.ip_address}\n"""
-            environment_variables += f"""ENVIRONMENT_DATABASE_CONTAINER_VOLUMNE_NAME={test_environment_info.database_info.container_info.volume_name}\n"""
-            with self._get_docker_client() as docker_client:
-                db_container = docker_client.containers.get(
-                    test_environment_info.database_info.container_info.container_name)
-                db_container.reload()
-                default_bridge_ip_address = db_container.attrs["NetworkSettings"]["Networks"]["bridge"]["IPAddress"]
-            environment_variables += f"""ENVIRONMENT_DATABASE_CONTAINER_DEFAULT_BRIDGE_IP_ADDRESS={default_bridge_ip_address}\n"""
-        if test_environment_info.test_container_info is not None:
-            environment_variables += f"""ENVIRONMENT_TEST_CONTAINER_NAME={test_container_name}\n"""
-            test_container_network_aliases = " ".join(test_environment_info.test_container_info.network_aliases)
-            environment_variables += f"""ENVIRONMENT_TEST_CONTAINER_NETWORK_ALIASES="{test_container_network_aliases}"\n"""
-            environment_variables += f"""ENVIRONMENT_TEST_CONTAINER_IP_ADDRESS={test_environment_info.test_container_info.ip_address}\n"""
-        return environment_variables
+    def _default_bridge_ip_address(self, test_environment_info) -> str:
+        if test_environment_info.database_info.container_info is None:
+            return None
+        container_name = test_environment_info.database_info.container_info.container_name
+        with self._get_docker_client() as docker_client:
+            db_container = docker_client.containers.get(container_name)
+            return default_bridge_ip_address(db_container)
+
+    def collect_shell_variables(self, test_environment_info) -> ShellVariables:
+        default_bridge_ip_address = self._default_bridge_ip_address(test_environment_info)
+        return ShellVariables.from_test_environment_info(
+            default_bridge_ip_address,
+            test_environment_info,
+        )
 
     def _start_database(self, attempt) \
             -> Generator[BaseTask, BaseTask, Tuple[DockerNetworkInfo, DatabaseInfo, bool, Optional[ContainerInfo]]]:

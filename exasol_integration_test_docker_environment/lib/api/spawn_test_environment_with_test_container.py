@@ -21,7 +21,6 @@ from exasol_integration_test_docker_environment \
     .lib.test_environment.parameter \
     .docker_db_test_environment_parameter import DbOsAccess
 
-
 def _cleanup(environment_info: EnvironmentInfo) -> None:
     if environment_info.test_container_info is None:
         remove_docker_container([environment_info.database_info.container_info.container_name])
@@ -38,6 +37,7 @@ def spawn_test_environment_with_test_container(
         test_container_content: TestContainerContentDescription,
         database_port_forward: Optional[int] = None,
         bucketfs_port_forward: Optional[int] = None,
+        ssh_port_forward: Optional[int] = None,
         db_mem_size: str = "2 GiB",
         db_disk_size: str = "2 GiB",
         nameserver: Tuple[str, ...] = tuple(),
@@ -71,6 +71,8 @@ def spawn_test_environment_with_test_container(
     raises: TaskRuntimeError if spawning the test environment fails
 
     """
+    def str_or_none(x: any) -> str:
+        return str(x) if x is not None else None
     parsed_db_mem_size = humanfriendly.parse_size(db_mem_size)
     if parsed_db_mem_size < humanfriendly.parse_size("1 GiB"):
         raise ArgumentConstraintError("db_mem_size", "needs to be at least 1 GiB")
@@ -91,10 +93,9 @@ def spawn_test_environment_with_test_container(
                                  target_docker_tag_prefix, "target")
     task_creator = lambda: generate_root_task(task_class=SpawnTestEnvironmentWithDockerDB,
                                               environment_name=environment_name,
-                                              database_port_forward=str(
-                                                  database_port_forward) if database_port_forward is not None else None,
-                                              bucketfs_port_forward=str(
-                                                  bucketfs_port_forward) if bucketfs_port_forward is not None else None,
+                                              database_port_forward=str_or_none(database_port_forward),
+                                              bucketfs_port_forward=str_or_none(bucketfs_port_forward),
+                                              ssh_port_forward=str_or_none(ssh_port_forward),
                                               mem_size=db_mem_size,
                                               disk_size=db_disk_size,
                                               nameservers=nameserver,

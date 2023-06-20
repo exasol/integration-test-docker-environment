@@ -46,7 +46,7 @@ class CertificateTest(unittest.TestCase):
                 self.on_host_docker_environment.environment_info.database_info.container_info.container_name
             database_network_name = \
                 self.on_host_docker_environment.environment_info.database_info.container_info.network_info.network_name
-            db_port = self.on_host_docker_environment.environment_info.database_info.db_port
+            db_port = self.on_host_docker_environment.environment_info.database_info.ports.database
 
             openssl_check_cmd = f"openssl s_client -connect {database_container}.{database_network_name}:{db_port}"
             print(f"OpenSSL cmd:{openssl_check_cmd}")

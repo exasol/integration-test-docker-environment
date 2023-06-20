@@ -70,7 +70,7 @@ class TestUpload(unittest.TestCase):
 
     def _get_bucket(self) -> Bucket:
         db_info = self.environment.environment_info.database_info
-        URL = f"http://{db_info.host}:{db_info.bucketfs_port}"
+        URL = f"http://{db_info.host}:{db_info.ports.bucketfs}"
         CREDENTAILS = {BUCKET_NAME: {"username": self.environment.bucketfs_username,
                                      "password": self.environment.bucketfs_password}}
         bucketfs = Service(URL, CREDENTAILS)

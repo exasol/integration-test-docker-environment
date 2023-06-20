@@ -56,7 +56,7 @@ class IsDatabaseReadyThread(Thread):
     def create_db_connection_command(self, exaplus_path: PurePath):
         username = self.database_credentials.db_user
         password = self.database_credentials.db_password
-        connection_options = f"""-c 'localhost:{self._database_info.db_port}' -u '{username}' -p '{password}'"""
+        connection_options = f"""-c 'localhost:{self._database_info.ports.database}' -u '{username}' -p '{password}'"""
 
         cmd = f"""{exaplus_path} {connection_options}  -sql 'select 1;' -jdbcparam 'validateservercertificate=0'"""
         bash_cmd = f"""bash -c "{cmd}" """
@@ -65,6 +65,6 @@ class IsDatabaseReadyThread(Thread):
     def create_bucketfs_connection_command(self):
         username = "w"
         password = self.database_credentials.bucketfs_write_password
-        cmd = f"""curl --silent --show-error --fail '{username}:{password}@localhost:{self._database_info.bucketfs_port}'"""
+        cmd = f"""curl --silent --show-error --fail '{username}:{password}@localhost:{self._database_info.ports.bucketfs}'"""
         bash_cmd = f"""bash -c "{cmd}" """
         return bash_cmd

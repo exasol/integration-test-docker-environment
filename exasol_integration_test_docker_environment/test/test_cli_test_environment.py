@@ -1,4 +1,5 @@
 import unittest
+from typing import List
 
 import docker.models.containers
 
@@ -29,40 +30,50 @@ class DockerTestEnvironmentTest(unittest.TestCase):
         utils.close_environments(cls.spawned_docker_test_environments, cls.test_environment)
 
     def test_db_container_started(self):
-        on_host_docker_environment = self.spawned_docker_test_environments.on_host_docker_environment
+        def assert_exactly_one(prefix: str, all: List[str], selected: List[str] = None):
+            selected = selected if selected is not None else all
+            log = self.spawned_docker_test_environments \
+                      .on_host_docker_environment \
+                      .completed_process.stdout.decode('utf8')
+            self.assertEqual(len(selected), 1, f"{prefix} in {all}.\nStartup log was: {log}")
         with ContextDockerClient() as docker_client:
             containers = [c.name for c in docker_client.containers.list() if self.docker_environment_name in c.name]
-            self.assertEqual(len(containers), 1,
-                             f"Not exactly 1 container in {containers}.\nStartup log was: "
-                             f"{on_host_docker_environment.completed_process.stdout.decode('utf8')}")
-            db_container = [c for c in containers if "db_container" in c]
-            self.assertEqual(len(db_container), 1,
-                             f"Found no db container in {containers}.\nStartup log was: "
-                             f"{on_host_docker_environment.completed_process.stdout.decode('utf8')}")
+            assert_exactly_one("Not exactly 1 container", containers)
+            db_containers = [c for c in containers if "db_container" in c]
+            assert_exactly_one("Found no db container", containers, db_containers)
 
     def test_db_available(self):
-        environment_info = self.spawned_docker_test_environments.on_host_docker_environment
-        db_container_name = environment_info.environment_info.database_info.container_info.container_name
+        db_container_name = self.spawned_docker_test_environments \
+                                .on_host_docker_environment \
+                                .environment_info \
+                                .database_info \
+                                .container_info \
+                                .container_name
         with ContextDockerClient() as docker_client:
             db_container = docker_client.containers.get(db_container_name)
-            exit_result = db_container.exec_run(self.create_db_connection_command(db_container))
-            exit_code = exit_result[0]
-            output = exit_result[1]
-            self.assertEqual(exit_code, 0,
-                             f"Error while executing 'exaplus' in test container got output\n {output}.")
+            command = self.db_connection_command(db_container)
+            exit_code, output = db_container.exec_run(command)
+            self.assertEqual(
+                exit_code,
+                0,
+                f"Error while executing 'exaplus' in test container. Got output:\n {output}",
+            )
 
-    def create_db_connection_command(self, db_container: docker.models.containers.Container):
-        spawned_docker_test_environments = self.spawned_docker_test_environments
-        username = spawned_docker_test_environments.on_host_docker_environment.db_username
-        password = spawned_docker_test_environments.on_host_docker_environment.db_password
-        db_host = spawned_docker_test_environments.on_host_docker_environment.environment_info.database_info.host
-        db_port = spawned_docker_test_environments.on_host_docker_environment.environment_info.database_info.db_port
-        db_version = spawned_docker_test_environments.on_host_docker_environment.docker_db_image_version
-        connection_options = f"-c '{db_host}:{db_port}' -u '{username}' -p '{password}'"
+    def db_connection_command(self, db_container: docker.models.containers.Container):
+        on_host = self.spawned_docker_test_environments.on_host_docker_environment
+        db_info = on_host.environment_info.database_info
+        connection_options = (
+            f"-c '{db_info.host}:{db_info.ports.database}' "
+            f"-u '{on_host.db_username}' "
+            f"-p '{on_host.db_password}'"
+        )
         exaplus = find_exaplus(db_container)
-        cmd = f"""{exaplus} {connection_options}  -sql 'select 1;' -jdbcparam 'validateservercertificate=0'"""
-        bash_cmd = f"""bash -c "{cmd}" """
-        return bash_cmd
+        command = (
+            f"{exaplus} {connection_options} "
+            "-sql 'select 1;' "
+            "-jdbcparam 'validateservercertificate=0'"
+        )
+        return f'bash -c "{command}" '
 
 
 if __name__ == '__main__':

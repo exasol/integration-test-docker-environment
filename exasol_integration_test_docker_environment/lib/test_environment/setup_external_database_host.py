@@ -10,8 +10,11 @@ from exasol_integration_test_docker_environment.lib.base.json_pickle_parameter i
 from exasol_integration_test_docker_environment.lib.data.database_credentials import DatabaseCredentialsParameter
 from exasol_integration_test_docker_environment.lib.data.database_info import DatabaseInfo
 from exasol_integration_test_docker_environment.lib.data.docker_network_info import DockerNetworkInfo
-from exasol_integration_test_docker_environment.lib.test_environment.parameter.external_test_environment_parameter import \
+from exasol_integration_test_docker_environment \
+    .lib.test_environment.parameter.external_test_environment_parameter import \
     ExternalDatabaseXMLRPCParameter, ExternalDatabaseHostParameter
+from exasol_integration_test_docker_environment \
+    .lib.test_environment.ports import Ports
 
 
 class SetupExternalDatabaseHost(DependencyLoggerBaseTask,
@@ -28,10 +31,12 @@ class SetupExternalDatabaseHost(DependencyLoggerBaseTask,
                 self.external_exasol_db_host == "127.0.01":
             database_host = self.network_info.gateway
         self.setup_database()
-        database_info = DatabaseInfo(host=database_host,
-                                     db_port=self.external_exasol_db_port,
-                                     bucketfs_port=self.external_exasol_bucketfs_port,
-                                     reused=False)
+        ports = Ports(
+            database=self.external_exasol_db_port,
+            bucketfs=self.external_exasol_bucketfs_port,
+            ssh=self.external_exasol_ssh_port,
+        )
+        database_info = DatabaseInfo(host=database_host, ports=ports, reused=False)
         self.return_object(database_info)
 
     def setup_database(self):

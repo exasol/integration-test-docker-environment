@@ -71,7 +71,7 @@ class TestPopulateData(unittest.TestCase):
             db_info = self.environment.environment_info.database_info
             db_user_name = self.environment.db_username
             db_password = self.environment.db_password
-            cmd = f"$EXAPLUS -x -q -c '{db_info.host}:{db_info.db_port}' " \
+            cmd = f"$EXAPLUS -x -q -c '{db_info.host}:{db_info.ports.database}' " \
                   f"-u '{db_user_name}' -p '{db_password}' -sql '{sql}' " \
                   f"-jdbcparam 'validateservercertificate=0'"
 

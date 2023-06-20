@@ -19,7 +19,8 @@ from exasol_integration_test_docker_environment \
         get_class,
         get_test_flavor,
 )
-from exasol_integration_test_docker_environment.testing.utils import find_free_ports
+from exasol_integration_test_docker_environment \
+    .lib.test_environment.ports import Ports
 
 
 class ApiTestEnvironment:
@@ -46,7 +47,7 @@ class ApiTestEnvironment:
         except Exception as e:
             print(e, file=stderr)
 
-    def _get_default_test_environment(self, name: str, database_port: int, bucketfs_port: int):
+    def _get_default_test_environment(self, name: str, ports: Ports):
         return ExaslctDockerTestEnvironment(
             name=self.name + "_" + name,
             database_host="localhost",
@@ -54,8 +55,8 @@ class ApiTestEnvironment:
             db_password="exasol",
             bucketfs_username="w",
             bucketfs_password="write",
-            database_port=database_port,
-            bucketfs_port=bucketfs_port)
+            ports=ports,
+        )
 
     def spawn_docker_test_environment_with_test_container(self, name: str,
                                                           test_container_content: TestContainerContentDescription,
@@ -63,29 +64,37 @@ class ApiTestEnvironment:
             -> ExaslctDockerTestEnvironment:
         if additional_parameter is None:
             additional_parameter = dict()
-        database_port, bucketfs_port = find_free_ports(2)
-        on_host_parameter = self._get_default_test_environment(name, database_port, bucketfs_port)
+        ports = Ports.random_free()
+        on_host_parameter = self._get_default_test_environment(name, ports)
         docker_db_image_version = on_host_parameter.docker_db_image_version
+        ports = on_host_parameter.ports
         on_host_parameter.environment_info, on_host_parameter.clean_up = \
-            spawn_test_environment_with_test_container(environment_name=on_host_parameter.name,
-                                                       database_port_forward=on_host_parameter.database_port,
-                                                       bucketfs_port_forward=on_host_parameter.bucketfs_port,
-                                                       docker_db_image_version=docker_db_image_version,
-                                                       test_container_content=test_container_content,
-                                                       **additional_parameter)
+            spawn_test_environment_with_test_container(
+                environment_name=on_host_parameter.name,
+                database_port_forward=None if ports is None else ports.database,
+                bucketfs_port_forward=None if ports is None else ports.bucketfs,
+                ssh_port_forward=None if ports is None else ports.ssh,
+                docker_db_image_version=docker_db_image_version,
+                test_container_content=test_container_content,
+                **additional_parameter,
+            )
         return on_host_parameter
 
-    def spawn_docker_test_environment(self, name: str,
-                                      additional_parameter: Dict[str, Any] = None) \
-            -> ExaslctDockerTestEnvironment:
+    def spawn_docker_test_environment(
+            self,
+            name: str,
+            additional_parameter: Dict[str, Any] = None,
+    ) -> ExaslctDockerTestEnvironment:
         if additional_parameter is None:
             additional_parameter = dict()
-        database_port, bucketfs_port = find_free_ports(2)
-        on_host_parameter = self._get_default_test_environment(name, database_port, bucketfs_port)
-        on_host_parameter.environment_info, on_host_parameter.clean_up = \
-            spawn_test_environment(environment_name=on_host_parameter.name,
-                                   database_port_forward=on_host_parameter.database_port,
-                                   bucketfs_port_forward=on_host_parameter.bucketfs_port,
-                                   docker_db_image_version=on_host_parameter.docker_db_image_version,
-                                   **additional_parameter)
-        return on_host_parameter
+        ports = Ports.random_free()
+        on_host = self._get_default_test_environment(name, ports)
+        on_host.environment_info, on_host.clean_up = spawn_test_environment(
+            environment_name=on_host.name,
+            database_port_forward=on_host.ports.database,
+            bucketfs_port_forward=on_host.ports.bucketfs,
+            ssh_port_forward=on_host.ports.ssh,
+            docker_db_image_version=on_host.docker_db_image_version,
+            **additional_parameter,
+        )
+        return on_host

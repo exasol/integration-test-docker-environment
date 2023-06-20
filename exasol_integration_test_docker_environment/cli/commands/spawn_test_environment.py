@@ -46,6 +46,13 @@ from exasol_integration_test_docker_environment.lib.api.common import add_option
     help="Host port to which the BucketFS port gets forwarded",
 )
 @click.option(
+    "--ssh-port-forward",
+    type=int,
+    default=None,
+    show_default=True,
+    help="Host port to which the SSH port gets forwarded. If not specified then ITDE selects a random free port.",
+)
+@click.option(
     "--db-mem-size",
     type=str,
     default="2 GiB",
@@ -83,6 +90,7 @@ def spawn_test_environment(
         environment_name: str,
         database_port_forward: Optional[int],
         bucketfs_port_forward: Optional[int],
+        ssh_port_forward: Optional[int],
         db_mem_size: str,
         db_disk_size: str,
         nameserver: Tuple[str, ...],
@@ -117,6 +125,7 @@ def spawn_test_environment(
                 environment_name,
                 database_port_forward,
                 bucketfs_port_forward,
+                ssh_port_forward,
                 db_mem_size,
                 db_disk_size,
                 nameserver,

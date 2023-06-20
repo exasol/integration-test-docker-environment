@@ -134,7 +134,7 @@ class UploadFileToBucketFS(DockerBaseTask):
 
     def generate_bucket_config(self, bucket_name: str) -> BucketConfig:
         connection_config = BucketFSConnectionConfig(
-            host=self._database_info.host, port=int(self._database_info.bucketfs_port),
+            host=self._database_info.host, port=int(self._database_info.ports.bucketfs),
             user="w", pwd=str(self.bucketfs_write_password),
             is_https=False)
         bucketfs_config = BucketFSConfig(

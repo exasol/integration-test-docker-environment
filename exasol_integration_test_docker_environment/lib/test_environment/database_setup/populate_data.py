@@ -31,7 +31,7 @@ class PopulateTestDataToDatabase(DockerBaseTask, DatabaseCredentialsParameter):
         with self._get_docker_client() as docker_client:
             test_container = docker_client.containers.get(self._test_container_info.container_name)
             cmd = f"cd {data_path_within_test_container}; " \
-                  f"$EXAPLUS -c '{self._database_info.host}:{self._database_info.db_port}' " \
+                  f"$EXAPLUS -c '{self._database_info.host}:{self._database_info.ports.database}' " \
                   f"-x -u '{username}' -p '{password}' -f {data_file_within_data_path} " \
                   f"-jdbcparam 'validateservercertificate=0'"
 

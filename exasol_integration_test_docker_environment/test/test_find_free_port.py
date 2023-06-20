@@ -1,6 +1,6 @@
 import unittest
 
-from exasol_integration_test_docker_environment.testing.utils import find_free_ports
+from exasol_integration_test_docker_environment.lib.test_environment.ports import find_free_ports
 
 
 class FindFreePortTest(unittest.TestCase):

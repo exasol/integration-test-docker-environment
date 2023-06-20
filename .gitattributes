@@ -1,2 +1,6 @@
+*.sh          text eol=lf
+.sh.sha512sum text eol=lf
+EXAConf       text eol=lf
+
 poetry.lock linguist-generated=true
 exasol_integration_test_docker_environment/docker_db_config/**/* linguist-generated=true

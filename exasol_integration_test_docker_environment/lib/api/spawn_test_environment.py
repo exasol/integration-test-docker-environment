@@ -36,6 +36,7 @@ def spawn_test_environment(
         environment_name: str,
         database_port_forward: Optional[int] = None,
         bucketfs_port_forward: Optional[int] = None,
+        ssh_port_forward: Optional[int] = None,
         db_mem_size: str = "2 GiB",
         db_disk_size: str = "2 GiB",
         nameserver: Tuple[str, ...] = tuple(),
@@ -68,6 +69,8 @@ def spawn_test_environment(
     raises: TaskRuntimeError if spawning the test environment fails
 
     """
+    def str_or_none(x: any) -> str:
+        return str(x) if x is not None else None
     parsed_db_mem_size = humanfriendly.parse_size(db_mem_size)
     if parsed_db_mem_size < humanfriendly.parse_size("1 GiB"):
         raise ArgumentConstraintError("db_mem_size", "needs to be at least 1 GiB")
@@ -88,10 +91,9 @@ def spawn_test_environment(
                                  target_docker_tag_prefix, "target")
     task_creator = lambda: generate_root_task(task_class=SpawnTestEnvironmentWithDockerDB,
                                               environment_name=environment_name,
-                                              database_port_forward=str(
-                                                  database_port_forward) if database_port_forward is not None else None,
-                                              bucketfs_port_forward=str(
-                                                  bucketfs_port_forward) if bucketfs_port_forward is not None else None,
+                                              database_port_forward=str_or_none(database_port_forward),
+                                              bucketfs_port_forward=str_or_none(bucketfs_port_forward),
+                                              ssh_port_forward=str_or_none(ssh_port_forward),
                                               mem_size=db_mem_size,
                                               disk_size=db_disk_size,
                                               nameservers=nameserver,

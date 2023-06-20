@@ -11,7 +11,7 @@
     # List of networks for this cluster: 'private' is mandatory, 'public' is optional.
     Networks = private
     # Comma-separated list of nameservers for this cluster.
-    NameServers = {{ name_servers }} 
+    NameServers = {{ name_servers }}
     Timezone = Europe/Berlin
     # Nr. of hugepages ('0' = disabled, 'host' = manually configured on the host, 'auto' = set automatically based on DB config)
     Hugepages = 0
@@ -39,7 +39,7 @@
     DeviceType = file
     # Comma-separated list of volumes to be mounted in all containers (e. g. '/mnt/my_data:/exa/my_data:rw' )
     # These user-defined volumes are mounted additionally to the internal ones (like the node root volume)
-    AdditionalVolumes = 
+    AdditionalVolumes =
 
 [Groups]
     [[root]]
@@ -61,6 +61,7 @@
         Group = root
         LoginEnabled = True
         AdditionalGroups = exausers, exadbadm, exastoradm, exabfsadm, exaadm
+        AuthorizedKeys = {{authorized_keys}}
     [[exadefusr]]
         ID = 500
         Group = exausers
@@ -69,7 +70,7 @@
 
 [Node : 11]
     PrivateNet = {{private_network}}
-    PublicNet = 
+    PublicNet =
     Name = n11
     UUID = A5F8F92113A34BA4B0A48D5397423BBA5CF95161
     DockerVolume = n11
@@ -85,7 +86,7 @@
     # Enable or disable background recovery / data restoration (does not affect on-demand recovery)
     BgRecEnabled = True
     # Max. throughput for background recovery / data restoration (in MiB/s)
-    BgRecLimit = 
+    BgRecLimit =
     # Space usage threshold (in percent, per node) for sending a warning
     SpaceWarnThreshold = 90
 
