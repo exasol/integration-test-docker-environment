@@ -6,7 +6,7 @@ import pytest
 
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.lib.base.ssh_access import SshKey, SshKeyCache
-from .helpers import container_named
+from test.integration.helpers import container_named
 
 
 def test_generate_ssh_key_file(api_database):
