@@ -21,7 +21,7 @@ from exasol_integration_test_docker_environment.lib.data.docker_network_info imp
 from exasol_integration_test_docker_environment.lib.docker.images.create.utils.pull_log_handler import PullLogHandler
 from exasol_integration_test_docker_environment.lib.docker.images.image_info import ImageInfo
 from exasol_integration_test_docker_environment.lib.test_environment.db_version import DbVersion
-from exasol_integration_test_docker_environment.lib.data.ssh_info.py import SshInfo
+from exasol_integration_test_docker_environment.lib.data.ssh_info import SshInfo
 from exasol_integration_test_docker_environment.lib.test_environment.ports import (
     find_free_ports,
     Ports,
