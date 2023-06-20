@@ -91,7 +91,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
     def _get_ssh_key(self) -> SshKey:
         if self.ssh_key_file:
             return SshKey.read_from(self.ssh_key_file)
-        self.ssh_key_file = SshCache().private_key
+        self.ssh_key_file = SshKeyCache().private_key
         return SshKey.from_cache()
 
     def _handle_output(self, output_generator, image_info: ImageInfo):
