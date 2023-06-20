@@ -38,10 +38,6 @@ class PortsType(type):
     def docker(self) -> 'Ports':
         return Ports(database=8888, bucketfs=6583, ssh=22)
 
-    @property
-    def forward(self) -> 'Ports':
-        return Ports(database=8563, bucketfs=6583, ssh=20002)
-
 
 class Ports(metaclass=PortsType):
     def __init__(self, database: int, bucketfs: int, ssh: Optional[int] = None):

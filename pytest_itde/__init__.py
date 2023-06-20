@@ -5,6 +5,7 @@ import pyexasol
 import pytest
 
 from pytest_itde import config
+from exasol_integration_test_docker_environment.lib.test_environment.ports import Ports
 
 EXASOL = config.OptionGroup(
     prefix="exasol",
@@ -18,7 +19,7 @@ EXASOL = config.OptionGroup(
         {
             "name": "port",
             "type": int,
-            "default": 8888, # replace by Ports.docker.database ?
+            "default": Ports.docker.database,
             "help_text": "Port on which the exasol db is listening",
         },
         {

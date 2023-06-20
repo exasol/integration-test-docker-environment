@@ -227,7 +227,7 @@ The python setup script creates configuration files on the host and in
 the test container.
 
 On the host the container information get stored in the build output
-directory usually under ``.build_output/cache/<ENVIRONMENT_NAME>/*``. In
+directory usually under ``.build_output/cache/<ITDE_NAME>/*``. In
 the test container the config file is stored at the root directory
 ``/``.
 
@@ -239,26 +239,26 @@ The following config files are available:
 
    ::
 
-      export ENVIRONMENT_NAME=test
-      export ENVIRONMENT_TYPE=EnvironmentType.docker_db
+      export ITDE_NAME=test
+      export ITDE_TYPE=EnvironmentType.docker_db
 
       # Database IP in environment docker network
-      export ENVIRONMENT_DATABASE_HOST=172.21.0.2
-      export ENVIRONMENT_DATABASE_DB_PORT=8888
-      export ENVIRONMENT_DATABASE_BUCKETFS_PORT=6583
-      export ENVIRONMENT_DATABASE_SSH_PORT=22
-      export ENVIRONMENT_DATABASE_CONTAINER_NAME=db_container_test
-      export ENVIRONMENT_DATABASE_CONTAINER_NETWORK_ALIASES="exasol_test_database db_container_test"
+      export ITDE_DATABASE_HOST=172.21.0.2
+      export ITDE_DATABASE_DB_PORT=8888
+      export ITDE_DATABASE_BUCKETFS_PORT=6583
+      export ITDE_DATABASE_SSH_PORT=22
+      export ITDE_DATABASE_CONTAINER_NAME=db_container_test
+      export ITDE_DATABASE_CONTAINER_NETWORK_ALIASES="exasol_test_database db_container_test"
       # Database IP in the environment docker network
-      export ENVIRONMENT_DATABASE_CONTAINER_IP_ADDRESS=172.21.0.2
-      export ENVIRONMENT_DATABASE_CONTAINER_VOLUMNE_NAME=db_container_test_volume
+      export ITDE_DATABASE_CONTAINER_IP_ADDRESS=172.21.0.2
+      export ITDE_DATABASE_CONTAINER_VOLUMNE_NAME=db_container_test_volume
       # Database IP on the docker default bridge which under Linux available from the host
-      export ENVIRONMENT_DATABASE_CONTAINER_DEFAULT_BRIDGE_IP_ADDRESS=172.17.0.3
+      export ITDE_DATABASE_CONTAINER_DEFAULT_BRIDGE_IP_ADDRESS=172.17.0.3
 
-      export ENVIRONMENT_TEST_CONTAINER_NAME=test_container_test
-      export ENVIRONMENT_TEST_CONTAINER_NETWORK_ALIASES="test_container test_container_test"
+      export ITDE_TEST_CONTAINER_NAME=test_container_test
+      export ITDE_TEST_CONTAINER_NETWORK_ALIASES="test_container test_container_test"
       # Test Container IP in the environment docker network
-      export ENVIRONMENT_TEST_CONTAINER_IP_ADDRESS=172.21.0.3
+      export ITDE_TEST_CONTAINER_IP_ADDRESS=172.21.0.3
 
 -  environment_info.json: Contains the EnvironmentInfo objects pickled
    with JsonPickle

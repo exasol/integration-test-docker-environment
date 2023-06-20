@@ -28,7 +28,7 @@ def test_udf_execution(api_database):
 
     with api_database() as db:
         dbinfo = db.environment_info.database_info
-        dsn = f"{dbinfo.host}:{dbinfo.db_port}"
+        dsn = f"{dbinfo.host}:{dbinfo.ports.database}"
         connection = pyexasol.connect(dsn=dsn, user="sys", password="exasol")
         if DbVersion.from_db_version_str(db.docker_db_image_version).major == 7:
             wait_until_container_is_unpacked()
