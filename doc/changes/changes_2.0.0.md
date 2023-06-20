@@ -24,18 +24,4 @@ If you need further versions, please open an issue.
 
 ## Changes
 
-* #301: Added commandline option `--db-os-access`
-* #302: Added support to create an SSH key for accessing Docker Container
-* #241: Renamed environment variable for test execution from `GOOGLE_CLOUD_BUILD` to `RUN_SLC_TESTS_WITHIN_CONTAINER`
-* #190: Added support for the Exasol 8.0 Docker-DB prerelease version
-* #326: Changed folder for SSH keys to `~/.cache/exasol/itde/`
-* #303: Added authorized_keys to Docker Container for SSH access
-
-## 1.7.0
-
 * #329: Added CLI option `--ssh-port-forward` to forward SSH port
-
-## 1.7.1
-* #337: Added Docker-DB 8.18.1
-* #350: TaskRuntimeError will be raised as chained exception with all task failures.
-
