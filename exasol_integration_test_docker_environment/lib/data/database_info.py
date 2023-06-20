@@ -14,7 +14,7 @@ class DatabaseInfo(Info):
             ports: Ports,
             reused: bool,
             container_info: ContainerInfo = None,
-            SshInfo = None,
+            ssh_info: SshInfo = None,
     ):
         self.container_info = container_info
         self.ports = ports
