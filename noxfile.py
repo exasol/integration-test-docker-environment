@@ -214,3 +214,11 @@ def run_minimal_tests(session: nox.Session, db_version: str):
 def get_all_db_versions(session: nox.Session):
     """Returns all, known, db-versions as JSON string"""
     print(json.dumps(get_db_versions()))
+
+
+@nox.session(name="release", python=False)
+def release(session: nox.Session):
+    project = toml.load(ROOT / "pyproject.toml")
+    version = project["tool"]["poetry"]["version"]
+    session.run("git", "tag", version)
+    session.run("git", "push", "origin", version)
