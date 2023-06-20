@@ -39,7 +39,6 @@ class StoppableBaseTask(TimeableBaseTask):
 
     def handle_failure(self, exception, exception_tb):
         if not isinstance(exception, StoppingFurtherExecution):
-            #            self.logger.error("Task %s failed. Got %s(%s).",self.task_id, type(exception), str(exception))
             with self.get_failure_log_path().open("w") as f:
                 f.write("%s" % exception_tb)
             if not self.failed_target.exists():
@@ -51,10 +50,10 @@ class StoppableBaseTask(TimeableBaseTask):
         failures.update(self.collect_failures_of_child_tasks())
         if self.get_failure_log_path().exists():
             with self.get_failure_log_path().open("r") as f:
-                exception = f.read()
+                exception = f.read().strip()
                 prefix = '    '
-                formated_exception = prefix + prefix.join(exception.splitlines(True))
-                failure_message = "- %s:\n%s" % (self.task_id, formated_exception)
+                formatted_exception = prefix + prefix.join(exception.splitlines(True))
+                failure_message = "- %s:\n%s" % (self.task_id, formatted_exception)
                 failures[failure_message] = None
 
         return failures
