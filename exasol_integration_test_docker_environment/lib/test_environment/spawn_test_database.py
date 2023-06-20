@@ -53,7 +53,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
     certificate_volume_name = luigi.OptionalParameter(None, significant=False)
     additional_db_parameter = luigi.ListParameter()
     ssh_user = luigi.Parameter("root")
-    ssh_key_file = luigi.OptionalParameter()
+    ssh_key_file = luigi.OptionalParameter(None, significant=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
