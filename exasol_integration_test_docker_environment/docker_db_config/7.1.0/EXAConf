@@ -73,7 +73,7 @@
         Group = root
         LoginEnabled = True
         AdditionalGroups = exausers, exadbadm, exastoradm, exabfsadm, exaadm
-        AuthorizedKeys = {{ authorized_keys }}
+        AuthorizedKeys = {{authorized_keys}}
     [[exadefusr]]
         ID = 500
         Group = exausers
