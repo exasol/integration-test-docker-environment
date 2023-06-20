@@ -22,6 +22,7 @@ def test_AbstractSpawnTestEnvironment():
         container_info = container_info,
     )
     test_container_info = Mock(
+        container_name = "test-container-name",
         network_aliases = ["tcna-1", "tcna-2"],
         ip_address = "tc-ip",
     )
@@ -48,21 +49,20 @@ def test_AbstractSpawnTestEnvironment():
         environment_name="env",
     )
     testee._get_docker_client = MagicMock(return_value=docker_client_context())
-    actual = testee.collect_environment_info_variables("test-container-name", test_environment)
-    print(f'{actual}')
-    assert actual.strip() == cleandoc("""
-        ENVIRONMENT_NAME=name
-        ENVIRONMENT_TYPE=type
-        ENVIRONMENT_DATABASE_HOST=db-host
-        ENVIRONMENT_DATABASE_DB_PORT=1
-        ENVIRONMENT_DATABASE_BUCKETFS_PORT=2
-        ENVIRONMENT_DATABASE_SSH_PORT=3
-        ENVIRONMENT_DATABASE_CONTAINER_NAME=container-name
-        ENVIRONMENT_DATABASE_CONTAINER_NETWORK_ALIASES="cna-1 cna-2"
-        ENVIRONMENT_DATABASE_CONTAINER_IP_ADDRESS=container-ip
-        ENVIRONMENT_DATABASE_CONTAINER_VOLUMNE_NAME=container-volume
-        ENVIRONMENT_DATABASE_CONTAINER_DEFAULT_BRIDGE_IP_ADDRESS=ip-address
-        ENVIRONMENT_TEST_CONTAINER_NAME=test-container-name
-        ENVIRONMENT_TEST_CONTAINER_NETWORK_ALIASES="tcna-1 tcna-2"
-        ENVIRONMENT_TEST_CONTAINER_IP_ADDRESS=tc-ip
+    actual = testee.collect_shell_variables(test_environment)
+    assert actual.render().strip() == cleandoc("""
+        ITDE_NAME=name
+        ITDE_TYPE=type
+        ITDE_DATABASE_HOST=db-host
+        ITDE_DATABASE_DB_PORT=1
+        ITDE_DATABASE_BUCKETFS_PORT=2
+        ITDE_DATABASE_SSH_PORT=3
+        ITDE_DATABASE_CONTAINER_NAME=container-name
+        ITDE_DATABASE_CONTAINER_NETWORK_ALIASES="cna-1 cna-2"
+        ITDE_DATABASE_CONTAINER_IP_ADDRESS=container-ip
+        ITDE_DATABASE_CONTAINER_VOLUMNE_NAME=container-volume
+        ITDE_DATABASE_CONTAINER_DEFAULT_BRIDGE_IP_ADDRESS=ip-address
+        ITDE_TEST_CONTAINER_NAME=test-container-name
+        ITDE_TEST_CONTAINER_NETWORK_ALIASES="tcna-1 tcna-2"
+        ITDE_TEST_CONTAINER_IP_ADDRESS=tc-ip
         """)
