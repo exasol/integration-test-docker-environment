@@ -4,9 +4,6 @@ from exasol_integration_test_docker_environment.lib.test_environment.ports impor
 from exasol_integration_test_docker_environment.lib.data.ssh_info import SshInfo
 
 
-# Replacing former separate parameters bucketfs_port_forward and
-# database_port_forward by a single parameter named ports is a breaking change
-# in the API.
 class DatabaseInfo(Info):
     def __init__(
             self,
