@@ -33,6 +33,7 @@ class PortsType(type):
     - docker
     - forward
     """
+
     @property
     def default_ports(self) -> 'Ports':
         return Ports(database=8888, bucketfs=6583, ssh=22)
