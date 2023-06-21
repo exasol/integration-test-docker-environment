@@ -241,6 +241,7 @@
 <li class="toctree-l5"><a class="reference internal" href="../api/exasol_integration_test_docker_environment.lib.data.docker_volume_info.html">exasol_integration_test_docker_environment.lib.data.docker_volume_info</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/exasol_integration_test_docker_environment.lib.data.environment_info.html">exasol_integration_test_docker_environment.lib.data.environment_info</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/exasol_integration_test_docker_environment.lib.data.environment_type.html">exasol_integration_test_docker_environment.lib.data.environment_type</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/exasol_integration_test_docker_environment.lib.data.ssh_info.html">exasol_integration_test_docker_environment.lib.data.ssh_info</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/exasol_integration_test_docker_environment.lib.data.test_container_content_description.html">exasol_integration_test_docker_environment.lib.data.test_container_content_description</a></li>
 </ul>
 </li>
@@ -477,13 +478,16 @@
 <section id="summary">
 <h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">#</a></h2>
 <p>Version 2.0.0 of ITDE comes with breaking changes as public API class <code class="docutils literal notranslate"><span class="pre">DatabaseInfo</span></code> has been changed.  Former separate attributes <code class="docutils literal notranslate"><span class="pre">database_port_forward</span></code>and <code class="docutils literal notranslate"><span class="pre">bucketfs_port_forward</span></code> have been replaced by a single attribute <code class="docutils literal notranslate"><span class="pre">port</span></code> set to an instance of <code class="docutils literal notranslate"><span class="pre">PortForwarding</span></code> with attributes <code class="docutils literal notranslate"><span class="pre">database</span></code>, <code class="docutils literal notranslate"><span class="pre">bucketfs</span></code>, and <code class="docutils literal notranslate"><span class="pre">ssh</span></code>.</p>
+<p>Previous versions of the ITDE used <code class="docutils literal notranslate"><span class="pre">docker_exec</span></code> to access the Docker Container, e.g. to analyze the content of logfiles or execute some shell commands. In future versions of the Exasol Docker-DB the format of the Docker Containers might change so that <code class="docutils literal notranslate"><span class="pre">docker_exec</span></code> is no longer possible. Instead ITDE will then need to use SSH access.</p>
+<p>The current release therefore enhances ITDE to enable to access the Docker Container via SSH.  The user can select the docker access method with command line option <code class="docutils literal notranslate"><span class="pre">--db-os-access</span></code> and can specify a port number to which ITDE forwards the SSH port of the Docker Container, see User Guide.</p>
+<p>Additionally the directory for storing the randomly generated SSH keys has been moved to <code class="docutils literal notranslate"><span class="pre">~/.cache/exasol/itde/</span></code>. By that ITDE can restrict file permissions allowing access only by the current user.</p>
 <p>T.B.D.</p>
 <section id="supported-exasol-versions">
 <h3>Supported Exasol Versions<a class="headerlink" href="#supported-exasol-versions" title="Permalink to this headline">#</a></h3>
 <ul class="simple">
 <li><p><strong>7.0</strong>: up to 7.0.20, <strong>except 7.0.5</strong></p></li>
 <li><p><strong>7.1</strong>: up to 7.1.17</p></li>
-<li><p><strong>8.17.0</strong> and 8.18.1</p></li>
+<li><p><strong>8</strong>: 8.18.1</p></li>
 </ul>
 <p>If you need further versions, please open an issue.</p>
 </section>
@@ -495,6 +499,7 @@
 <h2>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>#329: Added CLI option <code class="docutils literal notranslate"><span class="pre">--ssh-port-forward</span></code> to forward SSH port</p></li>
+<li><p>#343: Added SshInfo to DatabaseInfo containing user, port and path to SSH key file</p></li>
 </ul>
 </section>
 </section>
