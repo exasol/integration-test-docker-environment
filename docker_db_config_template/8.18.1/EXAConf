@@ -84,7 +84,7 @@
         Group = root
         LoginEnabled = True
         AdditionalGroups = exausers, exaadm, exadbadm, exastoradm, exabfsadm, exasaasadm
-        AuthorizedKeys = {{authorized_keys}}
+        AuthorizedKeys = {{ authorized_keys }}
     [[exadefusr]]
         ID = 500
         Group = exausers
@@ -97,7 +97,7 @@
         AdditionalGroups = exasaasadm,
 
 [Node : 11]
-    PrivateNet = {{private_network}}
+    PrivateNet = {{ private_network }}
     PublicNet =
     Name = n11
     # Affinity decides how this node is used in the cluster. i.e, the possibility to become master
@@ -156,7 +156,7 @@
     # Unique id of this database.
     ID = aCbUZhU3R8eEc0UIDS7wQw
     # Version nr. of this database.
-    Version = {{db_version}}
+    Version = {{ db_version }}
     # Memory size over all nodes (e. g. '1 TiB').
     MemSize = {{ mem_size }}
     Port = 8888

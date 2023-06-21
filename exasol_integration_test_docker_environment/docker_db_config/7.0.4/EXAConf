@@ -61,7 +61,7 @@
         Group = root
         LoginEnabled = True
         AdditionalGroups = exausers, exadbadm, exastoradm, exabfsadm, exaadm
-        AuthorizedKeys = {{authorized_keys}}
+        AuthorizedKeys = {{ authorized_keys }}
     [[exadefusr]]
         ID = 500
         Group = exausers
@@ -69,7 +69,7 @@
         AdditionalGroups = exadbadm, exastoradm, exabfsadm, exaadm
 
 [Node : 11]
-    PrivateNet = {{private_network}}
+    PrivateNet = {{ private_network }}
     PublicNet =
     Name = n11
     UUID = A5F8F92113A34BA4B0A48D5397423BBA5CF95161
@@ -118,7 +118,7 @@
 # An EXASOL database
 [DB : DB1]
     # Version nr. of this database.
-    Version = {{db_version}}
+    Version = {{ db_version }}
     # Memory size over all nodes (e. g. '1 TiB').
     MemSize = {{ mem_size }}
     Port = 8888

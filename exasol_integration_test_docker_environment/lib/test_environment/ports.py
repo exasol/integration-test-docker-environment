@@ -26,6 +26,14 @@ def find_free_ports(num_ports: int) -> List[int]:
 
 
 class PortsType(type):
+    """
+    The following properties are read-only class attributes:
+    - default_ports
+    - external
+    - docker
+    - forward
+    """
+
     @property
     def default_ports(self) -> 'Ports':
         return Ports(database=8888, bucketfs=6583, ssh=22)
