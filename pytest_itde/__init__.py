@@ -43,7 +43,7 @@ BUCKETFS = config.OptionGroup(
         {
             "name": "url",
             "type": str,
-            "default": "http://127.0.0.1:6666",
+            "default": f"http://127.0.0.1:{Ports.default.bucketfs}",
             "help_text": "Base url used to connect to the bucketfs service",
         },
         {
@@ -166,7 +166,8 @@ def _bootstrap_db(itde_config, exasol_config, bucketfs_config):
             environment_name=name,
             database_port_forward=exasol.port,
             bucketfs_port_forward=bucketfs_url.port,
-            ssh_port_forward=20002,
+            # should this rather be passed as a parameter to _bootstrap_db()?
+            ssh_port_forward=Ports.forward.ssh,
             db_mem_size="4GB",
             docker_db_image_version=itde.db_version,
         )

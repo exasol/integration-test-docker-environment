@@ -2,6 +2,7 @@ import pytest
 
 from pytest_itde import TestSchemas
 from pytest_itde.config import Option, OptionGroup
+from exasol_integration_test_docker_environment.lib.test_environment.ports import Ports
 
 OPTIONS = (
     Option(
@@ -87,7 +88,7 @@ EXASOL_OPTIONS = (
     {
         "name": "port",
         "type": int,
-        "default": 8888,
+        "default": Ports.default.database,
         "help_text": "Port on which the exasol db is listening",
     },
     {
@@ -108,7 +109,7 @@ BUCKETFS_OPTIONS = (
     {
         "name": "url",
         "type": str,
-        "default": "http://127.0.0.1:6666",
+        "default": f"http://127.0.0.1:{Ports.default.bucketfs}",
         "help_text": "Base url used to connect to the bucketfs service",
     },
     {
@@ -155,7 +156,7 @@ def test_option_group_prefix_property(group, expected):
                     prefix="exasol",
                     name="port",
                     type=int,
-                    default=8888,
+                    default=Ports.default.database,
                     help_text="Port on which the exasol db is listening",
                 ),
                 Option(

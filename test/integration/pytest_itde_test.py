@@ -47,7 +47,7 @@ def test_itde_smoke_test(make_test_files, pytester, files):
                 """
     def test_default_settings_of_exasol(exasol_config):
         assert exasol_config.host == 'localhost'
-        assert exasol_config.port == 8888
+        assert exasol_config.port == 8563
         assert exasol_config.username == 'SYS'
         assert exasol_config.password == 'exasol'
     """
@@ -57,7 +57,7 @@ def test_itde_smoke_test(make_test_files, pytester, files):
             "test_bucketfs_settings": cleandoc(
                 """
     def test_default_settings_of_bucketfs(bucketfs_config):
-        assert bucketfs_config.url == 'http://127.0.0.1:6666'
+        assert bucketfs_config.url == 'http://127.0.0.1:2580'
         assert bucketfs_config.username == 'w'
         assert bucketfs_config.password == 'write'
     """

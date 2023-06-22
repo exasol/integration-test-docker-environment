@@ -36,15 +36,22 @@ class PortsType(type):
 
     @property
     def default_ports(self) -> 'Ports':
-        return Ports(database=8888, bucketfs=6583, ssh=22)
+        # return Ports(database=8888, bucketfs=6583, ssh=22)
+        return Ports(database=8563, bucketfs=2580, ssh=22)
 
     @property
     def external(self) -> 'Ports':
-        return Ports(database=8563, bucketfs=6583, ssh=22)
+        # return Ports(database=8563, bucketfs=6583, ssh=22)
+        return Ports(database=8563, bucketfs=2580, ssh=22)
 
     @property
     def docker(self) -> 'Ports':
-        return Ports(database=8888, bucketfs=6583, ssh=22)
+        # return Ports(database=8888, bucketfs=6583, ssh=22)
+        return Ports(database=8563, bucketfs=2580, ssh=22)
+
+    @property
+    def forward(self) -> 'Ports':
+        return Ports(database=8563, bucketfs=2580, ssh=20002)
 
 
 class Ports(metaclass=PortsType):
