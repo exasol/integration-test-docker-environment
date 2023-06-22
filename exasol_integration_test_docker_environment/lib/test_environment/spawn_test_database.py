@@ -64,6 +64,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
 
         self.db_version = DbVersion.from_db_version_str(self.docker_db_image_version)
         self.docker_db_config_resource_name = f"docker_db_config/{self.db_version}"
+        self.ports = Ports.default_ports
 
     def run_task(self):
         subnet = netaddr.IPNetwork(self.network_info.subnet)
@@ -119,14 +120,13 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
 
     def _port_mappings(self):
         result = {}
-        defaults = Ports.default_ports
         if self.database_port_forward is not None:
-            result[f"{defaults.database}/tcp"] = ('0.0.0.0', int(self.database_port_forward))
+            result[f"{self.ports.database}/tcp"] = ('0.0.0.0', int(self.database_port_forward))
         if self.bucketfs_port_forward is not None:
-            result[f"{defaults.bucketfs}/tcp"] = ('0.0.0.0', int(self.bucketfs_port_forward))
+            result[f"{self.ports.bucketfs}/tcp"] = ('0.0.0.0', int(self.bucketfs_port_forward))
         if self.ssh_port_forward is None:
             self.ssh_port_forward = find_free_ports(1)[0]
-        result[f"{defaults.ssh}/tcp"] = ('0.0.0.0', int(self.ssh_port_forward))
+        result[f"{self.ports.ssh}/tcp"] = ('0.0.0.0', int(self.ssh_port_forward))
         return result
 
     def _create_database_container(self, db_ip_address: str, db_private_network: str):
@@ -159,7 +159,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                 docker_db_image_info,
             )
 
-            ports = self._port_mappings()
+            port_mappings = self._port_mappings()
             volumes = {db_volume.name: {"bind": "/exa", "mode": "rw"}}
             if self.certificate_volume_name is not None:
                 volumes[self.certificate_volume_name] = {"bind": CERTIFICATES_MOUNT_DIR, "mode": "ro"}
@@ -171,7 +171,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                     privileged=True,
                     volumes=volumes,
                     network_mode=None,
-                    ports=ports,
+                    ports=port_mappings,
                     runtime=self.docker_runtime
                 )
             enable_ssh_access(db_container, authorized_keys)
@@ -196,7 +196,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             ssh_info = SshInfo(self.ssh_user, self.ssh_port_forward, self.ssh_key_file)
             database_info = DatabaseInfo(
                 host=db_ip_address,
-                ports=Ports.default_ports,
+                ports=self.ports,
                 reused=reused,
                 container_info=container_info,
                 ssh_info=ssh_info,
@@ -329,6 +329,8 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         additional_db_parameter_str = " ".join(self.additional_db_parameter)
         rendered_template = template.render(private_network=db_private_network,
                                             db_version=str(self.db_version),
+                                            db_port=self.ports.database,
+                                            bucketfs_port=self.ports.bucketfs,
                                             image_version=self.docker_db_image_version,
                                             mem_size=self.mem_size,
                                             disk_size=self.disk_size,

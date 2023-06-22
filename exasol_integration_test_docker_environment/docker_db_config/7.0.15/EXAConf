@@ -75,7 +75,7 @@
     UUID = A5F8F92113A34BA4B0A48D5397423BBA5CF95161
     DockerVolume = n11
     # Ports to be exposed (container : host)
-    ExposedPorts = 8888:8899, 6583:6594
+    ExposedPorts = {{ db_port }}:8899, {{ bucketfs_port }}:6594
     [[Disk : disk1]]
         Component = exastorage
         Devices = dev.1
@@ -121,7 +121,7 @@
     Version = {{ db_version }}
     # Memory size over all nodes (e. g. '1 TiB').
     MemSize = {{ mem_size }}
-    Port = 8888
+    Port = {{ db_port }}
     # User and group IDs that own this database (e. g. '1000:1005').
     Owner = 500 : 500
     # Comma-separated list of node IDs for this DB (put reserve nodes at the end, if any).
@@ -155,7 +155,7 @@
 [BucketFS : bfsdefault]
     Owner = 500:500
     # HTTP port number (0 = disabled)
-    HttpPort = 6583
+    HttpPort = {{ bucketfs_port }}
     # HTTPS port number (0 = disabled)
     HttpsPort = 0
     SyncKey = OGhvcmxrTnluTlFrZTV3RVBTWG5Idlc4bkVMQUNxcWs=

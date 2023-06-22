@@ -43,7 +43,7 @@ BUCKETFS = config.OptionGroup(
         {
             "name": "url",
             "type": str,
-            "default": f"http://127.0.0.1:{Ports.default.bucketfs}",
+            "default": f"http://127.0.0.1:{Ports.default_ports.bucketfs}",
             "help_text": "Base url used to connect to the bucketfs service",
         },
         {
