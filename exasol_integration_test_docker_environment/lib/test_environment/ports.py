@@ -41,11 +41,19 @@ class PortsType(type):
 
     @property
     def external(self) -> 'Ports':
+        """
+        Used by
+        eitde/test/test_test_env_reuse.py
+        eitde/cli/options/test_environment_options.py
+        """
         # return Ports(database=8563, bucketfs=6583, ssh=22)
         return Ports(database=8563, bucketfs=2580, ssh=22)
 
     @property
     def docker(self) -> 'Ports':
+        """
+        Only used in pytest_itde/__init__.py
+        """
         # return Ports(database=8888, bucketfs=6583, ssh=22)
         return Ports(database=8563, bucketfs=2580, ssh=22)
 
