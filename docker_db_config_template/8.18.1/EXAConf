@@ -5,7 +5,7 @@
     Platform = Docker
     LicenseFile = /exa/etc/license.exasol_license
     CoredPort = 325
-    SSHPort = 22
+    SSHPort = {{ ssh_port }}
     IssueTracker = Jira
     XMLRPCPort = 443
     WebUIBackendPort = 4444

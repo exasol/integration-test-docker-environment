@@ -330,6 +330,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         rendered_template = template.render(private_network=db_private_network,
                                             db_version=str(self.db_version),
                                             db_port=self.ports.database,
+                                            ssh_port=self.ports.ssh,
                                             bucketfs_port=self.ports.bucketfs,
                                             image_version=self.docker_db_image_version,
                                             mem_size=self.mem_size,
