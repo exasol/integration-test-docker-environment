@@ -74,8 +74,6 @@
     Name = n11
     UUID = A5F8F92113A34BA4B0A48D5397423BBA5CF95161
     DockerVolume = n11
-    # Ports to be exposed (container : host)
-    ExposedPorts = {{ db_port }}:8899, {{ bucketfs_port }}:6594
     [[Disk : disk1]]
         Component = exastorage
         Devices = dev.1

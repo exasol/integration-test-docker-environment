@@ -104,8 +104,10 @@
     Affinity = 11
     UUID = F0EA64D47F374A00B0530772981C559EE1C59086
     DockerVolume = n11
+    # Commented out exposed ports as these are only used by
+    # https://github.com/exasol/docker-db/
     # Ports to be exposed (container : host)
-    ExposedPorts = {{ db_port }}:8899, {{ bucketfs_port }}:6594
+    # ExposedPorts = {{ db_port }}:8899, {{ bucketfs_port }}:6594
     [[Disk : disk1]]
         Component = exastorage
         Devices = dev.1

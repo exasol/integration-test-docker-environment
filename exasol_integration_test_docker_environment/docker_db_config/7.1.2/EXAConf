@@ -88,8 +88,6 @@
     Affinity = 11
     UUID = 02F4E2AF9C294CABA0A119A89AC60B44EC95D19C
     DockerVolume = n11
-    # Ports to be exposed (container : host)
-    ExposedPorts = {{ db_port }}:8899, {{ bucketfs_port }}:6594
     [[Disk : disk1]]
         Component = exastorage
         Devices = dev.1
