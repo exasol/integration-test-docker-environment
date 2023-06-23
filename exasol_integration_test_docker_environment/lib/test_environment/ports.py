@@ -30,32 +30,17 @@ class PortsType(type):
     The following properties are read-only class attributes:
     - default_ports
     - external
-    - docker
     - forward
     """
 
     @property
     def default_ports(self) -> 'Ports':
-        # return Ports(database=8888, bucketfs=6583, ssh=22)
         return Ports(database=8563, bucketfs=2580, ssh=22)
 
     @property
     def external(self) -> 'Ports':
-        """
-        Used by
-        eitde/test/test_test_env_reuse.py
-        eitde/cli/options/test_environment_options.py
-        """
-        # return Ports(database=8563, bucketfs=6583, ssh=22)
-        return Ports(database=8563, bucketfs=2580, ssh=22)
-
-    @property
-    def docker(self) -> 'Ports':
-        """
-        Only used in pytest_itde/__init__.py
-        """
-        # return Ports(database=8888, bucketfs=6583, ssh=22)
-        return Ports(database=8563, bucketfs=2580, ssh=22)
+        # For external databases SSH port might depend on version database.
+        return Ports(database=8563, bucketfs=2580, ssh=None)
 
     @property
     def forward(self) -> 'Ports':

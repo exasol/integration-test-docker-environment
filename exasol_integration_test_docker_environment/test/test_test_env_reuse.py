@@ -10,8 +10,7 @@ from exasol_integration_test_docker_environment.test.get_test_container_content 
 from exasol_integration_test_docker_environment.testing import luigi_utils
 from exasol_integration_test_docker_environment.cli.options import test_environment_options
 from exasol_integration_test_docker_environment.testing.utils import check_db_version_from_env
-from exasol_integration_test_docker_environment \
-    .lib.test_environment.ports import Ports
+from exasol_integration_test_docker_environment.lib.test_environment.ports import Ports
 
 
 class TestContainerReuseTest(unittest.TestCase):
@@ -34,6 +33,7 @@ class TestContainerReuseTest(unittest.TestCase):
         self.docker_db_version_parameter = check_db_version_from_env() or test_environment_options.LATEST_DB_VERSION
 
         self.setup_luigi_config()
+        self.ports = Ports.random_free()
 
     def tearDown(self):
         luigi_utils.clean(self._docker_repository_name)
@@ -49,17 +49,15 @@ class TestContainerReuseTest(unittest.TestCase):
 
     def run_spawn_test_env(self, cleanup: bool):
         result = None
-
-        ports = Ports.external
         task = generate_root_task(task_class=SpawnTestEnvironment,
                                   reuse_database_setup=True,
                                   reuse_database=True,
                                   reuse_test_container=True,
                                   no_test_container_cleanup_after_success=not cleanup,
                                   no_database_cleanup_after_success=not cleanup,
-                                  external_exasol_db_port=ports.database,
-                                  external_exasol_bucketfs_port=ports.bucketfs,
-                                  external_exasol_ssh_port=ports.ssh,
+                                  external_exasol_db_port=self.ports.database,
+                                  external_exasol_bucketfs_port=self.ports.bucketfs,
+                                  external_exasol_ssh_port=self.ports.ssh,
                                   external_exasol_xmlrpc_host="",
                                   external_exasol_db_host="",
                                   external_exasol_xmlrpc_port=0,

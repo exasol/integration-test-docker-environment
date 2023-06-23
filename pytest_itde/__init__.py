@@ -19,7 +19,7 @@ EXASOL = config.OptionGroup(
         {
             "name": "port",
             "type": int,
-            "default": Ports.docker.database,
+            "default": Ports.forward.database,
             "help_text": "Port on which the exasol db is listening",
         },
         {
@@ -43,7 +43,7 @@ BUCKETFS = config.OptionGroup(
         {
             "name": "url",
             "type": str,
-            "default": f"http://127.0.0.1:{Ports.default_ports.bucketfs}",
+            "default": f"http://127.0.0.1:{Ports.forward.bucketfs}",
             "help_text": "Base url used to connect to the bucketfs service",
         },
         {
