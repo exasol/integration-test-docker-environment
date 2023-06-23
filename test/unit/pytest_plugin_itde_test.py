@@ -88,7 +88,7 @@ EXASOL_OPTIONS = (
     {
         "name": "port",
         "type": int,
-        "default": Ports.default.database,
+        "default": Ports.default_ports.database,
         "help_text": "Port on which the exasol db is listening",
     },
     {
@@ -109,7 +109,7 @@ BUCKETFS_OPTIONS = (
     {
         "name": "url",
         "type": str,
-        "default": f"http://127.0.0.1:{Ports.default.bucketfs}",
+        "default": f"http://127.0.0.1:{Ports.default_ports.bucketfs}",
         "help_text": "Base url used to connect to the bucketfs service",
     },
     {
@@ -156,7 +156,7 @@ def test_option_group_prefix_property(group, expected):
                     prefix="exasol",
                     name="port",
                     type=int,
-                    default=Ports.default.database,
+                    default=Ports.default_ports.database,
                     help_text="Port on which the exasol db is listening",
                 ),
                 Option(
