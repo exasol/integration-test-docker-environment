@@ -197,7 +197,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             ssh_info = SshInfo(self.ssh_user, self.ssh_key_file)
             database_info = DatabaseInfo(
                 host=db_ip_address,
-                ports=self.ports,
+                ports=self.internal_ports,
                 reused=reused,
                 container_info=container_info,
                 ssh_info=ssh_info,
