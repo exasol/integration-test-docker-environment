@@ -12,9 +12,11 @@ class DatabaseInfo(Info):
             reused: bool,
             container_info: ContainerInfo = None,
             ssh_info: SshInfo = None,
+            port_forwards: Ports = None,
     ):
         self.container_info = container_info
         self.ports = ports
         self.host = host
         self.reused = reused
         self.ssh_info = ssh_info
+        self.port_forwards = port_forwards
