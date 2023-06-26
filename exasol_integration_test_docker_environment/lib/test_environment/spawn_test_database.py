@@ -64,7 +64,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
 
         self.db_version = DbVersion.from_db_version_str(self.docker_db_image_version)
         self.docker_db_config_resource_name = f"docker_db_config/{self.db_version}"
-        self.ports = Ports.default_ports
+        self.internal_ports = Ports.default_ports
 
     def run_task(self):
         subnet = netaddr.IPNetwork(self.network_info.subnet)
@@ -121,12 +121,12 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
     def _port_mappings(self):
         result = {}
         if self.database_port_forward is not None:
-            result[f"{self.ports.database}/tcp"] = ('0.0.0.0', int(self.database_port_forward))
+            result[f"{self.internal_ports.database}/tcp"] = ('0.0.0.0', int(self.database_port_forward))
         if self.bucketfs_port_forward is not None:
-            result[f"{self.ports.bucketfs}/tcp"] = ('0.0.0.0', int(self.bucketfs_port_forward))
+            result[f"{self.internal_ports.bucketfs}/tcp"] = ('0.0.0.0', int(self.bucketfs_port_forward))
         if self.ssh_port_forward is None:
             self.ssh_port_forward = find_free_ports(1)[0]
-        result[f"{self.ports.ssh}/tcp"] = ('0.0.0.0', int(self.ssh_port_forward))
+        result[f"{self.internal_ports.ssh}/tcp"] = ('0.0.0.0', int(self.ssh_port_forward))
         return result
 
     def _create_database_container(self, db_ip_address: str, db_private_network: str):
@@ -196,7 +196,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             ssh_info = SshInfo(self.ssh_user, self.ssh_port_forward, self.ssh_key_file)
             database_info = DatabaseInfo(
                 host=db_ip_address,
-                ports=self.ports,
+                ports=self.internal_ports,
                 reused=reused,
                 container_info=container_info,
                 ssh_info=ssh_info,
@@ -329,9 +329,9 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         additional_db_parameter_str = " ".join(self.additional_db_parameter)
         rendered_template = template.render(private_network=db_private_network,
                                             db_version=str(self.db_version),
-                                            db_port=self.ports.database,
-                                            ssh_port=self.ports.ssh,
-                                            bucketfs_port=self.ports.bucketfs,
+                                            db_port=self.internal_ports.database,
+                                            ssh_port=self.internal_ports.ssh,
+                                            bucketfs_port=self.internal_ports.bucketfs,
                                             image_version=self.docker_db_image_version,
                                             mem_size=self.mem_size,
                                             disk_size=self.disk_size,

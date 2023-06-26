@@ -61,6 +61,17 @@ BUCKETFS = config.OptionGroup(
     ),
 )
 
+SSH = config.OptionGroup(
+    prefix="ssh",
+    options=(
+        {
+            "name": "port",
+            "type": int,
+            "default": Ports.forward.ssh,
+            "help_text": "Port on which external processes can access the database via SSH protocol",
+        },
+    ),
+)
 
 def TestSchemas(value) -> Tuple[str]:
     """
@@ -117,6 +128,14 @@ def bucketfs_config(request) -> config.BucketFs:
 
 
 @pytest.fixture(scope="session")
+def ssh_config(request) -> config.Ssh:
+    """Returns the configuration settings for SSH access in this session."""
+    cli_arguments = request.config.option
+    kwargs = SSH.kwargs(os.environ, cli_arguments)
+    return config.Ssh(**kwargs)
+
+
+@pytest.fixture(scope="session")
 def itde_config(request) -> config.Itde:
     """Returns the configuration settings of the ITDE for this session."""
     cli_arguments = request.config.option
@@ -156,7 +175,7 @@ def _bootstrap_db(itde_config, exasol_config, bucketfs_config):
     def nop():
         pass
 
-    def start_db(name, itde, exasol, bucketfs):
+    def start_db(name, itde, exasol, bucketfs, ssh_access):
         from urllib.parse import urlparse
 
         from exasol_integration_test_docker_environment.lib import api
@@ -166,8 +185,7 @@ def _bootstrap_db(itde_config, exasol_config, bucketfs_config):
             environment_name=name,
             database_port_forward=exasol.port,
             bucketfs_port_forward=bucketfs_url.port,
-            # should this rather be passed as a parameter to _bootstrap_db()?
-            ssh_port_forward=Ports.forward.ssh,
+            ssh_port_forward=ssh_access.port,
             db_mem_size="4GB",
             docker_db_image_version=itde.db_version,
         )
@@ -177,7 +195,7 @@ def _bootstrap_db(itde_config, exasol_config, bucketfs_config):
     bootstrap_db = itde_config.db_version != "external"
 
     start = (
-        lambda: start_db(db_name, itde_config, exasol_config, bucketfs_config)
+        lambda: start_db(db_name, itde_config, exasol_config, bucketfs_config, ssh_config)
         if bootstrap_db
         else lambda: nop
     )
@@ -214,7 +232,7 @@ def itde(
         connection.commit()
 
 
-OPTION_GROUPS = (EXASOL, BUCKETFS, ITDE)
+OPTION_GROUPS = (EXASOL, BUCKETFS, ITDE, SSH)
 
 
 def _add_option_group(parser, group):
