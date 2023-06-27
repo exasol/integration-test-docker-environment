@@ -1,5 +1,5 @@
 import math
-from typing import Tuple
+from typing import Optional, Tuple
 
 import docker
 import humanfriendly
@@ -122,12 +122,12 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         aliases = self._get_network_aliases()
         network.connect(container, ipv4_address=ip_address, aliases=aliases)
 
-    def _port_mapping(self, internal: Ports, forwards: Ports):
+    def _port_mapping(self, internal_ports, forwarded_ports):
         result = {}
-        for name in ("database", "bucketfs", "ssh"):
-            port = internal.__getattribute__(name)
-            forward = forwards.__getattribute__(name)
-            result[f"{port}/tcp"] = ('0.0.0.0', forward)
+        for name, internal in internal_ports.__dict__.items():
+            forward = forwarded_ports.__getattribute__(name)
+            if forward:
+                result[f"{internal}/tcp"] = ('0.0.0.0', forward)
         return result
 
     def _create_database_container(self, db_ip_address: str, db_private_network: str):
@@ -162,10 +162,14 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
 
             if self.ssh_port_forward is None:
                 self.ssh_port_forward = str(find_free_ports(1)[0])
+
+            def port_or_none(spec: str) -> Optional[int]:
+                return None if spec is None else int(spec)
+
             forwarded_ports = Ports(
-                database=int(self.database_port_forward),
-                bucketfs=int(self.bucketfs_port_forward),
-                ssh=int(self.ssh_port_forward),
+                database=port_or_none(self.database_port_forward),
+                bucketfs=port_or_none(self.bucketfs_port_forward),
+                ssh=port_or_none(self.ssh_port_forward),
             )
             port_mapping = self._port_mapping(self.internal_ports, forwarded_ports)
             volumes = {db_volume.name: {"bind": "/exa", "mode": "rw"}}
