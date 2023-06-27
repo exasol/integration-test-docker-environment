@@ -43,6 +43,10 @@ CERTIFICATES_MOUNT_DIR = "/certificates"
 CERTIFICATES_DEFAULT_DIR = "/exa/etc/ssl/"
 
 
+def int_or_none(value: str) -> Optional[int]:
+    return None if value is None else int(value)
+
+
 class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
     environment_name = luigi.Parameter()  # type: str
     db_container_name = luigi.Parameter()  # type: str
@@ -65,6 +69,13 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         self.db_version = DbVersion.from_db_version_str(self.docker_db_image_version)
         self.docker_db_config_resource_name = f"docker_db_config/{self.db_version}"
         self.internal_ports = Ports.default_ports
+        if self.ssh_port_forward is None:
+            self.ssh_port_forward = str(find_free_ports(1)[0])
+        self.forwarded_ports = Ports(
+            database=int_or_none(self.database_port_forward),
+            bucketfs=int_or_none(self.bucketfs_port_forward),
+            ssh=int_or_none(self.ssh_port_forward),
+        )
 
     def run_task(self):
         subnet = netaddr.IPNetwork(self.network_info.subnet)
@@ -83,11 +94,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         database_info = None
         ssh_key = self._get_ssh_key()
         try:
-            database_info = self._create_database_info(
-                db_ip_address=db_ip_address,
-                forwarded_ports=None,
-                reused=True,
-            )
+            database_info = self._create_database_info(db_ip_address=db_ip_address, reused=True)
         except Exception as e:
             self.logger.warning("Tried to reuse database container %s, but got Exeception %s. "
                                 "Fallback to create new database.", self.db_container_name, e)
@@ -159,19 +166,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                 authorized_keys,
                 docker_db_image_info,
             )
-
-            if self.ssh_port_forward is None:
-                self.ssh_port_forward = str(find_free_ports(1)[0])
-
-            def port_or_none(spec: str) -> Optional[int]:
-                return None if spec is None else int(spec)
-
-            forwarded_ports = Ports(
-                database=port_or_none(self.database_port_forward),
-                bucketfs=port_or_none(self.bucketfs_port_forward),
-                ssh=port_or_none(self.ssh_port_forward),
-            )
-            port_mapping = self._port_mapping(self.internal_ports, forwarded_ports)
+            port_mapping = self._port_mapping(self.internal_ports, self.forwarded_ports)
             volumes = {db_volume.name: {"bind": "/exa", "mode": "rw"}}
             if self.certificate_volume_name is not None:
                 volumes[self.certificate_volume_name] = {"bind": CERTIFICATES_MOUNT_DIR, "mode": "ro"}
@@ -189,19 +184,10 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             enable_ssh_access(db_container, authorized_keys)
             self._connect_docker_network(docker_client, db_container, db_ip_address)
             db_container.start()
-            database_info = self._create_database_info(
-                db_ip_address=db_ip_address,
-                forwarded_ports=forwarded_ports,
-                reused=False,
-            )
+            database_info = self._create_database_info(db_ip_address=db_ip_address, reused=False)
             return database_info
 
-    def _create_database_info(
-            self,
-            db_ip_address: str,
-            forwarded_ports: Ports,
-            reused: bool,
-    ) -> DatabaseInfo:
+    def _create_database_info(self, db_ip_address: str, reused: bool) -> DatabaseInfo:
         with self._get_docker_client() as docker_client:
             db_container = docker_client.containers.get(self.db_container_name)
             if db_container.status != "running":
@@ -221,7 +207,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                 reused=reused,
                 container_info=container_info,
                 ssh_info=ssh_info,
-                forwarded_ports=forwarded_ports,
+                forwarded_ports=self.forwarded_ports,
             )
             return database_info
 
