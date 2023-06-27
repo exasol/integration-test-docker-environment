@@ -65,7 +65,6 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         self.db_version = DbVersion.from_db_version_str(self.docker_db_image_version)
         self.docker_db_config_resource_name = f"docker_db_config/{self.db_version}"
         self.internal_ports = Ports.default_ports
-        self.port_forwards = None
 
     def run_task(self):
         subnet = netaddr.IPNetwork(self.network_info.subnet)
@@ -84,7 +83,11 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         database_info = None
         ssh_key = self._get_ssh_key()
         try:
-            database_info = self._create_database_info(db_ip_address=db_ip_address, reused=True)
+            database_info = self._create_database_info(
+                db_ip_address=db_ip_address,
+                forwarded_ports=None,
+                reused=True,
+            )
         except Exception as e:
             self.logger.warning("Tried to reuse database container %s, but got Exeception %s. "
                                 "Fallback to create new database.", self.db_container_name, e)
@@ -119,15 +122,12 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         aliases = self._get_network_aliases()
         network.connect(container, ipv4_address=ip_address, aliases=aliases)
 
-    def _port_mappings(self):
+    def _port_mapping(self, internal: Ports, forwards: Ports):
         result = {}
-        if self.database_port_forward is not None:
-            result[f"{self.internal_ports.database}/tcp"] = ('0.0.0.0', int(self.database_port_forward))
-        if self.bucketfs_port_forward is not None:
-            result[f"{self.internal_ports.bucketfs}/tcp"] = ('0.0.0.0', int(self.bucketfs_port_forward))
-        if self.ssh_port_forward is None:
-            self.ssh_port_forward = find_free_ports(1)[0]
-        result[f"{self.internal_ports.ssh}/tcp"] = ('0.0.0.0', int(self.ssh_port_forward))
+        for name in ("database", "bucketfs", "ssh"):
+            port = internal.__getattribute__(name)
+            forward = forwards.__getattribute__(name)
+            result[f"{port}/tcp"] = ('0.0.0.0', forward)
         return result
 
     def _create_database_container(self, db_ip_address: str, db_private_network: str):
@@ -160,7 +160,14 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                 docker_db_image_info,
             )
 
-            self.port_forwards = self._port_mappings()
+            if self.ssh_port_forward is None:
+                self.ssh_port_forward = str(find_free_ports(1)[0])
+            forwarded_ports = Ports(
+                database=int(self.database_port_forward),
+                bucketfs=int(self.bucketfs_port_forward),
+                ssh=int(self.ssh_port_forward),
+            )
+            port_mapping = self._port_mapping(self.internal_ports, forwarded_ports)
             volumes = {db_volume.name: {"bind": "/exa", "mode": "rw"}}
             if self.certificate_volume_name is not None:
                 volumes[self.certificate_volume_name] = {"bind": CERTIFICATES_MOUNT_DIR, "mode": "ro"}
@@ -172,16 +179,25 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                     privileged=True,
                     volumes=volumes,
                     network_mode=None,
-                    ports=self.port_forwards,
+                    ports=port_mapping,
                     runtime=self.docker_runtime
                 )
             enable_ssh_access(db_container, authorized_keys)
             self._connect_docker_network(docker_client, db_container, db_ip_address)
             db_container.start()
-            database_info = self._create_database_info(db_ip_address=db_ip_address, reused=False)
+            database_info = self._create_database_info(
+                db_ip_address=db_ip_address,
+                forwarded_ports=forwarded_ports,
+                reused=False,
+            )
             return database_info
 
-    def _create_database_info(self, db_ip_address: str, reused: bool) -> DatabaseInfo:
+    def _create_database_info(
+            self,
+            db_ip_address: str,
+            forwarded_ports: Ports,
+            reused: bool,
+    ) -> DatabaseInfo:
         with self._get_docker_client() as docker_client:
             db_container = docker_client.containers.get(self.db_container_name)
             if db_container.status != "running":
@@ -201,7 +217,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                 reused=reused,
                 container_info=container_info,
                 ssh_info=ssh_info,
-                port_forwards=self.port_forwards,
+                forwarded_ports=forwarded_ports,
             )
             return database_info
 

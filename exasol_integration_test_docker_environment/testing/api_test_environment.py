@@ -67,11 +67,11 @@ class ApiTestEnvironment:
         if additional_parameter is None:
             additional_parameter = dict()
         ports = Ports.random_free()
-        on_host = self._get_default_test_environment(name, ports)
-        docker_db_image_version = on_host.docker_db_image_version
-        on_host.environment_info, on_host.clean_up = \
+        on_host_parameter = self._get_default_test_environment(name, ports)
+        docker_db_image_version = on_host_parameter.docker_db_image_version
+        on_host_parameter.environment_info, on_host_parameter.clean_up = \
             spawn_test_environment_with_test_container(
-                environment_name=on_host.name,
+                environment_name=on_host_parameter.name,
                 database_port_forward=ports.database,
                 bucketfs_port_forward=ports.bucketfs,
                 ssh_port_forward=ports.ssh,
@@ -79,7 +79,7 @@ class ApiTestEnvironment:
                 test_container_content=test_container_content,
                 **additional_parameter,
             )
-        return on_host
+        return on_host_parameter
 
     def spawn_docker_test_environment(
             self,
