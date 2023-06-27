@@ -169,7 +169,7 @@ def connection_factory():
 
 
 @pytest.fixture(scope="session")
-def _bootstrap_db(itde_config, exasol_config, bucketfs_config):
+def _bootstrap_db(itde_config, exasol_config, bucketfs_config, ssh_config):
     """Bootstraps the database should not be used from outside the itde plugin."""
 
     def nop():
