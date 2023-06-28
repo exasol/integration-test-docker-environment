@@ -1,3 +1,4 @@
+import os
 from inspect import cleandoc
 from itertools import chain
 
@@ -35,7 +36,11 @@ def _ids(params):
 )
 def test_itde_smoke_test(make_test_files, pytester, files):
     make_test_files(pytester, files)
-    result = pytester.runpytest()
+    cmdargs = {}
+    if "EXASOL_VERSION" in os.environ:
+        cmdargs = {"--itde-db-version": os.environ["EXASOL_VERSION"]}
+    args = chain.from_iterable(cmdargs.items())
+    result = pytester.runpytest(*args)
     assert result.ret == pytest.ExitCode.OK
 
 
