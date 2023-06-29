@@ -183,10 +183,11 @@ def run_tests(session: nox.Session, db_version: str):
             "./exasol_integration_test_docker_environment/test",
             env=env,
         )
+    session.run("pytest", '--log-level=DEBUG', './test/unit')
     session.run(
-        "pytest", "--itde-db-version", db_version, './test/integration'
+        "pytest", '--log-level=DEBUG',
+        "--itde-db-version", db_version, './test/integration/pytest_itde_test.py'
     )
-    session.run("pytest", './test/unit')
 
 
 @nox.session(name="run-minimal-tests", python=False)
