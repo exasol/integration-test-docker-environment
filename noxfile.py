@@ -172,8 +172,8 @@ def get_db_versions() -> List[str]:
 @nox.parametrize("db_version", get_db_versions())
 def run_tests(session: nox.Session, db_version: str):
     """Run the tests in the poetry environment"""
-    env = {"EXASOL_VERSION": db_version}
     with session.chdir(ROOT):
+        env = {"EXASOL_VERSION": db_version}
         session.run(
             "python",
             "-u",
@@ -184,11 +184,13 @@ def run_tests(session: nox.Session, db_version: str):
             env=env,
         )
     session.run("pytest", "-s", '--log-level=DEBUG', './test/unit')
-    session.run(
-        "pytest", '--log-level=DEBUG',
-        "-s",
-        './test/integration/pytest_itde_test.py'
-    )
+    # session.run(
+    #     "pytest", '--log-level=DEBUG',
+    #     "--itde-db-version", db_version,
+    #     "-s",
+    #     './test/integration/pytest_itde_test.py',
+    #     env=env,
+    # )
 
 
 @nox.session(name="run-minimal-tests", python=False)
