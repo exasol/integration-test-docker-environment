@@ -30,9 +30,6 @@ default_version_only=pytest.mark.skipif(
     increase which in turn causes error "no space left on device".""",
 )
 
-def test_pytest_param():
-    print(f'pytest.config = {pytest.config}')
-
 
 @default_version_only
 @pytest.mark.slow
