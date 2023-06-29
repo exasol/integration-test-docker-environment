@@ -15,6 +15,6 @@ jobs:
 
     - name: Run test 8.17.0
       # run: poetry run pytest --log-level=DEBUG -s test/integration/pytest_itde_test.py
-      # run: poetry run nox -s "run-tests(db_version='prerelease-8.17.0')"
+      run: poetry run nox -s "run-tests(db_version='prerelease-8.17.0')"
       # env:
       #   EXASOL_VERSION: "prerelease-8.17.0"
