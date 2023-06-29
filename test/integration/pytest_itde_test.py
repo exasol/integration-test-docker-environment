@@ -44,6 +44,13 @@ def test_itde_smoke_test(make_test_files, pytester, files):
     assert result.ret == pytest.ExitCode.OK
 
 
+@pytest.mark.skipif(
+    "EXASOL_VERSION" in os.environ and os.environ["EXASOL_VERSION"] != "8.18.0",
+    reason="""
+    Test skipped for EXASOL versions other than 8.18.0 to avoid error
+    no space left on device due to multiple huge docker images downloaded.
+    """,
+)
 @pytest.mark.parametrize(
     "files",
     [
