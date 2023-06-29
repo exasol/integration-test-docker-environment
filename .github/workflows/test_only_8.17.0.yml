@@ -1,5 +1,9 @@
 name: Run test 8.17.0
 
+on:
+  workflow_dispatch:
+  pull-request:
+
 jobs:
   run-test-8.17.0:
     runs-on: ubuntu-latest
