@@ -21,12 +21,16 @@ def _ids(params):
 
 
 default_version = "8.18.1"
-def is_default_version():
-    return "EXASOL_VERSION" in os.environ \
-        and os.environ["EXASOL_VERSION"] != default_version
+default_version_only=pytest.mark.skipif(
+    "EXASOL_VERSION" in os.environ and os.environ["EXASOL_VERSION"] != default_version,
+    reason="""This test always uses default version of Exasol database.  If
+    the current run of a matrix build uses a different version then executing
+    all tests requires to download two docker images in total.  For Exasol
+    versions 8 and higher the size of the Docker Containers did drastically
+    increase which in turn causes error "no space left on device".""",
+)
 
-
-@pytest.mark.skipif(not is_default_version())
+@default_version_only
 @pytest.mark.slow
 @pytest.mark.parametrize(
     "files",
@@ -52,14 +56,7 @@ def test_itde_smoke_test(make_test_files, pytester, files):
     assert result.ret == pytest.ExitCode.OK
 
 
-@pytest.mark.skipif(
-    not is_default_version(),
-    reason="""This test always uses default version of Exasol database.  If
-    the current run of a matrix build uses a different version then executing
-    all tests requires to download two docker images in total.  For Exasol
-    versions 8 and higher the size of the Docker Containers did drastically
-    increase which in turn causes error "no space left on device".""",
-)
+@default_version_only
 @pytest.mark.parametrize(
     "files",
     [
