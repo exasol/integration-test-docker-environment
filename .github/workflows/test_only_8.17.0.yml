@@ -14,4 +14,6 @@ jobs:
     - uses: ./.github/actions/prepare_poetry_env
 
     - name: Run test 8.17.0
-      run: poetry run nox -s "run-tests(db_version='prerelease-8.17.0')"
+      run: poetry run pytest -s test/integration/pytest_itde_test.py
+      env:
+        EXASOL_VERSION: "prerelease-8.17.0"
