@@ -30,6 +30,10 @@ default_version_only=pytest.mark.skipif(
     increase which in turn causes error "no space left on device".""",
 )
 
+def test_pytest_param():
+    print(f'pytest.config = {pytest.config}')
+
+
 @default_version_only
 @pytest.mark.slow
 @pytest.mark.parametrize(
@@ -47,11 +51,6 @@ default_version_only=pytest.mark.skipif(
 )
 def test_itde_smoke_test(make_test_files, pytester, files):
     make_test_files(pytester, files)
-    # cmdargs = {}
-    # if "EXASOL_VERSION" in os.environ:
-    #     cmdargs = {"--itde-db-version": os.environ["EXASOL_VERSION"]}
-    # args = chain.from_iterable(cmdargs.items())
-    # result = pytester.runpytest(*args)
     result = pytester.runpytest()
     assert result.ret == pytest.ExitCode.OK
 
