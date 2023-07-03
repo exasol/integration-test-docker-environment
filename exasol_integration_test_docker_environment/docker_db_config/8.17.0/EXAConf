@@ -170,9 +170,9 @@
     BuiltinScriptLanguageName = slc-6.0.0-c4-5-standard-EXASOL-8.0.0/ScriptLanguages-standard-EXASOL-8.0.0-slc-v6.0.0-PB5EHDLN
     AutoStart = True
     {% if additional_db_parameters %}
-    Params = -sandboxCHROOT=/opt/exasol/cos-8.29.2/sbin/nsexec_chroot {{ additional_db_parameters }}
+    Params = -sandboxCHROOT=/opt/exasol/cos-8.28.0/sbin/nsexec_chroot {{ additional_db_parameters }}
     {% else %}
-    Params = -sandboxCHROOT=/opt/exasol/cos-8.29.2/sbin/nsexec_chroot
+    Params = -sandboxCHROOT=/opt/exasol/cos-8.28.0/sbin/nsexec_chroot
     {% endif %}
 
     # JDBC driver configuration
