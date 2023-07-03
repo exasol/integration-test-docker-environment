@@ -1,0 +1,16 @@
+name: Run test 8.17.0
+
+on:
+  workflow_dispatch:
+  pull_request:
+
+jobs:
+  build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - uses: ./.github/actions/prepare_poetry_env
+
+    - name: Execute actual tests
+      run: poetry run nox -s "run-tests-experimental(db_version='prerelease-8.17.0')"
