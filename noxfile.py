@@ -174,12 +174,7 @@ def run_tests(session: nox.Session, db_version: str):
     """Run the tests in the poetry environment"""
     env = {"EXASOL_VERSION": db_version}
     session.run("pytest", "./test/unit")
-    session.run(
-        "pytest",
-        "--itde-db-version", db_version,
-        "./test/integration/pytest_itde_test.py",
-        env=env,
-    )
+    session.run("pytest", "./test/integration", env=env)
     with session.chdir(ROOT):
         session.run(
             "python",
