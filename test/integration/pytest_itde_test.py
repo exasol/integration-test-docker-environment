@@ -27,7 +27,7 @@ default_version_only=pytest.mark.skipif(
     the current run of a matrix build uses a different version then executing
     all tests requires to download two docker images in total.  For Exasol
     versions 8 and higher the size of the Docker Containers did drastically
-    increase which in turn causes error "no space left on device".""",
+    increase which in turn causes error "no space left on device" in the GitHub Action Runners.""",
 )
 
 
