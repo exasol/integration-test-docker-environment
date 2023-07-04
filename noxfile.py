@@ -164,15 +164,9 @@ def get_db_versions() -> List[str]:
     # on DockerHub, yet. Instead, we add its pre-release version.
     db_versions.remove("8.17.0")
     db_versions.append("prerelease-8.17.0")
+    db_versions.remove("7.1.0")
     db_versions.append("7.1.0-d1")
     return db_versions
-
-
-@nox.session(name="run-tests-experimental", python=False)
-@nox.parametrize("db_version", get_db_versions())
-def run_tests_experimental(session: nox.Session, db_version: str):
-    env = {"EXASOL_VERSION": db_version}
-    session.run("pytest", "./test/integration/test_udf_execution.py", env=env)
 
 
 @nox.session(name="run-tests", python=False)
