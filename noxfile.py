@@ -164,6 +164,7 @@ def get_db_versions() -> List[str]:
     # on DockerHub, yet. Instead, we add its pre-release version.
     db_versions.remove("8.17.0")
     db_versions.append("prerelease-8.17.0")
+    db_versions.remove("7.1.0")
     db_versions.append("7.1.0-d1")
     return db_versions
 
@@ -172,8 +173,10 @@ def get_db_versions() -> List[str]:
 @nox.parametrize("db_version", get_db_versions())
 def run_tests(session: nox.Session, db_version: str):
     """Run the tests in the poetry environment"""
+    env = {"EXASOL_VERSION": db_version}
+    session.run("pytest", "./test/unit")
+    session.run("pytest", "./test/integration", env=env)
     with session.chdir(ROOT):
-        env = {"EXASOL_VERSION": db_version}
         session.run(
             "python",
             "-u",
@@ -183,10 +186,6 @@ def run_tests(session: nox.Session, db_version: str):
             "./exasol_integration_test_docker_environment/test",
             env=env,
         )
-    session.run(
-        "pytest", "--itde-db-version", db_version, './test/integration'
-    )
-    session.run("pytest", './test/unit')
 
 
 @nox.session(name="run-minimal-tests", python=False)

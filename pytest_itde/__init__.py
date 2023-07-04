@@ -19,7 +19,7 @@ EXASOL = config.OptionGroup(
         {
             "name": "port",
             "type": int,
-            "default": Ports.docker.database,
+            "default": Ports.forward.database,
             "help_text": "Port on which the exasol db is listening",
         },
         {
@@ -43,7 +43,7 @@ BUCKETFS = config.OptionGroup(
         {
             "name": "url",
             "type": str,
-            "default": "http://127.0.0.1:6666",
+            "default": f"http://127.0.0.1:{Ports.forward.bucketfs}",
             "help_text": "Base url used to connect to the bucketfs service",
         },
         {
@@ -61,6 +61,17 @@ BUCKETFS = config.OptionGroup(
     ),
 )
 
+SSH = config.OptionGroup(
+    prefix="ssh",
+    options=(
+        {
+            "name": "port",
+            "type": int,
+            "default": Ports.forward.ssh,
+            "help_text": "Port on which external processes can access the database via SSH protocol",
+        },
+    ),
+)
 
 def TestSchemas(value) -> Tuple[str]:
     """
@@ -117,6 +128,14 @@ def bucketfs_config(request) -> config.BucketFs:
 
 
 @pytest.fixture(scope="session")
+def ssh_config(request) -> config.Ssh:
+    """Returns the configuration settings for SSH access in this session."""
+    cli_arguments = request.config.option
+    kwargs = SSH.kwargs(os.environ, cli_arguments)
+    return config.Ssh(**kwargs)
+
+
+@pytest.fixture(scope="session")
 def itde_config(request) -> config.Itde:
     """Returns the configuration settings of the ITDE for this session."""
     cli_arguments = request.config.option
@@ -150,13 +169,13 @@ def connection_factory():
 
 
 @pytest.fixture(scope="session")
-def _bootstrap_db(itde_config, exasol_config, bucketfs_config):
+def _bootstrap_db(itde_config, exasol_config, bucketfs_config, ssh_config):
     """Bootstraps the database should not be used from outside the itde plugin."""
 
     def nop():
         pass
 
-    def start_db(name, itde, exasol, bucketfs):
+    def start_db(name, itde, exasol, bucketfs, ssh_access):
         from urllib.parse import urlparse
 
         from exasol_integration_test_docker_environment.lib import api
@@ -166,7 +185,7 @@ def _bootstrap_db(itde_config, exasol_config, bucketfs_config):
             environment_name=name,
             database_port_forward=exasol.port,
             bucketfs_port_forward=bucketfs_url.port,
-            ssh_port_forward=20002,
+            ssh_port_forward=ssh_access.port,
             db_mem_size="4GB",
             docker_db_image_version=itde.db_version,
         )
@@ -176,7 +195,7 @@ def _bootstrap_db(itde_config, exasol_config, bucketfs_config):
     bootstrap_db = itde_config.db_version != "external"
 
     start = (
-        lambda: start_db(db_name, itde_config, exasol_config, bucketfs_config)
+        lambda: start_db(db_name, itde_config, exasol_config, bucketfs_config, ssh_config)
         if bootstrap_db
         else lambda: nop
     )
@@ -213,7 +232,7 @@ def itde(
         connection.commit()
 
 
-OPTION_GROUPS = (EXASOL, BUCKETFS, ITDE)
+OPTION_GROUPS = (EXASOL, BUCKETFS, ITDE, SSH)
 
 
 def _add_option_group(parser, group):

@@ -122,6 +122,13 @@ class BucketFs:
 
 
 @dataclass
+class Ssh:
+    """SSH configuration"""
+
+    port: int
+
+
+@dataclass
 class Itde:
     """Itde configuration settings"""
 

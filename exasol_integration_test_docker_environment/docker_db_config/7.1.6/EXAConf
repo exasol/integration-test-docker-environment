@@ -5,7 +5,7 @@
     Platform = Docker
     LicenseFile = /exa/etc/license.xml
     CoredPort = 10001
-    SSHPort = 22
+    SSHPort = {{ ssh_port }}
     XMLRPCPort = 443
     WebUIBackendPort = 4444
     WebUIDomain = exacluster.local
@@ -88,8 +88,6 @@
     Affinity = 11
     UUID = 02F4E2AF9C294CABA0A119A89AC60B44EC95D19C
     DockerVolume = n11
-    # Ports to be exposed (container : host)
-    ExposedPorts = 8888:8899, 6583:6594
     [[Disk : disk1]]
         Component = exastorage
         Devices = dev.1
@@ -135,7 +133,7 @@
     Version = {{ db_version }}
     # Memory size over all nodes (e. g. '1 TiB').
     MemSize = {{ mem_size }}
-    Port = 8888
+    Port = {{ db_port }}
     # User and group IDs that own this database (e. g. '1000:1005').
     Owner = 500 : 500
     # Comma-separated list of node IDs for this DB (put reserve nodes at the end, if any).
@@ -172,7 +170,7 @@
 [BucketFS : bfsdefault]
     Owner = 500 : 500
     # HTTP port number (0 = disabled)
-    HttpPort = 6583
+    HttpPort = {{ bucketfs_port }}
     # HTTPS port number (0 = disabled)
     HttpsPort = 0
     SyncKey = c3RxWjRxWUFpZUFQblEyc0p2djZUM0VZamVZa1M0bUs=

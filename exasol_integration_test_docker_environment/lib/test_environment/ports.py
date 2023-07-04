@@ -30,21 +30,21 @@ class PortsType(type):
     The following properties are read-only class attributes:
     - default_ports
     - external
-    - docker
     - forward
     """
 
     @property
     def default_ports(self) -> 'Ports':
-        return Ports(database=8888, bucketfs=6583, ssh=22)
+        return Ports(database=8563, bucketfs=2580, ssh=22)
 
     @property
     def external(self) -> 'Ports':
-        return Ports(database=8563, bucketfs=6583, ssh=22)
+        # For external databases SSH port might depend on version database.
+        return Ports(database=8563, bucketfs=2580, ssh=None)
 
     @property
-    def docker(self) -> 'Ports':
-        return Ports(database=8888, bucketfs=6583, ssh=22)
+    def forward(self) -> 'Ports':
+        return Ports(database=8563, bucketfs=2580, ssh=20002)
 
 
 class Ports(metaclass=PortsType):

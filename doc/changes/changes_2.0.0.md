@@ -26,3 +26,4 @@ If you need further versions, please open an issue.
 
 * #329: Added CLI option `--ssh-port-forward` to forward SSH port
 * #343: Added SshInfo to DatabaseInfo containing user, port and path to SSH key file
+* #308: Unified ports for database, BucketFS, and SSH

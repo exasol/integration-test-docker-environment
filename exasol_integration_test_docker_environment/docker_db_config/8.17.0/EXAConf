@@ -5,7 +5,7 @@
     Platform = Docker
     LicenseFile = /exa/etc/license.exasol_license
     CoredPort = 325
-    SSHPort = 22
+    SSHPort = {{ ssh_port }}
     IssueTracker = Jira
     XMLRPCPort = 443
     WebUIBackendPort = 4444
@@ -104,8 +104,6 @@
     Affinity = 11
     UUID = F0EA64D47F374A00B0530772981C559EE1C59086
     DockerVolume = n11
-    # Ports to be exposed (container : host)
-    ExposedPorts = 8888:8899, 6583:6594
     [[Disk : disk1]]
         Component = exastorage
         Devices = dev.1
@@ -159,7 +157,7 @@
     Version = {{ db_version }}
     # Memory size over all nodes (e. g. '1 TiB').
     MemSize = {{ mem_size }}
-    Port = 8888
+    Port = {{ db_port }}
     # User and group IDs that own this database (e. g. '1000:1005').
     Owner = 500 : 500
     # Comma-separated list of node IDs for this DB (put reserve nodes at the end, if any).
@@ -172,7 +170,9 @@
     BuiltinScriptLanguageName = slc-6.0.0-c4-5-standard-EXASOL-8.0.0/ScriptLanguages-standard-EXASOL-8.0.0-slc-v6.0.0-PB5EHDLN
     AutoStart = True
     {% if additional_db_parameters %}
-    Params = {{ additional_db_parameters }}
+    Params = -sandboxCHROOT=/opt/exasol/cos-8.28.0/sbin/nsexec_chroot {{ additional_db_parameters }}
+    {% else %}
+    Params = -sandboxCHROOT=/opt/exasol/cos-8.28.0/sbin/nsexec_chroot
     {% endif %}
 
     # JDBC driver configuration
@@ -198,7 +198,7 @@
 [BucketFS : bfsdefault]
     Owner = 500 : 500
     # HTTP port number (0 = disabled)
-    HttpPort = 6583
+    HttpPort = {{ bucketfs_port }}
     # HTTPS port number (0 = disabled)
     HttpsPort = 0
     SyncKey = bDRYa3pCNXRwaW9OR3k2NjJ2TGpyQ3YweXZEOVUyanQ=
