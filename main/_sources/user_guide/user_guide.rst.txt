@@ -244,8 +244,8 @@ The following config files are available:
 
       # Database IP in environment docker network
       export ITDE_DATABASE_HOST=172.21.0.2
-      export ITDE_DATABASE_DB_PORT=8888
-      export ITDE_DATABASE_BUCKETFS_PORT=6583
+      export ITDE_DATABASE_DB_PORT=8563
+      export ITDE_DATABASE_BUCKETFS_PORT=2580
       export ITDE_DATABASE_SSH_PORT=22
       export ITDE_DATABASE_CONTAINER_NAME=db_container_test
       export ITDE_DATABASE_CONTAINER_NETWORK_ALIASES="exasol_test_database db_container_test"
