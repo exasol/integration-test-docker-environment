@@ -30,13 +30,14 @@ def get_log_path(job_id: str) -> Path:
     the environment variable LOG_ENV_VARIABLE_NAME.
     """
     main_log_path = Path(build_config().output_directory) / "jobs" / job_id / "logs"
-    main_log_path.mkdir(parents=True, exist_ok=True)
     def_log_path = main_log_path / "main.log"
     env_log_path = os.getenv(LOG_ENV_VARIABLE_NAME)
     if env_log_path is not None:
         log_path = Path(env_log_path)
     else:
         log_path = def_log_path
+    log_path_dir = Path(os.path.dirname(log_path))
+    log_path_dir.mkdir(parents=True, exist_ok=True)
     return log_path
 
 
