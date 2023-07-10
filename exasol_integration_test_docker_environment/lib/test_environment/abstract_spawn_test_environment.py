@@ -144,24 +144,33 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
     def create_network_task(self, attempt: int):
         raise AbstractMethodException()
 
-    def _spawn_database_and_test_container(self,
-                                           network_info: DockerNetworkInfo,
-                                           certificate_volume_info: Optional[DockerVolumeInfo],
-                                           attempt: int) -> Tuple[DatabaseInfo, Optional[ContainerInfo]]:
-        certificate_volume_name = certificate_volume_info.volume_name if certificate_volume_info is not None else None
-        dependencies_tasks = {
-                DATABASE: self.create_spawn_database_task(network_info, certificate_volume_info, attempt)
-            }
+    def _spawn_database_and_test_container(
+            self,
+            network_info: DockerNetworkInfo,
+            certificate_volume_info: Optional[DockerVolumeInfo],
+            attempt: int,
+    ) -> Tuple[DatabaseInfo, Optional[ContainerInfo]]:
+        def volume_name(info):
+            return None if info is None else info.volume_name
+
+        child_tasks = {
+            DATABASE: self.create_spawn_database_task(
+                network_info,
+                certificate_volume_info,
+                attempt,
+            )
+        }
         if self.test_container_content is not None:
-            dependencies_tasks[TEST_CONTAINER] = \
-                self.create_spawn_test_container_task(network_info, certificate_volume_name, attempt)
-        database_and_test_container_info_future = yield from self.run_dependencies(dependencies_tasks)
-        database_and_test_container_info = \
-            self.get_values_from_futures(database_and_test_container_info_future)
-        test_container_info = None
-        if self.test_container_content is not None:
-            test_container_info = database_and_test_container_info[TEST_CONTAINER]
-        database_info = database_and_test_container_info[DATABASE]
+            certificate_volume_name = volume_name(certificate_volume_info)
+            child_tasks[TEST_CONTAINER] = self.create_spawn_test_container_task(
+                network_info,
+                certificate_volume_name,
+                attempt,
+            )
+        futures = yield from self.run_dependencies(child_tasks)
+        results = self.get_values_from_futures(futures)
+        database_info = results[DATABASE]
+        test_container_info = results[TEST_CONTAINER] if self.test_container_content is not None else None
         return database_info, test_container_info
 
     def create_spawn_database_task(self,
