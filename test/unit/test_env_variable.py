@@ -10,6 +10,7 @@ from exasol_integration_test_docker_environment.lib.api.common import generate_r
 from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import DependencyLoggerBaseTask
 from exasol_integration_test_docker_environment.lib.config.build_config import build_config
 
+
 @pytest.fixture
 def set_tempdir():
     path_old = os.getcwd()
@@ -23,7 +24,7 @@ def default_log_path(job_id):
     return Path(build_config().output_directory) / "jobs" / job_id / "logs" / "main.log"
 
 
-class TestTask_env(DependencyLoggerBaseTask):
+class TestTask(DependencyLoggerBaseTask):
     x = luigi.Parameter()
 
     def run_task(self):
@@ -37,7 +38,7 @@ def run_n_simple_tasks(task_number):
     tasks = []
 
     def create_task():
-        return generate_root_task(task_class=TestTask_env, x=f"{next(task_id_generator)}")
+        return generate_root_task(task_class=TestTask, x=f"{next(task_id_generator)}")
 
     for j in range(NUMBER_TASK):
         output = run_task(create_task, workers=5, task_dependencies_dot_file=None, use_job_specific_log_file=True)
@@ -136,7 +137,7 @@ def test_different_custom_logging_file(set_tempdir):
     Integration test which verifies that changing the log path from one invocation of run_task to the next will work
     """
     temp_dir = set_tempdir
-    task_creator = lambda: generate_root_task(task_class=TestTask_env, x="Test")
+    task_creator = lambda: generate_root_task(task_class=TestTask, x="Test")
 
     use_specific_log_file(task_creator, temp_dir, "first")
     use_specific_log_file(task_creator, temp_dir, "second")
