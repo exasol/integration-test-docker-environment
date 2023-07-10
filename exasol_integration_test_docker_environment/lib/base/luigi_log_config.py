@@ -36,7 +36,7 @@ def get_log_path(job_id: str) -> Path:
         log_path = Path(env_log_path)
     else:
         log_path = def_log_path
-    log_path_dir = Path(os.path.dirname(log_path))
+    log_path_dir = Path(log_path).parent
     log_path_dir.mkdir(parents=True, exist_ok=True)
     return log_path
 

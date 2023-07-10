@@ -2,6 +2,7 @@ import pytest
 import os.path
 import tempfile
 from pathlib import Path
+from unittest import mock
 
 import luigi
 
@@ -12,12 +13,17 @@ from exasol_integration_test_docker_environment.lib.config.build_config import b
 
 
 @pytest.fixture
-def set_tempdir():
+def set_tempdir(tmp_path):
     path_old = os.getcwd()
-    with tempfile.TemporaryDirectory() as temp_dir:
-        os.chdir(temp_dir)
-        yield temp_dir
+    os.chdir(tmp_path)
+    yield tmp_path
     os.chdir(path_old)
+
+
+@pytest.fixture()
+def mock_settings_env_vars():
+    with mock.patch.dict(os.environ, {}):
+        yield
 
 
 def default_log_path(job_id):
@@ -45,28 +51,15 @@ def run_n_simple_tasks(task_number):
         jobid = output["job_id"]
         log_path = get_log_path(jobid)
         tasks.append({"jobid": jobid, "log_path": log_path, "in_parameter": output["parameter"]})
-        assert log_path.exists()
-        assert os.path.isfile(log_path)
 
-    for task in tasks:
-        # extra loop, so we can check if all log content exists after tasks are finished.
-        # makes sure no log content got overwritten
-        with open(task["log_path"], "r") as f:
-            log_content = f.read()
-            in_param = task['in_parameter']
-            assert f"Logging: {in_param}" in log_content
     return tasks
 
 
 def use_specific_log_file(task_creator, temp_dir, test_name):
     log_path = Path(temp_dir) / (test_name + ".log")
     os.environ[LOG_ENV_VARIABLE_NAME] = str(log_path)
-    jobid = run_task(task_creator, workers=5, task_dependencies_dot_file=None, use_job_specific_log_file=True)
-    assert log_path.exists()
-    with open(log_path, "r") as f:
-        log_content = f.read()
-        assert f"Logging: Test" in log_content
-    os.environ.pop(LOG_ENV_VARIABLE_NAME)
+    run_task(task_creator, workers=5, task_dependencies_dot_file=None, use_job_specific_log_file=True)
+    return log_path
 
 
 def test_var_not_set(set_tempdir):
@@ -75,7 +68,16 @@ def test_var_not_set(set_tempdir):
     default log path
     """
     tasks = run_n_simple_tasks(1)
-    assert tasks[0]["log_path"] == default_log_path(tasks[0]["jobid"])
+
+    log_path = tasks[0]["log_path"]
+    assert log_path == default_log_path(tasks[0]["jobid"])
+    assert log_path.exists()
+    assert os.path.isfile(log_path)
+
+    with open(log_path, "r") as f:
+        log_content = f.read()
+        in_param = tasks[0]['in_parameter']
+        assert f"Logging: {in_param}" in log_content
 
 
 def test_var_not_set_same_logging_file(set_tempdir):
@@ -85,10 +87,18 @@ def test_var_not_set_same_logging_file(set_tempdir):
     """
     tasks = run_n_simple_tasks(5)
     for task in tasks:
-        assert task["log_path"] == default_log_path(task["jobid"])
+        log_path = task["log_path"]
+        assert log_path == default_log_path(task["jobid"])
+        assert log_path.exists()
+        assert os.path.isfile(log_path)
+
+        with open(log_path, "r") as f:
+            log_content = f.read()
+            in_param = task['in_parameter']
+            assert f"Logging: {in_param}" in log_content
 
 
-def test_custom_log_path_points_at_file(set_tempdir):
+def test_custom_log_path_points_at_file(set_tempdir, mock_settings_env_vars):
     """
     Integration test which verifies that using a custom log path for a single task works if the path points to a file
     """
@@ -96,54 +106,82 @@ def test_custom_log_path_points_at_file(set_tempdir):
     custom_log_path = Path(temp_dir) / "main.log"
     os.environ[LOG_ENV_VARIABLE_NAME] = str(custom_log_path)
     tasks = run_n_simple_tasks(1)
-    assert tasks[0]["log_path"] == custom_log_path
-    os.environ.pop(LOG_ENV_VARIABLE_NAME)
+
+    log_path = tasks[0]["log_path"]
+    assert log_path == custom_log_path
+    assert log_path.exists()
+    assert os.path.isfile(log_path)
+
+    with open(log_path, "r") as f:
+        log_content = f.read()
+        in_param = tasks[0]['in_parameter']
+        assert f"Logging: {in_param}" in log_content
 
 
-def test_preexisting_custom_log_file(set_tempdir):
+def test_preexisting_custom_log_file(set_tempdir, mock_settings_env_vars):
     """
     Integration test which verifies that using a custom log path for a single task works if file already exists.
     """
     temp_dir = set_tempdir
     custom_log_path = Path(temp_dir) / "main.log"
+    os.environ[LOG_ENV_VARIABLE_NAME] = str(custom_log_path)
     file_content = "This existing file has content."
     with open(custom_log_path, "a") as f:
         f.write(file_content)
-    os.environ[LOG_ENV_VARIABLE_NAME] = str(custom_log_path)
+
     tasks = run_n_simple_tasks(1)
-    assert tasks[0]["log_path"] == custom_log_path
+
+    log_path = tasks[0]["log_path"]
+    assert log_path == custom_log_path
+    assert log_path.exists()
+    assert os.path.isfile(log_path)
     with open(custom_log_path, "r") as f:
-        content = f.read()
-        assert file_content in content
-    os.environ.pop(LOG_ENV_VARIABLE_NAME)
+        log_content = f.read()
+        assert file_content in log_content
+        in_param = tasks[0]['in_parameter']
+        assert f"Logging: {in_param}" in log_content
 
 
-def test_same_logging_file_custom_log_path(set_tempdir):
+def test_same_logging_file_custom_log_path(set_tempdir, mock_settings_env_vars):
     """
-    Integration test which verifies that re-using the same logging for multiple tasks works as expected,
+    Integration test which verifies that re-using the same log file for multiple tasks works as expected,
     using a custom log path
     """
     temp_dir = set_tempdir
     custom_log_path = Path(temp_dir) / "main.log"
     os.environ[LOG_ENV_VARIABLE_NAME] = str(custom_log_path)
     tasks = run_n_simple_tasks(5)
+
     for task in tasks:
-        assert task["log_path"] == custom_log_path
-    os.environ.pop(LOG_ENV_VARIABLE_NAME)
+        log_path = task["log_path"]
+        assert log_path == custom_log_path
+        assert log_path.exists()
+        assert os.path.isfile(log_path)
+
+        with open(log_path, "r") as f:
+            log_content = f.read()
+            in_param = task['in_parameter']
+            assert f"Logging: {in_param}" in log_content
 
 
-def test_different_custom_logging_file(set_tempdir):
+def test_different_custom_logging_file(set_tempdir, mock_settings_env_vars):
     """
     Integration test which verifies that changing the log path from one invocation of run_task to the next will work
     """
     temp_dir = set_tempdir
     task_creator = lambda: generate_root_task(task_class=TestTask, x="Test")
 
-    use_specific_log_file(task_creator, temp_dir, "first")
-    use_specific_log_file(task_creator, temp_dir, "second")
+    log_path_1 = use_specific_log_file(task_creator, temp_dir, "first")
+    log_path_2 = use_specific_log_file(task_creator, temp_dir, "second")
+
+    for log_path in [log_path_1, log_path_2]:
+        assert log_path.exists()
+        with open(log_path, "r") as f:
+            log_content = f.read()
+            assert f"Logging: Test" in log_content
 
 
-def test_custom_log_path_points_at_dir(set_tempdir):
+def test_custom_log_path_points_at_dir(set_tempdir, mock_settings_env_vars):
     """
     Integration test which verifies that using a custom log path for a single task fails if the path points to a directory instead of a file
     """
@@ -151,14 +189,11 @@ def test_custom_log_path_points_at_dir(set_tempdir):
     custom_log_path = Path(temp_dir)
     os.environ[LOG_ENV_VARIABLE_NAME] = str(custom_log_path)
 
-    with pytest.raises(Exception) as e:
+    with pytest.raises(IsADirectoryError):
         run_n_simple_tasks(1)
 
-    assert e.type.__name__ == "IsADirectoryError"
-    os.environ.pop(LOG_ENV_VARIABLE_NAME)
 
-
-def test_missing_dir_in_custom_log_path(set_tempdir):
+def test_missing_dir_in_custom_log_path(set_tempdir, mock_settings_env_vars):
     """
     Integration test which verifies that all not preexisting dirs in a custom log path are created correctly.
     """
@@ -166,6 +201,15 @@ def test_missing_dir_in_custom_log_path(set_tempdir):
     custom_log_path = Path(temp_dir) / "another_dir" / "main.log"
     os.environ[LOG_ENV_VARIABLE_NAME] = str(custom_log_path)
     tasks = run_n_simple_tasks(1)
-    assert tasks[0]["log_path"] == custom_log_path
-    os.environ.pop(LOG_ENV_VARIABLE_NAME)
+    log_path = tasks[0]["log_path"]
+    assert log_path == custom_log_path
+    assert log_path.exists()
+    assert os.path.isfile(log_path)
+
+    with open(log_path, "r") as f:
+        log_content = f.read()
+        in_param = tasks[0]['in_parameter']
+        assert f"Logging: {in_param}" in log_content
+
+
 
