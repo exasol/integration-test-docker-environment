@@ -1,6 +1,5 @@
 import pytest
 import os.path
-import tempfile
 from pathlib import Path
 from unittest import mock
 
@@ -10,7 +9,6 @@ from exasol_integration_test_docker_environment.lib.base.luigi_log_config import
 from exasol_integration_test_docker_environment.lib.api.common import generate_root_task, run_task
 from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import DependencyLoggerBaseTask
 from exasol_integration_test_docker_environment.lib.config.build_config import build_config
-from test.unit.matchers import LogPathCorrectnessMatcher, UsedLogPath
 
 
 @pytest.fixture
@@ -25,6 +23,36 @@ def set_tempdir(tmp_path):
 def mock_settings_env_vars():
     with mock.patch.dict(os.environ, {}):
         yield
+
+
+class UsedLogPath:
+    def __init__(self, task):
+        self.log_path = task["log_path"]
+        self.task_input_parameter = task["in_parameter"]
+
+    def __repr__(self):
+        return f"{str(self.log_path)}" \
+               f"\n check log content for: 'Logging: {self.task_input_parameter}'"
+
+
+class LogPathCorrectnessMatcher:
+    """Assert that a given path meets some expectations."""
+
+    def __init__(self, expected_log_path: Path):
+        self.expected_log_path = expected_log_path
+
+    def __eq__(self, used_log_path: UsedLogPath):
+        log_path = used_log_path.log_path
+        if not (log_path == self.expected_log_path
+                and log_path.exists()
+                and log_path.is_file()):
+            return False
+
+        log_content = log_path.read_text()
+        return f"Logging: {used_log_path.task_input_parameter}" in log_content
+
+    def __repr__(self):
+        return f"{str(self.expected_log_path)}"
 
 
 def default_log_path(job_id):
@@ -71,7 +99,7 @@ def test_var_not_set(set_tempdir):
     tasks = run_n_simple_tasks(1)
 
     log_path_matcher = LogPathCorrectnessMatcher(default_log_path(tasks[0]["jobid"]))
-    log_path = UsedLogPath(tasks[0]["log_path"], tasks[0]['in_parameter'])
+    log_path = UsedLogPath(tasks[0])
     assert log_path == log_path_matcher
 
 
@@ -83,7 +111,7 @@ def test_var_not_set_same_logging_file(set_tempdir):
     tasks = run_n_simple_tasks(5)
     for task in tasks:
         log_path_matcher = LogPathCorrectnessMatcher(default_log_path(task["jobid"]))
-        log_path = UsedLogPath(task["log_path"], task['in_parameter'])
+        log_path = UsedLogPath(task)
         assert log_path == log_path_matcher
 
 
@@ -98,7 +126,7 @@ def test_custom_log_path_points_at_file(set_tempdir, mock_settings_env_vars):
 
     tasks = run_n_simple_tasks(1)
 
-    log_path = UsedLogPath(tasks[0]["log_path"], tasks[0]['in_parameter'])
+    log_path = UsedLogPath(tasks[0])
     assert log_path == log_path_matcher
 
 
@@ -116,7 +144,7 @@ def test_preexisting_custom_log_file(set_tempdir, mock_settings_env_vars):
 
     tasks = run_n_simple_tasks(1)
 
-    log_path = UsedLogPath(tasks[0]["log_path"], tasks[0]['in_parameter'])
+    log_path = UsedLogPath(tasks[0])
     assert log_path == log_path_matcher
 
     with open(custom_log_path, "r") as f:
@@ -136,7 +164,7 @@ def test_same_logging_file_custom_log_path(set_tempdir, mock_settings_env_vars):
     tasks = run_n_simple_tasks(5)
 
     for task in tasks:
-        log_path = UsedLogPath(task["log_path"], task['in_parameter'])
+        log_path = UsedLogPath(task)
         assert log_path == log_path_matcher
 
 
@@ -179,6 +207,6 @@ def test_missing_dir_in_custom_log_path(set_tempdir, mock_settings_env_vars):
     os.environ[LOG_ENV_VARIABLE_NAME] = str(custom_log_path)
     tasks = run_n_simple_tasks(1)
 
-    log_path = UsedLogPath(tasks[0]["log_path"], tasks[0]['in_parameter'])
+    log_path = UsedLogPath(tasks[0])
     assert log_path == log_path_matcher
 
