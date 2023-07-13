@@ -27,12 +27,12 @@ def mock_settings_env_vars():
 
 class UsedLogPath:
     def __init__(self, task):
-        self.log_path = task["log_path"]
+        self.log_path = Path(task["log_path"])
         self.task_input_parameter = task["in_parameter"]
 
     def __repr__(self):
-        return f"{str(self.log_path)}" \
-               f"\n check log content for: 'Logging: {self.task_input_parameter}'"
+        return f"log path: {str(self.log_path)}" \
+               f"\nlog content: 'self.log_path.read_text()'"
 
 
 class LogPathCorrectnessMatcher:
@@ -42,6 +42,8 @@ class LogPathCorrectnessMatcher:
         self.expected_log_path = expected_log_path
 
     def __eq__(self, used_log_path: UsedLogPath):
+        if not isinstance(used_log_path, UsedLogPath):
+              return False
         log_path = used_log_path.log_path
         if not (log_path == self.expected_log_path
                 and log_path.exists()
@@ -52,7 +54,8 @@ class LogPathCorrectnessMatcher:
         return f"Logging: {used_log_path.task_input_parameter}" in log_content
 
     def __repr__(self):
-        return f"{str(self.expected_log_path)}"
+        return f"log path: {str(self.expected_log_path)}"  \
+                    f"\nlog content: '.*Logging: {self.task_input_parameter}.*'"
 
 
 def default_log_path(job_id):
