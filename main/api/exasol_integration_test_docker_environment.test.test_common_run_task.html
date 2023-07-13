@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="exasol_integration_test_docker_environment.test.test_common_run_task_subprocess" href="exasol_integration_test_docker_environment.test.test_common_run_task_subprocess.html" /><link rel="prev" title="exasol_integration_test_docker_environment.test.test_click_api_consistency" href="exasol_integration_test_docker_environment.test.test_click_api_consistency.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="exasol_integration_test_docker_environment.test.test_db_version_supports_custom_certificates" href="exasol_integration_test_docker_environment.test.test_db_version_supports_custom_certificates.html" /><link rel="prev" title="exasol_integration_test_docker_environment.test.test_click_api_consistency" href="exasol_integration_test_docker_environment.test.test_click_api_consistency.html" />
 
     <meta name="generator" content="sphinx-4.5.0, furo 2022.09.29"/>
         <title>exasol_integration_test_docker_environment.test.test_common_run_task - Exasol Integration Test Docker Environment documentation</title>
@@ -380,7 +380,6 @@
 <li class="toctree-l4"><a class="reference internal" href="exasol_integration_test_docker_environment.test.test_cli_test_environment_nameservers.html">exasol_integration_test_docker_environment.test.test_cli_test_environment_nameservers</a></li>
 <li class="toctree-l4"><a class="reference internal" href="exasol_integration_test_docker_environment.test.test_click_api_consistency.html">exasol_integration_test_docker_environment.test.test_click_api_consistency</a></li>
 <li class="toctree-l4 current current-page"><a class="current reference internal" href="#">exasol_integration_test_docker_environment.test.test_common_run_task</a></li>
-<li class="toctree-l4"><a class="reference internal" href="exasol_integration_test_docker_environment.test.test_common_run_task_subprocess.html">exasol_integration_test_docker_environment.test.test_common_run_task_subprocess</a></li>
 <li class="toctree-l4"><a class="reference internal" href="exasol_integration_test_docker_environment.test.test_db_version_supports_custom_certificates.html">exasol_integration_test_docker_environment.test.test_db_version_supports_custom_certificates</a></li>
 <li class="toctree-l4"><a class="reference internal" href="exasol_integration_test_docker_environment.test.test_docker_access_method.html">exasol_integration_test_docker_environment.test.test_docker_access_method</a></li>
 <li class="toctree-l4"><a class="reference internal" href="exasol_integration_test_docker_environment.test.test_docker_build_base.html">exasol_integration_test_docker_environment.test.test_docker_build_base</a></li>
@@ -483,13 +482,10 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">CommonRunTaskTest</span></code>([methodName])</p></td>
-<td><p>All tests are executed in another process as we test the logging behavior which can be configured only once for a process! Note that multiprocessing.Process() does not work as it forks the current process, and thus inherits the logging configuration.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ReturnValueRunTaskTest</span></code>([methodName])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ReturnValueRunTaskTest</span></code>([methodName])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">TestTaskWithReturn</span></code>(*args, **kwargs)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">TestTaskWithReturn</span></code>(*args, **kwargs)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -502,12 +498,12 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="exasol_integration_test_docker_environment.test.test_common_run_task_subprocess.html">
+          <a class="next-page" href="exasol_integration_test_docker_environment.test.test_db_version_supports_custom_certificates.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">exasol_integration_test_docker_environment.test.test_common_run_task_subprocess</div>
+                <div class="title">exasol_integration_test_docker_environment.test.test_db_version_supports_custom_certificates</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>

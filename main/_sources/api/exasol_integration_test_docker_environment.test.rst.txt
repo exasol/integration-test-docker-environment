@@ -45,7 +45,6 @@ exasol\_integration\_test\_docker\_environment.test
    exasol_integration_test_docker_environment.test.test_cli_test_environment_nameservers
    exasol_integration_test_docker_environment.test.test_click_api_consistency
    exasol_integration_test_docker_environment.test.test_common_run_task
-   exasol_integration_test_docker_environment.test.test_common_run_task_subprocess
    exasol_integration_test_docker_environment.test.test_db_version_supports_custom_certificates
    exasol_integration_test_docker_environment.test.test_docker_access_method
    exasol_integration_test_docker_environment.test.test_docker_build_base
