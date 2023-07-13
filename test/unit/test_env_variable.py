@@ -32,7 +32,7 @@ class UsedLogPath:
 
     def __repr__(self):
         return f"log path: {str(self.log_path)}" \
-               f"\nlog content: 'self.log_path.read_text()'"
+               f"\nlog content: '{self.log_path.read_text()}'"
 
 
 class LogPathCorrectnessMatcher:
