@@ -212,4 +212,3 @@ def test_missing_dir_in_custom_log_path(set_tempdir, mock_settings_env_vars):
 
     log_path = UsedLogPath(tasks[0])
     assert log_path == log_path_matcher
-
