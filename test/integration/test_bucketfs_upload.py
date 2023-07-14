@@ -31,7 +31,7 @@ from exasol_integration_test_docker_environment \
         DockerExecFactory,
         SshExecFactory,
     )
-
+from test.integration.helpers import get_executor_factory
 
 BUCKET_NAME = "default"
 
@@ -42,15 +42,6 @@ def bucketfs_path(path: str, relative: bool = False) -> str:
     if relative:
         return suffix
     return f"{BUCKET_NAME}/{suffix}"
-
-
-def _executor_factory(
-        dbinfo: DatabaseInfo,
-        db_os_access: DbOsAccess=DbOsAccess.DOCKER_EXEC,
-) -> DbOsExecFactory:
-    if db_os_access == DbOsAccess.SSH:
-        return SshExecFactory.from_database_info(dbinfo)
-    return DockerExecFactory(dbinfo.container_info.container_name)
 
 
 class ArgumentError(Exception):
@@ -158,12 +149,11 @@ class UploadValidator:
         assert expected_content == self.bucketfs.download(self.filename)
 
 
-# @pytest.mark.parametrize("db_os_access", [DbOsAccess.DOCKER_EXEC, DbOsAccess.SSH])
-@pytest.mark.parametrize("db_os_access", [DbOsAccess.DOCKER_EXEC])
+@pytest.mark.parametrize("db_os_access", [DbOsAccess.DOCKER_EXEC, DbOsAccess.SSH])
 def test_upload_without_reuse(api_database, tmp_path, db_os_access):
     with api_database() as db:
         dbinfo = db.environment_info.database_info
-        executor_factory = _executor_factory(dbinfo, db_os_access)
+        executor_factory = get_executor_factory(dbinfo, db_os_access)
         bucketfs = BucketFsAccess(db, executor_factory)
         filename = "sample-file.txt"
         validator = UploadValidator(tmp_path, bucketfs, reuse=False)
