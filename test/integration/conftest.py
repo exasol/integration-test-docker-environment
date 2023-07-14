@@ -2,6 +2,7 @@ import contextlib
 from typing import Any, Callable, Dict, Iterator, List, NewType, Optional
 
 import pytest
+import re
 
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.testing import utils
@@ -32,7 +33,7 @@ def cli_isolation(request) -> Iterator[ExaslctTestEnvironment]:
 
 @pytest.fixture
 def api_isolation(request) -> Iterator[ApiTestEnvironment]:
-    testname = request.node.name
+    testname = re.sub(r"[[\]._]+", "_", request.node.name)
     environment = ApiTestEnvironment(test_object=None, name=testname)
     yield environment
     utils.close_environments(environment)

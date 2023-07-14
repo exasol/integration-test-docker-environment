@@ -8,6 +8,8 @@ from exasol_integration_test_docker_environment.lib.data.database_credentials im
 from exasol_integration_test_docker_environment.lib.data.database_info import DatabaseInfo
 from exasol_integration_test_docker_environment.lib.test_environment.database_setup.find_exaplus_in_db_container import \
     find_exaplus
+from exasol_integration_test_docker_environment.lib.base.db_os_executor import \
+    DbOsExecFactory
 
 
 class IsDatabaseReadyThread(Thread):
@@ -17,7 +19,8 @@ class IsDatabaseReadyThread(Thread):
                  database_info: DatabaseInfo,
                  database_container: Container,
                  database_credentials: DatabaseCredentials,
-                 docker_db_image_version: str):
+                 docker_db_image_version: str,
+                 executor_factory: DbOsExecFactory):
         super().__init__()
         self.logger = logger
         self.database_credentials = database_credentials
@@ -28,6 +31,7 @@ class IsDatabaseReadyThread(Thread):
         self.output_db_connection = None
         self.output_bucketfs_connection = None
         self.docker_db_image_version = docker_db_image_version
+        self.executor_factory = executor_factory
 
     def stop(self):
         self.logger.info("Stop IsDatabaseReadyThread")
@@ -37,7 +41,7 @@ class IsDatabaseReadyThread(Thread):
         db_connection_command = ""
         bucket_fs_connection_command = ""
         try:
-            exaplus_path = find_exaplus(self._db_container)
+            exaplus_path = find_exaplus(self._db_container, self.executor_factory)
             db_connection_command = self.create_db_connection_command(exaplus_path)
             bucket_fs_connection_command = self.create_bucketfs_connection_command()
         except RuntimeError as e:

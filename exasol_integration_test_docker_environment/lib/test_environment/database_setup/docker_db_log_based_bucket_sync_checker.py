@@ -3,8 +3,11 @@ from datetime import datetime
 
 from docker.models.containers import Container
 
-from exasol_integration_test_docker_environment.lib.test_environment.database_setup.bucketfs_sync_checker import \
-    BucketFSSyncChecker
+from exasol_integration_test_docker_environment \
+    .lib.test_environment.database_setup.bucketfs_sync_checker \
+    import BucketFSSyncChecker
+from exasol_integration_test_docker_environment \
+    .lib.base.db_os_executor import DbOsExecFactory
 
 
 class DockerDBLogBasedBucketFSSyncChecker(BucketFSSyncChecker):
@@ -13,12 +16,14 @@ class DockerDBLogBasedBucketFSSyncChecker(BucketFSSyncChecker):
                  database_container: Container,
                  pattern_to_wait_for: str,
                  log_file_to_check: str,
-                 bucketfs_write_password: str):
+                 bucketfs_write_password: str,
+                 executor_factory: DbOsExecFactory):
         self.logger = logger
         self.pattern_to_wait_for = pattern_to_wait_for
         self.log_file_to_check = log_file_to_check
         self.database_container = database_container
         self.bucketfs_write_password = bucketfs_write_password
+        self.executor_factory = executor_factory
 
     def prepare_upload(self):
         self.start_exit_code, self.start_output = self.find_pattern_in_logfile()

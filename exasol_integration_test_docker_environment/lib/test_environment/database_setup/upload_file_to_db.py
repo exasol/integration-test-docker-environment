@@ -15,11 +15,16 @@ from exasol_integration_test_docker_environment.lib.base.docker_base_task import
 from exasol_integration_test_docker_environment.lib.base.json_pickle_parameter import JsonPickleParameter
 from exasol_integration_test_docker_environment.lib.base.still_running_logger import StillRunningLogger, \
     StillRunningLoggerThread
-from exasol_integration_test_docker_environment.lib.data.environment_info import EnvironmentInfo
-from exasol_integration_test_docker_environment.lib.test_environment.database_setup.docker_db_log_based_bucket_sync_checker import \
-    DockerDBLogBasedBucketFSSyncChecker
-from exasol_integration_test_docker_environment.lib.test_environment.database_setup.time_based_bucketfs_sync_waiter import \
-    TimeBasedBucketFSSyncWaiter
+from exasol_integration_test_docker_environment.lib.data.environment_info \
+    import EnvironmentInfo
+from exasol_integration_test_docker_environment \
+    .lib.test_environment.database_setup.docker_db_log_based_bucket_sync_checker \
+    import DockerDBLogBasedBucketFSSyncChecker
+from exasol_integration_test_docker_environment \
+    .lib.test_environment.database_setup.time_based_bucketfs_sync_waiter \
+    import TimeBasedBucketFSSyncWaiter
+from exasol_integration_test_docker_environment \
+    .lib.base.db_os_executor import DbOsExecFactory
 
 
 @dataclasses.dataclass
@@ -35,6 +40,7 @@ class UploadFileToBucketFS(DockerBaseTask):
     reuse_uploaded = luigi.BoolParameter(False, significant=False)
     bucketfs_write_password = luigi.Parameter(
         significant=False, visibility=luigi.parameter.ParameterVisibility.HIDDEN)
+    executor_factory=JsonPickleParameter(DbOsExecFactory, significant=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -103,7 +109,8 @@ class UploadFileToBucketFS(DockerBaseTask):
                 log_file_to_check=log_file,
                 pattern_to_wait_for=pattern_to_wait_for,
                 logger=self.logger,
-                bucketfs_write_password=str(self.bucketfs_write_password)
+                bucketfs_write_password=str(self.bucketfs_write_password),
+                executor_factory=self.executor_factory,
             )
         else:
             return TimeBasedBucketFSSyncWaiter(sync_time_estimation)

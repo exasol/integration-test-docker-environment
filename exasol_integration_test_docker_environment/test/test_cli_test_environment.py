@@ -8,7 +8,10 @@ from exasol_integration_test_docker_environment.lib.test_environment.database_se
     find_exaplus
 from exasol_integration_test_docker_environment.testing import utils
 from exasol_integration_test_docker_environment.testing.exaslct_test_environment import ExaslctTestEnvironment
-
+from exasol_integration_test_docker_environment.lib.base.db_os_executor import (
+    DbOsExecFactory,
+    DockerExecFactory,
+)
 
 class DockerTestEnvironmentTest(unittest.TestCase):
 
@@ -51,7 +54,8 @@ class DockerTestEnvironmentTest(unittest.TestCase):
                                 .container_name
         with ContextDockerClient() as docker_client:
             db_container = docker_client.containers.get(db_container_name)
-            command = self.db_connection_command(db_container)
+            executor_factory = DockerExecFactory(db_container_name)
+            command = self.db_connection_command(db_container, executor_factory)
             exit_code, output = db_container.exec_run(command)
             self.assertEqual(
                 exit_code,
@@ -59,7 +63,11 @@ class DockerTestEnvironmentTest(unittest.TestCase):
                 f"Error while executing 'exaplus' in test container. Got output:\n {output}",
             )
 
-    def db_connection_command(self, db_container: docker.models.containers.Container):
+    def db_connection_command(
+            self,
+            db_container: docker.models.containers.Container,
+            executor_factory: DbOsExecFactory,
+    ) -> str:
         on_host = self.spawned_docker_test_environments.on_host_docker_environment
         db_info = on_host.environment_info.database_info
         connection_options = (
@@ -67,7 +75,7 @@ class DockerTestEnvironmentTest(unittest.TestCase):
             f"-u '{on_host.db_username}' "
             f"-p '{on_host.db_password}'"
         )
-        exaplus = find_exaplus(db_container)
+        exaplus = find_exaplus(db_container, executor_factory)
         command = (
             f"{exaplus} {connection_options} "
             "-sql 'select 1;' "
