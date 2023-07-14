@@ -166,7 +166,7 @@ def test_upload_without_reuse(api_database, tmp_path, db_os_access):
 def test_upload_with_reuse(api_database, tmp_path):
     with api_database() as db:
         dbinfo = db.environment_info.database_info
-        executor_factory = _executor_factory(dbinfo)
+        executor_factory = get_executor_factory(dbinfo)
         bucketfs = BucketFsAccess(db, executor_factory)
         filename = "sample-file.txt"
         validator = UploadValidator(tmp_path, bucketfs, reuse=True)
