@@ -38,5 +38,5 @@ def test_ssh_exec_factory_from_database_info():
     )
     factory = SshExecFactory.from_database_info(dbinfo)
     executor = factory.executor()
-    assert executor.connect_string == "my_user@my_host:3"
-    assert executor.key_file == "my_key_file"
+    assert executor._connect_string == "my_user@my_host:3"
+    assert executor._key_file == "my_key_file"

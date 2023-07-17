@@ -1,12 +1,32 @@
 from abc import abstractmethod
 import fabric
 import docker
-from typing import Protocol, runtime_checkable
+from docker import DockerClient
+from typing import Optional, Protocol, runtime_checkable
 from docker.models.containers import Container, ExecResult
 from exasol_integration_test_docker_environment \
     .lib.base.ssh_access import SshKey
 from exasol_integration_test_docker_environment \
     .lib.data.database_info import DatabaseInfo
+from exasol_integration_test_docker_environment.lib.docker \
+    import ContextDockerClient
+
+
+class DockerClientFactory(Protocol):
+    """
+    Create a Docker client.
+    """
+    @abstractmethod
+    def client(self) -> DockerClient:
+        ...
+
+
+class ContextDockerClientFactory(DockerClientFactory):
+    def __init__(self, timeout: int = 100000):
+        self._timeout = timeout
+
+    def client(self) -> DockerClient:
+        return ContextDockerClient(timeout=self._timeout)
 
 
 @runtime_checkable
@@ -22,42 +42,56 @@ class DbOsExecutor(Protocol):
 
 
 class DockerExecutor(DbOsExecutor):
-    def __init__(self, container_name: str, timeout: int = 100000):
-        self.container_name = container_name
-        self.timeout = timeout
-        self.container = None
+    def __init__(
+            self,
+            container_name: str,
+            timeout: int = 100000,
+            client_factory: Optional[DockerClientFactory] = None,
+    ):
+        self._container_name = container_name
+        self._container = None
+        if client_factory is None:
+            client_factory = ContextDockerClientFactory(timeout)
+        self._client_factory = client_factory
+        self._client = None
 
-    def _get_docker_client(self):
-        return ContextDockerClient(timeout=self.timeout)
+    def __enter__(self):
+        self._client = self._client_factory.client()
+        self._container = self._client.containers.get(self._container_name)
+        return self
 
-    def _find_container():
-        if not self.container:
-            with self._get_docker_client() as client:
-                self.container = client.containers.get(self.container_name)
-        return self.container
+    def __exit__(self, type_, value, traceback):
+        self._container = None
+        if self._client is not None:
+            self._client.close()
+            self._client = None
 
     def exec(self, cmd: str):
-        return self._find_container().exec_run(cmd)
+        return self._container.exec_run(cmd)
 
 
 class SshExecutor(DbOsExecutor):
     def __init__(self, connect_string: str, key_file: str):
-        self.connect_string = connect_string
-        self.key_file = key_file
-        self.connection = None
+        self._connect_string = connect_string
+        self._key_file = key_file
+        self._connection = None
 
-    def _connection(self):
-        if self.connection is None:
-            key = SshKey.read_from(self.key_file)
-            self.connection = fabric.Connection(
-                self.connect_string,
-                connect_kwargs={ "pkey": key.private },
-            )
-        return self.connection
+    def __enter__(self):
+        key = SshKey.read_from(self._key_file)
+        self._connection = fabric.Connection(
+            self._connect_string,
+            connect_kwargs={ "pkey": key.private },
+        )
+        return self
+
+    def __exit__(self, type_, value, traceback):
+        if self._connection is not None:
+            self._connection.close()
+            self._connection = None
 
     def exec(self, cmd: str) -> ExecResult:
         # monkeypatch.setattr('sys.stdin', io.StringIO(''))
-        result = self._connection().run(cmd)
+        result = self._connection.run(cmd)
         return ExecResult(result.exited, result.stdout)
 
 
@@ -77,11 +111,11 @@ class DbOsExecFactory(Protocol):
 
 class DockerExecFactory(DbOsExecFactory):
     def __init__(self, container_name: str, timeout: int = 100000):
-        self.container_name = container_name
-        self.timeout = timeout
+        self._container_name = container_name
+        self._timeout = timeout
 
     def executor(self) -> DbOsExecutor:
-        return DockerExecutor(self.container_name, self.timeout)
+        return DockerExecutor(self._container_name, self._timeout)
 
 
 class SshExecFactory(DockerExecFactory):
@@ -93,8 +127,8 @@ class SshExecFactory(DockerExecFactory):
         )
 
     def __init__(self, connect_string: str, ssh_key_file: str):
-        self.connect_string = connect_string
-        self.key_file = ssh_key_file
+        self._connect_string = connect_string
+        self._key_file = ssh_key_file
 
     def executor(self) -> DbOsExecutor:
-        return SshExecutor(self.connect_string, self.key_file)
+        return SshExecutor(self._connect_string, self._key_file)
