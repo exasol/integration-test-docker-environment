@@ -20,8 +20,7 @@ class DockerClientFactory(Protocol):
     def client(self) -> DockerClient:
         ...
 
-
-class ContextDockerClientFactory(DockerClientFactory):
+class DockerClientFactory:
     def __init__(self, timeout: int = 100000):
         self._timeout = timeout
 
@@ -42,29 +41,19 @@ class DbOsExecutor(Protocol):
 
 
 class DockerExecutor(DbOsExecutor):
-    def __init__(
-            self,
-            container_name: str,
-            timeout: int = 100000,
-            client_factory: Optional[DockerClientFactory] = None,
-    ):
+    def __init__(self, docker_client: DockerClient, container_name: str):
         self._container_name = container_name
         self._container = None
-        if client_factory is None:
-            client_factory = ContextDockerClientFactory(timeout)
-        self._client_factory = client_factory
-        self._client = None
+        self._client = docker_client
 
     def __enter__(self):
-        self._client = self._client_factory.client()
         self._container = self._client.containers.get(self._container_name)
         return self
 
     def __exit__(self, type_, value, traceback):
         self._container = None
-        if self._client is not None:
-            self._client.close()
-            self._client = None
+        self._client.close()
+        self._client = None
 
     def exec(self, cmd: str):
         return self._container.exec_run(cmd)
@@ -110,15 +99,22 @@ class DbOsExecFactory(Protocol):
 
 
 class DockerExecFactory(DbOsExecFactory):
-    def __init__(self, container_name: str, timeout: int = 100000):
+    def __init__(
+            self,
+            container_name: str,
+            client_factory: Optional[DockerClientFactory] = None,
+    ):
         self._container_name = container_name
-        self._timeout = timeout
+        if client_factory is None:
+            client_factory = DockerClientFactory()
+        self._client_factory = client_factory
 
     def executor(self) -> DbOsExecutor:
-        return DockerExecutor(self._container_name, self._timeout)
+        client = self._client_factory.client()
+        return DockerExecutor(client, self._container_name)
 
 
-class SshExecFactory(DockerExecFactory):
+class SshExecFactory(DbOsExecFactory):
     @classmethod
     def from_database_info(cls, info: DatabaseInfo):
         return SshExecFactory(
