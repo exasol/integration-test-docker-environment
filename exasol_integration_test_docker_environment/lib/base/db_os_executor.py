@@ -42,9 +42,9 @@ class DbOsExecutor(Protocol):
 
 class DockerExecutor(DbOsExecutor):
     def __init__(self, docker_client: DockerClient, container_name: str):
+        self._client = docker_client
         self._container_name = container_name
         self._container = None
-        self._client = docker_client
 
     def __enter__(self):
         self._container = self._client.containers.get(self._container_name)

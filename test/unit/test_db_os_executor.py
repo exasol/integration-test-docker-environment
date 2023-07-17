@@ -1,5 +1,7 @@
+from unittest.mock import MagicMock, Mock
 from exasol_integration_test_docker_environment \
     .lib.base.db_os_executor import (
+        DockerClientFactory,
         DbOsExecutor,
         DockerExecutor,
         SshExecutor,
@@ -9,6 +11,29 @@ from exasol_integration_test_docker_environment \
 from exasol_integration_test_docker_environment.lib.test_environment.ports import Ports
 from exasol_integration_test_docker_environment.lib.data.ssh_info import SshInfo
 from exasol_integration_test_docker_environment.lib.data.database_info import DatabaseInfo
+
+
+def test_docker_client_factory():
+    factory = DockerClientFactory()
+    client = Mock()
+    factory.client = MagicMock(return_value=client)
+    testee = DockerExecFactory("container_name", factory)
+
+    executor = testee.executor()
+    factory.client.assert_called()
+    assert executor._client == client
+
+
+def test_executor_closes_client():
+    container = Mock()
+    containers_mock = Mock()
+    containers_mock.get = MagicMock(return_value=container)
+    client = Mock(containers=containers_mock)
+    with DockerExecutor(client, "container_name") as executor:
+        executor.exec("sample command")
+        container.exec_run.assert_called_with("sample command")
+        client.close.assert_not_called()
+    client.close.assert_called()
 
 
 def test_docker_exec_factory():
