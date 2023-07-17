@@ -14,7 +14,7 @@ class DbOsExecutor(Protocol):
     """
     This class provides an abstraction to execute commands inside a Docker
     Container.  See concrete implementations in sub-classes
-    ``PlainDockerExec`` and ``SshDockerExec``.
+    ``DockerExecutor`` and ``SshExecutor``.
     """
     @abstractmethod
     def exec(self, cmd: str) -> ExecResult:
