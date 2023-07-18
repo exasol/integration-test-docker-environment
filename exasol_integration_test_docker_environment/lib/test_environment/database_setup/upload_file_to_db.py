@@ -60,16 +60,20 @@ class UploadFileToBucketFS(DockerBaseTask):
             else:
                 database_container = None
             if not self.should_be_reused(upload_target):
-                self.upload_and_wait(database_container,
-                                     file_to_upload,
-                                     upload_target,
-                                     log_file,
-                                     pattern_to_wait_for,
-                                     sync_time_estimation)
-                self.return_object(UploadResult(
-                    upload_target=upload_target,
-                    reused=False
-                ))
+                with self.executor_factory.executor() as executor:
+                    self.upload_and_wait(
+                        database_container,
+                        file_to_upload,
+                        upload_target,
+                        log_file,
+                        pattern_to_wait_for,
+                        sync_time_estimation,
+                        db_os_executor=executor,
+                    )
+                    self.return_object(UploadResult(
+                        upload_target=upload_target,
+                        reused=False
+                    ))
             else:
                 self.logger.warning("Reusing uploaded target %s instead of file %s",
                                     upload_target, file_to_upload)
@@ -79,30 +83,49 @@ class UploadFileToBucketFS(DockerBaseTask):
                     reused=True
                 ))
 
-    def upload_and_wait(self, database_container,
-                        file_to_upload: str, upload_target: str,
-                        log_file: str, pattern_to_wait_for: str,
-                        sync_time_estimation: int):
-        still_running_logger = StillRunningLogger(self.logger,
-                                                  "file upload of %s to %s"
-                                                  % (file_to_upload, upload_target))
+    def upload_and_wait(
+            self,
+            database_container,
+            file_to_upload: str,
+            upload_target: str,
+            log_file: str,
+            pattern_to_wait_for: str,
+            sync_time_estimation: int,
+            db_os_executor: DbOsExecutor,
+    ):
+        still_running_logger = StillRunningLogger(
+            self.logger,
+            f"file upload of {file_to_upload} to {upload_target}",
+        )
         thread = StillRunningLoggerThread(still_running_logger)
         thread.start()
-        sync_checker = self.get_sync_checker(database_container, sync_time_estimation,
-                                             log_file, pattern_to_wait_for)
+        sync_checker = self.get_sync_checker(
+            database_container,
+            sync_time_estimation,
+            log_file,
+            pattern_to_wait_for,
+            db_os_executor=db_os_executor,
+        )
         sync_checker.prepare_upload()
         try:
-            output = self.upload_file(file_to_upload=file_to_upload, upload_target=upload_target)
+            output = self.upload_file(
+                file_to_upload=file_to_upload,
+                upload_target=upload_target,
+            )
             sync_checker.wait_for_bucketfs_sync()
             self.write_logs(output)
         finally:
             thread.stop()
             thread.join()
 
-    def get_sync_checker(self, database_container: Container,
-                         sync_time_estimation: int,
-                         log_file: str,
-                         pattern_to_wait_for: str):
+    def get_sync_checker(
+            self,
+            database_container: Container,
+            sync_time_estimation: int,
+            log_file: str,
+            pattern_to_wait_for: str,
+            db_os_executor: DbOsExecutor,
+    ):
         if database_container is not None:
             return DockerDBLogBasedBucketFSSyncChecker(
                 database_container=database_container,
@@ -110,7 +133,7 @@ class UploadFileToBucketFS(DockerBaseTask):
                 pattern_to_wait_for=pattern_to_wait_for,
                 logger=self.logger,
                 bucketfs_write_password=str(self.bucketfs_write_password),
-                executor_factory=self.executor_factory,
+                executor=db_os_executor,
             )
         else:
             return TimeBasedBucketFSSyncWaiter(sync_time_estimation)
@@ -156,12 +179,12 @@ class UploadFileToBucketFS(DockerBaseTask):
         self.logger.info("upload file %s to %s",
                          file_to_upload, upload_target)
         bucket_name, path_in_bucket, file_in_bucket = self.split_upload_target(upload_target)
-
         bucket_config = self.generate_bucket_config(bucket_name)
         upload.upload_file_to_bucketfs(
             bucket_config=bucket_config,
             bucket_file_path=f"{path_in_bucket}/{file_in_bucket}",
-            local_file_path=Path(file_to_upload))
+            local_file_path=Path(file_to_upload)
+        )
         return f"File '{file_to_upload}' to '{upload_target}'"
 
     def write_logs(self, output):

@@ -49,11 +49,6 @@ class ArgumentError(Exception):
 
 
 class BucketFsAccess:
-    # TODO: eitde/lib/test_environment/database_setup/upload_file_to_db.py
-    # at exasol_bucketfs_utils_python import list_files, upload
-    # reports BucketFsDeprecationWarning:
-    # This API is deprecated and will be dropped in the future,
-    # please use the new API in the `exasol.bucketfs` package.
     class FileUploadTask(UploadFileToBucketFS):
         local_path = luigi.Parameter()
         target = luigi.Parameter()
@@ -163,10 +158,11 @@ def test_upload_without_reuse(api_database, tmp_path, db_os_access):
                  .validate("new content", expected_reuse=False)
 
 
-def test_upload_with_reuse(api_database, tmp_path):
+@pytest.mark.parametrize("db_os_access", [DbOsAccess.DOCKER_EXEC, DbOsAccess.SSH])
+def test_upload_with_reuse(api_database, tmp_path, db_os_access):
     with api_database() as db:
         dbinfo = db.environment_info.database_info
-        executor_factory = get_executor_factory(dbinfo)
+        executor_factory = get_executor_factory(dbinfo, db_os_access)
         bucketfs = BucketFsAccess(db, executor_factory)
         filename = "sample-file.txt"
         validator = UploadValidator(tmp_path, bucketfs, reuse=True)

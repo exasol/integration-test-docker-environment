@@ -1,13 +1,13 @@
 from pathlib import PurePath
 
-import docker.models.containers
-from exasol_integration_test_docker_environment.lib.base.db_os_executor import \
-    DbOsExecFactory
+import docker
+from exasol_integration_test_docker_environment.lib.base.db_os_executor \
+    import DbOsExecutor
 
 
 def find_exaplus(
         db_container: docker.models.containers.Container,
-        executor_factory: DbOsExecFactory,
+        os_executor: DbOsExecutor,
 ) -> PurePath:
     """
     Tries to find path of exaplus in given container in directories where exaplus is normally installed.

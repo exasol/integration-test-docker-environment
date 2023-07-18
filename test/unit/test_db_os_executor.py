@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock, Mock
+from unittest.mock import MagicMock, Mock, create_autospec
 from exasol_integration_test_docker_environment \
     .lib.base.db_os_executor import (
         DockerClientFactory,
@@ -11,17 +11,8 @@ from exasol_integration_test_docker_environment \
 from exasol_integration_test_docker_environment.lib.test_environment.ports import Ports
 from exasol_integration_test_docker_environment.lib.data.ssh_info import SshInfo
 from exasol_integration_test_docker_environment.lib.data.database_info import DatabaseInfo
-
-
-def test_docker_client_factory():
-    factory = DockerClientFactory()
-    client = Mock()
-    factory.client = MagicMock(return_value=client)
-    testee = DockerExecFactory("container_name", factory)
-
-    executor = testee.executor()
-    factory.client.assert_called()
-    assert executor._client == client
+from exasol_integration_test_docker_environment.lib.docker \
+    import ContextDockerClient
 
 
 def test_executor_closes_client():
@@ -36,16 +27,26 @@ def test_executor_closes_client():
     client.close.assert_called()
 
 
+def test_ssh_exec_factory():
+    factory = SshExecFactory("connect_string", "ssh_key_file")
+    executor = factory.executor()
+    assert isinstance(executor, DbOsExecutor) and type(executor) is SshExecutor
+
+
 def test_docker_exec_factory():
     factory = DockerExecFactory("container_name", None)
     executor = factory.executor()
     assert isinstance(executor, DbOsExecutor) and type(executor) is DockerExecutor
 
 
-def test_ssh_exec_factory():
-    factory = SshExecFactory("connect_string", "ssh_key_file")
-    executor = factory.executor()
-    assert isinstance(executor, DbOsExecutor) and type(executor) is SshExecutor
+def test_docker_client_factory_usage():
+    client = Mock()
+    factory = create_autospec(DockerClientFactory)
+    factory.client = MagicMock(return_value=client)
+    testee = DockerExecFactory("container_name", factory)
+    executor = testee.executor()
+    factory.client.assert_called()
+    assert executor._client == client
 
 
 def test_ssh_exec_factory_from_database_info():

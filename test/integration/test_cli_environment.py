@@ -46,18 +46,13 @@ class NumberCheck:
         )
 
 
-def smoke_test_sql(
-        db_container: docker.models.containers.Container,
-        env: ExaslctDockerTestEnvironment,
-        executor_factory: DbOsExecFactory,
-) -> str:
+def smoke_test_sql(exaplus_path: str, env: ExaslctDockerTestEnvironment) -> str:
     def quote(s):
         return f"'{s}'"
 
     db_info = env.environment_info.database_info
-    exaplus = find_exaplus(db_container, executor_factory)
-    command = [ str(exaplus) ]
-    command += [
+    command = [
+        str(exaplus_path),
         "-c", quote(f"{db_info.host}:{db_info.ports.database}"),
         "-u", quote(env.db_username),
         "-p", quote(env.db_password),
@@ -93,11 +88,9 @@ def test_db_available(cli_database, db_os_access):
             db_container_name = dbinfo.container_info.container_name
             db_container = docker_client.containers.get(db_container_name)
             executor_factory = get_executor_factory(dbinfo, db_os_access)
-            command = smoke_test_sql(
-                db_container,
-                db.on_host_docker_environment,
-                executor_factory,
-            )
-            exit_code, output = db_container.exec_run(command)
-            assert exit_code == 0, \
-                f"Error while executing 'exaplus' in test container. Got output:\n {output}"
+            with executor_factory.executor() as executor:
+                exaplus = find_exaplus(db_container, executor)
+                command = smoke_test_sql(exaplus, db.on_host_docker_environment)
+                exit_code, output = db_container.exec_run(command)
+                assert exit_code == 0, \
+                    f"Error while executing 'exaplus' in test container. Got output:\n {output}"
