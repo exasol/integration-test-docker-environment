@@ -107,8 +107,6 @@ class DbOsExecFactory(Protocol):
 class DockerExecFactory(DbOsExecFactory):
     def __init__(self, container_name: str, client_factory: DockerClientFactory):
         self._container_name = container_name
-        if client_factory is None:
-            client_factory = DockerClientFactory()
         self._client_factory = client_factory
 
     def executor(self) -> DbOsExecutor:
