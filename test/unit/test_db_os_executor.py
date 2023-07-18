@@ -39,15 +39,13 @@ def test_executor_closes_client():
 def test_docker_exec_factory():
     factory = DockerExecFactory("container_name", None)
     executor = factory.executor()
-    assert isinstance(executor, DbOsExecutor)
-    assert type(executor) is DockerExecutor
+    assert isinstance(executor, DbOsExecutor) and type(executor) is DockerExecutor
 
 
 def test_ssh_exec_factory():
     factory = SshExecFactory("connect_string", "ssh_key_file")
     executor = factory.executor()
-    assert isinstance(executor, DbOsExecutor)
-    assert type(executor) is SshExecutor
+    assert isinstance(executor, DbOsExecutor) and type(executor) is SshExecutor
 
 
 def test_ssh_exec_factory_from_database_info():
