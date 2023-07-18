@@ -46,12 +46,18 @@ class DockerExecutor(DbOsExecutor):
         return self
 
     def __exit__(self, type_, value, traceback):
-        self._container = None
-        self._client.close()
-        self._client = None
+        self.close()
+
+    def __del__(self):
+        self.close()
 
     def exec(self, cmd: str):
         return self._container.exec_run(cmd)
+
+    def close(self):
+        self._container = None
+        self._client.close()
+        self._client = None
 
 
 class SshExecutor(DbOsExecutor):
@@ -69,14 +75,19 @@ class SshExecutor(DbOsExecutor):
         return self
 
     def __exit__(self, type_, value, traceback):
+        self.close()
+
+    def __del__(self):
+        self.close()
+
+    def exec(self, cmd: str) -> ExecResult:
+        result = self._connection.run(cmd)
+        return ExecResult(result.exited, result.stdout)
+
+    def close(self):
         if self._connection is not None:
             self._connection.close()
             self._connection = None
-
-    def exec(self, cmd: str) -> ExecResult:
-        # monkeypatch.setattr('sys.stdin', io.StringIO(''))
-        result = self._connection.run(cmd)
-        return ExecResult(result.exited, result.stdout)
 
 
 @runtime_checkable
