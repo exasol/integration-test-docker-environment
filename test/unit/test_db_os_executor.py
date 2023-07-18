@@ -37,7 +37,7 @@ def test_executor_closes_client():
 
 
 def test_docker_exec_factory():
-    factory = DockerExecFactory("container_name")
+    factory = DockerExecFactory("container_name", None)
     executor = factory.executor()
     assert isinstance(executor, DbOsExecutor)
     assert type(executor) is DockerExecutor

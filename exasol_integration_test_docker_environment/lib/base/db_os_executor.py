@@ -2,7 +2,7 @@ from abc import abstractmethod
 import fabric
 import docker
 from docker import DockerClient
-from typing import Optional, Protocol, runtime_checkable
+from typing import Protocol, runtime_checkable
 from docker.models.containers import Container, ExecResult
 from exasol_integration_test_docker_environment \
     .lib.base.ssh_access import SshKey
@@ -12,15 +12,10 @@ from exasol_integration_test_docker_environment.lib.docker \
     import ContextDockerClient
 
 
-class DockerClientFactory(Protocol):
+class DockerClientFactory:
     """
     Create a Docker client.
     """
-    @abstractmethod
-    def client(self) -> DockerClient:
-        ...
-
-class DockerClientFactory:
     def __init__(self, timeout: int = 100000):
         self._timeout = timeout
 
@@ -99,11 +94,7 @@ class DbOsExecFactory(Protocol):
 
 
 class DockerExecFactory(DbOsExecFactory):
-    def __init__(
-            self,
-            container_name: str,
-            client_factory: Optional[DockerClientFactory] = None,
-    ):
+    def __init__(self, container_name: str, client_factory: DockerClientFactory):
         self._container_name = container_name
         if client_factory is None:
             client_factory = DockerClientFactory()

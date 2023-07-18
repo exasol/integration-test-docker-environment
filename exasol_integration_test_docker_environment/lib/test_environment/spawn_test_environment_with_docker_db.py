@@ -28,6 +28,7 @@ from exasol_integration_test_docker_environment \
     import SpawnTestDockerDatabase
 from exasol_integration_test_docker_environment \
     .lib.base.db_os_executor import (
+        DockerClientFactory,
         DbOsExecFactory,
         SshExecFactory,
         DockerExecFactory,
@@ -78,7 +79,8 @@ class SpawnTestEnvironmentWithDockerDB(
     def _executor_factory(self, database_info: DatabaseInfo) -> DbOsExecFactory:
         if self.db_os_access == DbOsAccess.SSH:
             return SshExecFactory.from_database_info(database_info)
-        return DockerExecFactory(self.db_container_name)
+        client_factory = DockerClientFactory(timeout=100000)
+        return DockerExecFactory(self.db_container_name, client_factory)
 
     def create_spawn_database_task(
             self,

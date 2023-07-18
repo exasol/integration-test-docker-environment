@@ -8,6 +8,7 @@ from exasol_integration_test_docker_environment.lib.base.db_os_executor import (
     SshExecFactory,
     DockerExecFactory,
     DbOsExecFactory,
+    DockerClientFactory,
 )
 from exasol_integration_test_docker_environment.lib.data.database_info \
     import DatabaseInfo
@@ -35,4 +36,5 @@ def get_executor_factory(
 ) -> DbOsExecFactory:
     if db_os_access == DbOsAccess.SSH:
         return SshExecFactory.from_database_info(dbinfo)
-    return DockerExecFactory(dbinfo.container_info.container_name)
+    client_factory = DockerClientFactory(timeout=100000)
+    return DockerExecFactory(dbinfo.container_info.container_name, client_factory)
