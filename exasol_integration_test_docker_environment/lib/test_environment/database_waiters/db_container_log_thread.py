@@ -27,23 +27,27 @@ class DBContainerLogThread(Thread):
         self.finish = True
 
     def run(self):
-        with ContainerLogHandler(self.log_file, self.logger, self.description) as log_handler:
-            still_running_logger = StillRunningLogger(
-                self.logger, self.description)
-            while not self.finish:
-                self.current_timestamp = math.floor(time.time())
-                log = self.container.logs(since=self.previous_timestamp, until=self.current_timestamp)
-                if len(log) != 0:
-                    still_running_logger.log()
-                    log_handler.handle_log_lines(log)
-                log_line = log.decode("utf-8").lower()
-                if ("error" in log_line and not "sshd was not started" in log_line) \
-                        or "exception" in log_line \
-                        or ("returned with state 1" in log_line 
-                                and not "(membership) returned with state 1" in log_line): # exclude webui not found in 7.0.0 
-                    self.logger.info("ContainerLogHandler error message, %s", log_line)
-                    self.error_message = log_line
-                    self.finish = True
-                self.previous_timestamp = self.current_timestamp
-                self.complete_log = log_handler.get_complete_log().copy()
-                time.sleep(1)
+        try:
+            with ContainerLogHandler(self.log_file, self.logger, self.description) as log_handler:
+                still_running_logger = StillRunningLogger(
+                    self.logger, self.description)
+                while not self.finish:
+                    self.current_timestamp = math.floor(time.time())
+                    log = self.container.logs(since=self.previous_timestamp, until=self.current_timestamp)
+                    if len(log) != 0:
+                        still_running_logger.log()
+                        log_handler.handle_log_lines(log)
+                    log_line = log.decode("utf-8").lower()
+                    if ("error" in log_line and not "sshd was not started" in log_line) \
+                            or "exception" in log_line \
+                            or ("returned with state 1" in log_line
+                                    and not "(membership) returned with state 1" in log_line): # exclude webui not found in 7.0.0
+                        self.logger.info("ContainerLogHandler error message, %s", log_line)
+                        self.error_message = log_line
+                        self.finish = True
+                    self.previous_timestamp = self.current_timestamp
+                    self.complete_log = log_handler.get_complete_log().copy()
+                    time.sleep(1)
+        except Exception as e:
+            self.finish = True
+            self.logger.exception("Caught exception in DBContainerLogThread.run.")
