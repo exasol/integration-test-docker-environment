@@ -69,8 +69,11 @@ def spawn_test_environment(
     raises: TaskRuntimeError if spawning the test environment fails
 
     """
+    print("spawn_test_environment", locals())
+
     def str_or_none(x: any) -> str:
         return str(x) if x is not None else None
+
     parsed_db_mem_size = humanfriendly.parse_size(db_mem_size)
     if parsed_db_mem_size < humanfriendly.parse_size("1 GiB"):
         raise ArgumentConstraintError("db_mem_size", "needs to be at least 1 GiB")
@@ -115,4 +118,5 @@ def spawn_test_environment(
     environment_info = run_task(task_creator, workers, task_dependencies_dot_file,
                                 log_level=log_level,
                                 use_job_specific_log_file=use_job_specific_log_file)
+    print("after spawn")
     return environment_info, functools.partial(_cleanup, environment_info)
