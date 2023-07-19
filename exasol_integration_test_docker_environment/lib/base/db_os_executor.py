@@ -20,7 +20,8 @@ class DockerClientFactory:
         self._timeout = timeout
 
     def client(self) -> DockerClient:
-        return ContextDockerClient(timeout=self._timeout)
+        with ContextDockerClient(timeout=self._timeout) as client:
+            return client
 
 
 # Avoid TypeError: Instance and class checks can only be
@@ -117,8 +118,8 @@ class DockerExecFactory(DbOsExecFactory):
         self._client_factory = client_factory
 
     def executor(self) -> DbOsExecutor:
-        with self._client_factory.client() as client:
-            return DockerExecutor(client, self._container_name)
+        client = self._client_factory.client()
+        return DockerExecutor(client, self._container_name)
 
 
 class SshExecFactory(DbOsExecFactory):
