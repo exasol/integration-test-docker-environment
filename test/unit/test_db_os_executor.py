@@ -1,4 +1,7 @@
-from unittest.mock import MagicMock, Mock, create_autospec
+from unittest.mock import MagicMock, create_autospec
+from docker import DockerClient
+from docker.models.containers import Container as DockerContainer
+
 from exasol_integration_test_docker_environment \
     .lib.base.db_os_executor import (
         DockerClientFactory,
@@ -16,10 +19,9 @@ from exasol_integration_test_docker_environment.lib.docker \
 
 
 def test_executor_closes_client():
-    container = Mock()
-    containers_mock = Mock()
-    containers_mock.get = MagicMock(return_value=container)
-    client = Mock(containers=containers_mock)
+    container = create_autospec(DockerContainer)
+    client:Union[MagicMock, DockerClient] = create_autospec(DockerClient)
+    client.containers.get = MagicMock(return_value=container)
     with DockerExecutor(client, "container_name") as executor:
         executor.exec("sample command")
         container.exec_run.assert_called_with("sample command")
@@ -40,7 +42,7 @@ def test_docker_exec_factory():
 
 
 def test_docker_client_factory_usage():
-    client = Mock()
+    client = create_autospec(DockerClient)
     factory = create_autospec(DockerClientFactory)
     factory.client = MagicMock(return_value=client)
     testee = DockerExecFactory("container_name", factory)
