@@ -1,4 +1,6 @@
 import contextlib
+from typing import Any, cast
+from unittest.mock import Mock
 
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment \
@@ -38,3 +40,7 @@ def get_executor_factory(
         return SshExecFactory.from_database_info(dbinfo)
     client_factory = DockerClientFactory(timeout=100000)
     return DockerExecFactory(dbinfo.container_info.container_name, client_factory)
+
+
+def mock_cast(obj: Any) -> Mock:
+    return cast(Mock, obj)

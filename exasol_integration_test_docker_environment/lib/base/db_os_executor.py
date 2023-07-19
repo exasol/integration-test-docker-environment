@@ -58,8 +58,9 @@ class DockerExecutor(DbOsExecutor):
 
     def close(self):
         self._container = None
-        self._client.close()
-        self._client = None
+        if self._client is not None:
+            self._client.close()
+            self._client = None
 
 
 class SshExecutor(DbOsExecutor):
