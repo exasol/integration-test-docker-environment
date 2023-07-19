@@ -25,6 +25,7 @@ class DockerClientFactory:
 
 # Avoid TypeError: Instance and class checks can only be
 # used with @runtime_checkable protocols
+# raised by unit tests
 @runtime_checkable
 class DbOsExecutor(Protocol):
     """
@@ -93,6 +94,10 @@ class SshExecutor(DbOsExecutor):
             self._connection = None
 
 
+# Avoid TypeError: Instance and class checks can only be
+# used with @runtime_checkable protocols
+# raised by integration tests
+@runtime_checkable
 class DbOsExecFactory(Protocol):
     """
     This class defines abstract method ``executor()`` to be implemented by
