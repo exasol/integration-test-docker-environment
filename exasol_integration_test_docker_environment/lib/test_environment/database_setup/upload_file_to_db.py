@@ -24,7 +24,10 @@ from exasol_integration_test_docker_environment \
     .lib.test_environment.database_setup.time_based_bucketfs_sync_waiter \
     import TimeBasedBucketFSSyncWaiter
 from exasol_integration_test_docker_environment \
-    .lib.base.db_os_executor import DbOsExecFactory
+    .lib.base.db_os_executor import (
+        DbOsExecutor,
+        DbOsExecFactory
+    )
 
 
 @dataclasses.dataclass
