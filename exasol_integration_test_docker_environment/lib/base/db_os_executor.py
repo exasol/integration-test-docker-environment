@@ -117,8 +117,8 @@ class DockerExecFactory(DbOsExecFactory):
         self._client_factory = client_factory
 
     def executor(self) -> DbOsExecutor:
-        client = self._client_factory.client()
-        return DockerExecutor(client, self._container_name)
+        with self._client_factory.client() as client:
+            return DockerExecutor(client, self._container_name)
 
 
 class SshExecFactory(DbOsExecFactory):
