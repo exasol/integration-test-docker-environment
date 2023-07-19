@@ -36,7 +36,7 @@ def test_ssh_exec_factory():
 
 
 def test_docker_exec_factory():
-    factory = DockerExecFactory("container_name", None)
+    factory = DockerExecFactory("container_name", create_autospec(DockerClientFactory))
     executor = factory.executor()
     assert isinstance(executor, DbOsExecutor) and type(executor) is DockerExecutor
 

@@ -23,6 +23,8 @@ class DockerClientFactory:
         return ContextDockerClient(timeout=self._timeout)
 
 
+# Avoid TypeError: Instance and class checks can only be
+# used with @runtime_checkable protocols
 @runtime_checkable
 class DbOsExecutor(Protocol):
     """
@@ -90,7 +92,6 @@ class SshExecutor(DbOsExecutor):
             self._connection = None
 
 
-@runtime_checkable
 class DbOsExecFactory(Protocol):
     """
     This class defines abstract method ``executor()`` to be implemented by
