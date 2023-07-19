@@ -170,15 +170,3 @@ def test_upload_with_reuse(api_database, tmp_path, db_os_access):
                  .validate("old content", expected_reuse=False)
         validator.upload(filename, "new content") \
                  .validate("old content", expected_reuse=True)
-
-def test_xxx(api_database):
-    print('Before api_database context', flush=True)
-    with api_database(additional_parameters={"log_level":"DEBUG"}) as db:
-        print('In context of test_xxx with api_database', flush=True)
-
-
-
-
-
-
-
