@@ -102,15 +102,15 @@ class SshExecutor(DbOsExecutor):
 @runtime_checkable
 class DbOsExecFactory(Protocol):
     """
-    This class defines abstract method ``executor()`` to be implemented by
+    This class defines an abstract method ``executor()`` to be implemented by
     inheriting factories.
     """
 
     @abstractmethod
     def executor(self) -> DbOsExecutor:
         """
-        Create an executor for executing commands inside a Docker
-        Container.
+        Create an executor for executing commands inside of the operating
+        system of the database.
         """
         ...
 

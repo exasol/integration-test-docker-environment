@@ -41,7 +41,6 @@ class IsDatabaseReadyThread(Thread):
         print(self.__class__, "run", dir(self.executor_factory))
         try:
             with self.executor_factory.executor() as executor:
-                print(self.__class__, "executor")
                 db_connection_command = ""
                 bucket_fs_connection_command = ""
                 try:
