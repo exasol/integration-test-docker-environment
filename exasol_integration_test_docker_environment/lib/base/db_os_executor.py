@@ -30,9 +30,10 @@ class DockerClientFactory:
 @runtime_checkable
 class DbOsExecutor(Protocol):
     """
-    This class provides an abstraction to execute commands inside a Docker
-    Container.  See concrete implementations in sub-classes
-    ``DockerExecutor`` and ``SshExecutor``.
+    This class provides an abstraction to execute operating system
+    commands inside on the database host, e.g. inside a Docker Container.  See
+    concrete implementations in sub-classes ``DockerExecutor`` and
+    ``SshExecutor``.
     """
     @abstractmethod
     def exec(self, cmd: str) -> ExecResult:
