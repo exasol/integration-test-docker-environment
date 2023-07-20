@@ -108,8 +108,10 @@ class DbOsExecFactory(Protocol):
 
     @abstractmethod
     def executor(self) -> DbOsExecutor:
-        """Create an executor for executing commands inside a Docker
-        Container."""
+        """
+        Create an executor for executing commands inside a Docker
+        Container.
+        """
         ...
 
 

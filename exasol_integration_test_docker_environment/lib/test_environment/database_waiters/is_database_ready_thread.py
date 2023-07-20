@@ -14,7 +14,6 @@ from exasol_integration_test_docker_environment.lib.base.db_os_executor import \
 
 
 class IsDatabaseReadyThread(Thread):
-
     def __init__(self,
                  logger: Logger,
                  database_info: DatabaseInfo,
