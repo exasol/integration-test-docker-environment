@@ -38,13 +38,11 @@ class IsDatabaseReadyThread(Thread):
         self.finish = True
 
     def run(self):
-        print(self.__class__, "run", dir(self.executor_factory))
         try:
             with self.executor_factory.executor() as executor:
                 db_connection_command = ""
                 bucket_fs_connection_command = ""
                 try:
-                    print(self.__class__, "find_exaplus")
                     exaplus_path = find_exaplus(self._db_container, executor)
                     db_connection_command = self.create_db_connection_command(exaplus_path)
                     bucket_fs_connection_command = self.create_bucketfs_connection_command()
