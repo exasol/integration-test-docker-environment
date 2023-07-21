@@ -31,7 +31,7 @@ class DockerClientFactory:
 class DbOsExecutor(Protocol):
     """
     This class provides an abstraction to execute operating system
-    commands inside on the database host, e.g. inside a Docker Container.  See
+    commands on the database host, e.g. inside a Docker Container.  See
     concrete implementations in sub-classes ``DockerExecutor`` and
     ``SshExecutor``.
     """
