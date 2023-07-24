@@ -192,21 +192,34 @@ def run_tests(session: nox.Session, db_version: str):
 @nox.parametrize("db_version", get_db_versions())
 def run_minimal_tests(session: nox.Session, db_version: str):
     """Run the minimal tests in the poetry environment"""
-    with session.chdir(ROOT):
-        env = {"EXASOL_VERSION": db_version}
-        minimal_tests = (
+    env = {"EXASOL_VERSION": db_version}
+    minimal_tests = {
+        "old-itest": [
             "test_api_test_environment.py",
+            # "test_cli_test_environment.py",
             "test_doctor.py",
             "test_termination_handler.py",
+        ],
+        "new-itest": [
+            "test_cli_environment.py"
+            ],
+        "unit": "./test/unit",
+    }
+    session.run("pytest", minimal_tests["unit"], env=env)
+    for test in minimal_tests["new-itest"]:
+        session.run(
+            "pytest",
+            f"./test/integration/{test}",
+            env=env,
         )
-        for test in minimal_tests:
+    with session.chdir(ROOT):
+        for test in minimal_tests["old-itest"]:
             session.run(
                 "python",
                 "-u",
                 f"./exasol_integration_test_docker_environment/test/{test}",
                 env=env,
             )
-    session.run("pytest", './test/unit')
 
 
 @nox.session(name="get-all-db-versions", python=False)
