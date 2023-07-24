@@ -29,6 +29,17 @@ from test.integration.helpers import (
 )
 
 
+@pytest.fixture
+def fabric_stdin(monkeypatch):
+    """
+    Mock stdin to avoid ThreadException when reading from stdin while
+    stdout is captured by pytest: OSError: pytest: reading from stdin while
+    output is captured!  Consider using ``-s``.
+    See https://github.com/fabric/fabric/issues/2005
+    """
+    monkeypatch.setattr('sys.stdin', io.StringIO(''))
+
+
 def test_generate_ssh_key_file(api_database):
     params = { "db_os_access": "SSH" }
     with api_database(additional_parameters=params) as db:
@@ -40,17 +51,13 @@ def test_generate_ssh_key_file(api_database):
     assert " itde-ssh-access" in command[1].decode("utf-8")
 
 
-def test_ssh_access(api_database, monkeypatch):
+def test_ssh_access(api_database, fabric_stdin):
     params = { "db_os_access": "SSH" }
     with api_database(additional_parameters=params) as db:
         container_name = db.environment_info.database_info.container_info.container_name
         with container_named(container_name) as container:
             command = container.exec_run("cat /root/.ssh/authorized_keys")
         key = SshKey.from_cache()
-        # Mock stdin to avoid ThreadException when reading from
-        # stdin while stdout is capture by pytest.
-        # See https://github.com/fabric/fabric/issues/2005
-        monkeypatch.setattr('sys.stdin', io.StringIO(''))
         result = fabric.Connection(
             f"root@localhost:{db.ports.ssh}",
             connect_kwargs={ "pkey": key.private },
@@ -84,7 +91,7 @@ def sshd_container(request):
 
 
 @pytest.mark.parametrize("db_os_access", [DbOsAccess.SSH, DbOsAccess.DOCKER_EXEC])
-def test_db_os_executor_factory(sshd_container, db_os_access, monkeypatch):
+def test_db_os_executor_factory(sshd_container, db_os_access, fabric_stdin):
     def database_info(container_name, ssh_port_forward):
         ssh_info = SshInfo(
             user="linuxserver.io",
@@ -109,7 +116,6 @@ def test_db_os_executor_factory(sshd_container, db_os_access, monkeypatch):
         dbinfo = database_info(container.name, ssh_port_forward)
         factory = get_executor_factory(dbinfo, ssh_port_forward)
         with factory.executor() as executor:
-            monkeypatch.setattr('sys.stdin', io.StringIO(''))
             exit_code, output = executor.exec("ls /keygen.sh")
     output = output.decode('utf-8').strip()
     assert (exit_code, output) == (0, "/keygen.sh")
