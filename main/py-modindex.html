@@ -205,6 +205,7 @@
 <li class="toctree-l4 has-children"><a class="reference internal" href="api/exasol_integration_test_docker_environment.lib.base.html">exasol_integration_test_docker_environment.lib.base</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" role="switch" type="checkbox"/><label for="toctree-checkbox-11"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l5"><a class="reference internal" href="api/exasol_integration_test_docker_environment.lib.base.abstract_task_future.html">exasol_integration_test_docker_environment.lib.base.abstract_task_future</a></li>
 <li class="toctree-l5"><a class="reference internal" href="api/exasol_integration_test_docker_environment.lib.base.base_task.html">exasol_integration_test_docker_environment.lib.base.base_task</a></li>
+<li class="toctree-l5"><a class="reference internal" href="api/exasol_integration_test_docker_environment.lib.base.db_os_executor.html">exasol_integration_test_docker_environment.lib.base.db_os_executor</a></li>
 <li class="toctree-l5"><a class="reference internal" href="api/exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task.html">exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task</a></li>
 <li class="toctree-l5"><a class="reference internal" href="api/exasol_integration_test_docker_environment.lib.base.docker_base_task.html">exasol_integration_test_docker_environment.lib.base.docker_base_task</a></li>
 <li class="toctree-l5"><a class="reference internal" href="api/exasol_integration_test_docker_environment.lib.base.docker_parameter.html">exasol_integration_test_docker_environment.lib.base.docker_parameter</a></li>
@@ -371,7 +372,6 @@
 <li class="toctree-l4"><a class="reference internal" href="api/exasol_integration_test_docker_environment.test.test_base_task.html">exasol_integration_test_docker_environment.test.test_base_task</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/exasol_integration_test_docker_environment.test.test_base_task_cleanup.html">exasol_integration_test_docker_environment.test.test_base_task_cleanup</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/exasol_integration_test_docker_environment.test.test_certificate_docker_build.html">exasol_integration_test_docker_environment.test.test_certificate_docker_build</a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/exasol_integration_test_docker_environment.test.test_cli_test_environment.html">exasol_integration_test_docker_environment.test.test_cli_test_environment</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/exasol_integration_test_docker_environment.test.test_cli_test_environment_additional_params.html">exasol_integration_test_docker_environment.test.test_cli_test_environment_additional_params</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/exasol_integration_test_docker_environment.test.test_cli_test_environment_db_disk_size.html">exasol_integration_test_docker_environment.test.test_cli_test_environment_db_disk_size</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/exasol_integration_test_docker_environment.test.test_cli_test_environment_db_mem_size.html">exasol_integration_test_docker_environment.test.test_cli_test_environment_db_mem_size</a></li>
@@ -392,7 +392,6 @@
 <li class="toctree-l4"><a class="reference internal" href="api/exasol_integration_test_docker_environment.test.test_termination_handler.html">exasol_integration_test_docker_environment.test.test_termination_handler</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/exasol_integration_test_docker_environment.test.test_test_container_reuse.html">exasol_integration_test_docker_environment.test.test_test_container_reuse</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/exasol_integration_test_docker_environment.test.test_test_env_reuse.html">exasol_integration_test_docker_environment.test.test_test_env_reuse</a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/exasol_integration_test_docker_environment.test.test_upload.html">exasol_integration_test_docker_environment.test.test_upload</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="api/exasol_integration_test_docker_environment.testing.html">exasol_integration_test_docker_environment.testing</a><input class="toctree-checkbox" id="toctree-checkbox-31" name="toctree-checkbox-31" role="switch" type="checkbox"/><label for="toctree-checkbox-31"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -600,6 +599,12 @@
     <td></td>
     <td>&#160;&#160;&#160;
         <a href="api/exasol_integration_test_docker_environment.lib.base.base_task.html#module-exasol_integration_test_docker_environment.lib.base.base_task"><code class="xref">exasol_integration_test_docker_environment.lib.base.base_task</code></a></td><td>
+    <em></em></td>
+  </tr>
+  <tr class="cg-1">
+    <td></td>
+    <td>&#160;&#160;&#160;
+        <a href="api/exasol_integration_test_docker_environment.lib.base.db_os_executor.html#module-exasol_integration_test_docker_environment.lib.base.db_os_executor"><code class="xref">exasol_integration_test_docker_environment.lib.base.db_os_executor</code></a></td><td>
     <em></em></td>
   </tr>
   <tr class="cg-1">
@@ -1361,12 +1366,6 @@
   <tr class="cg-1">
     <td></td>
     <td>&#160;&#160;&#160;
-        <a href="api/exasol_integration_test_docker_environment.test.test_cli_test_environment.html#module-exasol_integration_test_docker_environment.test.test_cli_test_environment"><code class="xref">exasol_integration_test_docker_environment.test.test_cli_test_environment</code></a></td><td>
-    <em></em></td>
-  </tr>
-  <tr class="cg-1">
-    <td></td>
-    <td>&#160;&#160;&#160;
         <a href="api/exasol_integration_test_docker_environment.test.test_cli_test_environment_additional_params.html#module-exasol_integration_test_docker_environment.test.test_cli_test_environment_additional_params"><code class="xref">exasol_integration_test_docker_environment.test.test_cli_test_environment_additional_params</code></a></td><td>
     <em></em></td>
   </tr>
@@ -1482,12 +1481,6 @@
     <td></td>
     <td>&#160;&#160;&#160;
         <a href="api/exasol_integration_test_docker_environment.test.test_test_env_reuse.html#module-exasol_integration_test_docker_environment.test.test_test_env_reuse"><code class="xref">exasol_integration_test_docker_environment.test.test_test_env_reuse</code></a></td><td>
-    <em></em></td>
-  </tr>
-  <tr class="cg-1">
-    <td></td>
-    <td>&#160;&#160;&#160;
-        <a href="api/exasol_integration_test_docker_environment.test.test_upload.html#module-exasol_integration_test_docker_environment.test.test_upload"><code class="xref">exasol_integration_test_docker_environment.test.test_upload</code></a></td><td>
     <em></em></td>
   </tr>
   <tr class="cg-1">

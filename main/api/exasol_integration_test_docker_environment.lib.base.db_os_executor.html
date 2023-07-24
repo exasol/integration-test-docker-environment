@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="exasol_integration_test_docker_environment.testing" href="exasol_integration_test_docker_environment.testing.html" /><link rel="prev" title="exasol_integration_test_docker_environment.test.test_test_env_reuse" href="exasol_integration_test_docker_environment.test.test_test_env_reuse.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task" href="exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task.html" /><link rel="prev" title="exasol_integration_test_docker_environment.lib.base.base_task" href="exasol_integration_test_docker_environment.lib.base.base_task.html" />
 
     <meta name="generator" content="sphinx-4.5.0, furo 2022.09.29"/>
-        <title>exasol_integration_test_docker_environment.test.test_upload - Exasol Integration Test Docker Environment documentation</title>
+        <title>exasol_integration_test_docker_environment.lib.base.db_os_executor - Exasol Integration Test Docker Environment documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
@@ -193,7 +193,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="exasol_integration_test_docker_environment.doctor.html">exasol_integration_test_docker_environment.doctor</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="exasol_integration_test_docker_environment.lib.html">exasol_integration_test_docker_environment.lib</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3 current has-children"><a class="reference internal" href="exasol_integration_test_docker_environment.lib.html">exasol_integration_test_docker_environment.lib</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l4 has-children"><a class="reference internal" href="exasol_integration_test_docker_environment.lib.api.html">exasol_integration_test_docker_environment.lib.api</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" role="switch" type="checkbox"/><label for="toctree-checkbox-10"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l5"><a class="reference internal" href="exasol_integration_test_docker_environment.lib.api.api_errors.html">exasol_integration_test_docker_environment.lib.api.api_errors</a></li>
 <li class="toctree-l5"><a class="reference internal" href="exasol_integration_test_docker_environment.lib.api.build_test_container.html">exasol_integration_test_docker_environment.lib.api.build_test_container</a></li>
@@ -204,9 +204,10 @@
 <li class="toctree-l5"><a class="reference internal" href="exasol_integration_test_docker_environment.lib.api.spawn_test_environment_with_test_container.html">exasol_integration_test_docker_environment.lib.api.spawn_test_environment_with_test_container</a></li>
 </ul>
 </li>
-<li class="toctree-l4 has-children"><a class="reference internal" href="exasol_integration_test_docker_environment.lib.base.html">exasol_integration_test_docker_environment.lib.base</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" role="switch" type="checkbox"/><label for="toctree-checkbox-11"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4 current has-children"><a class="reference internal" href="exasol_integration_test_docker_environment.lib.base.html">exasol_integration_test_docker_environment.lib.base</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" role="switch" type="checkbox"/><label for="toctree-checkbox-11"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l5"><a class="reference internal" href="exasol_integration_test_docker_environment.lib.base.abstract_task_future.html">exasol_integration_test_docker_environment.lib.base.abstract_task_future</a></li>
 <li class="toctree-l5"><a class="reference internal" href="exasol_integration_test_docker_environment.lib.base.base_task.html">exasol_integration_test_docker_environment.lib.base.base_task</a></li>
+<li class="toctree-l5 current current-page"><a class="current reference internal" href="#">exasol_integration_test_docker_environment.lib.base.db_os_executor</a></li>
 <li class="toctree-l5"><a class="reference internal" href="exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task.html">exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task</a></li>
 <li class="toctree-l5"><a class="reference internal" href="exasol_integration_test_docker_environment.lib.base.docker_base_task.html">exasol_integration_test_docker_environment.lib.base.docker_base_task</a></li>
 <li class="toctree-l5"><a class="reference internal" href="exasol_integration_test_docker_environment.lib.base.docker_parameter.html">exasol_integration_test_docker_environment.lib.base.docker_parameter</a></li>
@@ -361,7 +362,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="exasol_integration_test_docker_environment.main.html">exasol_integration_test_docker_environment.main</a></li>
-<li class="toctree-l3 current has-children"><a class="reference internal" href="exasol_integration_test_docker_environment.test.html">exasol_integration_test_docker_environment.test</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-30" name="toctree-checkbox-30" role="switch" type="checkbox"/><label for="toctree-checkbox-30"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l3 has-children"><a class="reference internal" href="exasol_integration_test_docker_environment.test.html">exasol_integration_test_docker_environment.test</a><input class="toctree-checkbox" id="toctree-checkbox-30" name="toctree-checkbox-30" role="switch" type="checkbox"/><label for="toctree-checkbox-30"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="exasol_integration_test_docker_environment.test.get_test_container_content.html">exasol_integration_test_docker_environment.test.get_test_container_content</a></li>
 <li class="toctree-l4"><a class="reference internal" href="exasol_integration_test_docker_environment.test.test_api_build_test_container.html">exasol_integration_test_docker_environment.test.test_api_build_test_container</a></li>
 <li class="toctree-l4"><a class="reference internal" href="exasol_integration_test_docker_environment.test.test_api_external_test_environment.html">exasol_integration_test_docker_environment.test.test_api_external_test_environment</a></li>
@@ -373,7 +374,6 @@
 <li class="toctree-l4"><a class="reference internal" href="exasol_integration_test_docker_environment.test.test_base_task.html">exasol_integration_test_docker_environment.test.test_base_task</a></li>
 <li class="toctree-l4"><a class="reference internal" href="exasol_integration_test_docker_environment.test.test_base_task_cleanup.html">exasol_integration_test_docker_environment.test.test_base_task_cleanup</a></li>
 <li class="toctree-l4"><a class="reference internal" href="exasol_integration_test_docker_environment.test.test_certificate_docker_build.html">exasol_integration_test_docker_environment.test.test_certificate_docker_build</a></li>
-<li class="toctree-l4"><a class="reference internal" href="exasol_integration_test_docker_environment.test.test_cli_test_environment.html">exasol_integration_test_docker_environment.test.test_cli_test_environment</a></li>
 <li class="toctree-l4"><a class="reference internal" href="exasol_integration_test_docker_environment.test.test_cli_test_environment_additional_params.html">exasol_integration_test_docker_environment.test.test_cli_test_environment_additional_params</a></li>
 <li class="toctree-l4"><a class="reference internal" href="exasol_integration_test_docker_environment.test.test_cli_test_environment_db_disk_size.html">exasol_integration_test_docker_environment.test.test_cli_test_environment_db_disk_size</a></li>
 <li class="toctree-l4"><a class="reference internal" href="exasol_integration_test_docker_environment.test.test_cli_test_environment_db_mem_size.html">exasol_integration_test_docker_environment.test.test_cli_test_environment_db_mem_size</a></li>
@@ -394,7 +394,6 @@
 <li class="toctree-l4"><a class="reference internal" href="exasol_integration_test_docker_environment.test.test_termination_handler.html">exasol_integration_test_docker_environment.test.test_termination_handler</a></li>
 <li class="toctree-l4"><a class="reference internal" href="exasol_integration_test_docker_environment.test.test_test_container_reuse.html">exasol_integration_test_docker_environment.test.test_test_container_reuse</a></li>
 <li class="toctree-l4"><a class="reference internal" href="exasol_integration_test_docker_environment.test.test_test_env_reuse.html">exasol_integration_test_docker_environment.test.test_test_env_reuse</a></li>
-<li class="toctree-l4 current current-page"><a class="current reference internal" href="#">exasol_integration_test_docker_environment.test.test_upload</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="exasol_integration_test_docker_environment.testing.html">exasol_integration_test_docker_environment.testing</a><input class="toctree-checkbox" id="toctree-checkbox-31" name="toctree-checkbox-31" role="switch" type="checkbox"/><label for="toctree-checkbox-31"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -472,22 +471,8 @@
           </label>
         </div>
         <article role="main">
-          <section id="module-exasol_integration_test_docker_environment.test.test_upload">
-<span id="exasol-integration-test-docker-environment-test-test-upload"></span><h1>exasol_integration_test_docker_environment.test.test_upload<a class="headerlink" href="#module-exasol_integration_test_docker_environment.test.test_upload" title="Permalink to this headline">#</a></h1>
-<p class="rubric">Functions</p>
-<div class="table-wrapper autosummary longtable docutils container">
-<table class="autosummary longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">construct_upload_target</span></code>(file_to_upload)</p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
-</div>
+          <section id="module-exasol_integration_test_docker_environment.lib.base.db_os_executor">
+<span id="exasol-integration-test-docker-environment-lib-base-db-os-executor"></span><h1>exasol_integration_test_docker_environment.lib.base.db_os_executor<a class="headerlink" href="#module-exasol_integration_test_docker_environment.lib.base.db_os_executor" title="Permalink to this headline">#</a></h1>
 <p class="rubric">Classes</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
@@ -496,10 +481,25 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">TestUpload</span></code>([methodName])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DbOsExecFactory</span></code>(*args, **kwargs)</p></td>
+<td><p>This class defines an abstract method <code class="docutils literal notranslate"><span class="pre">executor()</span></code> to be implemented by inheriting factories.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DbOsExecutor</span></code>(*args, **kwargs)</p></td>
+<td><p>This class provides an abstraction to execute operating system commands on the database host, e.g.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DockerClientFactory</span></code>([timeout])</p></td>
+<td><p>Create a Docker client.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DockerExecFactory</span></code>(container_name, client_factory)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">TestfileUpload</span></code>(*args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DockerExecutor</span></code>(docker_client, container_name)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SshExecFactory</span></code>(connect_string, ssh_key_file)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SshExecutor</span></code>(connect_string, key_file)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -512,23 +512,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="exasol_integration_test_docker_environment.testing.html">
+          <a class="next-page" href="exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">exasol_integration_test_docker_environment.testing</div>
+                <div class="title">exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="exasol_integration_test_docker_environment.test.test_test_env_reuse.html">
+          <a class="prev-page" href="exasol_integration_test_docker_environment.lib.base.base_task.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">exasol_integration_test_docker_environment.test.test_test_env_reuse</div>
+                <div class="title">exasol_integration_test_docker_environment.lib.base.base_task</div>
                 
               </div>
             </a>

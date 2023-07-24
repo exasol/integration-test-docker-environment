@@ -38,7 +38,6 @@ exasol\_integration\_test\_docker\_environment.test
    exasol_integration_test_docker_environment.test.test_base_task
    exasol_integration_test_docker_environment.test.test_base_task_cleanup
    exasol_integration_test_docker_environment.test.test_certificate_docker_build
-   exasol_integration_test_docker_environment.test.test_cli_test_environment
    exasol_integration_test_docker_environment.test.test_cli_test_environment_additional_params
    exasol_integration_test_docker_environment.test.test_cli_test_environment_db_disk_size
    exasol_integration_test_docker_environment.test.test_cli_test_environment_db_mem_size
@@ -59,5 +58,4 @@ exasol\_integration\_test\_docker\_environment.test
    exasol_integration_test_docker_environment.test.test_termination_handler
    exasol_integration_test_docker_environment.test.test_test_container_reuse
    exasol_integration_test_docker_environment.test.test_test_env_reuse
-   exasol_integration_test_docker_environment.test.test_upload
 
