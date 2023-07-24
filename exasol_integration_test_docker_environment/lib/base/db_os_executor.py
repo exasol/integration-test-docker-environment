@@ -56,7 +56,7 @@ class DockerExecutor(DbOsExecutor):
     def __del__(self):
         self.close()
 
-    def exec(self, cmd: str):
+    def exec(self, cmd: str) -> ExecResult:
         return self._container.exec_run(cmd)
 
     def close(self):
@@ -88,7 +88,8 @@ class SshExecutor(DbOsExecutor):
 
     def exec(self, cmd: str) -> ExecResult:
         result = self._connection.run(cmd)
-        return ExecResult(result.exited, result.stdout)
+        output = result.stdout.encode("utf-8")
+        return ExecResult(result.exited, output)
 
     def close(self):
         if self._connection is not None:
