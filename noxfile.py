@@ -205,7 +205,7 @@ def run_minimal_tests(session: nox.Session, db_version: str):
             ],
         "unit": "./test/unit",
     }
-    session.run("pytest", minimal_tests["unit"], env=env)
+    session.run("pytest", minimal_tests["unit"])
     for test in minimal_tests["new-itest"]:
         session.run(
             "pytest",
