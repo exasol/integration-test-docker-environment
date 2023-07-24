@@ -26,7 +26,16 @@ from exasol_integration_test_docker_environment \
 from exasol_integration_test_docker_environment \
     .lib.test_environment.spawn_test_database \
     import SpawnTestDockerDatabase
-
+from exasol_integration_test_docker_environment \
+    .lib.base.db_os_executor import (
+        DockerClientFactory,
+        DbOsExecFactory,
+        SshExecFactory,
+        DockerExecFactory,
+    )
+from exasol_integration_test_docker_environment \
+    .lib.test_environment.parameter.docker_db_test_environment_parameter \
+    import DbOsAccess
 
 class SpawnTestEnvironmentWithDockerDB(
     AbstractSpawnTestEnvironment,
@@ -67,6 +76,12 @@ class SpawnTestEnvironmentWithDockerDB(
             attempt=attempt,
         )
 
+    def _executor_factory(self, database_info: DatabaseInfo) -> DbOsExecFactory:
+        if self.db_os_access == DbOsAccess.SSH:
+            return SshExecFactory.from_database_info(database_info)
+        client_factory = DockerClientFactory(timeout=100000)
+        return DockerExecFactory(self.db_container_name, client_factory)
+
     def create_spawn_database_task(
             self,
             network_info: DockerNetworkInfo,
@@ -91,4 +106,5 @@ class SpawnTestEnvironmentWithDockerDB(
             database_info=database_info,
             attempt=attempt,
             docker_db_image_version=self.docker_db_image_version,
+            executor_factory=self._executor_factory(database_info)
         )

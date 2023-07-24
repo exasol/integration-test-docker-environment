@@ -4,6 +4,7 @@ from typing import Any, Callable, Dict, Iterator, List, NewType, Optional
 import pytest
 
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
+from test.integration.helpers import normalize_request_name
 from exasol_integration_test_docker_environment.testing import utils
 from exasol_integration_test_docker_environment \
     .testing.api_test_environment import ApiTestEnvironment
@@ -19,7 +20,7 @@ from exasol_integration_test_docker_environment.testing \
 
 @pytest.fixture
 def cli_isolation(request) -> Iterator[ExaslctTestEnvironment]:
-    testname = request.node.name
+    testname = normalize_request_name(request.node.name)
     environment = ExaslctTestEnvironment(
         test_object=None,
         executable="itde",
@@ -32,7 +33,7 @@ def cli_isolation(request) -> Iterator[ExaslctTestEnvironment]:
 
 @pytest.fixture
 def api_isolation(request) -> Iterator[ApiTestEnvironment]:
-    testname = request.node.name
+    testname = normalize_request_name(request.node.name)
     environment = ApiTestEnvironment(test_object=None, name=testname)
     yield environment
     utils.close_environments(environment)

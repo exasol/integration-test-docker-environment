@@ -29,3 +29,4 @@ If you need further versions, please open an issue.
 * #308: Unified ports for database, BucketFS, and SSH
 * #322: Added additional tests for environment variable LOG_ENV_VARIABLE_NAME
 * #359: Fixed custom logging path not working if dir does not exist.
+* #304: Create SSH access replacements for calls to `docker.exec_run()`

@@ -71,6 +71,7 @@ def spawn_test_environment(
     """
     def str_or_none(x: any) -> str:
         return str(x) if x is not None else None
+
     parsed_db_mem_size = humanfriendly.parse_size(db_mem_size)
     if parsed_db_mem_size < humanfriendly.parse_size("1 GiB"):
         raise ArgumentConstraintError("db_mem_size", "needs to be at least 1 GiB")

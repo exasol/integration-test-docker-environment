@@ -112,26 +112,27 @@ class CreateSSLCertificatesTask(DockerBaseTask):
 
         with self._get_docker_client() as docker_client:
             try:
-                test_container = \
-                    docker_client.containers.create(
-                        image=certificate_container_image_info.get_target_complete_name(),
-                        name="certificate_resources",
-                        network_mode=None,
-                        command="sleep infinity",
-                        detach=True,
-                        volumes=volumes,
-                        labels={"test_environment_name": self.environment_name,
-                                "container_type": "certificate_resources"},
-                        runtime=self.docker_runtime
-                    )
-                test_container.start()
+                container = docker_client.containers.create(
+                    image=certificate_container_image_info.get_target_complete_name(),
+                    name="certificate_resources",
+                    network_mode=None,
+                    command="sleep infinity",
+                    detach=True,
+                    volumes=volumes,
+                    labels={
+                        "test_environment_name": self.environment_name,
+                        "container_type": "certificate_resources",
+                    },
+                    runtime=self.docker_runtime
+                )
+                container.start()
                 self.logger.info("Creating certificates...")
                 cmd = f"bash /scripts/create_certificates.sh " \
                       f"{self._construct_complete_host_name} {CERTIFICATES_MOUNT_PATH}"
-                exit_code, output = test_container.exec_run(cmd)
+                exit_code, output = container.exec_run(cmd)
                 self.logger.info(output.decode('utf-8'))
                 if exit_code != 0:
                     raise RuntimeError(f"Error creating certificates:'{output.decode('utf-8')}'")
             finally:
-                test_container.stop()
-                test_container.remove()
+                container.stop()
+                container.remove()

@@ -1,4 +1,5 @@
 import time
+from logging import Logger
 from pathlib import PurePath
 from threading import Thread
 
@@ -8,16 +9,18 @@ from exasol_integration_test_docker_environment.lib.data.database_credentials im
 from exasol_integration_test_docker_environment.lib.data.database_info import DatabaseInfo
 from exasol_integration_test_docker_environment.lib.test_environment.database_setup.find_exaplus_in_db_container import \
     find_exaplus
+from exasol_integration_test_docker_environment.lib.base.db_os_executor import \
+    DbOsExecFactory
 
 
 class IsDatabaseReadyThread(Thread):
-
     def __init__(self,
-                 logger,
+                 logger: Logger,
                  database_info: DatabaseInfo,
                  database_container: Container,
                  database_credentials: DatabaseCredentials,
-                 docker_db_image_version: str):
+                 docker_db_image_version: str,
+                 executor_factory: DbOsExecFactory):
         super().__init__()
         self.logger = logger
         self.database_credentials = database_credentials
@@ -28,37 +31,43 @@ class IsDatabaseReadyThread(Thread):
         self.output_db_connection = None
         self.output_bucketfs_connection = None
         self.docker_db_image_version = docker_db_image_version
+        self.executor_factory = executor_factory
 
     def stop(self):
         self.logger.info("Stop IsDatabaseReadyThread")
         self.finish = True
 
     def run(self):
-        db_connection_command = ""
-        bucket_fs_connection_command = ""
         try:
-            exaplus_path = find_exaplus(self._db_container)
-            db_connection_command = self.create_db_connection_command(exaplus_path)
-            bucket_fs_connection_command = self.create_bucketfs_connection_command()
-        except RuntimeError as e:
-            self.logger.error(e)
+            with self.executor_factory.executor() as executor:
+                db_connection_command = ""
+                bucket_fs_connection_command = ""
+                try:
+                    exaplus_path = find_exaplus(self._db_container, executor)
+                    db_connection_command = self.create_db_connection_command(exaplus_path)
+                    bucket_fs_connection_command = self.create_bucketfs_connection_command()
+                except RuntimeError as e:
+                    self.logger.exception("Caught exception while searching for exaplus.")
+                    self.finish = True
+                while not self.finish:
+                    (exit_code_db_connection, self.output_db_connection) = \
+                        self._db_container.exec_run(cmd=db_connection_command)
+                    (exit_code_bucketfs_connection, self.output_bucketfs_connection) = \
+                        self._db_container.exec_run(cmd=bucket_fs_connection_command)
+                    if exit_code_db_connection == 0 and exit_code_bucketfs_connection == 0:
+                        self.finish = True
+                        self.is_ready = True
+                    time.sleep(1)
+        except Exception as e:
             self.finish = True
-        while not self.finish:
-            (exit_code_db_connection, self.output_db_connection) = \
-                self._db_container.exec_run(cmd=db_connection_command)
-            (exit_code_bucketfs_connection, self.output_bucketfs_connection) = \
-                self._db_container.exec_run(cmd=bucket_fs_connection_command)
-            if exit_code_db_connection == 0 and exit_code_bucketfs_connection == 0:
-                self.finish = True
-                self.is_ready = True
-            time.sleep(1)
+            self.logger.exception("Caught exception in IsDatabaseReadyThread.run.")
 
     def create_db_connection_command(self, exaplus_path: PurePath):
         username = self.database_credentials.db_user
         password = self.database_credentials.db_password
         connection_options = f"""-c 'localhost:{self._database_info.ports.database}' -u '{username}' -p '{password}'"""
 
-        cmd = f"""{exaplus_path} {connection_options}  -sql 'select 1;' -jdbcparam 'validateservercertificate=0'"""
+        cmd = f"""{exaplus_path} {connection_options} -sql 'select 1;' -jdbcparam 'validateservercertificate=0'"""
         bash_cmd = f"""bash -c "{cmd}" """
         return bash_cmd
 

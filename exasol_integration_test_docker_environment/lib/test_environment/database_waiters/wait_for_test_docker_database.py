@@ -14,6 +14,8 @@ from exasol_integration_test_docker_environment.lib.test_environment.database_wa
     DBContainerLogThread
 from exasol_integration_test_docker_environment.lib.test_environment.database_waiters.is_database_ready_thread import \
     IsDatabaseReadyThread
+from exasol_integration_test_docker_environment.lib.base.db_os_executor import \
+    DbOsExecFactory
 
 
 class WaitForTestDockerDatabase(DockerBaseTask, DatabaseCredentialsParameter):
@@ -22,6 +24,7 @@ class WaitForTestDockerDatabase(DockerBaseTask, DatabaseCredentialsParameter):
     db_startup_timeout_in_seconds = luigi.IntParameter(10 * 60, significant=False)
     attempt = luigi.IntParameter(1)
     docker_db_image_version = luigi.Parameter()
+    executor_factory = JsonPickleParameter(DbOsExecFactory, significant=False)
 
     def run_task(self):
         with self._get_docker_client() as docker_client:
@@ -49,11 +52,14 @@ class WaitForTestDockerDatabase(DockerBaseTask, DatabaseCredentialsParameter):
                                                     startup_log_file,
                                                     "Database Startup %s" % db_container.name)
         container_log_thread.start()
-        is_database_ready_thread = IsDatabaseReadyThread(self.logger,
-                                                         self.database_info,
-                                                         db_container,
-                                                         self.get_database_credentials(),
-                                                         self.docker_db_image_version)
+        is_database_ready_thread = IsDatabaseReadyThread(
+            self.logger,
+            self.database_info,
+            db_container,
+            self.get_database_credentials(),
+            self.docker_db_image_version,
+            self.executor_factory,
+        )
         is_database_ready_thread.start()
         return container_log_thread, is_database_ready_thread
 
@@ -99,7 +105,7 @@ class WaitForTestDockerDatabase(DockerBaseTask, DatabaseCredentialsParameter):
 {is_database_ready_thread.output_db_connection}
 ========== IsDatabaseReadyThread output bucketfs connection: ============
 {is_database_ready_thread.output_bucketfs_connection}
-========== Container-Log: ============ 
+========== Container-Log: ============
 {container_log}
 """
         self.logger.warning(
