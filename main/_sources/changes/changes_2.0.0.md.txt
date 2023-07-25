@@ -10,11 +10,12 @@ The current release therefore enhances ITDE to enable to access the Docker Conta
 
 Additionally the directory for storing the randomly generated SSH keys has been moved to `~/.cache/exasol/itde/`. By that ITDE can restrict file permissions allowing access only by the current user.
 
+This release also removes versions 7.0.x of the Exasol database from the regular CI builds as version 8.x is already available and ITDE only supports the latest two minor versions.
+
 T.B.D.
 
 ### Supported Exasol Versions
 
-* **7.0**: up to 7.0.20, **except 7.0.5**
 * **7.1**: up to 7.1.17
 * **8**: 8.18.1
 
@@ -30,3 +31,4 @@ If you need further versions, please open an issue.
 * #322: Added additional tests for environment variable LOG_ENV_VARIABLE_NAME
 * #359: Fixed custom logging path not working if dir does not exist.
 * #304: Create SSH access replacements for calls to `docker.exec_run()`
+* #368: Removed versions 7.0.x of Exasol database

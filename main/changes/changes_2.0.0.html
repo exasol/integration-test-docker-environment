@@ -479,11 +479,11 @@
 <p>Previous versions of the ITDE used <code class="docutils literal notranslate"><span class="pre">docker_exec</span></code> to access the Docker Container, e.g. to analyze the content of logfiles or execute some shell commands. In future versions of the Exasol Docker-DB the format of the Docker Containers might change so that <code class="docutils literal notranslate"><span class="pre">docker_exec</span></code> is no longer possible. Instead ITDE will then need to use SSH access.</p>
 <p>The current release therefore enhances ITDE to enable to access the Docker Container via SSH.  The user can select the docker access method with command line option <code class="docutils literal notranslate"><span class="pre">--db-os-access</span></code> and can specify a port number to which ITDE forwards the SSH port of the Docker Container, see User Guide.</p>
 <p>Additionally the directory for storing the randomly generated SSH keys has been moved to <code class="docutils literal notranslate"><span class="pre">~/.cache/exasol/itde/</span></code>. By that ITDE can restrict file permissions allowing access only by the current user.</p>
+<p>This release also removes versions 7.0.x of the Exasol database from the regular CI builds as version 8.x is already available and ITDE only supports the latest two minor versions.</p>
 <p>T.B.D.</p>
 <section id="supported-exasol-versions">
 <h3>Supported Exasol Versions<a class="headerlink" href="#supported-exasol-versions" title="Permalink to this headline">#</a></h3>
 <ul class="simple">
-<li><p><strong>7.0</strong>: up to 7.0.20, <strong>except 7.0.5</strong></p></li>
 <li><p><strong>7.1</strong>: up to 7.1.17</p></li>
 <li><p><strong>8</strong>: 8.18.1</p></li>
 </ul>
@@ -502,6 +502,7 @@
 <li><p>#322: Added additional tests for environment variable LOG_ENV_VARIABLE_NAME</p></li>
 <li><p>#359: Fixed custom logging path not working if dir does not exist.</p></li>
 <li><p>#304: Create SSH access replacements for calls to <code class="docutils literal notranslate"><span class="pre">docker.exec_run()</span></code></p></li>
+<li><p>#368: Removed versions 7.0.x of Exasol database</p></li>
 </ul>
 </section>
 </section>
