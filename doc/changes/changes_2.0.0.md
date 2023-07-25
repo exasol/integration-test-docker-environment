@@ -10,7 +10,7 @@ The current release therefore enhances ITDE to enable to access the Docker Conta
 
 Additionally the directory for storing the randomly generated SSH keys has been moved to `~/.cache/exasol/itde/`. By that ITDE can restrict file permissions allowing access only by the current user.
 
-This release also removes versions 7.0.x of the Exasol database from the regular CI builds as version 8.x are already available and ITDE only supports the latest two minor versions.
+This release also removes versions 7.0.x of the Exasol database from the regular CI builds as version 8.x is already available and ITDE only supports the latest two minor versions.
 
 T.B.D.
 
