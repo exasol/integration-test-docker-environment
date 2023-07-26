@@ -43,6 +43,7 @@ class IsDatabaseReadyThread(Thread):
                 db_connection_command = ""
                 bucket_fs_connection_command = ""
                 try:
+                    executor.prepare()
                     exaplus_path = find_exaplus(self._db_container, executor)
                     db_connection_command = self.create_db_connection_command(exaplus_path)
                     bucket_fs_connection_command = self.create_bucketfs_connection_command()
