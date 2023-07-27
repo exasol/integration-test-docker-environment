@@ -89,6 +89,7 @@ def test_db_available(cli_database, db_os_access):
             db_container = docker_client.containers.get(db_container_name)
             executor_factory = get_executor_factory(dbinfo, db_os_access)
             with executor_factory.executor() as executor:
+                executor.prepare()
                 exaplus = find_exaplus(db_container, executor)
                 command = smoke_test_sql(exaplus, db.on_host_docker_environment)
                 exit_code, output = db_container.exec_run(command)
