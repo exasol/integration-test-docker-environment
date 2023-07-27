@@ -81,8 +81,8 @@ def test_db_container_started(cli_database):
 
 
 @pytest.mark.parametrize("db_os_access", ["DOCKER_EXEC", "SSH"])
-def test_db_available(cli_database, db_os_access):
-    params = { "db_os_access": db_os_access }
+def test_db_available(cli_database, fabric_stdin, db_os_access):
+    params = [ "--db-os-access", db_os_access ]
     with cli_database(additional_parameters=params) as db:
         with ContextDockerClient() as docker_client:
             dbinfo = db.on_host_docker_environment.environment_info.database_info

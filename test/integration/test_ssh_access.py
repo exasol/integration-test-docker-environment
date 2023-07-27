@@ -2,7 +2,6 @@ import contextlib
 import docker
 from docker.models.containers import Container as DockerContainer
 import fabric
-import io
 import os
 import pytest
 import time
@@ -27,17 +26,6 @@ from test.integration.helpers import (
     get_executor_factory,
     normalize_request_name,
 )
-
-
-@pytest.fixture
-def fabric_stdin(monkeypatch):
-    """
-    Mock stdin to avoid ThreadException when reading from stdin while
-    stdout is captured by pytest: OSError: pytest: reading from stdin while
-    output is captured!  Consider using ``-s``.
-    See https://github.com/fabric/fabric/issues/2005
-    """
-    monkeypatch.setattr('sys.stdin', io.StringIO(''))
 
 
 def test_generate_ssh_key_file(api_database):

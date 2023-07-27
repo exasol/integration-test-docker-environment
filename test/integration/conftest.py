@@ -1,7 +1,8 @@
 import contextlib
-from typing import Any, Callable, Dict, Iterator, List, NewType, Optional
-
+import io
 import pytest
+
+from typing import Any, Callable, Dict, Iterator, List, NewType, Optional
 
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from test.integration.helpers import normalize_request_name
@@ -102,3 +103,13 @@ def api_database(api_isolation: ApiTestEnvironment) -> ApiContextProvider:
         utils.close_environments(spawned)
 
     return create_context
+
+@pytest.fixture
+def fabric_stdin(monkeypatch):
+    """
+    Mock stdin to avoid ThreadException when reading from stdin while
+    stdout is captured by pytest: OSError: pytest: reading from stdin while
+    output is captured!  Consider using ``-s``.
+    See https://github.com/fabric/fabric/issues/2005
+    """
+    monkeypatch.setattr('sys.stdin', io.StringIO(''))
