@@ -144,9 +144,10 @@ class UploadValidator:
         assert expected_content == self.bucketfs.download(self.filename)
 
 
-@pytest.mark.parametrize("db_os_access", [DbOsAccess.DOCKER_EXEC, DbOsAccess.SSH])
+@pytest.mark.parametrize("db_os_access", ["DOCKER_EXEC", "SSH"])
 def test_upload_without_reuse(api_database, tmp_path, db_os_access):
-    with api_database() as db:
+    params = { "db_os_access": db_os_access }
+    with api_database(additional_parameters=params) as db:
         dbinfo = db.environment_info.database_info
         executor_factory = get_executor_factory(dbinfo, db_os_access)
         bucketfs = BucketFsAccess(db, executor_factory)
@@ -158,9 +159,10 @@ def test_upload_without_reuse(api_database, tmp_path, db_os_access):
                  .validate("new content", expected_reuse=False)
 
 
-@pytest.mark.parametrize("db_os_access", [DbOsAccess.DOCKER_EXEC, DbOsAccess.SSH])
+@pytest.mark.parametrize("db_os_access", ["DOCKER_EXEC", "SSH"])
 def test_upload_with_reuse(api_database, tmp_path, db_os_access):
-    with api_database() as db:
+    params = { "db_os_access": db_os_access }
+    with api_database(additional_parameters=params) as db:
         dbinfo = db.environment_info.database_info
         executor_factory = get_executor_factory(dbinfo, db_os_access)
         bucketfs = BucketFsAccess(db, executor_factory)

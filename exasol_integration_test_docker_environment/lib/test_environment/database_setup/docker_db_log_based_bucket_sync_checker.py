@@ -32,7 +32,6 @@ class DockerDBLogBasedBucketFSSyncChecker(BucketFSSyncChecker):
         self.logger.info("wait for upload of file")
 
         ready = False
-        self.executor.prepare()
         while not ready:
             exit_code, output = self.find_pattern_in_logfile()
             if self.exit_code_changed(exit_code, self.start_exit_code) or \

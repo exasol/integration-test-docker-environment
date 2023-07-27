@@ -1,6 +1,6 @@
 import contextlib
 import re
-from typing import Any, cast
+from typing import Any, Union, cast
 from unittest.mock import Mock
 
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
@@ -39,8 +39,10 @@ def container_named(*names, matcher=None):
 
 def get_executor_factory(
     dbinfo: DatabaseInfo,
-    db_os_access: DbOsAccess=DbOsAccess.DOCKER_EXEC,
+    db_os_access: Union[DbOsAccess,str] = DbOsAccess.DOCKER_EXEC,
 ) -> DbOsExecFactory:
+    if isinstance(db_os_access, str):
+        db_os_access = DbOsAccess[db_os_access]
     if db_os_access == DbOsAccess.SSH:
         return SshExecFactory.from_database_info(dbinfo)
     client_factory = DockerClientFactory(timeout=100000)
