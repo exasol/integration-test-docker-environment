@@ -80,9 +80,10 @@ def test_db_container_started(cli_database):
             assert check.count(db_containers) == 1, check.fail("Found no db container")
 
 
-@pytest.mark.parametrize("db_os_access", [DbOsAccess.DOCKER_EXEC, DbOsAccess.SSH])
+@pytest.mark.parametrize("db_os_access", ["DOCKER_EXEC", "SSH"])
 def test_db_available(cli_database, db_os_access):
-    with cli_database() as db:
+    params = { "db_os_access": db_os_access }
+    with cli_database(additional_parameters=params) as db:
         with ContextDockerClient() as docker_client:
             dbinfo = db.on_host_docker_environment.environment_info.database_info
             db_container_name = dbinfo.container_info.container_name
