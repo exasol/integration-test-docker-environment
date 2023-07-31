@@ -1,7 +1,6 @@
 from abc import abstractmethod
 import fabric
 import docker
-import sys
 import time
 from docker import DockerClient
 from typing import Protocol, runtime_checkable
@@ -98,22 +97,16 @@ class SshExecutor(DbOsExecutor):
         return ExecResult(result.exited, output)
 
     def prepare(self):
-        print("SshExecutor: probing until ssh connection is available")
         retry = 0
         while retry < 20:
             try:
                 retry += 1
-                prefix = "," if retry > 1 else ""
-                print(f'{prefix}{retry}', end='')
-                sys.stdout.flush()
                 self._connection.run("true", warn=True, hide=True)
                 break
             except NoValidConnectionsError as ex:
                 if retry > 20:
-                    print("...")
                     raise ex
                 time.sleep(1)
-        print(".")
 
     def close(self):
         if self._connection is not None:
