@@ -43,6 +43,7 @@ class IsDatabaseReadyThread(Thread):
                 db_connection_command = ""
                 bucket_fs_connection_command = ""
                 try:
+                    executor.prepare()
                     exaplus_path = find_exaplus(self._db_container, executor)
                     db_connection_command = self.create_db_connection_command(exaplus_path)
                     bucket_fs_connection_command = self.create_bucketfs_connection_command()
@@ -51,9 +52,9 @@ class IsDatabaseReadyThread(Thread):
                     self.finish = True
                 while not self.finish:
                     (exit_code_db_connection, self.output_db_connection) = \
-                        self._db_container.exec_run(cmd=db_connection_command)
+                        executor.exec(db_connection_command)
                     (exit_code_bucketfs_connection, self.output_bucketfs_connection) = \
-                        self._db_container.exec_run(cmd=bucket_fs_connection_command)
+                        executor.exec(bucket_fs_connection_command)
                     if exit_code_db_connection == 0 and exit_code_bucketfs_connection == 0:
                         self.finish = True
                         self.is_ready = True

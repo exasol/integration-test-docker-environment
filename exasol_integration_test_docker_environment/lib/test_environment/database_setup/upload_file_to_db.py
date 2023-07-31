@@ -64,6 +64,7 @@ class UploadFileToBucketFS(DockerBaseTask):
                 database_container = None
             if not self.should_be_reused(upload_target):
                 with self.executor_factory.executor() as executor:
+                    executor.prepare()
                     self.upload_and_wait(
                         database_container,
                         file_to_upload,

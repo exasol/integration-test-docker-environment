@@ -50,8 +50,7 @@ class DockerDBLogBasedBucketFSSyncChecker(BucketFSSyncChecker):
     def find_pattern_in_logfile(self):
         cmd = f"""grep '{self.pattern_to_wait_for}' {self.log_file_to_check}"""
         bash_cmd = f"""bash -c "{cmd}" """
-        exit_code, output = \
-            self.database_container.exec_run(bash_cmd)
+        exit_code, output = self.executor.exec(bash_cmd)
         return exit_code, output
 
     def output_happened_after_start_time(self, output, start_time):

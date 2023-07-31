@@ -1,6 +1,7 @@
 from abc import abstractmethod
 import fabric
 import docker
+import time
 from docker import DockerClient
 from typing import Protocol, runtime_checkable
 from docker.models.containers import Container, ExecResult
@@ -10,6 +11,7 @@ from exasol_integration_test_docker_environment \
     .lib.data.database_info import DatabaseInfo
 from exasol_integration_test_docker_environment.lib.docker \
     import ContextDockerClient
+from paramiko.ssh_exception import NoValidConnectionsError
 
 
 class DockerClientFactory:
@@ -38,6 +40,9 @@ class DbOsExecutor(Protocol):
     @abstractmethod
     def exec(self, cmd: str) -> ExecResult:
         ...
+
+    def prepare(self):
+        pass
 
 
 class DockerExecutor(DbOsExecutor):
@@ -87,9 +92,21 @@ class SshExecutor(DbOsExecutor):
         self.close()
 
     def exec(self, cmd: str) -> ExecResult:
-        result = self._connection.run(cmd)
+        result = self._connection.run(cmd, warn=True, hide=True)
         output = result.stdout.encode("utf-8")
         return ExecResult(result.exited, output)
+
+    def prepare(self):
+        retry = 0
+        while retry < 20:
+            try:
+                retry += 1
+                self._connection.run("true", warn=True, hide=True)
+                break
+            except NoValidConnectionsError as ex:
+                if retry > 20:
+                    raise ex
+                time.sleep(1)
 
     def close(self):
         if self._connection is not None:

@@ -81,14 +81,16 @@ def test_db_container_started(cli_database):
 
 
 @pytest.mark.parametrize("db_os_access", [DbOsAccess.DOCKER_EXEC, DbOsAccess.SSH])
-def test_db_available(cli_database, db_os_access):
-    with cli_database() as db:
+def test_db_available(cli_database, fabric_stdin, db_os_access):
+    params = [ "--db-os-access", db_os_access.name ]
+    with cli_database(additional_parameters=params) as db:
         with ContextDockerClient() as docker_client:
             dbinfo = db.on_host_docker_environment.environment_info.database_info
             db_container_name = dbinfo.container_info.container_name
             db_container = docker_client.containers.get(db_container_name)
             executor_factory = get_executor_factory(dbinfo, db_os_access)
             with executor_factory.executor() as executor:
+                executor.prepare()
                 exaplus = find_exaplus(db_container, executor)
                 command = smoke_test_sql(exaplus, db.on_host_docker_environment)
                 exit_code, output = db_container.exec_run(command)
