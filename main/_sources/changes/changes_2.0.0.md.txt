@@ -1,8 +1,8 @@
-# Integration-Test-Docker-Environment 2.0.0, released t.b.d.
+# Integration-Test-Docker-Environment 2.0.0, released 2023-08-07
 
 ## Summary
 
-Version 2.0.0 of ITDE comes with breaking changes as public API class `DatabaseInfo` has been changed.  Former separate attributes `database_port_forward`and `bucketfs_port_forward` have been replaced by a single attribute `port` set to an instance of `PortForwarding` with attributes `database`, `bucketfs`, and `ssh`.
+Version 2.0.0 of ITDE comes with breaking changes as the public API class `DatabaseInfo` has been changed.  Former separate attributes `database_port_forward`and `bucketfs_port_forward` have been replaced by a single attribute `port` set to an instance of `PortForwarding` with attributes `database`, `bucketfs`, and `ssh`.
 
 Previous versions of the ITDE used `docker_exec` to access the Docker Container, e.g. to analyze the content of logfiles or execute some shell commands. In future versions of the Exasol Docker-DB the format of the Docker Containers might change so that `docker_exec` is no longer possible. Instead ITDE will then need to use SSH access.
 
@@ -11,8 +11,6 @@ The current release therefore enhances ITDE to enable to access the Docker Conta
 Additionally the directory for storing the randomly generated SSH keys has been moved to `~/.cache/exasol/itde/`. By that ITDE can restrict file permissions allowing access only by the current user.
 
 This release also removes versions 7.0.x of the Exasol database from the regular CI builds as version 8.x is already available and ITDE only supports the latest two minor versions.
-
-T.B.D.
 
 ### Supported Exasol Versions
 
@@ -32,4 +30,4 @@ If you need further versions, please open an issue.
 * #359: Fixed custom logging path not working if dir does not exist.
 * #304: Create SSH access replacements for calls to `docker.exec_run()`
 * #368: Removed versions 7.0.x of Exasol database
-* #305: Replaced calls to `DockerContainer.exec_run()` to support SSH access alternatively 
+* #305: Replaced calls to `DockerContainer.exec_run()` to support SSH access alternatively
