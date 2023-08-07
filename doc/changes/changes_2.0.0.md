@@ -1,4 +1,4 @@
-# Integration-Test-Docker-Environment 2.0.0, released t.b.d.
+# Integration-Test-Docker-Environment 2.0.0, released 2023-08-07
 
 ## Summary
 
@@ -11,8 +11,6 @@ The current release therefore enhances ITDE to enable to access the Docker Conta
 Additionally the directory for storing the randomly generated SSH keys has been moved to `~/.cache/exasol/itde/`. By that ITDE can restrict file permissions allowing access only by the current user.
 
 This release also removes versions 7.0.x of the Exasol database from the regular CI builds as version 8.x is already available and ITDE only supports the latest two minor versions.
-
-T.B.D.
 
 ### Supported Exasol Versions
 
@@ -32,4 +30,4 @@ If you need further versions, please open an issue.
 * #359: Fixed custom logging path not working if dir does not exist.
 * #304: Create SSH access replacements for calls to `docker.exec_run()`
 * #368: Removed versions 7.0.x of Exasol database
-* #305: Replaced calls to `DockerContainer.exec_run()` to support SSH access alternatively 
+* #305: Replaced calls to `DockerContainer.exec_run()` to support SSH access alternatively
