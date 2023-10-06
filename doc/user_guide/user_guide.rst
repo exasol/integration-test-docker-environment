@@ -251,7 +251,7 @@ The following config files are available:
       export ITDE_DATABASE_CONTAINER_NETWORK_ALIASES="exasol_test_database db_container_test"
       # Database IP in the environment docker network
       export ITDE_DATABASE_CONTAINER_IP_ADDRESS=172.21.0.2
-      export ITDE_DATABASE_CONTAINER_VOLUMNE_NAME=db_container_test_volume
+      export ITDE_DATABASE_CONTAINER_VOLUME_NAME=db_container_test_volume
       # Database IP on the docker default bridge which under Linux available from the host
       export ITDE_DATABASE_CONTAINER_DEFAULT_BRIDGE_IP_ADDRESS=172.17.0.3
 

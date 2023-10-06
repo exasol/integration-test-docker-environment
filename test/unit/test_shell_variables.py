@@ -52,6 +52,7 @@ def test_from_test_environment_info():
         ITDE_DATABASE_CONTAINER_NAME=container-name
         ITDE_DATABASE_CONTAINER_NETWORK_ALIASES="cna-1 cna-2"
         ITDE_DATABASE_CONTAINER_IP_ADDRESS=container-ip
+        ITDE_DATABASE_CONTAINER_VOLUME_NAME=container-volume
         ITDE_DATABASE_CONTAINER_VOLUMNE_NAME=container-volume
         ITDE_DATABASE_CONTAINER_DEFAULT_BRIDGE_IP_ADDRESS=ip-address
         ITDE_TEST_CONTAINER_NAME=test-container-name
