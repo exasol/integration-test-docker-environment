@@ -3,8 +3,9 @@ The doctor module provides functionality to check the health of the `exasol_inte
 package and also provide help to find potential fixes.
 """
 import sys
+from typing import Iterable
+from exasol import error
 from enum import Enum
-from typing import Iterator
 
 import docker
 from docker.errors import DockerException
@@ -12,38 +13,44 @@ from docker.errors import DockerException
 SUPPORTED_PLATFORMS = ["linux", "darwin"]
 
 
-class ErrorCodes(Enum):
-    """The equivalent of ICD-10 codes this doctor is using"""
+class Error(Enum):
+    Unknown = error.ExaError(
+        "E-ITDE-0",
+        "Unknown issue.",
+        ["An unknown error occurred, please contact the maintainer."],
+        {}
+    )
 
-    Unknown = "Unknown issue"
-    UnixSocketNotAvailable = "Could not find unix socket to connect to"
-    TargetPlatformNotSupported = "The platform you are running on is not supported."
+    UnixSocketNotAvailable = error.ExaError(
+        "E-ITDE-1",
+        "Could not find unix socket to connect to.",
+        ["Make sure environment variable DOCKER_HOST is configured correctly."],
+        {}
+    )
+
+    TargetPlatformNotSupported = error.ExaError(
+        "E-ITDE-2",
+        "The platform ITDE is running on is not supported.",
+        ["Make sure you are using one of the following platforms: [linux, darwin]."],
+        {}
+    )
 
 
-def recommend_mitigation(error_code) -> str:
-    """Get treatment advice based on the error_code"""
-    return {
-        ErrorCodes.Unknown: "You are sick but this symptoms are unknown, please contact the maintainer.",
-        ErrorCodes.UnixSocketNotAvailable: "Make sure your DOCKER_HOST environment variable is configured correctly.",
-        ErrorCodes.TargetPlatformNotSupported: f"Make sure you are using one of the following platforms: {SUPPORTED_PLATFORMS}.",
-    }[error_code]
-
-
-def diagnose_docker_daemon_not_available() -> Iterator[ErrorCodes]:
+def diagnose_docker_daemon_not_available() -> Iterable[error.ExaError]:
     """Diagnose reasons why docker deamon is not available"""
 
     def _is_unix_socket_issue(message: str) -> bool:
         return "FileNotFoundError(2, 'No such file or directory')" in message
 
-    errors = set()
+    errors = list()
     try:
         _docker = docker.from_env()
     except DockerException as ex:
         msg = f"{ex}"
         if _is_unix_socket_issue(msg):
-            errors.add(ErrorCodes.UnixSocketNotAvailable)
+            errors.append(Error.UnixSocketNotAvailable)
         if len(errors) == 0:
-            errors.add(ErrorCodes.Unknown)
+            errors.append(Error.Unknown)
     return errors
 
 
@@ -65,7 +72,7 @@ def is_supported_platform() -> bool:
     return sys.platform in SUPPORTED_PLATFORMS
 
 
-def health_checkup() -> Iterator[ErrorCodes]:
+def health_checkup() -> Iterable[error.ExaError]:
     """
     Runs all known examinations
 
@@ -73,7 +80,7 @@ def health_checkup() -> Iterator[ErrorCodes]:
     """
     examinations = [
         (is_docker_daemon_available, diagnose_docker_daemon_not_available),
-        (is_supported_platform, lambda: ErrorCodes.TargetPlatformNotSupported),
+        (is_supported_platform, lambda: Error.TargetPlatformNotSupported),
     ]
     for is_fine, diagnosis in examinations:
         if not is_fine():

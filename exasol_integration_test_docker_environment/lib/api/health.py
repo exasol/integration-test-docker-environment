@@ -1,6 +1,6 @@
 from inspect import cleandoc
 
-from exasol_integration_test_docker_environment.doctor import health_checkup, recommend_mitigation
+from exasol_integration_test_docker_environment.doctor import health_checkup
 from exasol_integration_test_docker_environment.lib.api.api_errors import HealthProblem
 from exasol_integration_test_docker_environment.lib.api.common import cli_function
 
@@ -17,16 +17,10 @@ def health():
     :raises HealthProblem
     """
 
-    problems = set(health_checkup())
-    if not problems:
+    errors = set(health_checkup())
+    if not errors:
         return
 
-    suggestion_template = cleandoc(
-        """
-        * {problem}
-          Fix: {suggestion}
-        """
-    )
     message = cleandoc(
         """
         {count} problem(s) have been identified.
@@ -34,14 +28,7 @@ def health():
         {problems}
         """
     ).format(
-        count=len(problems),
-        problems="\n".join(
-            (
-                suggestion_template.format(
-                    problem=icd.value, suggestion=recommend_mitigation(icd)
-                )
-                for icd in problems
-            )
-        ),
+        count=len(errors),
+        problems="\n".join(f"{error.value}" for error in errors),
     )
     raise HealthProblem(message)
