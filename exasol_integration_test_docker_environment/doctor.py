@@ -24,7 +24,7 @@ class Error(Enum):
     UnixSocketNotAvailable = error.ExaError(
         "E-ITDE-1",
         "Could not find unix socket to connect to.",
-        ["Make sure your DOCKER_HOST environment variable is configured correctly."],
+        ["Make sure environment variable DOCKER_HOST is configured correctly."],
         {}
     )
 
