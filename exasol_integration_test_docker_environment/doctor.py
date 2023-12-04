@@ -30,7 +30,7 @@ class Error(Enum):
 
     TargetPlatformNotSupported = error.ExaError(
         "E-ITDE-2",
-        "The platform you are running on is not supported.",
+        "The platform ITDE is running on is not supported.",
         ["Make sure you are using one of the following platforms: [linux, darwin]."],
         {}
     )
