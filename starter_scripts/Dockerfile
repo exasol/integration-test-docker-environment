@@ -22,7 +22,6 @@ ENV LANG=C.UTF-8
 
 RUN mkdir /exasol_integration_test_docker_environment
 COPY exasol_integration_test_docker_environment /integration_test_docker_environment/exasol_integration_test_docker_environment
-COPY pytest_itde /integration_test_docker_environment/pytest_itde
 COPY poetry.lock /integration_test_docker_environment/poetry.lock
 COPY pyproject.toml /integration_test_docker_environment/pyproject.toml
 COPY LICENSE /integration_test_docker_environment/LICENSE
