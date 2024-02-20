@@ -50,6 +50,7 @@ toml = ">=0.10.2"
 nox = "^2022.1.7"
 mypy = "^1.1.1"
 exasol-sphinx-github-pages-generator = { git = "https://github.com/exasol/sphinx-github-pages-generator.git" }
+pyexasol = "^0.25.2"
 
 
 [tool.poetry.scripts]
