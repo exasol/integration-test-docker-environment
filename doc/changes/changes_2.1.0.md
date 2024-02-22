@@ -2,7 +2,7 @@
 
 ## Summary
 
-This release addresses dependencies and dependency issues.
+This release addresses dependencies updates and dependency issues.
 
 ### Supported Exasol Versions
 
