@@ -11,7 +11,7 @@ This release addresses dependencies and dependency issues.
 
 ## Dependencies
 
-* Constrain docker depency to `>= 4.0.0, < 7.0.0`, for further details see [docker/docker-py#3223](https://github.com/docker/docker-py/issues/3223)
+* Constrain docker dependency to `>= 4.0.0, < 7.0.0`, for further details see [docker/docker-py#3223](https://github.com/docker/docker-py/issues/3223)
 
 ## Internal
 
