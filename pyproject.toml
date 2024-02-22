@@ -4,7 +4,7 @@ packages = [
     { include = "exasol_integration_test_docker_environment" },
     { include = "pytest_itde" }
 ]
-version = "2.0.1"
+version = "2.1.0"
 description = "Integration Test Docker Environment for Exasol"
 
 license = "MIT"
@@ -27,7 +27,7 @@ python = ">=3.8,<4"
 click = ">=7.0"
 # The `sys_platform` marker makes sure the docker dependency is only installed on
 # non windows platforms.
-docker = { version = ">=4.0.0", markers = "sys_platform != 'win32'" }
+docker = { version = ">=4.0.0,<7.0.0", markers = "sys_platform != 'win32'" }
 gitpython = ">=2.1.0"
 humanfriendly = ">=4.18"
 jinja2 = ">=2.10.1"
