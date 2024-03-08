@@ -34,7 +34,8 @@ class ShellVariables:
                 "DATABASE_CONTAINER_NAME": info.database_info.container_info.container_name,
                 "DATABASE_CONTAINER_NETWORK_ALIASES": f'"{network_aliases}"',
                 "DATABASE_CONTAINER_IP_ADDRESS": info.database_info.container_info.ip_address,
-                "DATABASE_CONTAINER_VOLUMNE_NAME": info.database_info.container_info.volume_name,
+                "DATABASE_CONTAINER_VOLUME_NAME": info.database_info.container_info.volume_name,
+                "DATABASE_CONTAINER_VOLUMNE_NAME": info.database_info.container_info.volume_name, # Backward compatibility
                 "DATABASE_CONTAINER_DEFAULT_BRIDGE_IP_ADDRESS": default_bridge_ip_address,
             })
         if info.test_container_info is not None:

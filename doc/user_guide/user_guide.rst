@@ -82,7 +82,7 @@ or if you work on the code of the Test Environment (requires Python
 
    ./start-test-env-with-poetry spawn-test-environment --environment-name <NAME>
 
-Shutdown of the test environment is currently done manual.
+Shutdown of the test environment is currently done manually.
 
 Options
 ~~~~~~~
@@ -125,7 +125,7 @@ The following options are available to customize the test environment.
                                      larger size, because the database needs at
                                      least so much more disk.  [default: 2 GiB]
 
-     --nameserver TEXT               Add a nameserver to the list of DNS
+     --nameserver TEXT               Add a name server to the list of DNS
                                      nameservers which the docker-db should use
                                      for resolving domain names. You can repeat
                                      this option to add further nameservers.
@@ -154,7 +154,7 @@ The following options are available to customize the test environment.
                                      Directory where the system creates temporary
                                      directories.  [default: /tmp]
 
-You can look at them on the commandline with:
+You can look at them on the command line with:
 
 ::
 
@@ -164,7 +164,7 @@ The integration-test-docker-environment command line tool
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Besides, the already mentioned command ``spawn-test-environment``, the
-integration-test-docker-environemnt command line tool provides a couple
+integration-test-docker-environment command line tool provides a couple
 of other helpful tools.
 
 Run ``main.py --help``, to get a list of the available commands:
@@ -233,7 +233,7 @@ the test container the config file is stored at the root directory
 
 The following config files are available:
 
--  environment_info.sh: This file is meant to be source by the bash and
+-  ``environment_info.sh``: This file is meant to be source by the bash and
    then provides the information as environment variables. Here an
    example for the content:
 
@@ -251,7 +251,7 @@ The following config files are available:
       export ITDE_DATABASE_CONTAINER_NETWORK_ALIASES="exasol_test_database db_container_test"
       # Database IP in the environment docker network
       export ITDE_DATABASE_CONTAINER_IP_ADDRESS=172.21.0.2
-      export ITDE_DATABASE_CONTAINER_VOLUMNE_NAME=db_container_test_volume
+      export ITDE_DATABASE_CONTAINER_VOLUME_NAME=db_container_test_volume
       # Database IP on the docker default bridge which under Linux available from the host
       export ITDE_DATABASE_CONTAINER_DEFAULT_BRIDGE_IP_ADDRESS=172.17.0.3
 
@@ -260,15 +260,15 @@ The following config files are available:
       # Test Container IP in the environment docker network
       export ITDE_TEST_CONTAINER_IP_ADDRESS=172.21.0.3
 
--  environment_info.json: Contains the EnvironmentInfo objects pickled
-   with JsonPickle
+-  ``environment_info.json``: Contains the EnvironmentInfo objects pickled
+   with `JsonPickle <https://github.com/jsonpickle/jsonpickle>`__.
 
 Currently supported Exasol Versions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  **7.0**: up to 7.0.20 **except 7.0.5**
 -  **7.1**: up to 7.1.17
--  8.17.0 and 8.18.1
+-  **8**: 8.17.0 and 8.18.1
 
 If you need further versions, please open an issue.
 
@@ -278,7 +278,7 @@ SSH Access
 
 Up to version 1.6.0 ITDE used ``docker_exec`` to access the operating system
 of the Exasol database inside the Docker Container, e.g. to analyze the
-content of logfiles or execute some shell commands. With version 8 of Exasol
+content of log files or execute some shell commands. With version 8 of Exasol
 database the format of the Docker Containers might change so that
 ``docker_exec`` is no longer possible. Instead ITDE will then need to use SSH
 access.
@@ -330,7 +330,7 @@ started. This makes
 `shared directories <https://docs.docker.com/docker-for-mac/osxfs/>`__
 more complicated then on Linux.
 
-We start the python setup script for the test environment in its own
+We start the Python setup script for the test environment in its own
 Docker container, lets call it ``docker runner``, because the library
 `Luigi <https://luigi.readthedocs.io/en/stable/>`__ can have problems
 with Mac OS X and to avoid the installation of further dependencies. To
