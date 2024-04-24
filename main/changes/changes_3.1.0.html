@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Integration-Test-Docker-Environment 1.4.0, released 2023-03-15" href="changes_1.4.0.html" /><link rel="prev" title="Integration-Test-Docker-Environment 1.6.0, released 2023-05-12" href="changes_1.6.0.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Integration-Test-Docker-Environment 3.0.0, released 2024-02-22" href="changes_3.0.0.html" /><link rel="prev" title="Changes" href="changelog.html" />
 
     <meta name="generator" content="sphinx-4.5.0, furo 2022.09.29"/>
-        <title>Integration-Test-Docker-Environment 1.5.0, released 2023-03-21 - Exasol Integration Test Docker Environment documentation</title>
+        <title>Integration-Test-Docker-Environment X.Y.Z, released TBD - Exasol Integration Test Docker Environment documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
@@ -412,14 +412,14 @@
 </ul>
 </li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="changelog.html">Changes</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-32" name="toctree-checkbox-32" role="switch" type="checkbox"/><label for="toctree-checkbox-32"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="changes_3.1.0.html">Integration-Test-Docker-Environment X.Y.Z, released TBD</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Integration-Test-Docker-Environment X.Y.Z, released TBD</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changes_3.0.0.html">Integration-Test-Docker-Environment 3.0.0, released 2024-02-22</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changes_2.1.0.html">Integration-Test-Docker-Environment 2.1.0, released 2024-02-22</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changes_2.0.0.html">Integration-Test-Docker-Environment 2.0.0, released 2023-08-07</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changes_1.7.1.html">Integration-Test-Docker-Environment 1.7.1, released 2023-06-19</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changes_1.7.0.html">Integration-Test-Docker-Environment 1.7.0, released 2023-06-15</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changes_1.6.0.html">Integration-Test-Docker-Environment 1.6.0, released 2023-05-12</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Integration-Test-Docker-Environment 1.5.0, released 2023-03-21</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changes_1.5.0.html">Integration-Test-Docker-Environment 1.5.0, released 2023-03-21</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changes_1.4.0.html">Integration-Test-Docker-Environment 1.4.0, released 2023-03-15</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changes_1.3.0.html">Integration-Test-Docker-Environment 1.3.0, released 2023-02-17</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changes_1.2.0.html">Integration-Test-Docker-Environment 1.2.0, released 2022-11-03</a></li>
@@ -474,75 +474,16 @@
           </label>
         </div>
         <article role="main">
-          <section id="integration-test-docker-environment-1-5-0-released-2023-03-21">
-<h1>Integration-Test-Docker-Environment 1.5.0, released 2023-03-21<a class="headerlink" href="#integration-test-docker-environment-1-5-0-released-2023-03-21" title="Permalink to this headline">#</a></h1>
+          <section id="integration-test-docker-environment-x-y-z-released-tbd">
+<h1>Integration-Test-Docker-Environment X.Y.Z, released TBD<a class="headerlink" href="#integration-test-docker-environment-x-y-z-released-tbd" title="Permalink to this headline">#</a></h1>
 <section id="summary">
 <h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">#</a></h2>
-<p>Added pytest plugin and fixed itde cli command</p>
-<section id="supported-exasol-versions">
-<h3>Supported Exasol Versions<a class="headerlink" href="#supported-exasol-versions" title="Permalink to this headline">#</a></h3>
-<ul class="simple">
-<li><p><strong>7.0</strong>: up to 7.0.20, <strong>except 7.0.5</strong></p></li>
-<li><p><strong>7.1</strong>: up to 7.1.17</p></li>
-</ul>
-<p>If you need further versions, please open an issue.</p>
-</section>
-</section>
-<section id="feature">
-<h2>Feature<a class="headerlink" href="#feature" title="Permalink to this headline">#</a></h2>
-<ul>
-<li><p>Added pytest plugin and fixtures</p>
-<ul>
-<li><p>Show settings related to itde plugin</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pytest<span class="w"> </span>--help<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s2">&quot;itde\|exasol\|bucketfs&quot;</span>
-</pre></div>
-</div>
-</li>
-<li><p>Show fixtures related to itde</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pytest<span class="w"> </span>--fixtures<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>pytest_itde<span class="w"> </span>-A<span class="w"> </span><span class="m">3</span>
-</pre></div>
-</div>
-</li>
-<li><p>Use itde to setup a test db etc. for a test</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># In order to use itde, just request it as fixture</span>
-<span class="c1"># ATTENTION: initial startup may be up to ~1-2 minutes</span>
-<span class="c1"># (Somtimes even longer if images must be fetched for the first time)</span>
-<span class="k">def</span> <span class="nf">test_smoke_test_plugin</span><span class="p">(</span><span class="n">itde</span><span class="p">):</span>
-    <span class="n">db</span> <span class="o">=</span> <span class="n">itde</span><span class="o">.</span><span class="n">exasol_config</span><span class="p">,</span>
-    <span class="n">bucketfs</span> <span class="o">=</span> <span class="n">itde</span><span class="o">.</span><span class="n">bucketfs_config</span><span class="p">,</span>
-    <span class="n">itde_cfg</span> <span class="o">=</span> <span class="n">itde</span><span class="o">.</span><span class="n">itde_config</span><span class="p">,</span>
-    <span class="n">ctrl_connection</span> <span class="o">=</span> <span class="n">itde</span><span class="o">.</span><span class="n">connection</span><span class="p">,</span>
-    <span class="k">assert</span> <span class="kc">True</span>
-</pre></div>
-</div>
-</li>
-</ul>
-</li>
-</ul>
+<p>TBD</p>
 </section>
 <section id="changes">
 <h2>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">#</a></h2>
-<ul>
-<li><p>Fixed <code class="docutils literal notranslate"><span class="pre">itde</span></code> cli command and subcommands</p>
-<ul>
-<li><p>Provide all available subcommands in help</p></li>
-<li><p>Provide examples and basic doc string for commands</p></li>
-<li><p>Fix subcommand imports</p></li>
-<li><p>Example Usage:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="w">  </span>$<span class="w"> </span>itde<span class="w"> </span>spawn-test-environment<span class="w"> </span>--environment-name<span class="w"> </span><span class="nb">test</span><span class="w"> </span><span class="se">\\</span>
-<span class="w">  </span>--database-port-forward<span class="w"> </span><span class="m">8888</span><span class="w"> </span>--bucketfs-port-forward<span class="w"> </span><span class="m">6666</span><span class="w"> </span><span class="se">\\</span>
-<span class="w">  </span>--docker-db-image-version<span class="w"> </span><span class="m">7</span>.1.9<span class="w"> </span>--db-mem-size<span class="w"> </span>4GB
-</pre></div>
-</div>
-</li>
-</ul>
-</li>
-</ul>
-</section>
-<section id="internal">
-<h2>Internal<a class="headerlink" href="#internal" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
-<li><p>Updated dependencies</p></li>
+<li><p>Moved <code class="docutils literal notranslate"><span class="pre">pytest</span></code> dependency to development dependencies</p></li>
 </ul>
 </section>
 </section>
@@ -552,23 +493,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="changes_1.4.0.html">
+          <a class="next-page" href="changes_3.0.0.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Integration-Test-Docker-Environment 1.4.0, released 2023-03-15</div>
+                <div class="title">Integration-Test-Docker-Environment 3.0.0, released 2024-02-22</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="changes_1.6.0.html">
+          <a class="prev-page" href="changelog.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Integration-Test-Docker-Environment 1.6.0, released 2023-05-12</div>
+                <div class="title">Changes</div>
                 
               </div>
             </a>
@@ -604,14 +545,9 @@
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Integration-Test-Docker-Environment 1.5.0, released 2023-03-21</a><ul>
-<li><a class="reference internal" href="#summary">Summary</a><ul>
-<li><a class="reference internal" href="#supported-exasol-versions">Supported Exasol Versions</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#feature">Feature</a></li>
+<li><a class="reference internal" href="#">Integration-Test-Docker-Environment X.Y.Z, released TBD</a><ul>
+<li><a class="reference internal" href="#summary">Summary</a></li>
 <li><a class="reference internal" href="#changes">Changes</a></li>
-<li><a class="reference internal" href="#internal">Internal</a></li>
 </ul>
 </li>
 </ul>
