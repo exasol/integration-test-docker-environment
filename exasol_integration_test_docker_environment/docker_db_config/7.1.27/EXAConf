@@ -1,0 +1,208 @@
+[Global]
+    Revision = 14
+    Checksum = COMMIT
+    ClusterName = cl4
+    Platform = Docker
+    LicenseFile = /exa/etc/license.xml
+    CoredPort = 10001
+    SSHPort = {{ ssh_port }}
+    XMLRPCPort = 443
+    WebUIBackendPort = 4444
+    WebUIDomain = exacluster.local
+    EnableLoadBalancer = False
+    AuthenticationToken = VFdOQ2ZVZExoRGZqb21ZVzpWWVR0d0NXYVh6am9TckhmeGdnQ3pwU2pFSktOTXlqUHNMclhQU0drWHdld2xDZndXeFFORU1rVnNFSGN4c2Jp
+    # List of networks for this cluster: 'private' is mandatory, 'public' is optional.
+    Networks = private
+    # Comma-separated list of nameservers for this cluster.
+    NameServers = {{ name_servers }}
+    # Path to c4 unix domain socket, used for deployments of new clusters and nodes.
+    C4Socket = /var/run/c4_socket
+    Timezone = Europe/Berlin
+    LicenseRAWMEMWarnThreshold = 80
+    # Nr. of hugepages ('0' = disabled, 'host' = manually configured on the host, 'auto' = set automatically based on DB config)
+    Hugepages = 0
+    StorageConnectionThreads = 16
+    StorageMaxConnections = 1024
+    ConfVersion = {{ db_version }}
+    OSVersion = {{ db_version }}
+    REVersion = {{ db_version }}
+    DBVersion = {{ db_version }}
+    ImageVersion = {{ db_version }}
+
+# SSL options
+[SSL]
+    # The SSL certificate, private key and CA for all EXASOL services
+    Cert = {{ certificate_dir }}/cert.crt
+    CertKey = {{ certificate_dir }}/cert.key
+    CertAuth = {{ certificate_dir }}/rootCA.crt
+    # Options to verify certificates: none, optional, required
+    CertVerify = none
+    # Domain name in the certifcate
+    CertDomainName =
+
+# Docker related options
+[Docker]
+    # The directory that contains all data related to this docker cluster
+    # (except for mapped devices)
+    RootDir = /exa/etc
+    # The EXASOL docker image used for all containers of this cluster
+    Image = exasol/docker-db:latest
+    # The type of storage devices for this cluster: 'block' or 'file'
+    DeviceType = file
+    # Comma-separated list of volumes to be mounted in all containers (e. g. '/mnt/my_data:/exa/my_data:rw' )
+    # These user-defined volumes are mounted additionally to the internal ones (like the node root volume)
+    AdditionalVolumes =
+
+[Groups]
+    [[root]]
+        ID = 0
+    [[exausers]]
+        ID = 500
+    [[exadbadm]]
+        ID = 1001
+    [[exastoradm]]
+        ID = 1002
+    [[exabfsadm]]
+        ID = 1003
+    [[exaadm]]
+        ID = 1004
+
+[Users]
+    [[root]]
+        ID = 0
+        Group = root
+        LoginEnabled = True
+        AdditionalGroups = exausers, exadbadm, exastoradm, exabfsadm, exaadm
+        AuthorizedKeys = {{ authorized_keys }}
+    [[exadefusr]]
+        ID = 500
+        Group = exausers
+        LoginEnabled = False
+        AdditionalGroups = exadbadm, exastoradm, exabfsadm, exaadm
+
+[Node : 11]
+    PrivateNet = {{ private_network }}
+    PublicNet =
+    Name = n11
+    # Affinity decides how this node is used in the cluster. i.e, the possibility to become master
+    Affinity = 11
+    UUID = 02F4E2AF9C294CABA0A119A89AC60B44EC95D19C
+    DockerVolume = n11
+    [[Disk : disk1]]
+        Component = exastorage
+        Devices = dev.1
+        Mapping = dev.1:/exa/data/storage
+
+# Global EXAStorage options
+[EXAStorage]
+    # Enable or disable background recovery / data restoration (does not affect on-demand recovery)
+    BgRecEnabled = True
+    # Max. throughput for background recovery / data restoration (in MiB/s)
+    BgRecLimit =
+    # Space usage threshold (in percent, per node) for sending a warning
+    SpaceWarnThreshold = 90
+
+# An EXAStorage volume
+[EXAVolume : DataVolume1]
+    # Type of volume: 'data' | 'archive'
+    Type = data
+    # Volume size (e. g. '1 TiB')
+    Size = {{ disk_size }}
+    # Name of the disk to be used for this volume.
+    # This disk must exist on all volume nodes.
+    Disk = disk1
+    # Comma-separated list of node IDs for this volume (put dedicated redundancy nodes at the end, if any)
+    Nodes = 11
+    # OPTIONAL: Nr. of master nodes for this volume. Remaining nodes will be used for redundancy only.
+    NumMasterNodes = 1
+    # Desired redundancy for this volume
+    Redundancy = 1
+    BlockSize = 4 KiB
+    StripeSize = 256 KiB
+    # User and group IDs that own this volume (e. g. '1000:1005')
+    Owner = 500 : 500
+    Permissions = rwx
+    # OPTIONAL: shared volumes can be opened (for writing) by multiple clients simultaneously
+    Shared = True
+    # OPTIONAL: I/O priority (0 = highest, 20 = lowest)
+    Priority = 10
+
+# An EXASOL database
+[DB : DB1]
+    # Version nr. of this database.
+    Version = {{ db_version }}
+    # Memory size over all nodes (e. g. '1 TiB').
+    MemSize = {{ mem_size }}
+    Port = {{ db_port }}
+    # User and group IDs that own this database (e. g. '1000:1005').
+    Owner = 500 : 500
+    # Comma-separated list of node IDs for this DB (put reserve nodes at the end, if any).
+    Nodes = 11
+    # Nr. of initially active nodes for this DB. The remaining nodes will be reserve nodes.
+    NumActiveNodes = 1
+    # Name of the data volume to be used by this database.
+    DataVolume = DataVolume1
+    EnableAuditing = True
+    BuiltinScriptLanguageName = ScriptLanguages-release-standard-exasol-7.1.0-1.1.0
+    AutoStart = True
+    # Additional db parameters
+    {% if additional_db_parameters %}
+    Params = {{ additional_db_parameters }}
+    {% endif %}
+    # JDBC driver configuration
+    [[JDBC]]
+        # BucketFS that contains the JDBC driver
+        BucketFS = bfsdefault
+        # Bucket that contains the JDBC driver
+        Bucket = default
+        # Directory within the bucket that contains the drivers
+        Dir = drivers/jdbc
+    # Oracle driver configuration
+    [[Oracle]]
+        # BucketFS that contains the JDBC drivers
+        BucketFS = bfsdefault
+        # Bucket that contains the JDBC drivers
+        Bucket = default
+        # Directory within the bucket that contains the drivers
+        Dir = drivers/oracle
+
+# The default BucketFS (auto-generated)
+[BucketFS : bfsdefault]
+    Owner = 500 : 500
+    # HTTP port number (0 = disabled)
+    HttpPort = {{ bucketfs_port }}
+    # HTTPS port number (0 = disabled)
+    HttpsPort = 0
+    SyncKey = c3RxWjRxWUFpZUFQblEyc0p2djZUM0VZamVZa1M0bUs=
+    SyncPeriod = 30000
+    mode = rsync
+    bucketvolume = None
+    # The default bucket (auto-generated)
+    [[Bucket : default]]
+        # ReadPasswd is "read" (without quotes)
+        ReadPasswd = cmVhZAo=
+        # WritePasswd is "write" (without quotes)
+        WritePasswd = d3JpdGU=
+        Public = True
+        Name = default
+        AdditionalFiles = EXAClusterOS:/usr/opt/EXASuite-7/ScriptLanguages/*
+
+    [[Bucket : myudfs]]
+        # ReadPasswd is "read" (without quotes)
+        ReadPasswd = cmVhZAo=
+        # WritePasswd is "write" (without quotes)
+        WritePasswd = d3JpdGU=
+        Public = True
+        Name = myudfs
+
+    [[Bucket : jdbc_adapter]]
+        # ReadPasswd is "read" (without quotes)
+        ReadPasswd = cmVhZAo=
+        # WritePasswd is "write" (without quotes)
+        WritePasswd = d3JpdGU=
+        Public = True
+        Name = jdbc-adapter
+[Logging]
+    LogRotationTypes = local,
+    RemoteLogRotationVolume = cloud_data_remote_volume
+    RemoteLogRotationPrefix = Logs
