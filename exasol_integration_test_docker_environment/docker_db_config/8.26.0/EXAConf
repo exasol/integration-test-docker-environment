@@ -26,8 +26,8 @@
     StorageMaxConnections = 1024
     # The meta package name, which was installed by C4 to run this system.
     MetaPackage = none
-    ConfVersion = 8.29.2
-    OSVersion = 8.29.2
+    ConfVersion = 8.45.0
+    OSVersion = 8.45.0
     DBVersion = {{ db_version }}
     ImageVersion = {{ db_version }}
     # Cored only accepts incomming messages from privileged ports (port number less than 1024).
@@ -170,9 +170,9 @@
     BuiltinScriptLanguageName = slc-6.0.0-c4-5-standard-EXASOL-8.0.0/ScriptLanguages-standard-EXASOL-8.0.0-slc-v6.0.0-PB5EHDLN
     AutoStart = True
     {% if additional_db_parameters %}
-    Params = -sandboxCHROOT=/opt/exasol/cos-8.29.2/sbin/nsexec_chroot {{ additional_db_parameters }}
+    Params = -sandboxCHROOT=/opt/exasol/cos-8.45.0/sbin/nsexec_chroot {{ additional_db_parameters }}
     {% else %}
-    Params = -sandboxCHROOT=/opt/exasol/cos-8.29.2/sbin/nsexec_chroot
+    Params = -sandboxCHROOT=/opt/exasol/cos-8.45.0/sbin/nsexec_chroot
     {% endif %}
 
     # JDBC driver configuration
