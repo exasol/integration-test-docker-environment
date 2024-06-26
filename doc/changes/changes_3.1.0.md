@@ -11,7 +11,7 @@ Updated dependency constraints and supported Exasol versions.
 
 ## Dependencies
 
-* Update docker dependency constrains to `>= 4.0.0, != 7.0.0`, for further details see:
+* Updated docker dependency constrains to `>= 4.0.0, != 7.0.0`, for further details see:
     - [docker/docker-py#3240](https://github.com/docker/docker-py/issues/3240)
     - [docker/docker-py#3223](https://github.com/docker/docker-py/issues/3223)
 
