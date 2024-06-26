@@ -2,7 +2,7 @@
 
 ## Summary
 
-Updated dependency constrains and supported Exasol versions.
+Updated dependency constraints and supported Exasol versions.
 
 ### Supported Exasol Versions
 
