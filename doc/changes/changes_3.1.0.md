@@ -1,9 +1,8 @@
-# Integration-Test-Docker-Environment 3.1.0, released t.b.d.
+# Integration-Test-Docker-Environment 3.1.0, released 2024-06-26
 
 ## Summary
 
-t.b.d.
-
+Updated dependency constrains and supported Exasol versions.
 
 ### Supported Exasol Versions
 
@@ -12,7 +11,9 @@ t.b.d.
 
 ## Dependencies
 
-* Constrain docker dependency to `>= 4.0.0, < 7.0.0`, for further details see [docker/docker-py#3223](https://github.com/docker/docker-py/issues/3223)
+* Update docker dependency constrains to `>= 4.0.0, != 7.0.0`, for further details see:
+    - [docker/docker-py#3240](https://github.com/docker/docker-py/issues/3240)
+    - [docker/docker-py#3223](https://github.com/docker/docker-py/issues/3223)
 
 ## Changes
 
