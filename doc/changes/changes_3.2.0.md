@@ -7,7 +7,7 @@ Updated dependency constraints and supported Exasol versions.
 ### Supported Exasol Versions
 
 * **7.1**: up to 7.1.26
-* **8**: from 8.17.0 up to 8.27.0
+* **8**: from 8.17.0 up to 8.31.0
 
 ## Dependencies
 
