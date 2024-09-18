@@ -2,7 +2,7 @@ import math
 import time
 from pathlib import Path
 from threading import Thread
-from typing import Callable
+from typing import Callable, Optional
 
 from docker.models.containers import Container
 
@@ -34,7 +34,7 @@ class DBContainerLogThread(Thread):
         def ignore_return_code(log_line_local):
             return any(x in log_line_local for x in self.ignore_error_return_codes)
 
-        def contains(substr: str, ignore: Callable[[str], bool] | None = None):
+        def contains(substr: str, ignore: Optional[Callable[[str], bool]] = None):
             if not substr in log_line:
                 return False
             return ignore is None or not ignore(log_line)
