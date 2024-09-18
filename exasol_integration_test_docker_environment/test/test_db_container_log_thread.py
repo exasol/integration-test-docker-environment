@@ -57,7 +57,7 @@ class ReturnValueRunTaskTest(unittest.TestCase):
         error_message = self._run_container_log_thread(["confd returned with state 1"])
         self.assertIn("confd returned with state 1\n", error_message)
 
-    def test_container_ignore_rsyslogd(self) -> None:
+    def test_container_log_thread_ignore_rsyslogd(self) -> None:
         """
         Integration test which verifies that the DBContainerLogThread returns no error message if rsyslogd crashes.
         """
