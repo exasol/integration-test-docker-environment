@@ -2,6 +2,7 @@ import math
 import time
 from pathlib import Path
 from threading import Thread
+from typing import Callable
 
 from docker.models.containers import Container
 
@@ -26,6 +27,24 @@ class DBContainerLogThread(Thread):
             "rsyslogd) returned with state 1"  # exclude rsyslogd which might crash when running itde under lima
         )
 
+    def _contains_error(self, log_line: str) -> bool:
+        def ignore_sshd(log_line_local):
+            return "sshd was not started" in log_line_local
+
+        def ignore_return_code(log_line_local):
+            return any(x in log_line_local for x in self.ignore_error_return_codes)
+
+        def contains(substr: str, ignore: Callable[[str], bool] | None = None):
+            if not substr in log_line:
+                return False
+            return ignore is None or not ignore(log_line)
+
+        return (
+                contains("error", ignore_sshd)
+                or contains("exception")
+                or contains("returned with state 1", ignore_return_code)
+        )
+
     def stop(self):
         self.logger.info("Stop ContainerLogThread")
         self.finish = True
@@ -42,11 +61,7 @@ class DBContainerLogThread(Thread):
                         still_running_logger.log()
                         log_handler.handle_log_lines(log)
                     log_line = log.decode("utf-8").lower()
-                    if ("error" in log_line and not "sshd was not started" in log_line) \
-                            or "exception" in log_line \
-                            or ("returned with state 1" in log_line
-                                and not any((ignore_error_return_code in log_line for ignore_error_return_code in
-                                             self.ignore_error_return_codes))):
+                    if self._contains_error(log_line):
                         self.logger.info("ContainerLogHandler error message, %s", log_line)
                         self.error_message = log_line
                         self.finish = True
