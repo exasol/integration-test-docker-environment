@@ -69,5 +69,30 @@ class ReturnValueRunTaskTest(unittest.TestCase):
         error_message = self._run_container_log_thread(rsys_logd_logs)
         self.assertIsNone(error_message)
 
+    def test_container_log_thread_ignore_sshd(self) -> None:
+        """
+        Integration test which verifies that the DBContainerLogThread returns no error message if sshd crashes.
+        """
+        sshd_logs = [
+            "[2024-09-17 14:12:20.335085 +00:00] error : sshd was not started.",
+        ]
+        error_message = self._run_container_log_thread(sshd_logs)
+        self.assertIsNone(error_message)
+
+    def test_container_log_thread_exception(self) -> None:
+        """
+        Integration test which verifies that the DBContainerLogThread returns an error message if an exception was thrown.
+        """
+        sshd_logs = [
+            "Traceback (most recent call last):",
+            'File "/opt/cos/something.py", line 364, in runcode',
+            '    coro = func()',
+            '  File "<input>", line 1, in <module>',
+            'Exception: bad thing happend'
+        ]
+        error_message = self._run_container_log_thread(sshd_logs)
+        self.assertIn("exception: bad thing happend\n", error_message)
+
+
 if __name__ == '__main__':
     unittest.main()
