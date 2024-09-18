@@ -134,7 +134,7 @@ The following options are available to customize the test environment.
                                      containers
 
      --docker-db-image-version TEXT  Docker DB Image Version against which the
-                                     tests should run.  [default: 8.27.0]
+                                     tests should run.  [default: 8.31.0]
 
      --docker-db-image-name TEXT     Docker DB Image Name against which the tests
                                      should run.  [default: exasol/docker-db]
@@ -266,8 +266,8 @@ The following config files are available:
 Currently supported Exasol Versions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  **7.1**: up to 7.1.26
--  **8**: from 8.17.0 up to 8.27.0
+-  **7.1**: up to 7.1.29
+-  **8**: from 8.17.0 up to 8.31.0
 
 If you need further versions, please open an issue.
 
