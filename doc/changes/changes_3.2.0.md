@@ -1,4 +1,4 @@
-# Integration-Test-Docker-Environment 3.1.0, released 2024-06-26
+# Integration-Test-Docker-Environment 3.2.0, released t.b.d.
 
 ## Summary
 
@@ -12,4 +12,4 @@ Updated dependency constraints and supported Exasol versions.
 ## Dependencies
 
 ## Changes
-
+#412: Add latest Docker-DB versions 
