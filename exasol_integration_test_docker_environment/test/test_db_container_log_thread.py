@@ -48,7 +48,7 @@ class ReturnValueRunTaskTest(unittest.TestCase):
         Integration test which verifies that the DBContainerLogThread returns no error message if no error is logged.
         """
         error_message = self._run_container_log_thread(["test", "something", "db started"])
-        self.assertEqual(None, error_message)
+        self.assertIsNone(error_message)
 
     def test_container_log_thread_error(self) -> None:
         """
@@ -67,7 +67,7 @@ class ReturnValueRunTaskTest(unittest.TestCase):
             "[2024-09-17 14:12:20.336967 +00:00] 30 auto-restarted processes exited in the last 0 seconds. Starting to delay process death handling."
         ]
         error_message = self._run_container_log_thread(rsys_logd_logs)
-        self.assertEqual(None, error_message)
+        self.assertIsNone(error_message)
 
 if __name__ == '__main__':
     unittest.main()
