@@ -2,7 +2,7 @@ from typing import List
 
 import luigi
 import netaddr
-import pkg_resources
+import importlib.resources
 from docker.models.containers import Container
 from docker.transport import unixconn
 
@@ -180,12 +180,17 @@ class SpawnTestContainer(DockerBaseTask, TestContainerParameter):
     def register_certificates(self, test_container: Container):
         if self.certificate_volume_name is not None:
             script_name = "install_root_certificate.sh"
-            script_str = pkg_resources.resource_string(
-                PACKAGE_NAME,
-                f"certificate_resources/{script_name}")  # type: bytes
-
+            script = (
+                importlib.resources.filename(PACKAGE_NAME)
+                / "certificate_resources"
+                / script_name
+            )
             script_location_in_container = f"scripts/{script_name}"
-            copy_script_to_container(script_str.decode("UTF-8"), script_location_in_container, test_container)
+            copy_script_to_container(
+                script.read_text(),
+                script_location_in_container,
+                test_container,
+            )
 
             exit_code, output = test_container.exec_run(f"bash {script_location_in_container}")
             if exit_code != 0:

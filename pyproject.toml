@@ -3,7 +3,7 @@ name = "exasol-integration-test-docker-environment"
 packages = [
     { include = "exasol_integration_test_docker_environment" },
 ]
-version = "3.2.0"
+version = "3.3.0"
 description = "Integration Test Docker Environment for Exasol"
 
 license = "MIT"
@@ -44,7 +44,7 @@ fabric = "^3.0.1"
 portalocker = "^2.7.0"
 exasol-error-reporting = "^0.4.0"
 # The current combination of dependencies for ITDE and Luigi is not compatible with projects that run on Python 3.8.
-# The latest version of docutils, version 0.21.1, is required to run on Python 3.9 or higher. 
+# The latest version of docutils, version 0.21.1, is required to run on Python 3.9 or higher.
 # As a temporary fix, until support for Python 3.8 is dropped (which is estimated to be around 6 months),
 # we are explicitly requiring a version of docutils that is less than or equal to 0.20.1 in ITDE.
 # Once support for Python 3.8 is dropped, this dependency can be removed as it is only needed as a transitive dependency.
