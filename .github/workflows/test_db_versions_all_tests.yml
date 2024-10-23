@@ -32,7 +32,7 @@ jobs:
           echo "All tests activated"
           exit 0
         else
-          echo "Fail, because not all tests are deactivated"
+          echo "Fail, because not all tests are activated"
           exit 1
         fi
       env:

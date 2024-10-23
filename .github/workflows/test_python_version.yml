@@ -14,8 +14,8 @@ jobs:
         exasol_version:
         - "default"
         python_version:
-        - 3.8
-        - 3.9
+        - "3.9"
+        - "3.10"
     name: Run tests with Python ${{ matrix.python_version }} and Exasol ${{ matrix.exasol_version }}
     runs-on: ubuntu-latest
     steps:

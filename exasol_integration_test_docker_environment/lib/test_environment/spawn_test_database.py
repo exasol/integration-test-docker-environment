@@ -5,7 +5,9 @@ import docker
 import humanfriendly
 import luigi
 import netaddr
-import importlib.resources
+import importlib.resources as importlib_res
+
+from exasol_integration_test_docker_environment.lib.test_environment import importlib_compatibility
 from docker.models.containers import Container
 from docker.models.volumes import Volume
 from docker.client import DockerClient
@@ -37,6 +39,9 @@ from exasol_integration_test_docker_environment.lib.base.ssh_access import (
     SshKeyCache,
     SshKey,
 )
+
+
+importlib_compatibility.backport(importlib_res)
 
 
 CERTIFICATES_MOUNT_DIR = "/certificates"
@@ -306,7 +311,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
 
     def _db_file(self, filename: str) -> str:
         return (
-            importlib.resources.files(PACKAGE_NAME)
+            importlib_res.files(PACKAGE_NAME)
             / self.docker_db_config_resource_name
             / filename
         )
@@ -389,3 +394,9 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             except Exception as e:
                 self.logger.error(f"Error during removing docker volume %s: %s", db_volume_name, e)
 
+
+
+
+if __name__ == "__main__":
+    f = importlib_res.files("importlib")
+    print(f'{f}')
