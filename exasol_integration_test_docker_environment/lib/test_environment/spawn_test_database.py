@@ -393,10 +393,3 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                 self._remove_volume(db_volume_name)
             except Exception as e:
                 self.logger.error(f"Error during removing docker volume %s: %s", db_volume_name, e)
-
-
-
-
-if __name__ == "__main__":
-    f = importlib_res.files("importlib")
-    print(f'{f}')
