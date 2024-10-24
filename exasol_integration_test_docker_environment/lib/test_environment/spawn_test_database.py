@@ -5,9 +5,8 @@ import docker
 import humanfriendly
 import luigi
 import netaddr
-import importlib.resources as importlib_res
+import importlib_resources
 
-from exasol_integration_test_docker_environment.lib.test_environment import importlib_compatibility
 from docker.models.containers import Container
 from docker.models.volumes import Volume
 from docker.client import DockerClient
@@ -39,9 +38,6 @@ from exasol_integration_test_docker_environment.lib.base.ssh_access import (
     SshKeyCache,
     SshKey,
 )
-
-
-importlib_compatibility.backport(importlib_res)
 
 
 CERTIFICATES_MOUNT_DIR = "/certificates"
@@ -311,7 +307,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
 
     def _db_file(self, filename: str) -> str:
         return (
-            importlib_res.files(PACKAGE_NAME)
+            importlib_resources.files(PACKAGE_NAME)
             / self.docker_db_config_resource_name
             / filename
         )

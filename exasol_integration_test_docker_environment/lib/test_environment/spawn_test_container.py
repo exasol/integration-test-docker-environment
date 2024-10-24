@@ -2,8 +2,7 @@ from typing import List
 
 import luigi
 import netaddr
-import importlib.resources as importlib_res
-from exasol_integration_test_docker_environment.lib.test_environment import importlib_compatibility
+import importlib_resources
 
 from docker.models.containers import Container
 from docker.transport import unixconn
@@ -21,8 +20,6 @@ from exasol_integration_test_docker_environment.lib.test_environment.docker_cont
 from exasol_integration_test_docker_environment.lib.test_environment.parameter.test_container_parameter import \
     TestContainerParameter
 
-
-importlib_compatibility.backport(importlib_res)
 
 class SpawnTestContainer(DockerBaseTask, TestContainerParameter):
     environment_name = luigi.Parameter()
@@ -185,7 +182,7 @@ class SpawnTestContainer(DockerBaseTask, TestContainerParameter):
         if self.certificate_volume_name is not None:
             script_name = "install_root_certificate.sh"
             script = (
-                importlib_res.files(PACKAGE_NAME)
+                importlib_resources.files(PACKAGE_NAME)
                 / "certificate_resources"
                 / script_name
             )
