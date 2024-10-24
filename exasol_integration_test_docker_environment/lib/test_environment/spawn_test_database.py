@@ -5,7 +5,8 @@ import docker
 import humanfriendly
 import luigi
 import netaddr
-import pkg_resources
+import importlib_resources
+
 from docker.models.containers import Container
 from docker.models.volumes import Volume
 from docker.client import DockerClient
@@ -304,6 +305,13 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         )
         return volume, container
 
+    def _db_file(self, filename: str) -> str:
+        return (
+            importlib_resources.files(PACKAGE_NAME)
+            / self.docker_db_config_resource_name
+            / filename
+        )
+
     def _upload_init_db_files(
             self,
             container: Container,
@@ -311,11 +319,8 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             authorized_keys: str,
     ):
         copy = DockerContainerCopy(container)
-        init_db_script_str = pkg_resources.resource_string(
-            PACKAGE_NAME,
-            f"{self.docker_db_config_resource_name}/init_db.sh") # type: bytes
-
-        copy.add_string_to_file("init_db.sh", init_db_script_str.decode("utf-8"))
+        init_script = self._db_file("init_db.sh")
+        copy.add_string_to_file("init_db.sh", init_script.read_text())
         self._add_exa_conf(copy, db_private_network, authorized_keys)
         copy.copy("/")
 
@@ -330,10 +335,8 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         """
         certificate_dir = CERTIFICATES_MOUNT_DIR if self.certificate_volume_name is not None \
                             else CERTIFICATES_DEFAULT_DIR
-        template_str = pkg_resources.resource_string(
-            PACKAGE_NAME,
-            f"{self.docker_db_config_resource_name}/EXAConf") # type: bytes
-        template = Template(template_str.decode("utf-8"))
+        template_file = self._db_file("EXAConf")
+        template = Template(template_file.read_text())
         additional_db_parameter_str = " ".join(self.additional_db_parameter)
         rendered_template = template.render(private_network=db_private_network,
                                             db_version=str(self.db_version),
