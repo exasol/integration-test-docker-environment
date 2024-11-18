@@ -8,9 +8,12 @@ Install Poetry:
 
 ``sudo apt install python3-poetry``
 
+Install dependencies:
+``poetry install``
+
 Install the Git commit hooks:
 
-``githooks/install.sh``
+``poetry run pre-commit install``
 
 .. toctree::
    :maxdepth: 1
@@ -33,7 +36,6 @@ Prerequisites
 Triggering the Release
 ----------------------
 In order to trigger a release a new tag must be pushed to Github.
-For further details see: `.github/workflows/release.yml`.
 
 
 #. Create a local tag with the appropriate version number
