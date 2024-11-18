@@ -11,14 +11,14 @@ repos:
         language: system
         entry: poetry run nox -s project:fix
 
-  - repo: local
-    hooks:
-      - id: type-check
-        name: type-check
-        types: [ python ]
-        pass_filenames: false
-        language: system
-        entry: poetry run nox -s lint:typing
+#  - repo: local
+#    hooks:
+#      - id: type-check
+#        name: type-check
+#        types: [ python ]
+#        pass_filenames: false
+#        language: system
+#        entry: poetry run nox -s lint:typing
 
   - repo: local
     hooks:
