@@ -1,155 +1,18 @@
-import toml
 import json
-import webbrowser
+import shutil
 from pathlib import Path
 from typing import List
 
 import nox
+import toml
 
 ROOT = Path(__file__).parent
-LOCAL_DOC = ROOT / "doc"
 
-nox.options.sessions = []
+# imports all nox task provided by the toolbox
+from exasol.toolbox.nox.tasks import *  # type: ignore
 
-
-def _build_html_doc(session: nox.Session):
-    session.run(
-        "sphinx-apidoc",
-        "-T",
-        "-e",
-        "-o",
-        "api",
-        "../exasol_integration_test_docker_environment",
-    )
-    session.run("sphinx-build", "-b", "html", "-W", ".", ".build-docu")
-
-
-def _open_docs_in_browser(session: nox.Session):
-    index_file_path = Path(".build-docu/index.html").resolve()
-    webbrowser.open_new_tab(index_file_path.as_uri())
-
-
-@nox.session(name="build-html-doc", python=False)
-def build_html_doc(session: nox.Session):
-    """Build the documentation for current checkout"""
-    with session.chdir(LOCAL_DOC):
-        _build_html_doc(session)
-
-
-@nox.session(name="open-html-doc", python=False)
-def open_html_doc(session: nox.Session):
-    """Open the documentation for current checkout in the browser"""
-    with session.chdir(LOCAL_DOC):
-        _open_docs_in_browser(session)
-
-
-@nox.session(name="build-and-open-html-doc", python=False)
-def build_and_open_html_doc(session: nox.Session):
-    """Build and open the documentation for current checkout in browser"""
-    with session.chdir(LOCAL_DOC):
-        _build_html_doc(session)
-        _open_docs_in_browser(session)
-
-
-@nox.session(name="commit-pages-main", python=False)
-def commit_pages_main(session: nox.Session):
-    """
-    Generate the GitHub pages documentation for the main branch and
-    commit it to the branch github-pages/main
-    """
-    with session.chdir(ROOT):
-        session.run(
-            "sgpg",
-            "--target-branch",
-            "github-pages/main",
-            "--push-origin",
-            "origin",
-            "--commit",
-            "--source-branch",
-            "main",
-            "--module-path",
-            "../integration-test-docker-environment",
-        )
-
-
-@nox.session(name="commit-pages-current", python=False)
-def commit_pages_current(session: nox.Session):
-    """
-    Generate the GitHub pages documentation for the current branch and
-    commit it to the branch github-pages/<current_branch>
-    """
-    branch = session.run("git", "branch", "--show-current", silent=True)
-    with session.chdir(ROOT):
-        session.run(
-            "sgpg",
-            "--target-branch",
-            "github-pages/" + branch[:-1],
-            "--push-origin",
-            "origin",
-            "--commit",
-            "--module-path",
-            "../integration-test-docker-environment",
-        )
-
-
-@nox.session(name="push-pages-main", python=False)
-def push_pages_main(session: nox.Session):
-    """
-    Generate the GitHub pages documentation for the main branch and
-    pushes it to the remote branch github-pages/main
-    """
-    with session.chdir(ROOT):
-        session.run(
-            "sgpg",
-            "--target-branch",
-            "github-pages/main",
-            "--push",
-            "--source-branch",
-            "main",
-            "--module-path",
-            "../integration-test-docker-environment",
-        )
-
-
-@nox.session(name="push-pages-current", python=False)
-def push_pages_current(session: nox.Session):
-    """
-    Generate the GitHub pages documentation for the current branch and
-    pushes it to the remote branch github-pages/<current_branch>
-    """
-    branch = session.run("git", "branch", "--show-current", silent=True)
-    with session.chdir(ROOT):
-        session.run(
-            "sgpg",
-            "--target-branch",
-            "github-pages/" + branch[:-1],
-            "--push",
-            "--module-path",
-            "../integration-test-docker-environment",
-        )
-
-
-@nox.session(name="push-pages-release", python=False)
-def push_pages_release(session: nox.Session):
-    """Generate the GitHub pages documentation for the release and pushes it to the remote branch github-pages/main"""
-    tags = session.run("git", "tag", "--sort=committerdate", silent=True)
-    # get the latest tag. last element in list is empty string, so choose second to last
-    tag = tags.split("\n")[-2]
-    with session.chdir(ROOT):
-        session.run(
-            "sgpg",
-            "--target-branch",
-            "github-pages/main",
-            "--push-origin",
-            "origin",
-            "--push",
-            "--source-branch",
-            tag,
-            "--source-origin",
-            "tags",
-            "--module-path",
-            "../integration-test-docker-environment",
-        )
+# default actions to be run if nothing is explicitly specified with the -s option
+nox.options.sessions = ["project:fix"]
 
 
 def get_db_versions() -> List[str]:
@@ -200,10 +63,7 @@ def run_minimal_tests(session: nox.Session, db_version: str):
             "test_doctor.py",
             "test_termination_handler.py",
         ],
-        "new-itest": [
-            "test_cli_environment.py",
-            "test_db_container_log_thread.py"
-            ],
+        "new-itest": ["test_cli_environment.py", "test_db_container_log_thread.py"],
         "unit": "./test/unit",
     }
     session.run("pytest", minimal_tests["unit"])
@@ -235,3 +95,23 @@ def release(session: nox.Session):
     version = project["tool"]["poetry"]["version"]
     session.run("git", "tag", version)
     session.run("git", "push", "origin", version)
+
+@nox.session(name="starter-scripts-checksums", python=False)
+def starter_scripts_checksums(session: nox.Session):
+    start_script_dir = ROOT / "starter_scripts"
+    with session.chdir(start_script_dir):
+        for start_script_entry in start_script_dir.iterdir():
+            if start_script_entry.is_file():
+                sha512 = session.run("sha512sum", start_script_entry.name, silent=True)
+                with open( start_script_dir /"checksums" / f"{start_script_entry.name}.sha512sum", "w") as f:
+                    f.write(sha512)
+    session.run("git", "add", "starter_scripts/checksums")
+
+@nox.session(name="copy-docker-db-config-templates", python=False)
+def copy_docker_db_config_templates(session: nox.Session):
+    target_path = ROOT / "exasol_integration_test_docker_environment" / "docker_db_config"
+    if target_path.is_dir():
+        shutil.rmtree(target_path)
+    with session.chdir(ROOT):
+        session.run("cp", "-rL", "docker_db_config_template", str(target_path))
+    session.run("git", "add", str(target_path))

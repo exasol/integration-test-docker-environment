@@ -1,0 +1,52 @@
+default_stages: [ commit ]
+repos:
+
+  - repo: local
+    hooks:
+      - id: code-format
+        name: code-format
+        types: [ python ]
+        files: "pyproject.toml"
+        pass_filenames: false
+        language: system
+        entry: poetry run nox -s fix
+
+  - repo: local
+    hooks:
+      - id: type-check
+        name: type-check
+        types: [ python ]
+        pass_filenames: false
+        language: system
+        entry: poetry run nox -s type-check
+
+  - repo: local
+    hooks:
+      - id: lint
+        name: lint
+        types: [ python ]
+        pass_filenames: false
+        language: system
+        entry: poetry run nox -s lint
+
+  - repo: local
+    hooks:
+      - id: update-starter-script-checksums
+        name: update-starter-script-checksums
+        language: system
+        entry: poetry run nox -s starter-scripts-checksums
+
+  - repo: local
+    hooks:
+      - id: copy-docker-db-config-templates
+        name: copy-docker-db-config-templates
+        language: system
+        entry: poetry run nox -s copy-docker-db-config-templates
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: no-commit-to-branch
