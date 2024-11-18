@@ -9,3 +9,5 @@ Pipfile.lock
 dist/
 .vagrant
 TAGS
+/.lint.json
+/.lint.txt
