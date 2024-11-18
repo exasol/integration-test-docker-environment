@@ -34,7 +34,6 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.intersphinx",
     "sphinx.ext.autosummary",
-    "sphinx.ext.autosectionlabel",
     "sphinx_copybutton",
     "myst_parser",
     "sphinx_design",
@@ -79,6 +78,6 @@ html_title = "Toolbox"
 html_theme_options = {
     "light_logo": "_static/light-exasol-logo.svg",
     "dark_logo": "_static/dark-exasol-logo.svg",
-    "github_url": "https://github.com/exasol/python-toolbox",
+    "github_url": "https://github.com/exasol/integration-test-docker-environment",
     "accent_color": "grass",
 }
