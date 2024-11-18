@@ -33,6 +33,7 @@ repos:
     hooks:
       - id: update-starter-script-checksums
         name: update-starter-script-checksums
+        pass_filenames: false
         language: system
         entry: poetry run nox -s starter-scripts-checksums
 
@@ -40,6 +41,7 @@ repos:
     hooks:
       - id: copy-docker-db-config-templates
         name: copy-docker-db-config-templates
+        pass_filenames: false
         language: system
         entry: poetry run nox -s copy-docker-db-config-templates
 
