@@ -25,13 +25,20 @@ Prerequisites
 -------------
 
 * Change log needs to be up to date
-* Latest change log version needs to match project and package version
-* Release tag needs to match package, changelog and project version
+* ``unreleased`` change log version needs to be up-to-date
+* Release tag needs to match package
 
   For Example:
         * Tag: 0.4.0
-        * Changelog: changes_0.4.0.md
         * \`poetry version -s\`: 0.4.0
+
+Preparing the Release
+----------------------
+Run the following nox task in order to prepare the changelog.
+
+    .. code-block:: shell
+
+        nox -s release:prepare
 
 Triggering the Release
 ----------------------
