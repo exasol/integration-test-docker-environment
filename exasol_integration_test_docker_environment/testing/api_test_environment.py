@@ -4,7 +4,7 @@ import shutil
 import tempfile
 from pathlib import Path
 from sys import stderr
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 from exasol_integration_test_docker_environment.lib.api import spawn_test_environment
 from exasol_integration_test_docker_environment.lib.api import spawn_test_environment_with_test_container
@@ -62,7 +62,7 @@ class ApiTestEnvironment:
             self,
             name: str,
             test_container_content: TestContainerContentDescription,
-            additional_parameter: Dict[str, Any] = None,
+            additional_parameter: Optional[Dict[str, Any]] = None,
     ) -> ExaslctDockerTestEnvironment:
         if additional_parameter is None:
             additional_parameter = dict()
@@ -84,7 +84,7 @@ class ApiTestEnvironment:
     def spawn_docker_test_environment(
             self,
             name: str,
-            additional_parameter: Dict[str, Any] = None,
+            additional_parameter: Optional[Dict[str, Any]] = None,
     ) -> ExaslctDockerTestEnvironment:
         if additional_parameter is None:
             additional_parameter = dict()

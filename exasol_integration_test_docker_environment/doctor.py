@@ -84,5 +84,5 @@ def health_checkup() -> Iterable[error.ExaError]:
     ]
     for is_fine, diagnosis in examinations:
         if not is_fine():
-            for error_code in diagnosis():
+            for error_code in diagnosis(): # type: ignore
                 yield error_code

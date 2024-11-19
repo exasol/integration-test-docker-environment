@@ -2,7 +2,7 @@ import contextlib
 import os
 import tempfile
 from pathlib import Path
-from typing import Optional, Callable
+from typing import Optional, Callable, Generator
 
 import jinja2
 import logging
@@ -52,16 +52,16 @@ def restore_logger(logger_creator: Callable[[], logging.Logger]):
     }
     yield
     after_logger = logger_creator()
-    after_logger.level = logger_info[LOG_LEVEL]
-    after_logger.handlers = logger_info[HANDLERS]
-    after_logger.filters = logger_info[FILTERS]
-    after_logger.propagate = logger_info[PROPAGATE]
+    after_logger.level = logger_info[LOG_LEVEL] # type: ignore
+    after_logger.handlers = logger_info[HANDLERS] # type: ignore
+    after_logger.filters = logger_info[FILTERS] # type: ignore
+    after_logger.propagate = logger_info[PROPAGATE] # type: ignore
 
 
 @contextlib.contextmanager
 def get_luigi_log_config(log_file_target: Path,
                          use_job_specific_log_file: bool,
-                         log_level: Optional[str] = None) -> Path:
+                         log_level: Optional[str] = None) -> Generator[Path, None, None]:
     """
     Yields a context manager containing the path of the log-config file.
     log_file_target contains the location of the log-file.

@@ -106,6 +106,7 @@ class APISpawnTestEnvironmentTestWithCustomRuntimeMapping(unittest.TestCase):
 
     def _assert_deployment_available(self, environment_info: EnvironmentInfo) -> None:
         with ContextDockerClient() as docker_client:
+            assert environment_info.test_container_info
             test_container = docker_client.containers.get(environment_info.test_container_info.container_name)
             exit_code, output = test_container.exec_run("cat /test/test.txt")
             self.assertEqual(exit_code, 0)
@@ -113,6 +114,7 @@ class APISpawnTestEnvironmentTestWithCustomRuntimeMapping(unittest.TestCase):
 
     def _assert_deployment_not_shared(self, environment_info: EnvironmentInfo, temp_path: Path):
         with ContextDockerClient() as docker_client:
+            assert environment_info.test_container_info
             test_container = docker_client.containers.get(environment_info.test_container_info.container_name)
             exit_code, output = test_container.exec_run("touch /test_target/test_new.txt")
             self.assertEqual(exit_code, 0)

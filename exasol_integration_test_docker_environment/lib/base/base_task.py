@@ -85,8 +85,8 @@ class RunTaskFuture(AbstractTaskFuture):
 
 
 class BaseTask(Task):
-    caller_output_path = luigi.ListParameter([], significant=False, visibility=ParameterVisibility.HIDDEN)
-    job_id = luigi.Parameter()
+    caller_output_path : List[str] = luigi.ListParameter([], significant=False, visibility=ParameterVisibility.HIDDEN) # type: ignore
+    job_id : str = luigi.Parameter() # type: ignore
 
     def __init__(self, *args, **kwargs):
         self._registered_tasks = []
@@ -153,7 +153,7 @@ class BaseTask(Task):
 
     def _get_output_path_for_job(self) -> Path:
         return Path(build_config().output_directory,
-                    "jobs", self.job_id)
+                    "jobs", self.job_id) # type: ignore
 
     def _extend_output_path(self):
         extension = self.extend_output_path()
@@ -184,7 +184,7 @@ class BaseTask(Task):
         return path
 
     def get_cache_path(self) -> Path:
-        path = Path(build_config().output_directory, "cache")
+        path = Path(str(build_config().output_directory), "cache")
         path.mkdir(parents=True, exist_ok=True)
         return path
 

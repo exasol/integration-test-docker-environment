@@ -14,9 +14,9 @@ class DockerPushImageTask(DockerPushImageBaseTask):
     # don't want to wait for the push finishing before starting to build depended images,
     # but we also need to create a DockerPushImageTask for each DockerCreateImageTask of a goal
 
-    required_task_info = JsonPickleParameter(RequiredTaskInfo,
+    required_task_info : RequiredTaskInfo = JsonPickleParameter(RequiredTaskInfo,
                                              visibility=luigi.parameter.ParameterVisibility.HIDDEN,
-                                             significant=True)  # type:RequiredTaskInfo
+                                             significant=True)  # type:ignore
 
     def get_docker_image_task(self):
         module = importlib.import_module(self.required_task_info.module_name)

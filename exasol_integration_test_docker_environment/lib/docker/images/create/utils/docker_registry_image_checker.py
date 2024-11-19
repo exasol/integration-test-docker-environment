@@ -35,7 +35,7 @@ class DockerRegistryImageChecker:
 
     def check(self, image: str):
         log_handler = DockerRegistryImageCheckerPullLogHandler()
-        queue = mp.Queue()
+        queue : mp.Queue = mp.Queue()
         process = mp.Process(target=self.map, args=(image, queue))
         process.start()
         try:

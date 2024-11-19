@@ -28,7 +28,7 @@ TEST_CONTAINER = "test_container"
 class AbstractSpawnTestEnvironment(DockerBaseTask,
                                    GeneralSpawnTestEnvironmentParameter,
                                    DatabaseCredentialsParameter):
-    environment_name = luigi.Parameter()  # type: str
+    environment_name : str = luigi.Parameter()  # type: ignore
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -68,7 +68,7 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
             shell_variables: ShellVariables,
             json: str,
     ):
-        test_container_name = test_environment_info.test_container_info.container_name
+        test_container_name = test_environment_info.test_container_info.container_name # type: ignore
         with self._get_docker_client() as docker_client:
             test_container = docker_client.containers.get(test_container_name)
             self.logger.info(f"Create test environment info in test container '{test_container_name}' at '/'")
@@ -102,7 +102,7 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
                 json,
             )
 
-    def _default_bridge_ip_address(self, test_environment_info) -> str:
+    def _default_bridge_ip_address(self, test_environment_info) -> Optional[str]:
         if test_environment_info.database_info.container_info is None:
             return None
         container_name = test_environment_info.database_info.container_info.container_name
@@ -111,27 +111,25 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
             return default_bridge_ip_address(db_container)
 
     def collect_shell_variables(self, test_environment_info) -> ShellVariables:
-        default_bridge_ip_address = self._default_bridge_ip_address(test_environment_info)
         return ShellVariables.from_test_environment_info(
-            default_bridge_ip_address,
+            self._default_bridge_ip_address(test_environment_info), # type: ignore
             test_environment_info,
         )
 
     def _start_database(self, attempt) \
             -> Generator[BaseTask, BaseTask, Tuple[DockerNetworkInfo, DatabaseInfo, bool, Optional[ContainerInfo]]]:
-        network_info = yield from self._create_network(attempt)
-        ssl_volume_info = None
-        if self.create_certificates:
-            ssl_volume_info = yield from self._create_ssl_certificates()
-        database_info, test_container_info = \
-            yield from self._spawn_database_and_test_container(network_info, ssl_volume_info, attempt)
-        is_database_ready = yield from self._wait_for_database(database_info, attempt)
-        return network_info, database_info, is_database_ready, test_container_info
+        network_info = yield from self._create_network(attempt) # type: ignore
+        ssl_volume_info = None # type: ignore
+        if self.create_certificates: # type: ignore
+            ssl_volume_info = yield from self._create_ssl_certificates() # type: ignore
+        database_info, test_container_info = yield from self._spawn_database_and_test_container(network_info, ssl_volume_info, attempt) # type: ignore
+        is_database_ready = yield from self._wait_for_database(database_info, attempt) # type: ignore
+        return network_info, database_info, is_database_ready, test_container_info # type: ignore
 
-    def _create_ssl_certificates(self) -> DockerVolumeInfo:
+    def _create_ssl_certificates(self) -> DockerVolumeInfo: # type: ignore
         ssl_info_future = yield from self.run_dependencies(self.create_ssl_certificates())
         ssl_info = self.get_values_from_future(ssl_info_future)
-        return ssl_info
+        return ssl_info # type: ignore
 
     def create_ssl_certificates(self):
         raise AbstractMethodException()
@@ -144,12 +142,12 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
     def create_network_task(self, attempt: int):
         raise AbstractMethodException()
 
-    def _spawn_database_and_test_container(
+    def _spawn_database_and_test_container( # type: ignore
             self,
             network_info: DockerNetworkInfo,
             certificate_volume_info: Optional[DockerVolumeInfo],
             attempt: int,
-    ) -> Tuple[DatabaseInfo, Optional[ContainerInfo]]:
+    ) -> Tuple[DatabaseInfo, Optional[ContainerInfo]]: # type: ignore
         def volume_name(info):
             return None if info is None else info.volume_name
 

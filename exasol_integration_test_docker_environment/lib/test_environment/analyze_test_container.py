@@ -42,7 +42,7 @@ class AnalyzeTestContainer(DockerAnalyzeImageTask, TestContainerParameter):
 
     def is_rebuild_requested(self) -> bool:
         config = build_config()
-        return config.force_rebuild
+        return bool(config.force_rebuild)
 
 
 class DockerTestContainerBuildBase(DockerBuildBase, TestContainerParameter):

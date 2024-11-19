@@ -50,7 +50,7 @@ class TestTask(DockerBaseTask, TestContainerParameter):
                                    test_container_content=self.test_container_content
                                    )
         test_container_future_1 = yield from self.run_dependencies(test_container_task_1)
-        container_info = test_container_future_1.get_output()  # type: ContainerInfo
+        container_info : ContainerInfo = test_container_future_1.get_output()  # type: ignore
         with ContextDockerClient() as docker_client:
             container = docker_client.containers.get(container_info.container_name)
             self.return_object({"container_id": container.id, "image_id": container.image.id})

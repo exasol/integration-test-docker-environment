@@ -49,16 +49,16 @@ def int_or_none(value: str) -> Optional[int]:
 
 
 class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
-    environment_name = luigi.Parameter()  # type: str
-    db_container_name = luigi.Parameter()  # type: str
-    attempt = luigi.IntParameter(1)  # type: int
-    network_info = JsonPickleParameter(DockerNetworkInfo, significant=False)  # type: DockerNetworkInfo
-    ip_address_index_in_subnet = luigi.IntParameter(significant=False)  # type: int
-    docker_runtime = luigi.OptionalParameter(None, significant=False)  # type: str
-    certificate_volume_name = luigi.OptionalParameter(None, significant=False)
+    environment_name : str = luigi.Parameter()  # type: ignore
+    db_container_name : str = luigi.Parameter()  # type: ignore
+    attempt : int = luigi.IntParameter(1)  # type: ignore
+    network_info : DockerNetworkInfo = JsonPickleParameter(DockerNetworkInfo, significant=False)  # type: ignore
+    ip_address_index_in_subnet : int = luigi.IntParameter(significant=False)  # type: ignore
+    docker_runtime : Optional[str] = luigi.OptionalParameter(None, significant=False)  # type: ignore
+    certificate_volume_name : Optional[str] = luigi.OptionalParameter(None, significant=False) # type: ignore
     additional_db_parameter = luigi.ListParameter()
-    ssh_user = luigi.Parameter("root")
-    ssh_key_file = luigi.OptionalParameter(None, significant=False)
+    ssh_user : str = luigi.Parameter("root") # type: ignore
+    ssh_key_file : Optional[str] = luigi.OptionalParameter(None, significant=False) # type: ignore
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -92,8 +92,6 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
     def _try_to_reuse_database(self, db_ip_address: str) -> DatabaseInfo:
         self.logger.info("Try to reuse database container %s",
                          self.db_container_name)
-        database_info = None
-        ssh_key = self._get_ssh_key()
         try:
             database_info = self._create_database_info(db_ip_address=db_ip_address, reused=True)
         except Exception as e:
@@ -103,8 +101,8 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
 
     def _get_ssh_key(self) -> SshKey:
         if self.ssh_key_file:
-            return SshKey.read_from(self.ssh_key_file)
-        self.ssh_key_file = SshKeyCache().private_key
+            return SshKey.read_from(self.ssh_key_file) # type: ignore
+        self.ssh_key_file = SshKeyCache().private_key # type: ignore
         return SshKey.from_cache()
 
     def _handle_output(self, output_generator, image_info: ImageInfo):
@@ -201,7 +199,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                 network_info=self.network_info,
                 volume_name=self._get_db_volume_name(),
             )
-            ssh_info = SshInfo(self.ssh_user, self.ssh_key_file)
+            ssh_info = SshInfo(self.ssh_user, self.ssh_key_file) # type: ignore
             database_info = DatabaseInfo(
                 host=db_ip_address,
                 ports=self.internal_ports,
@@ -320,7 +318,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
     ):
         copy = DockerContainerCopy(container)
         init_script = self._db_file("init_db.sh")
-        copy.add_string_to_file("init_db.sh", init_script.read_text())
+        copy.add_string_to_file("init_db.sh", init_script.read_text()) # type: ignore
         self._add_exa_conf(copy, db_private_network, authorized_keys)
         copy.copy("/")
 
@@ -336,8 +334,8 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         certificate_dir = CERTIFICATES_MOUNT_DIR if self.certificate_volume_name is not None \
                             else CERTIFICATES_DEFAULT_DIR
         template_file = self._db_file("EXAConf")
-        template = Template(template_file.read_text())
-        additional_db_parameter_str = " ".join(self.additional_db_parameter)
+        template = Template(template_file.read_text()) # type: ignore
+        additional_db_parameter_str = " ".join(self.additional_db_parameter) # type: ignore
         rendered_template = template.render(private_network=db_private_network,
                                             db_version=str(self.db_version),
                                             db_port=self.internal_ports.database,
@@ -346,7 +344,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                                             image_version=self.docker_db_image_version,
                                             mem_size=self.mem_size,
                                             disk_size=self.disk_size,
-                                            name_servers=",".join(self.nameservers),
+                                            name_servers=",".join(self.nameservers), # type: ignore
                                             certificate_dir=certificate_dir,
                                             additional_db_parameters=additional_db_parameter_str,
                                             authorized_keys=authorized_keys)

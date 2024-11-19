@@ -66,11 +66,12 @@ class TestPopulateData(unittest.TestCase):
     def _execute_sql_on_db(self, sql: str) -> str:
         with ContextDockerClient() as docker_client:
             print(f"Executing sql on db: '{sql}'")
-            test_container = docker_client.containers.get(self.environment.environment_info.
+            environment = self.environment # type: ignore
+            test_container = docker_client.containers.get(environment.environment_info.
                                                           test_container_info.container_name)
-            db_info = self.environment.environment_info.database_info
-            db_user_name = self.environment.db_username
-            db_password = self.environment.db_password
+            db_info = environment.environment_info.database_info
+            db_user_name = environment.db_username
+            db_password = environment.db_password
             cmd = f"$EXAPLUS -x -q -c '{db_info.host}:{db_info.ports.database}' " \
                   f"-u '{db_user_name}' -p '{db_password}' -sql '{sql}' " \
                   f"-jdbcparam 'validateservercertificate=0'"

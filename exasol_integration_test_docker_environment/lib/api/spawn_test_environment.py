@@ -1,5 +1,5 @@
 import functools
-from typing import Tuple, Optional, Callable
+from typing import Tuple, Optional, Callable, Any
 import humanfriendly
 
 from exasol_integration_test_docker_environment.lib.api.common import (
@@ -26,8 +26,10 @@ from exasol_integration_test_docker_environment \
 
 
 def _cleanup(environment_info: EnvironmentInfo) -> None:
-    remove_docker_container([environment_info.database_info.container_info.container_name])
-    remove_docker_volumes([environment_info.database_info.container_info.volume_name])
+    if environment_info.database_info.container_info is not None:
+        remove_docker_container([environment_info.database_info.container_info.container_name])
+        if environment_info.database_info.container_info.volume_name is not None:
+            remove_docker_volumes([environment_info.database_info.container_info.volume_name])
     remove_docker_networks([environment_info.network_info.network_name])
 
 
@@ -69,7 +71,7 @@ def spawn_test_environment(
     raises: TaskRuntimeError if spawning the test environment fails
 
     """
-    def str_or_none(x: any) -> str:
+    def str_or_none(x: Any) -> Optional[str]:
         return str(x) if x is not None else None
 
     parsed_db_mem_size = humanfriendly.parse_size(db_mem_size)
@@ -78,6 +80,8 @@ def spawn_test_environment(
     parsed_db_disk_size = humanfriendly.parse_size(db_disk_size)
     if parsed_db_disk_size < humanfriendly.parse_size("100 MiB"):
         raise ArgumentConstraintError("db_disk_size", "needs to be at least 100 MiB")
+    db_os_access_value = DbOsAccess[db_os_access] if db_os_access else DbOsAccess.DOCKER_EXEC
+
     set_build_config(False,
                      tuple(),
                      False,
@@ -101,7 +105,7 @@ def spawn_test_environment(
                                               docker_runtime=docker_runtime,
                                               docker_db_image_version=docker_db_image_version,
                                               docker_db_image_name=docker_db_image_name,
-                                              db_os_access=DbOsAccess[db_os_access],
+                                              db_os_access=db_os_access_value,
                                               db_user="sys",
                                               db_password="exasol",
                                               bucketfs_write_password="write",

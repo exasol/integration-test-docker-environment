@@ -6,14 +6,14 @@ from exasol_integration_test_docker_environment.lib.data.docker_network_info imp
 
 
 class PrepareDockerNetworkForTestEnvironment(DockerBaseTask):
-    environment_name = luigi.Parameter()
-    network_name = luigi.Parameter()
-    test_container_name = luigi.Parameter(significant=False)
-    db_container_name = luigi.OptionalParameter(None, significant=False)
-    reuse = luigi.BoolParameter(False, significant=False)
-    no_cleanup_after_success = luigi.BoolParameter(False, significant=False)
-    no_cleanup_after_failure = luigi.BoolParameter(False, significant=False)
-    attempt = luigi.IntParameter(-1)
+    environment_name : str = luigi.Parameter() # type: ignore
+    network_name : str  = luigi.Parameter() # type: ignore
+    test_container_name : str  = luigi.Parameter(significant=False) # type: ignore
+    db_container_name : Optional[str] = luigi.OptionalParameter(None, significant=False) # type: ignore
+    reuse : bool = luigi.BoolParameter(False, significant=False) # type: ignore
+    no_cleanup_after_success : bool = luigi.BoolParameter(False, significant=False) # type: ignore
+    no_cleanup_after_failure : bool = luigi.BoolParameter(False, significant=False) # type: ignore
+    attempt : int = luigi.IntParameter(-1) # type: ignore
 
     def run_task(self):
         self.network_info = None

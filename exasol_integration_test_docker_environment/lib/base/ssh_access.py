@@ -95,7 +95,7 @@ class SshKey:
         return SshKey(rsa_key)
 
     @classmethod
-    def from_cache(cls, cache_directory: Path = None) -> 'SshKey':
+    def from_cache(cls, cache_directory: Optional[Path] = None) -> 'SshKey':
         cache = SshKeyCache(cache_directory)
         priv = cache.private_key
         with portalocker.Lock(_path(_LOCK_FILE), 'wb', timeout=10) as fh:
@@ -106,6 +106,6 @@ class SshKey:
             os.makedirs(cache.directory, mode=0o700, exist_ok=True)
             return (
                 cls.generate()
-                .write_private_key(priv)
-                .write_public_key(cache.public_key)
+                .write_private_key(str(priv))
+                .write_public_key(str(cache.public_key))
             )

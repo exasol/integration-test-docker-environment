@@ -68,7 +68,7 @@ def run_minimal_tests(session: nox.Session, db_version: str):
         "new-itest": ["test_cli_environment.py", "test_db_container_log_thread.py"],
         "unit": "./test/unit",
     }
-    session.run("pytest", minimal_tests["unit"])
+    session.run("pytest", minimal_tests["unit"]) #type: ignore
     for test in minimal_tests["new-itest"]:
         session.run(
             "pytest",
@@ -104,7 +104,7 @@ def starter_scripts_checksums(session: nox.Session):
     with session.chdir(start_script_dir):
         for start_script_entry in start_script_dir.iterdir():
             if start_script_entry.is_file():
-                sha512 = session.run("sha512sum", start_script_entry.name, silent=True)
+                sha512 : str = session.run("sha512sum", start_script_entry.name, silent=True) # type: ignore
                 with open( start_script_dir /"checksums" / f"{start_script_entry.name}.sha512sum", "w") as f:
                     f.write(sha512)
     session.run("git", "add", "starter_scripts/checksums")

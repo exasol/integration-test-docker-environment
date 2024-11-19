@@ -41,7 +41,7 @@ class LogPathCorrectnessMatcher:
     def __init__(self, expected_log_path: Path):
         self.expected_log_path = expected_log_path
 
-    def __eq__(self, used_log_path: UsedLogPath):
+    def __eq__(self, used_log_path: object):
         if not isinstance(used_log_path, UsedLogPath):
               return False
         log_path = used_log_path.log_path

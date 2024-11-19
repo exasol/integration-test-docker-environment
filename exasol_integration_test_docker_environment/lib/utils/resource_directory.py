@@ -3,6 +3,7 @@ import logging
 import tempfile
 from pathlib import Path
 from types import ModuleType
+from typing import Optional
 
 import importlib_resources as ir
 
@@ -60,7 +61,7 @@ class ResourceDirectory:
         # We need to transform the module to a string and later back to a module
         # because this class will be pickled by luigi and modules are not supported for serialization
         self._resource_package_str = resource_package.__name__
-        self._tmp_directory = None
+        self._tmp_directory : Optional[tempfile.TemporaryDirectory] = None
 
     @property
     def tmp_directory(self):
@@ -71,14 +72,16 @@ class ResourceDirectory:
 
     def create(self) -> str:
         self._tmp_directory = tempfile.TemporaryDirectory()
+        assert self._tmp_directory
         source_path = ir.files(self._resource_package_str)
         LOG.debug(f"Copying resource package: '{self._resource_package_str}' to '{self._tmp_directory.name}'")
         _copy_importlib_resources_dir_tree(source_path, Path(self._tmp_directory.name))
         return self._tmp_directory.name
 
     def cleanup(self):
-        self._tmp_directory.cleanup()
-        self._tmp_directory = None
+        if self._tmp_directory is not None:
+            self._tmp_directory.cleanup()
+            self._tmp_directory = None
 
     def __enter__(self):
         return self.create()

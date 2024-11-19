@@ -3,7 +3,7 @@ import fabric
 import docker
 import time
 from docker import DockerClient
-from typing import Protocol, runtime_checkable
+from typing import Protocol, runtime_checkable, Optional
 from docker.models.containers import Container, ExecResult
 from exasol_integration_test_docker_environment \
     .lib.base.ssh_access import SshKey
@@ -49,7 +49,7 @@ class DockerExecutor(DbOsExecutor):
     def __init__(self, docker_client: DockerClient, container_name: str):
         self._client = docker_client
         self._container_name = container_name
-        self._container = None
+        self._container : Optional[Container] = None
 
     def __enter__(self):
         self._container = self._client.containers.get(self._container_name)
@@ -62,6 +62,7 @@ class DockerExecutor(DbOsExecutor):
         self.close()
 
     def exec(self, cmd: str) -> ExecResult:
+        assert self._container
         return self._container.exec_run(cmd)
 
     def close(self):
@@ -75,7 +76,7 @@ class SshExecutor(DbOsExecutor):
     def __init__(self, connect_string: str, key_file: str):
         self._connect_string = connect_string
         self._key_file = key_file
-        self._connection = None
+        self._connection : Optional[fabric.Connection] = None
 
     def __enter__(self):
         key = SshKey.read_from(self._key_file)
@@ -92,6 +93,7 @@ class SshExecutor(DbOsExecutor):
         self.close()
 
     def exec(self, cmd: str) -> ExecResult:
+        assert self._connection
         result = self._connection.run(cmd, warn=True, hide=True)
         output = result.stdout.encode("utf-8")
         return ExecResult(result.exited, output)
@@ -146,6 +148,7 @@ class DockerExecFactory(DbOsExecFactory):
 class SshExecFactory(DbOsExecFactory):
     @classmethod
     def from_database_info(cls, info: DatabaseInfo):
+        assert info.ssh_info
         return SshExecFactory(
             f"{info.ssh_info.user}@{info.host}:{info.ports.ssh}",
             info.ssh_info.key_file,

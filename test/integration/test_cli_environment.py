@@ -27,6 +27,7 @@ class NumberCheck:
 
     @property
     def log(self) -> str:
+        assert self.db.on_host_docker_environment.completed_process
         return (
             self
             .db
@@ -50,6 +51,7 @@ def smoke_test_sql(exaplus_path: str, env: ExaslctDockerTestEnvironment) -> str:
     def quote(s):
         return f"'{s}'"
 
+    assert env.environment_info
     db_info = env.environment_info.database_info
     command = [
         str(exaplus_path),
@@ -63,7 +65,7 @@ def smoke_test_sql(exaplus_path: str, env: ExaslctDockerTestEnvironment) -> str:
         "-jdbcparam",
         "validateservercertificate=0",
     ]
-    command = " ".join(command)
+    command = " ".join(command) #type: ignore
     return f'bash -c "{command}" '
 
 

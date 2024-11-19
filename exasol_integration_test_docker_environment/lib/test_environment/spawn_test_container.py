@@ -22,31 +22,31 @@ from exasol_integration_test_docker_environment.lib.test_environment.parameter.t
 
 
 class SpawnTestContainer(DockerBaseTask, TestContainerParameter):
-    environment_name = luigi.Parameter()
-    test_container_name = luigi.Parameter()
-    network_info = JsonPickleParameter(
-        DockerNetworkInfo, significant=False)  # type: DockerNetworkInfo
-    ip_address_index_in_subnet = luigi.IntParameter(significant=False)
-    attempt = luigi.IntParameter(1)
-    reuse_test_container = luigi.BoolParameter(False, significant=False)
-    no_test_container_cleanup_after_success = luigi.BoolParameter(False, significant=False)
-    no_test_container_cleanup_after_failure = luigi.BoolParameter(False, significant=False)
-    docker_runtime = luigi.OptionalParameter(None, significant=False)
-    certificate_volume_name = luigi.OptionalParameter(None, significant=False)
+    environment_name : str = luigi.Parameter() #type: ignore
+    test_container_name : str = luigi.Parameter() #type: ignore
+    network_info : DockerNetworkInfo = JsonPickleParameter(
+        DockerNetworkInfo, significant=False) # type: ignore
+    ip_address_index_in_subnet : int = luigi.IntParameter(significant=False) #type: ignore
+    attempt : int = luigi.IntParameter(1) #type: ignore
+    reuse_test_container : bool = luigi.BoolParameter(False, significant=False) #type: ignore
+    no_test_container_cleanup_after_success : bool = luigi.BoolParameter(False, significant=False) #type: ignore
+    no_test_container_cleanup_after_failure : bool = luigi.BoolParameter(False, significant=False) #type: ignore
+    docker_runtime : Optional[str] = luigi.OptionalParameter(None, significant=False) #type: ignore
+    certificate_volume_name : Optional[str] = luigi.OptionalParameter(None, significant=False) #type: ignore
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.ip_address_index_in_subnet < 0:
+        if self.ip_address_index_in_subnet < 0: # type: ignore
             raise Exception(
                 "ip_address_index_in_subnet needs to be greater than 0 got %s"
-                % self.ip_address_index_in_subnet)
+                % self.ip_address_index_in_subnet) # type: ignore
 
     def register_required(self):
         self.test_container_image_future = \
             self.register_dependency(self.create_child_task(task_class=DockerTestContainerBuild,
                                                             test_container_content=self.test_container_content))
 
-    def is_reuse_possible(self) -> bool:
+    def is_reuse_possible(self) -> luigi.BoolParameter | bool:
         test_container_image_info = \
             self.get_values_from_futures(self.test_container_image_future)["test-container"]  # type: ImageInfo
         test_container = None
@@ -55,16 +55,16 @@ class SpawnTestContainer(DockerBaseTask, TestContainerParameter):
                 test_container = docker_client.containers.get(self.test_container_name)
             except Exception as e:
                 pass
-            ret_val = self.network_info.reused and self.reuse_test_container and \
+            ret_val : bool = bool(self.network_info.reused and self.reuse_test_container and \
                       test_container is not None and \
                       test_container_image_info.get_target_complete_name() in test_container.image.tags and \
-                      test_container_image_info.image_state == ImageState.USED_LOCAL.name
+                      test_container_image_info.image_state == ImageState.USED_LOCAL.name)
 
         return ret_val
 
     def run_task(self):
         subnet = netaddr.IPNetwork(self.network_info.subnet)
-        ip_address = str(subnet[2 + self.ip_address_index_in_subnet])
+        ip_address = str(subnet[2 + self.ip_address_index_in_subnet]) # type: ignore
         container_info = None
 
         if self.is_reuse_possible():
@@ -101,17 +101,17 @@ class SpawnTestContainer(DockerBaseTask, TestContainerParameter):
         except Exception as e:
             self.logger.warning("Tried to reuse test container %s, but got Exeception %s. "
                                 "Fallback to create new database.", self.test_container_name, e)
-        return container_info
+        return container_info # type: ignore
 
     def _create_test_container(self, ip_address,
                                network_info: DockerNetworkInfo) -> ContainerInfo:
-        self._remove_container(self.test_container_name)
+        self._remove_container(self.test_container_name) # type: ignore
         self.logger.info(f"Creating new test container {self.test_container_name}")
         test_container_image_info = \
             self.get_values_from_futures(self.test_container_image_future)["test-container"]
 
         volumes = dict()
-        for runtime_mapping in self.test_container_content.runtime_mappings:
+        for runtime_mapping in self.test_container_content.runtime_mappings: # type: ignore
             volumes[runtime_mapping.source.absolute()] = {
                 "bind": runtime_mapping.target,
                 "mode": "rw"
@@ -160,14 +160,14 @@ class SpawnTestContainer(DockerBaseTask, TestContainerParameter):
             test_container = docker_client.containers.get(self.test_container_name)
             if test_container.status != "running":
                 raise Exception(f"Container {self.test_container_name} not running")
-            container_info = ContainerInfo(container_name=self.test_container_name,
+            container_info = ContainerInfo(container_name=self.test_container_name, # type: ignore
                                            ip_address=ip_address,
                                            network_aliases=network_aliases,
                                            network_info=network_info)
         return container_info
 
     def _get_export_directory(self):
-        return self.get_values_from_future(self.export_directory_future)
+        return self.get_values_from_future(self.export_directory_future) # type: ignore
 
     def _remove_container(self, container_name: str):
         try:
@@ -202,6 +202,6 @@ class SpawnTestContainer(DockerBaseTask, TestContainerParameter):
                 (not success and not self.no_test_container_cleanup_after_failure):
             try:
                 self.logger.info(f"Cleaning up container %s", self.test_container_name)
-                self._remove_container(self.test_container_name)
+                self._remove_container(self.test_container_name) # type: ignore
             except Exception as e:
                 self.logger.error(f"Error during removing container %s: %s", self.test_container_name, e)

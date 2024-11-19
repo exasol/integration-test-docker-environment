@@ -1,8 +1,11 @@
-from typing import Dict
+from typing import Dict, Optional, Generator, Set
 
 import docker
 import luigi
+
+from exasol_integration_test_docker_environment.lib.base.base_task import BaseTask
 from exasol_integration_test_docker_environment.lib.base.docker_base_task import DockerBaseTask
+from exasol_integration_test_docker_environment.lib.base.pickle_target import PickleTarget
 from exasol_integration_test_docker_environment.lib.data.docker_volume_info import DockerVolumeInfo
 from exasol_integration_test_docker_environment.lib.docker.images.image_info import ImageInfo
 from exasol_integration_test_docker_environment.lib.test_environment.create_certificates.analyze_certificate_container import \
@@ -14,14 +17,14 @@ CERTIFICATES_MOUNT_PATH = "/certificates"
 
 
 class CreateSSLCertificatesTask(DockerBaseTask):
-    environment_name = luigi.Parameter()
-    docker_runtime = luigi.OptionalParameter(None, significant=False)
-    db_container_name = luigi.Parameter(significant=False)
-    network_name = luigi.Parameter()
-    reuse = luigi.BoolParameter(False, significant=False)
-    no_cleanup_after_success = luigi.BoolParameter(False, significant=False)
-    no_cleanup_after_failure = luigi.BoolParameter(False, significant=False)
-    volume_name = luigi.Parameter()
+    environment_name : str = luigi.Parameter() # type: ignore
+    docker_runtime : Optional[str] = luigi.OptionalParameter(None, significant=False) # type: ignore
+    db_container_name : str = luigi.Parameter(significant=False) # type: ignore
+    network_name : str = luigi.Parameter() # type: ignore
+    reuse : bool = luigi.BoolParameter(False, significant=False) # type: ignore
+    no_cleanup_after_success : bool = luigi.BoolParameter(False, significant=False) # type: ignore
+    no_cleanup_after_failure : bool  = luigi.BoolParameter(False, significant=False) # type: ignore
+    volume_name : str = luigi.Parameter() # type: ignore
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -53,7 +56,7 @@ class CreateSSLCertificatesTask(DockerBaseTask):
 
         self.return_object(self.volume_info)
 
-    def build_image(self) -> Dict[str, ImageInfo]:
+    def build_image(self) -> Generator["BaseTask", PickleTarget, Set[str]]:
         task = self.create_child_task(task_class=DockerCertificateContainerBuild,
                                       certificate_container_root_directory=self._temp_resource_directory.tmp_directory)
         image_infos_future = yield from self.run_dependencies(task)
@@ -66,6 +69,7 @@ class CreateSSLCertificatesTask(DockerBaseTask):
             if volume_properties['Name'] == self.volume_name:
                 return DockerVolumeInfo(volume_name=str(self.volume_name),
                                         mount_point=volume_properties['Mountpoint'], reused=reused)
+        raise RuntimeError(f"Volume Info not found for created volume {self.volume_name}")
 
     def create_docker_volume(self) -> DockerVolumeInfo:
         self.remove_volume(self.volume_name)

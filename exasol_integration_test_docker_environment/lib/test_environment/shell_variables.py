@@ -20,13 +20,13 @@ class ShellVariables:
         default_bridge_ip_address and EnvironmentInfo.
         """
         info = test_environment_info
-        env = {
+        env : Dict[str, str] = {
             "NAME": info.name,
             "TYPE": info.type,
             "DATABASE_HOST": info.database_info.host,
-            "DATABASE_DB_PORT": info.database_info.ports.database,
-            "DATABASE_BUCKETFS_PORT": info.database_info.ports.bucketfs,
-            "DATABASE_SSH_PORT": info.database_info.ports.ssh,
+            "DATABASE_DB_PORT": str(info.database_info.ports.database) if info.database_info.ports.database else "",
+            "DATABASE_BUCKETFS_PORT": str(info.database_info.ports.bucketfs) if  info.database_info.ports.bucketfs else "",
+            "DATABASE_SSH_PORT": str(info.database_info.ports.ssh) if info.database_info.ports.ssh else "",
         }
         if info.database_info.container_info is not None:
             network_aliases = " ".join(info.database_info.container_info.network_aliases)
@@ -34,7 +34,7 @@ class ShellVariables:
                 "DATABASE_CONTAINER_NAME": info.database_info.container_info.container_name,
                 "DATABASE_CONTAINER_NETWORK_ALIASES": f'"{network_aliases}"',
                 "DATABASE_CONTAINER_IP_ADDRESS": info.database_info.container_info.ip_address,
-                "DATABASE_CONTAINER_VOLUMNE_NAME": info.database_info.container_info.volume_name,
+                "DATABASE_CONTAINER_VOLUMNE_NAME": info.database_info.container_info.volume_name or "",
                 "DATABASE_CONTAINER_DEFAULT_BRIDGE_IP_ADDRESS": default_bridge_ip_address,
             })
         if info.test_container_info is not None:

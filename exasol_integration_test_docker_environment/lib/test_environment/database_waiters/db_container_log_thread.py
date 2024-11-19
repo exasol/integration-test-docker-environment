@@ -2,7 +2,7 @@ import math
 import time
 from pathlib import Path
 from threading import Thread
-from typing import Callable, Optional
+from typing import Callable, Optional, List
 
 from docker.models.containers import Container
 
@@ -13,15 +13,15 @@ from exasol_integration_test_docker_environment.lib.logging.container_log_handle
 class DBContainerLogThread(Thread):
     def __init__(self, container: Container, logger, log_file: Path, description: str):
         super().__init__()
-        self.complete_log = []
+        self.complete_log : List[str] = list()
         self.description = description
         self.logger = logger
         self.log_file = log_file
         self.container = container
         self.finish = False
-        self.previous_timestamp = None
-        self.current_timestamp = None
-        self.error_message = None
+        self.previous_timestamp : Optional[float] = None
+        self.current_timestamp : Optional[float] = None
+        self.error_message : Optional[str] = None
         self.ignore_error_return_codes = (
             "(membership) returned with state 1",  # exclude webui not found in 7.0.0
             "rsyslogd) returned with state 1"  # exclude rsyslogd which might crash when running itde under lima

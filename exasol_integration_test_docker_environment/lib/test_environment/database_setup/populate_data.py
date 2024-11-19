@@ -13,9 +13,9 @@ from exasol_integration_test_docker_environment.lib.data.environment_info import
 class PopulateTestDataToDatabase(DockerBaseTask, DatabaseCredentialsParameter):
     logger = logging.getLogger('luigi-interface')
 
-    environment_name = luigi.Parameter()
-    test_environment_info = JsonPickleParameter(
-        EnvironmentInfo, significant=False)  # type: EnvironmentInfo
+    environment_name : str = luigi.Parameter() # type: ignore
+    test_environment_info : EnvironmentInfo = JsonPickleParameter(
+        EnvironmentInfo, significant=False)  # type: ignore
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

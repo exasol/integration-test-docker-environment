@@ -1,6 +1,6 @@
 from datetime import datetime
 from enum import Enum
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 from exasol_integration_test_docker_environment.lib.base.info import Info
 
@@ -48,7 +48,7 @@ class ImageInfo(Info):
                  build_name: str = "",
                  build_date_time: datetime = datetime.utcnow(),
                  image_state: ImageState = ImageState.NOT_EXISTING,
-                 depends_on_images: Dict[str, "ImageInfo"] = None):
+                 depends_on_images: Optional[Dict[str, "ImageInfo"]] = None):
         self.build_name = build_name
         self.date_time = str(build_date_time)
         self.commit = commit

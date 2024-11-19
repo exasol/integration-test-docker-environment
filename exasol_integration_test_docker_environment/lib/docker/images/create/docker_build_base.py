@@ -85,12 +85,13 @@ class DockerBuildBase(DependencyLoggerBaseTask):
     def _build_with_depenencies_is_requested(self, image_info: ImageInfo, shortcut_build: bool):
         needs_to_be_build = image_info.image_state == ImageState.NEEDS_TO_BE_BUILD.name
         result = (not shortcut_build or needs_to_be_build) and \
-                 len(image_info.depends_on_images) > 0
+                 image_info.depends_on_images and len(image_info.depends_on_images) > 0
         return result
 
     def _create_build_task_with_dependencies(
             self, image_info: ImageInfo,
             shortcut_build: bool = True) -> DockerCreateImageTask:
+        assert image_info.depends_on_images
         required_tasks = \
             self._create_build_tasks_for_image_infos(
                 image_info.depends_on_images, shortcut_build)

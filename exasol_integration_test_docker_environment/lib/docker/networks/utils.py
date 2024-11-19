@@ -1,10 +1,10 @@
 import logging
-from typing import Iterator
+from typing import Iterator, List
 
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 
 
-def remove_docker_networks(networks: Iterator[str]):
+def remove_docker_networks(networks: List[str]):
     """
     Removes the given networks using docker API.
     """
