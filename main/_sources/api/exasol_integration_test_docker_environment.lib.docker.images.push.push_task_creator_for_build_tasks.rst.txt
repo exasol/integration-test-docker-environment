@@ -1,0 +1,12 @@
+exasol\_integration\_test\_docker\_environment.lib.docker.images.push.push\_task\_creator\_for\_build\_tasks
+============================================================================================================
+
+.. automodule:: exasol_integration_test_docker_environment.lib.docker.images.push.push_task_creator_for_build_tasks
+
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      PushTaskCreatorFromBuildTasks
+   

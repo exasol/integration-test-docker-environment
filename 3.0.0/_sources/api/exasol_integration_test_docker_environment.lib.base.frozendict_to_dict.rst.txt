@@ -1,0 +1,12 @@
+exasol\_integration\_test\_docker\_environment.lib.base.frozendict\_to\_dict
+============================================================================
+
+.. automodule:: exasol_integration_test_docker_environment.lib.base.frozendict_to_dict
+
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      FrozenDictToDict
+   

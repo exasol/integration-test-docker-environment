@@ -1,0 +1,14 @@
+exasol\_integration\_test\_docker\_environment.lib.data.test\_container\_content\_description
+=============================================================================================
+
+.. automodule:: exasol_integration_test_docker_environment.lib.data.test_container_content_description
+
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      TestContainerBuildMapping
+      TestContainerContentDescription
+      TestContainerRuntimeMapping
+   

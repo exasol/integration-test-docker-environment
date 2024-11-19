@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="grass" data-content_root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>User Guide - Toolbox</title><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Developer Guide" href="../developer_guide/developer_guide.html" /><link rel="prev" title="Integration Test Docker Environment" href="../index.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"auto");
+  </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=397bb51e" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=83eaa723" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/tabs.css?v=4c969af8" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sy-f-text: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+  --sy-f-heading: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+}
+</style>
+    <meta property="og:type" content="website"/><meta property="og:title" content="User Guide"/>
+<meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="../index.html">
+      <img class="light-logo" src="../_static/light-exasol-logo.svg" alt="Exasol Integration Test Docker Environment" height="28" loading="lazy" />
+      <img class="dark-logo" src="../_static/dark-exasol-logo.svg" alt="Exasol Integration Test Docker Environment" height="28" loading="lazy" />
+      <strong>Exasol Integration Test Docker Environment</strong>
+    </a>
+    <div class="sy-head-nav" id="HeadNav">
+      <nav class="sy-head-links"></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><div class="nav-versions">
+    <button type="button" aria-label="Versions">
+      <span class="md:hidden">Versions</span>
+      <span class="hidden md:inline">1.5.0</span>
+      <i class="i-lucide chevron-down"></i>
+    </button>
+    <div class="nav-versions-choices"><ul><li><a href="../../main/user_guide/user_guide.html">main</a></li><li><a href="../../3.2.0/user_guide/user_guide.html">3.2.0</a></li><li><a href="../../3.1.0/user_guide/user_guide.html">3.1.0</a></li><li><a href="../../3.0.0/user_guide/user_guide.html">3.0.0</a></li><li><a href="../../2.1.0/user_guide/user_guide.html">2.1.0</a></li><li><a href="../../2.0.0/user_guide/user_guide.html">2.0.0</a></li><li><a href="../../1.7.1/user_guide/user_guide.html">1.7.1</a></li><li><a href="../../1.7.0/user_guide/user_guide.html">1.7.0</a></li><li><a href="../../1.6.0/user_guide/user_guide.html">1.6.0</a></li><li><a href="user_guide.html">1.5.0</a></li><li><a href="../../1.4.0/user_guide/user_guide.html">1.4.0</a></li><li><a href="../../1.3.0/user_guide/user_guide.html">1.3.0</a></li><li><a href="../../1.2.0/user_guide/user_guide.html">1.2.0</a></li><li><a href="../../1.1.0/user_guide/user_guide.html">1.1.0</a></li><li><a href="../../1.0.0/user_guide/user_guide.html">1.0.0</a></li></ul></div>
+  </div><div class="sy-head-socials">
+  <a href="https://github.com/exasol/integration-test-docker-environment" aria-label="GitHub">
+    <iconify-icon icon="simple-icons:github"></iconify-icon>
+  </a></div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="HeadNav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2 -translate-x-2"></span>
+          <span class="hamburger_3 -translate-x-1"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developer_guide/developer_guide.html">Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changes/changelog.html">Changes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#about">About</a><ul>
+<li><a class="reference internal" href="#comparison-to-docker-db-and-the-exasol-testcontainers">Comparison to Docker-DB and the Exasol Testcontainers</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li><a class="reference internal" href="#getting-started">Getting started</a><ul>
+<li><a class="reference internal" href="#options">Options</a></li>
+<li><a class="reference internal" href="#the-integration-test-docker-environment-command-line-tool">The integration-test-docker-environment command line tool</a></li>
+<li><a class="reference internal" href="#the-integration-test-docker-environment-api">The integration-test-docker-environment API</a></li>
+<li><a class="reference internal" href="#default-credentials">Default Credentials</a></li>
+<li><a class="reference internal" href="#accessing-the-environment-information">Accessing the Environment Information</a></li>
+<li><a class="reference internal" href="#currently-supported-exasol-versions">Currently supported Exasol Versions</a></li>
+<li><a class="reference internal" href="#tested-docker-runtimes">Tested Docker Runtimes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#mac-os-x-support">Mac OS X Support</a><ul>
+<li><a class="reference internal" href="#what-do-i-need-to-do-to-start-the-test-environment-with-mac-os-x">What do I need to do to start the Test Environment with Mac OS X</a></li>
+<li><a class="reference internal" href="#what-happens-under-the-hood">What happens under the hood</a></li>
+</ul>
+</li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6"><div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">Exasol Integration Test Docker Environment</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name">User Guide</strong>
+        <meta itemprop="position" content="2" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+        <article class="yue" role="main">
+          <section id="user-guide">
+<h1>User Guide<a class="headerlink" href="#user-guide" title="Link to this heading">¶</a></h1>
+<section id="about">
+<h2>About<a class="headerlink" href="#about" title="Link to this heading">¶</a></h2>
+<p>This project starts the database container,
+and optionally (only available via API) also a test container.
+Both containers exist in the same Docker network. This allows you to
+connect from the test container to the Docker-DB container. Furthermore,
+this package provides two utility tasks which allow the population of
+some test data and upload of files to the BucketFS. Besides the test
+container, you can also access the Exasol database and the Bucket-FS
+from the host via forwarded ports.</p>
+<section id="comparison-to-docker-db-and-the-exasol-testcontainers">
+<h3>Comparison to Docker-DB and the Exasol Testcontainers<a class="headerlink" href="#comparison-to-docker-db-and-the-exasol-testcontainers" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>This project uses the
+<a class="reference external" href="https://hub.docker.com/r/exasol/docker-db">Docker-DB</a>, but it
+does the configuration, setup and startup for you. For example, it
+waits until the Database and the Bucket-FS accept connections. It
+also provides tasks which simplify the population the database with
+test data and upload of files to the BucketFS.</p></li>
+<li><p>The <a class="reference external" href="https://github.com/exasol/exasol-testcontainers/">Exasol
+Testcontainers</a>
+provide similar features for Java integration tests, so if you have a
+Java project use the Exasol Testcontainer, because they are more
+integrated in the Java ecosystem than this project. Testcontainers
+are designed to integrate with popular unit testing frameworks like
+<a class="reference external" href="https://www.testcontainers.org/test_framework_integration/junit_4/">JUnit4</a>,
+<a class="reference external" href="https://www.testcontainers.org/test_framework_integration/junit_5/">JUnit5</a>
+and
+<a class="reference external" href="https://www.testcontainers.org/test_framework_integration/spock/">Spock</a>.
+Most notably, lifecycle management of containers controlled by the
+tests lifecycle.</p></li>
+</ul>
+<p>However, if you have a project in any other language you can use this
+project to start a test Exasol database via a command line interface.
+And if you have a Python project, you also have the possibility to start
+the additional test-container, which is started in the same docker
+network as the database.</p>
+</section>
+</section>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading">¶</a></h2>
+<p>In order to start a Docker-DB Test Environment, you need:</p>
+<ul class="simple">
+<li><p>Tested Operating System:</p>
+<ul>
+<li><p>Linux</p></li>
+<li><p>Mac OS X with <a class="reference external" href="https://docs.docker.com/docker-for-mac/install/">Docker Desktop on
+Mac</a> and Intel
+processor</p></li>
+<li><p>Windows is currently <strong>not supported</strong></p></li>
+</ul>
+</li>
+<li><p>Docker with privileged mode</p></li>
+<li><p>At least 2 GiB RAM</p></li>
+<li><p>We recommend at least 15 GB free disk space on the partition where
+Docker stores its images and containers. On Linux Docker typically
+stores the images under <code class="docutils literal notranslate"><span class="pre">/var/lib/docker</span></code>.</p></li>
+</ul>
+</section>
+<section id="getting-started">
+<h2>Getting started<a class="headerlink" href="#getting-started" title="Link to this heading">¶</a></h2>
+<p>Clone the repository</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">exasol</span><span class="o">/</span><span class="n">integration</span><span class="o">-</span><span class="n">test</span><span class="o">-</span><span class="n">docker</span><span class="o">-</span><span class="n">environment</span>
+</span></pre></div>
+</div>
+<p>Starting the test environment:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="o">./</span><span class="n">start</span><span class="o">-</span><span class="n">test</span><span class="o">-</span><span class="n">env</span> <span class="n">spawn</span><span class="o">-</span><span class="n">test</span><span class="o">-</span><span class="n">environment</span> <span class="o">--</span><span class="n">environment</span><span class="o">-</span><span class="n">name</span> <span class="o">&lt;</span><span class="n">NAME</span><span class="o">&gt;</span>
+</span></pre></div>
+</div>
+<p>or if you work on the code of the Test Environment (requires Python
+&gt;=3.8 with <a class="reference external" href="https://python-poetry.org/">poetry</a>):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="o">./</span><span class="n">start</span><span class="o">-</span><span class="n">test</span><span class="o">-</span><span class="n">env</span><span class="o">-</span><span class="k">with</span><span class="o">-</span><span class="n">poetry</span> <span class="n">spawn</span><span class="o">-</span><span class="n">test</span><span class="o">-</span><span class="n">environment</span> <span class="o">--</span><span class="n">environment</span><span class="o">-</span><span class="n">name</span> <span class="o">&lt;</span><span class="n">NAME</span><span class="o">&gt;</span>
+</span></pre></div>
+</div>
+<p>Shutdown of the test environment is currently done manual.</p>
+<section id="options">
+<h3>Options<a class="headerlink" href="#options" title="Link to this heading">¶</a></h3>
+<p>The following options are available to customize the test environment.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">Usage</span><span class="p">:</span> <span class="n">main</span><span class="o">.</span><span class="n">py</span> <span class="n">spawn</span><span class="o">-</span><span class="n">test</span><span class="o">-</span><span class="n">environment</span> <span class="p">[</span><span class="n">OPTIONS</span><span class="p">]</span>
+</span><span data-line="2">
+</span><span data-line="3">  <span class="n">This</span> <span class="n">command</span> <span class="n">spawn</span> <span class="n">a</span> <span class="n">test</span> <span class="n">environment</span> <span class="k">with</span> <span class="n">a</span> <span class="n">docker</span><span class="o">-</span><span class="n">db</span> <span class="n">container</span><span class="o">.</span>
+</span><span data-line="4">
+</span><span data-line="5"><span class="n">Options</span><span class="p">:</span>
+</span><span data-line="6">  <span class="o">--</span><span class="n">environment</span><span class="o">-</span><span class="n">name</span> <span class="n">TEXT</span>         <span class="n">Name</span> <span class="n">of</span> <span class="n">the</span> <span class="n">docker</span> <span class="n">environment</span><span class="o">.</span> <span class="n">This</span> <span class="n">name</span>
+</span><span data-line="7">                                  <span class="n">gets</span> <span class="n">used</span> <span class="k">as</span> <span class="n">suffix</span> <span class="k">for</span> <span class="n">the</span> <span class="n">container</span>
+</span><span data-line="8">                                  <span class="n">db_container_</span><span class="o">&lt;</span><span class="n">name</span><span class="o">&gt;</span> <span class="ow">and</span>
+</span><span data-line="9">                                  <span class="n">test_container_</span><span class="o">&lt;</span><span class="n">name</span><span class="o">&gt;</span>  <span class="p">[</span><span class="n">required</span><span class="p">]</span>
+</span><span data-line="10">
+</span><span data-line="11">  <span class="o">--</span><span class="n">database</span><span class="o">-</span><span class="n">port</span><span class="o">-</span><span class="n">forward</span> <span class="n">INTEGER</span>
+</span><span data-line="12">                                  <span class="n">Host</span> <span class="n">port</span> <span class="n">to</span> <span class="n">which</span> <span class="n">the</span> <span class="n">database</span> <span class="n">port</span> <span class="n">gets</span>
+</span><span data-line="13">                                  <span class="n">forwarded</span>
+</span><span data-line="14">
+</span><span data-line="15">  <span class="o">--</span><span class="n">bucketfs</span><span class="o">-</span><span class="n">port</span><span class="o">-</span><span class="n">forward</span> <span class="n">INTEGER</span>
+</span><span data-line="16">                                  <span class="n">Host</span> <span class="n">port</span> <span class="n">to</span> <span class="n">which</span> <span class="n">the</span> <span class="n">BucketFS</span> <span class="n">port</span> <span class="n">gets</span>
+</span><span data-line="17">                                  <span class="n">forwarded</span>
+</span><span data-line="18">
+</span><span data-line="19">  <span class="o">--</span><span class="n">db</span><span class="o">-</span><span class="n">mem</span><span class="o">-</span><span class="n">size</span> <span class="n">TEXT</span>              <span class="n">The</span> <span class="n">main</span> <span class="n">memory</span> <span class="n">used</span> <span class="n">by</span> <span class="n">the</span> <span class="n">database</span><span class="o">.</span> <span class="n">Format</span>
+</span><span data-line="20">                                  <span class="o">&lt;</span><span class="n">number</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">unit</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span> <span class="mi">1</span> <span class="n">GiB</span><span class="o">.</span> <span class="n">The</span> <span class="n">minimum</span>
+</span><span data-line="21">                                  <span class="n">size</span> <span class="ow">is</span> <span class="mi">1</span> <span class="n">GB</span><span class="p">,</span> <span class="n">below</span> <span class="n">that</span> <span class="n">the</span> <span class="n">database</span> <span class="n">will</span>
+</span><span data-line="22">                                  <span class="ow">not</span> <span class="n">start</span><span class="o">.</span>  <span class="p">[</span><span class="n">default</span><span class="p">:</span> <span class="mi">2</span> <span class="n">GiB</span><span class="p">]</span>
+</span><span data-line="23">
+</span><span data-line="24">  <span class="o">--</span><span class="n">db</span><span class="o">-</span><span class="n">disk</span><span class="o">-</span><span class="n">size</span> <span class="n">TEXT</span>             <span class="n">The</span> <span class="n">disk</span> <span class="n">size</span> <span class="n">available</span> <span class="k">for</span> <span class="n">the</span> <span class="n">database</span><span class="o">.</span>
+</span><span data-line="25">                                  <span class="n">Format</span> <span class="o">&lt;</span><span class="n">number</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">unit</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span> <span class="mi">1</span> <span class="n">GiB</span><span class="o">.</span> <span class="n">The</span>
+</span><span data-line="26">                                  <span class="n">minimum</span> <span class="n">size</span> <span class="ow">is</span> <span class="mi">100</span> <span class="n">MiB</span><span class="o">.</span> <span class="n">However</span><span class="p">,</span> <span class="n">the</span> <span class="n">setup</span>
+</span><span data-line="27">                                  <span class="n">creates</span> <span class="n">volume</span> <span class="n">files</span> <span class="k">with</span> <span class="n">at</span> <span class="n">least</span> <span class="mi">2</span> <span class="n">GB</span>
+</span><span data-line="28">                                  <span class="n">larger</span> <span class="n">size</span><span class="p">,</span> <span class="n">because</span> <span class="n">the</span> <span class="n">database</span> <span class="n">needs</span> <span class="n">at</span>
+</span><span data-line="29">                                  <span class="n">least</span> <span class="n">so</span> <span class="n">much</span> <span class="n">more</span> <span class="n">disk</span><span class="o">.</span>  <span class="p">[</span><span class="n">default</span><span class="p">:</span> <span class="mi">2</span> <span class="n">GiB</span><span class="p">]</span>
+</span><span data-line="30">
+</span><span data-line="31">  <span class="o">--</span><span class="n">nameserver</span> <span class="n">TEXT</span>               <span class="n">Add</span> <span class="n">a</span> <span class="n">nameserver</span> <span class="n">to</span> <span class="n">the</span> <span class="nb">list</span> <span class="n">of</span> <span class="n">DNS</span>
+</span><span data-line="32">                                  <span class="n">nameservers</span> <span class="n">which</span> <span class="n">the</span> <span class="n">docker</span><span class="o">-</span><span class="n">db</span> <span class="n">should</span> <span class="n">use</span>
+</span><span data-line="33">                                  <span class="k">for</span> <span class="n">resolving</span> <span class="n">domain</span> <span class="n">names</span><span class="o">.</span> <span class="n">You</span> <span class="n">can</span> <span class="n">repeat</span>
+</span><span data-line="34">                                  <span class="n">this</span> <span class="n">option</span> <span class="n">to</span> <span class="n">add</span> <span class="n">further</span> <span class="n">nameservers</span><span class="o">.</span>
+</span><span data-line="35">
+</span><span data-line="36">  <span class="o">--</span><span class="n">docker</span><span class="o">-</span><span class="n">runtime</span> <span class="n">TEXT</span>           <span class="n">The</span> <span class="n">docker</span> <span class="n">runtime</span> <span class="n">used</span> <span class="n">to</span> <span class="n">start</span> <span class="nb">all</span>
+</span><span data-line="37">                                  <span class="n">containers</span>
+</span><span data-line="38">
+</span><span data-line="39">  <span class="o">--</span><span class="n">docker</span><span class="o">-</span><span class="n">db</span><span class="o">-</span><span class="n">image</span><span class="o">-</span><span class="n">version</span> <span class="n">TEXT</span>  <span class="n">Docker</span> <span class="n">DB</span> <span class="n">Image</span> <span class="n">Version</span> <span class="n">against</span> <span class="n">which</span> <span class="n">the</span>
+</span><span data-line="40">                                  <span class="n">tests</span> <span class="n">should</span> <span class="n">run</span><span class="o">.</span>  <span class="p">[</span><span class="n">default</span><span class="p">:</span> <span class="mf">7.1.17</span><span class="p">]</span>
+</span><span data-line="41">
+</span><span data-line="42">  <span class="o">--</span><span class="n">docker</span><span class="o">-</span><span class="n">db</span><span class="o">-</span><span class="n">image</span><span class="o">-</span><span class="n">name</span> <span class="n">TEXT</span>     <span class="n">Docker</span> <span class="n">DB</span> <span class="n">Image</span> <span class="n">Name</span> <span class="n">against</span> <span class="n">which</span> <span class="n">the</span> <span class="n">tests</span>
+</span><span data-line="43">                                  <span class="n">should</span> <span class="n">run</span><span class="o">.</span>  <span class="p">[</span><span class="n">default</span><span class="p">:</span> <span class="n">exasol</span><span class="o">/</span><span class="n">docker</span><span class="o">-</span><span class="n">db</span><span class="p">]</span>
+</span><span data-line="44">
+</span><span data-line="45">  <span class="o">--</span><span class="n">output</span><span class="o">-</span><span class="n">directory</span> <span class="n">DIRECTORY</span>    <span class="n">Output</span> <span class="n">directory</span> <span class="n">where</span> <span class="n">the</span> <span class="n">system</span> <span class="n">stores</span> <span class="nb">all</span>
+</span><span data-line="46">                                  <span class="n">output</span> <span class="ow">and</span> <span class="n">log</span> <span class="n">files</span><span class="o">.</span>  <span class="p">[</span><span class="n">default</span><span class="p">:</span>
+</span><span data-line="47">                                  <span class="o">.</span><span class="n">build_output</span><span class="p">]</span>
+</span><span data-line="48">
+</span><span data-line="49">  <span class="o">--</span><span class="n">temporary</span><span class="o">-</span><span class="n">base</span><span class="o">-</span><span class="n">directory</span> <span class="n">DIRECTORY</span>
+</span><span data-line="50">                                  <span class="n">Directory</span> <span class="n">where</span> <span class="n">the</span> <span class="n">system</span> <span class="n">creates</span> <span class="n">temporary</span>
+</span><span data-line="51">                                  <span class="n">directories</span><span class="o">.</span>  <span class="p">[</span><span class="n">default</span><span class="p">:</span> <span class="o">/</span><span class="n">tmp</span><span class="p">]</span>
+</span></pre></div>
+</div>
+<p>You can look at them on the commandline with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="o">./</span><span class="n">start</span><span class="o">-</span><span class="n">test</span><span class="o">-</span><span class="n">env</span> <span class="n">spawn</span><span class="o">-</span><span class="n">test</span><span class="o">-</span><span class="n">environment</span> <span class="o">--</span><span class="n">help</span>
+</span></pre></div>
+</div>
+</section>
+<section id="the-integration-test-docker-environment-command-line-tool">
+<h3>The integration-test-docker-environment command line tool<a class="headerlink" href="#the-integration-test-docker-environment-command-line-tool" title="Link to this heading">¶</a></h3>
+<p>Besides, the already mentioned command <code class="docutils literal notranslate"><span class="pre">spawn-test-environment</span></code>, the
+integration-test-docker-environemnt command line tool provides a couple
+of other helpful tools.</p>
+<p>Run <code class="docutils literal notranslate"><span class="pre">main.py</span> <span class="pre">--help</span></code>, to get a list of the available commands:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="go">Usage: main.py [OPTIONS] COMMAND [ARGS]...</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="go">Options:</span>
+</span><span data-line="4"><span class="go">  --help  Show this message and exit.</span>
+</span><span data-line="5">
+</span><span data-line="6"><span class="go">Commands:</span>
+</span><span data-line="7"><span class="go">  health                  Check the health of the execution environment.</span>
+</span><span data-line="8"><span class="go">  spawn-test-environment  This command spawn a test environment with a...</span>
+</span></pre></div>
+</div>
+<p>To get more details on a specific command run
+<code class="docutils literal notranslate"><span class="pre">main.py</span> <span class="pre">&lt;command&gt;</span> <span class="pre">--help</span></code>, e.g. <code class="docutils literal notranslate"><span class="pre">main.py</span> <span class="pre">health</span> <span class="pre">--help</span></code>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="go">Usage: main.py health [OPTIONS]</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="go">  Check the health of the execution environment.</span>
+</span><span data-line="4">
+</span><span data-line="5"><span class="go">  If no issues have been found, using the library or executing the test should</span>
+</span><span data-line="6"><span class="go">  work just fine. For all found issues there will be a proposed fix/solution.</span>
+</span><span data-line="7">
+</span><span data-line="8"><span class="go">  If the environment was found to be healthy the exit code will be 0.</span>
+</span><span data-line="9">
+</span><span data-line="10"><span class="go">Options:</span>
+</span><span data-line="11"><span class="go">  --help  Show this message and exit.</span>
+</span></pre></div>
+</div>
+</section>
+<section id="the-integration-test-docker-environment-api">
+<h3>The integration-test-docker-environment API<a class="headerlink" href="#the-integration-test-docker-environment-api" title="Link to this heading">¶</a></h3>
+<p>t.b.d. <em>Link to sphinx documentation</em></p>
+</section>
+<section id="default-credentials">
+<h3>Default Credentials<a class="headerlink" href="#default-credentials" title="Link to this heading">¶</a></h3>
+<p>The default credentials for the database are</p>
+<ul class="simple">
+<li><p>User: <code class="docutils literal notranslate"><span class="pre">sys</span></code></p></li>
+<li><p>Password: <code class="docutils literal notranslate"><span class="pre">exasol</span></code></p></li>
+</ul>
+<p>and for the Bucket-FS:</p>
+<ul class="simple">
+<li><p>User: <code class="docutils literal notranslate"><span class="pre">w</span></code></p></li>
+<li><p>Password: <code class="docutils literal notranslate"><span class="pre">write</span></code></p></li>
+</ul>
+<p>or</p>
+<ul class="simple">
+<li><p>User: <code class="docutils literal notranslate"><span class="pre">r</span></code></p></li>
+<li><p>Password: <code class="docutils literal notranslate"><span class="pre">read</span></code></p></li>
+</ul>
+</section>
+<section id="accessing-the-environment-information">
+<h3>Accessing the Environment Information<a class="headerlink" href="#accessing-the-environment-information" title="Link to this heading">¶</a></h3>
+<p>The python setup script creates configuration files on the host and in
+the test container.</p>
+<p>On the host the container information get stored in the build output
+directory usually under <code class="docutils literal notranslate"><span class="pre">.build_output/cache/&lt;ENVIRONMENT_NAME&gt;/*</span></code>. In
+the test container the config file is stored at the root directory
+<code class="docutils literal notranslate"><span class="pre">/</span></code>.</p>
+<p>The following config files are available:</p>
+<ul>
+<li><p>environment_info.sh: This file is meant to be source by the bash and
+then provides the information as environment variables. Here an
+example for the content:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">export</span> <span class="n">ENVIRONMENT_NAME</span><span class="o">=</span><span class="n">test</span>
+</span><span data-line="2"><span class="n">export</span> <span class="n">ENVIRONMENT_TYPE</span><span class="o">=</span><span class="n">EnvironmentType</span><span class="o">.</span><span class="n">docker_db</span>
+</span><span data-line="3">
+</span><span data-line="4"><span class="c1"># Database IP in environment docker network</span>
+</span><span data-line="5"><span class="n">export</span> <span class="n">ENVIRONMENT_DATABASE_HOST</span><span class="o">=</span><span class="mf">172.21.0.2</span>
+</span><span data-line="6"><span class="n">export</span> <span class="n">ENVIRONMENT_DATABASE_DB_PORT</span><span class="o">=</span><span class="mi">8888</span>
+</span><span data-line="7"><span class="n">export</span> <span class="n">ENVIRONMENT_DATABASE_BUCKETFS_PORT</span><span class="o">=</span><span class="mi">6583</span>
+</span><span data-line="8"><span class="n">export</span> <span class="n">ENVIRONMENT_DATABASE_CONTAINER_NAME</span><span class="o">=</span><span class="n">db_container_test</span>
+</span><span data-line="9"><span class="n">export</span> <span class="n">ENVIRONMENT_DATABASE_CONTAINER_NETWORK_ALIASES</span><span class="o">=</span><span class="s2">&quot;exasol_test_database db_container_test&quot;</span>
+</span><span data-line="10"><span class="c1"># Database IP in the environment docker network</span>
+</span><span data-line="11"><span class="n">export</span> <span class="n">ENVIRONMENT_DATABASE_CONTAINER_IP_ADDRESS</span><span class="o">=</span><span class="mf">172.21.0.2</span>
+</span><span data-line="12"><span class="n">export</span> <span class="n">ENVIRONMENT_DATABASE_CONTAINER_VOLUMNE_NAME</span><span class="o">=</span><span class="n">db_container_test_volume</span>
+</span><span data-line="13"><span class="c1"># Database IP on the docker default bridge which under Linux available from the host</span>
+</span><span data-line="14"><span class="n">export</span> <span class="n">ENVIRONMENT_DATABASE_CONTAINER_DEFAULT_BRIDGE_IP_ADDRESS</span><span class="o">=</span><span class="mf">172.17.0.3</span>
+</span><span data-line="15">
+</span><span data-line="16"><span class="n">export</span> <span class="n">ENVIRONMENT_TEST_CONTAINER_NAME</span><span class="o">=</span><span class="n">test_container_test</span>
+</span><span data-line="17"><span class="n">export</span> <span class="n">ENVIRONMENT_TEST_CONTAINER_NETWORK_ALIASES</span><span class="o">=</span><span class="s2">&quot;test_container test_container_test&quot;</span>
+</span><span data-line="18"><span class="c1"># Test Container IP in the environment docker network</span>
+</span><span data-line="19"><span class="n">export</span> <span class="n">ENVIRONMENT_TEST_CONTAINER_IP_ADDRESS</span><span class="o">=</span><span class="mf">172.21.0.3</span>
+</span></pre></div>
+</div>
+</li>
+<li><p>environment_info.json: Contains the EnvironmentInfo objects pickled
+with JsonPickle</p></li>
+</ul>
+</section>
+<section id="currently-supported-exasol-versions">
+<h3>Currently supported Exasol Versions<a class="headerlink" href="#currently-supported-exasol-versions" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>7.0</strong>: up to 7.0.20 <strong>except 7.0.5</strong></p></li>
+<li><p><strong>7.1</strong>: up to 7.1.15</p></li>
+</ul>
+<p>If you need further versions, please open an issue.</p>
+</section>
+<section id="tested-docker-runtimes">
+<h3>Tested Docker Runtimes<a class="headerlink" href="#tested-docker-runtimes" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Docker Default Runtime</p></li>
+<li><p><a class="reference external" href="https://github.com/NVIDIA/nvidia-container-runtime">NVIDIA Container
+Runtime</a> for
+GPU accelerated UDFs</p></li>
+</ul>
+</section>
+</section>
+<section id="mac-os-x-support">
+<h2>Mac OS X Support<a class="headerlink" href="#mac-os-x-support" title="Link to this heading">¶</a></h2>
+<section id="what-do-i-need-to-do-to-start-the-test-environment-with-mac-os-x">
+<h3>What do I need to do to start the Test Environment with Mac OS X<a class="headerlink" href="#what-do-i-need-to-do-to-start-the-test-environment-with-mac-os-x" title="Link to this heading">¶</a></h3>
+<p>The Exasol Docker-DB needs per default a bit more than 2 GB of RAM,
+however the Docker VM on Mac OS X provides often not enough RAM to
+accommodate this. You should increase the RAM of the Docker VM to at
+least 4.25 GB or reduce the DB Mem Size for the Exasol Docker-DB to less
+than 2 GB with <code class="docutils literal notranslate"><span class="pre">--db-mem-size</span> <span class="pre">1</span> <span class="pre">GiB</span></code>.</p>
+</section>
+<section id="what-happens-under-the-hood">
+<h3>What happens under the hood<a class="headerlink" href="#what-happens-under-the-hood" title="Link to this heading">¶</a></h3>
+<p>Mac OS X with Docker Desktop for Mac uses a lightweight virtual machine
+with linux in which the docker daemon runs and the containers get
+started. This makes
+<a class="reference external" href="https://docs.docker.com/docker-for-mac/networking/">networking</a> and
+<a class="reference external" href="https://docs.docker.com/docker-for-mac/osxfs/">shared directories</a>
+more complicated then on Linux.</p>
+<p>We start the python setup script for the test environment in its own
+Docker container, lets call it <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">runner</span></code>, because the library
+<a class="reference external" href="https://luigi.readthedocs.io/en/stable/">Luigi</a> can have problems
+with Mac OS X and to avoid the installation of further dependencies. To
+support Mac OS X, the <code class="docutils literal notranslate"><span class="pre">start-test-env</span></code> script starts the
+<code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">runner</span></code> container and mounts the docker socket at
+<code class="docutils literal notranslate"><span class="pre">/var/run/docker.sock</span></code> and the directory of the test environment from
+the Mac OS X host to the container. Then, it starts
+<code class="docutils literal notranslate"><span class="pre">start-test-env-without-docker</span></code> which then starts the python script.
+It is important, that the repository gets cloned to the Mac OS X host
+and not to a docker container, because the python scripts tries to start
+further docker container which use host mounts to share the tests
+directory of the test environment with the docker container.</p>
+<div class="toctree-wrapper compound">
+</div>
+</section>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="../index.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title">Home</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="../developer_guide/developer_guide.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title">Developer Guide</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright"><p>2022, Exasol AG</p>
+  
+  <p>
+    Made with
+    
+    <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+    <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+  </p>
+</div>
+      <div class="sy-foot-socials">
+<a href="https://github.com/exasol/integration-test-docker-environment" aria-label="GitHub">
+  <iconify-icon icon="simple-icons:github"></iconify-icon>
+</a></div>
+    </div>
+  </div>
+</footer>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script src="../_static/tabs.js?v=3ee01567"></script>
+      <script src="../_static/design-tabs.js?v=f930bc37"></script>
+      <script src="../_static/shibuya.js?v=e2e99575"></script></body>
+</html>

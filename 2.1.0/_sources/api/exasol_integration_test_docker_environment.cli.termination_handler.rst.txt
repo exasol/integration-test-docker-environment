@@ -1,0 +1,18 @@
+exasol\_integration\_test\_docker\_environment.cli.termination\_handler
+=======================================================================
+
+.. automodule:: exasol_integration_test_docker_environment.cli.termination_handler
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      print_err
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      TerminationHandler
+   

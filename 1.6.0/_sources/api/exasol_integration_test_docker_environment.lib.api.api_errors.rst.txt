@@ -1,0 +1,14 @@
+exasol\_integration\_test\_docker\_environment.lib.api.api\_errors
+==================================================================
+
+.. automodule:: exasol_integration_test_docker_environment.lib.api.api_errors
+
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      ArgumentConstraintError
+      HealthProblem
+      TaskRuntimeError
+   

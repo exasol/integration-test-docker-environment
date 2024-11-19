@@ -1,0 +1,12 @@
+exasol\_integration\_test\_docker\_environment.lib.test\_environment.database\_waiters.wait\_for\_external\_database
+====================================================================================================================
+
+.. automodule:: exasol_integration_test_docker_environment.lib.test_environment.database_waiters.wait_for_external_database
+
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      WaitForTestExternalDatabase
+   
