@@ -46,7 +46,7 @@ class SpawnTestContainer(DockerBaseTask, TestContainerParameter):
             self.register_dependency(self.create_child_task(task_class=DockerTestContainerBuild,
                                                             test_container_content=self.test_container_content))
 
-    def is_reuse_possible(self) -> luigi.BoolParameter | bool:
+    def is_reuse_possible(self) -> bool:
         test_container_image_info = \
             self.get_values_from_futures(self.test_container_image_future)["test-container"]  # type: ImageInfo
         test_container = None
