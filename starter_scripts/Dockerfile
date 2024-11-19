@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND=noninteractive
 
 COPY ext/01_nodoc /etc/dpkg/dpkg.cfg.d/01_nodoc
@@ -7,7 +7,7 @@ RUN apt-get -y update && \
     apt-get -y install --no-install-recommends\
         ca-certificates \
         locales \
-        python3.8-venv \
+        python3.10-venv \
         git \
         bash \
         curl && \
@@ -27,7 +27,7 @@ COPY pyproject.toml /integration_test_docker_environment/pyproject.toml
 COPY LICENSE /integration_test_docker_environment/LICENSE
 COPY README.rst /integration_test_docker_environment/README.rst
 
-ENV POETRY_VERSION=1.4.2
+ENV POETRY_VERSION=1.8.2
 RUN curl -sSL https://install.python-poetry.org | python3 -
 
 ENV PATH /root/.local/bin:$PATH

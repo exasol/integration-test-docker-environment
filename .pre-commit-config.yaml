@@ -1,0 +1,26 @@
+default_stages: [ commit ]
+repos:
+
+  - repo: local
+    hooks:
+      - id: update-starter-script-checksums
+        name: update-starter-script-checksums
+        pass_filenames: false
+        language: system
+        entry: poetry run nox -s starter-scripts-checksums
+
+  - repo: local
+    hooks:
+      - id: copy-docker-db-config-templates
+        name: copy-docker-db-config-templates
+        pass_filenames: false
+        language: system
+        entry: poetry run nox -s copy-docker-db-config-templates
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: no-commit-to-branch

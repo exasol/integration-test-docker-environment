@@ -19,10 +19,12 @@ jobs:
     name: Run tests with Python ${{ matrix.python_version }} and Exasol ${{ matrix.exasol_version }}
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
-    - uses: ./.github/actions/prepare_poetry_env
+    - name: Setup Python & Poetry Environment
+      uses: exasol/python-toolbox/.github/actions/python-environment@0.17.0
       with:
-        python_version: "${{ matrix.python_version }}"
+        python-version: ${{ matrix.python_version }}
+        poetry-version: '1.8.2'
     - name: Run all tests
       run: poetry run nox -s "run-tests(db_version='${{ matrix.exasol_version }}')"

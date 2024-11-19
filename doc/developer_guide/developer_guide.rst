@@ -8,9 +8,12 @@ Install Poetry:
 
 ``sudo apt install python3-poetry``
 
+Install dependencies:
+``poetry install``
+
 Install the Git commit hooks:
 
-``githooks/install.sh``
+``poetry run pre-commit install``
 
 .. toctree::
    :maxdepth: 1
@@ -22,18 +25,24 @@ Prerequisites
 -------------
 
 * Change log needs to be up to date
-* Latest change log version needs to match project and package version
-* Release tag needs to match package, changelog and project version
+* ``unreleased`` change log version needs to be up-to-date
+* Release tag needs to match package
 
   For Example:
         * Tag: 0.4.0
-        * Changelog: changes_0.4.0.md
         * \`poetry version -s\`: 0.4.0
+
+Preparing the Release
+----------------------
+Run the following nox task in order to prepare the changelog.
+
+    .. code-block:: shell
+
+        nox -s release:prepare
 
 Triggering the Release
 ----------------------
 In order to trigger a release a new tag must be pushed to Github.
-For further details see: `.github/workflows/release.yml`.
 
 
 #. Create a local tag with the appropriate version number

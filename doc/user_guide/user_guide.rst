@@ -76,7 +76,7 @@ Starting the test environment:
    ./start-test-env spawn-test-environment --environment-name <NAME>
 
 or if you work on the code of the Test Environment (requires Python
->=3.8 with `poetry <https://python-poetry.org/>`__):
+>=3.9 with `poetry <https://python-poetry.org/>`__):
 
 ::
 
