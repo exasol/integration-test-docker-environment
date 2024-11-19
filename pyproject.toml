@@ -51,7 +51,7 @@ toml = ">=0.10.2"
 nox = "^2022.1.7"
 mypy = "^1.1.1"
 pyexasol = "^0.25.2"
-exasol-toolbox = "^0.17.0"
+exasol-toolbox = ">=0.18.0"
 
 [tool.poetry.scripts]
 itde = 'exasol_integration_test_docker_environment.main:main'
