@@ -39,7 +39,6 @@ requests = ">=2.21.0"
 simplejson = ">=3.16.0"
 importlib_resources = ">=5.4.0" #Needed to copy resource files, can be removed after upgrading to Python 3.9 (see https://docs.python.org/3.11/library/importlib.resources.html#importlib.resources.files)
 "stopwatch.py" = ">=1.0.0"
-exasol-bucketfs = ">=0.6.0,<2.0.0"
 fabric = "^3.0.1"
 portalocker = "^2.7.0"
 exasol-error-reporting = ">=0.4.0"
@@ -52,6 +51,7 @@ nox = "^2022.1.7"
 mypy = "^1.1.1"
 pyexasol = "^0.25.2"
 exasol-toolbox = ">=0.18.0"
+joblib = "^1.4.2"
 
 [tool.poetry.scripts]
 itde = 'exasol_integration_test_docker_environment.main:main'
