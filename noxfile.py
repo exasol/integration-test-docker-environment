@@ -6,6 +6,8 @@ from typing import List
 import nox
 import toml
 
+from noxconfig import PROJECT_CONFIG
+
 ROOT = Path(__file__).parent
 
 # imports all nox task provided by the toolbox
@@ -123,3 +125,11 @@ def security_lint(session: nox.Session) -> None:
     """Runs the security linter on the project"""
     py_files = [f"{file}" for file in python_files(ROOT / "exasol_integration_test_docker_environment")]
     _security_lint(session, py_files)
+
+@nox.session(name="test:unit", python=False)
+def unit_tests(session: nox.Session) -> None:
+    """Runs all unit tests"""
+    from exasol.toolbox.nox._shared import _context
+    from exasol.toolbox.nox._test import _unit_tests
+    context = _context(session, coverage=True)
+    _unit_tests(session, PROJECT_CONFIG, context)

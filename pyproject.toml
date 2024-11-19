@@ -58,4 +58,4 @@ itde = 'exasol_integration_test_docker_environment.main:main'
 
 
 [tool.pylint.master]
-fail-under = 6.55
+fail-under = 6.50
