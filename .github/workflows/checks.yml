@@ -119,32 +119,5 @@ jobs:
           include-hidden-files: true
 
   Tests:
-    name: Tests (Python-${{ matrix.python-version }}, Exasol-${{ matrix.exasol-version}})
-    needs: [ Documentation, Lint, Type-Check, Security ]
-    runs-on: ubuntu-latest
-    env:
-      GITHUB_TOKEN: ${{ secrets.ALTERNATIVE_GITHUB_TOKEN ||  secrets.GITHUB_TOKEN }}
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.9", "3.10", "3.11"]
-        exasol-version: ["7.1.9"]
-
-    steps:
-      - name: SCM Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@0.17.0
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Run Tests and Compute Coverage
-        run: poetry run nox -s test:coverage -- -- --db-version ${{ matrix.exasol-version }}
-
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v4.4.0
-        with:
-          name: coverage-python${{ matrix.python-version }}
-          path: .coverage
-          include-hidden-files: true
+    name: Tests
+    uses: ./.github/workflows/tests.yml
