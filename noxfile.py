@@ -115,3 +115,11 @@ def copy_docker_db_config_templates(session: nox.Session):
     with session.chdir(ROOT):
         session.run("cp", "-rL", "docker_db_config_template", str(target_path))
     session.run("git", "add", str(target_path))
+
+@nox.session(name="lint:security", python=False)
+def security_lint(session: nox.Session) -> None:
+    from exasol.toolbox.nox._lint import _security_lint
+    from exasol.toolbox.nox._shared import python_files
+    """Runs the security linter on the project"""
+    py_files = [f"{file}" for file in python_files(ROOT / "exasol_integration_test_docker_environment")]
+    _security_lint(session, py_files)
