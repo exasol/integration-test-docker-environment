@@ -4,9 +4,3 @@ EXAConf       text eol=lf
 
 poetry.lock linguist-generated=true
 exasol_integration_test_docker_environment/docker_db_config/**/* linguist-generated=true
-.github/workflows/cd.yml linguist-generated=true
-.github/workflows/check-release-tag.yml linguist-generated=true
-.github/workflows/ci.yml linguist-generated=true
-.github/workflows/gh-pages.yml linguist-generated=true
-.github/workflows/pr-merge.yml linguist-generated=true
-.github/workflows/report.yml linguist-generated=true
