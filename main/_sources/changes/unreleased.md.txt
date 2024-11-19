@@ -9,3 +9,4 @@ Code name:
 * #119: Refactored `pkg_resources` usage to `importlib.resources`
 * #420: Added file `py.typed` to enable mypy to find project specific types
 * #418: Use exasol/python-toolbox
+* #411: Removed usage of exasol-bucketfs 

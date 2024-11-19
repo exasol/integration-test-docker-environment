@@ -15,4 +15,3 @@ exasol\_integration\_test\_docker\_environment.lib.test\_environment.database\_s
    find_exaplus_in_db_container
    populate_data
    time_based_bucketfs_sync_waiter
-   upload_file_to_db
