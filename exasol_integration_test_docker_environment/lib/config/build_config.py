@@ -1,4 +1,5 @@
 import luigi
+from typing import List, Optional
 
 from exasol_integration_test_docker_environment.cli.options.system_options import DEFAULT_OUTPUT_DIRECTORY
 
