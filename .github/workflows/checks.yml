@@ -120,4 +120,4 @@ jobs:
 
   Tests:
     name: Tests
-    uses: ./.github/workflows/tests.yml
+    uses: ./.github/workflows/tests_with_coverage.yml
