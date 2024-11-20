@@ -1,8 +1,8 @@
 import os
 import unittest
 from contextlib import contextmanager
-from email.generator import Generator
-from typing import ContextManager, Mapping
+
+from typing import Generator
 from unittest.mock import patch
 
 from exasol_integration_test_docker_environment.doctor import (
