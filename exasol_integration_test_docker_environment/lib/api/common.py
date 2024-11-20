@@ -104,8 +104,9 @@ def import_build_steps(flavor_path: Tuple[str, ...]):
         path_to_build_steps = Path(path).joinpath("flavor_base/build_steps.py")
         module_name_for_build_steps = extract_modulename_for_build_steps(path)
         spec = importlib.util.spec_from_file_location(module_name_for_build_steps, path_to_build_steps)
-        module = importlib.util.module_from_spec(spec) # type: ignore
-        spec.loader.exec_module(module) # type: ignore
+        assert spec and spec.loader
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
 
 
 def generate_root_task(task_class, *args, **kwargs) -> DependencyLoggerBaseTask:
@@ -178,7 +179,7 @@ def _configure_logging(
         use_job_specific_log_file: bool) -> Iterator[Dict[str, str]]:
     with get_luigi_log_config(log_file_target=log_file_path,
                               log_level=log_level,
-                              use_job_specific_log_file=use_job_specific_log_file) as luigi_config: # type: Path
+                              use_job_specific_log_file=use_job_specific_log_file) as luigi_config:
         no_configure_logging, run_kwargs = _configure_logging_parameter(
             log_level=log_level,
             luigi_config=luigi_config,
