@@ -153,7 +153,7 @@ class BaseTask(Task):
 
     def _get_output_path_for_job(self) -> Path:
         return Path(build_config().output_directory,
-                    "jobs", self.job_id) # type: ignore
+                    "jobs", self.job_id)
 
     def _extend_output_path(self):
         extension = self.extend_output_path()

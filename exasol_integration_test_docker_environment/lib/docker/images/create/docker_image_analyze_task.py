@@ -137,8 +137,8 @@ class DockerAnalyzeImageTask(DockerBaseTask):
         return all(issubclass(value, DockerAnalyzeImageTask)
                    for value in task_classes.values())
 
-    def requires_tasks(self) -> Optional[Dict[str, Type["DockerAnalyzeImageTask"]]]:
-        pass
+    def requires_tasks(self) -> Dict[str, Type["DockerAnalyzeImageTask"]]:
+        return dict()
 
     def run_task(self):
         image_info_of_dependencies = self.get_values_from_futures(self.dependencies_futures)

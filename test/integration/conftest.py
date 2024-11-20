@@ -67,7 +67,7 @@ def cli_database(cli_isolation) -> CliContextProvider:
 
     @contextlib.contextmanager # type: ignore
     def create_context( # type: ignore
-            name: Optional[str] = None, # type: ignore
+            name: Optional[str] = None,
             additional_parameters: Optional[List[str]] = None,
     ) -> SpawnedTestEnvironments:
         name = name if name else cli_isolation.name

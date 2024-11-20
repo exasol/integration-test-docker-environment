@@ -68,7 +68,8 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
             shell_variables: ShellVariables,
             json: str,
     ):
-        test_container_name = test_environment_info.test_container_info.container_name # type: ignore
+        assert test_environment_info.test_container_info
+        test_container_name = test_environment_info.test_container_info.container_name
         with self._get_docker_client() as docker_client:
             test_container = docker_client.containers.get(test_container_name)
             self.logger.info(f"Create test environment info in test container '{test_container_name}' at '/'")
@@ -102,31 +103,31 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
                 json,
             )
 
-    def _default_bridge_ip_address(self, test_environment_info) -> Optional[str]:
-        if test_environment_info.database_info.container_info is None:
-            return None
-        container_name = test_environment_info.database_info.container_info.container_name
-        with self._get_docker_client() as docker_client:
-            db_container = docker_client.containers.get(container_name)
-            return default_bridge_ip_address(db_container)
+    def _default_bridge_ip_address(self, test_environment_info) -> str:
+        if test_environment_info.database_info.container_info is not None:
+            container_name = test_environment_info.database_info.container_info.container_name
+            with self._get_docker_client() as docker_client:
+                db_container = docker_client.containers.get(container_name)
+                return default_bridge_ip_address(db_container)
+        raise RuntimeError("Could not find default bridge ip address")
 
     def collect_shell_variables(self, test_environment_info) -> ShellVariables:
         return ShellVariables.from_test_environment_info(
-            self._default_bridge_ip_address(test_environment_info), # type: ignore
+            self._default_bridge_ip_address(test_environment_info),
             test_environment_info,
         )
 
     def _start_database(self, attempt) \
             -> Generator[BaseTask, BaseTask, Tuple[DockerNetworkInfo, DatabaseInfo, bool, Optional[ContainerInfo]]]:
-        network_info = yield from self._create_network(attempt) # type: ignore
-        ssl_volume_info = None # type: ignore
-        if self.create_certificates: # type: ignore
+        network_info = yield from self._create_network(attempt)
+        ssl_volume_info = None
+        if self.create_certificates:
             ssl_volume_info = yield from self._create_ssl_certificates() # type: ignore
         database_info, test_container_info = yield from self._spawn_database_and_test_container(network_info, ssl_volume_info, attempt) # type: ignore
         is_database_ready = yield from self._wait_for_database(database_info, attempt) # type: ignore
         return network_info, database_info, is_database_ready, test_container_info # type: ignore
 
-    def _create_ssl_certificates(self) -> DockerVolumeInfo: # type: ignore
+    def _create_ssl_certificates(self) -> Generator:
         ssl_info_future = yield from self.run_dependencies(self.create_ssl_certificates())
         ssl_info = self.get_values_from_future(ssl_info_future)
         return ssl_info # type: ignore
