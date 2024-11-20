@@ -5,7 +5,7 @@ from pathlib import Path
 import luigi
 from luigi import Parameter
 
-from typing import Set, Dict
+from typing import Set, Dict, List
 
 from exasol_integration_test_docker_environment.lib.api.common import generate_root_task
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
@@ -44,7 +44,7 @@ class TestDockerBuildBaseTestAnalyzeImage(DockerAnalyzeImageTask):
 
 
 class TestDockerBuildBase(DockerBuildBase):
-    goals = luigi.ListParameter([])
+    goals : List[str] = luigi.ListParameter([]) # type: ignore
 
     def get_goal_class_map(self) -> Dict[str, DockerAnalyzeImageTask]:
         goal_class_map = {

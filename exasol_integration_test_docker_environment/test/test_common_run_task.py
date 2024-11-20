@@ -1,6 +1,4 @@
-import subprocess
 import unittest
-from pathlib import Path
 
 import luigi
 
