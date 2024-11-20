@@ -116,18 +116,6 @@ def generate_root_task(task_class, *args, **kwargs) -> DependencyLoggerBaseTask:
     return task_class(**params)
 
 
-def _run_task_with_logging_config(
-        task: DependencyLoggerBaseTask,
-        log_file_path: Path,
-        log_level: Optional[str],
-        use_job_specific_log_file: bool,
-        workers: int) -> bool:
-    with _configure_logging(log_file_path, log_level, use_job_specific_log_file) as run_kwargs:
-        no_scheduling_errors = luigi.build([task], workers=workers,
-                                           local_scheduler=True, **run_kwargs)
-        return no_scheduling_errors
-
-
 def run_task(task_creator: Callable[[], DependencyLoggerBaseTask], workers: int = 2,
              task_dependencies_dot_file: Optional[str] = None,
              log_level: Optional[str] = None, use_job_specific_log_file: bool = False) \
@@ -152,6 +140,16 @@ def run_task(task_creator: Callable[[], DependencyLoggerBaseTask], workers: int 
                 f"The detailed log of the integration-test-docker-environment can be found at: {log_file_path}")
         task.cleanup(success)
 
+def _run_task_with_logging_config(
+        task: DependencyLoggerBaseTask,
+        log_file_path: Path,
+        log_level: Optional[str],
+        use_job_specific_log_file: bool,
+        workers: int) -> bool:
+    with _configure_logging(log_file_path, log_level, use_job_specific_log_file) as run_kwargs:
+        no_scheduling_errors = luigi.build([task], workers=workers,
+                                           local_scheduler=True, **run_kwargs)
+        return no_scheduling_errors
 
 def _handle_task_result(
         no_scheduling_errors: bool,
