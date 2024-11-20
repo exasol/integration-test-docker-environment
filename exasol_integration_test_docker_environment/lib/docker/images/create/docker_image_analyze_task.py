@@ -1,6 +1,6 @@
 import abc
 from pathlib import Path
-from typing import Dict, Type
+from typing import Dict, Type, Optional
 
 import docker
 import git
@@ -137,8 +137,7 @@ class DockerAnalyzeImageTask(DockerBaseTask):
         return all(issubclass(value, DockerAnalyzeImageTask)
                    for value in task_classes.values())
 
-    @abc.abstractmethod
-    def requires_tasks(self) -> Dict[str, Type["DockerAnalyzeImageTask"]]:
+    def requires_tasks(self) -> Optional[Dict[str, Type["DockerAnalyzeImageTask"]]]:
         pass
 
     def run_task(self):
