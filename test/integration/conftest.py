@@ -1,6 +1,5 @@
 import contextlib
 import io
-from contextlib import _GeneratorContextManager
 
 import pytest
 
