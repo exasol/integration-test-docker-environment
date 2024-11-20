@@ -24,9 +24,9 @@ class ShellVariables:
             "NAME": info.name,
             "TYPE": info.type,
             "DATABASE_HOST": info.database_info.host,
-            "DATABASE_DB_PORT": str(info.database_info.ports.database) if info.database_info.ports.database else "",
-            "DATABASE_BUCKETFS_PORT": str(info.database_info.ports.bucketfs) if  info.database_info.ports.bucketfs else "",
-            "DATABASE_SSH_PORT": str(info.database_info.ports.ssh) if info.database_info.ports.ssh else "",
+            "DATABASE_DB_PORT": str(info.database_info.ports.database) if info.database_info.ports.database is not None else "",
+            "DATABASE_BUCKETFS_PORT": str(info.database_info.ports.bucketfs) if  info.database_info.ports.bucketfs is not None else "",
+            "DATABASE_SSH_PORT": str(info.database_info.ports.ssh) if info.database_info.ports.ssh is not None else "",
         }
         if info.database_info.container_info is not None:
             network_aliases = " ".join(info.database_info.container_info.network_aliases)
