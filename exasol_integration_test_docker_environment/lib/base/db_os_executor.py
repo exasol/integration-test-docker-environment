@@ -37,12 +37,11 @@ class DbOsExecutor(Protocol):
     concrete implementations in sub-classes ``DockerExecutor`` and
     ``SshExecutor``.
     """
-    @abstractmethod
     def exec(self, cmd: str) -> ExecResult:
         ...
 
     def prepare(self):
-        pass
+        ...
 
 
 class DockerExecutor(DbOsExecutor):
@@ -64,6 +63,9 @@ class DockerExecutor(DbOsExecutor):
     def exec(self, cmd: str) -> ExecResult:
         assert self._container
         return self._container.exec_run(cmd)
+
+    def prepare(self):
+        pass
 
     def close(self):
         self._container = None
@@ -143,6 +145,7 @@ class DockerExecFactory(DbOsExecFactory):
     def executor(self) -> DbOsExecutor:
         client = self._client_factory.client()
         return DockerExecutor(client, self._container_name)
+
 
 
 class SshExecFactory(DbOsExecFactory):
