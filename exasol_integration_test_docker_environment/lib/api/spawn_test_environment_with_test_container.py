@@ -22,14 +22,15 @@ from exasol_integration_test_docker_environment \
     .docker_db_test_environment_parameter import DbOsAccess
 
 def _cleanup(environment_info: EnvironmentInfo) -> None:
-    if environment_info.test_container_info is not None:
-        remove_docker_container([environment_info.test_container_info.container_name])
-    if environment_info.database_info.container_info is not None:
-        remove_docker_container([environment_info.database_info.container_info.container_name])
-        if environment_info.database_info.container_info.volume_name is not None:
-            remove_docker_volumes([environment_info.database_info.container_info.volume_name])
-    remove_docker_networks([environment_info.network_info.network_name])
+    if test_container_info := environment_info.test_container_info:
+        remove_docker_container([test_container_info.container_name])
 
+    if db_container_info := environment_info.database_info.container_info:
+        remove_docker_container([db_container_info.container_name])
+        if name := db_container_info.volume_name:
+            remove_docker_volumes([name])
+
+    remove_docker_networks([environment_info.network_info.network_name])
 
 @no_cli_function
 def spawn_test_environment_with_test_container(

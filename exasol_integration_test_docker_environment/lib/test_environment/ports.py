@@ -55,8 +55,6 @@ class Ports(metaclass=PortsType):
 
     @classmethod
     def random_free(cls, ssh: bool = True) -> 'Ports':
-        ports : List[int] = find_free_ports(3 if ssh else 2)
-        if ssh:
-            return Ports(ports[0], ports[1], ports[2])
-        else:
-            return Ports(ports[0], ports[1], None)
+        count = 3 if ssh else 2
+        ports = find_free_ports(count)
+        return Ports(ports[0], ports[1], None) if not ssh else Ports(ports[0], ports[1], ports[2])
