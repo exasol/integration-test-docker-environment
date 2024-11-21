@@ -203,6 +203,6 @@ class SpawnTestContainer(DockerBaseTask, TestContainerParameter):
                 (not success and not self.no_test_container_cleanup_after_failure):
             try:
                 self.logger.info(f"Cleaning up container %s", self.test_container_name)
-                self._remove_container(self.test_container_name) # type: ignore
+                self._remove_container(self.test_container_name)
             except Exception as e:
                 self.logger.error(f"Error during removing container %s: %s", self.test_container_name, e)
