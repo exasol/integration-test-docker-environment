@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Optional
 from exasol_integration_test_docker_environment.lib.data.environment_info import EnvironmentInfo
 
 
@@ -12,7 +12,7 @@ class ShellVariables:
     @classmethod
     def from_test_environment_info(
             cls,
-            default_bridge_ip_address: str,
+            default_bridge_ip_address: Optional[str],
             test_environment_info: EnvironmentInfo,
     ) -> 'ShellVariables':
         """
@@ -29,6 +29,7 @@ class ShellVariables:
             "DATABASE_SSH_PORT": str(info.database_info.ports.ssh) if info.database_info.ports.ssh is not None else "",
         }
         if info.database_info.container_info is not None:
+            assert default_bridge_ip_address
             network_aliases = " ".join(info.database_info.container_info.network_aliases)
             env.update({
                 "DATABASE_CONTAINER_NAME": info.database_info.container_info.container_name,

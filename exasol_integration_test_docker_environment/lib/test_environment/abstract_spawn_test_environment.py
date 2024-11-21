@@ -103,13 +103,13 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
                 json,
             )
 
-    def _default_bridge_ip_address(self, test_environment_info) -> str:
+    def _default_bridge_ip_address(self, test_environment_info) -> Optional[str]:
         if test_environment_info.database_info.container_info is not None:
             container_name = test_environment_info.database_info.container_info.container_name
             with self._get_docker_client() as docker_client:
                 db_container = docker_client.containers.get(container_name)
                 return default_bridge_ip_address(db_container)
-        raise RuntimeError("Could not find default bridge ip address")
+        return None
 
     def collect_shell_variables(self, test_environment_info) -> ShellVariables:
         return ShellVariables.from_test_environment_info(
