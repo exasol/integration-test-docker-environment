@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Union
 
 import luigi
 import netaddr
@@ -111,7 +111,7 @@ class SpawnTestContainer(DockerBaseTask, TestContainerParameter):
         test_container_image_info = \
             self.get_values_from_futures(self.test_container_image_future)["test-container"]
 
-        volumes : Dict[str | Path, Dict[str, str]] = dict()
+        volumes : Dict[Union[str, Path], Dict[str, str]] = dict()
         for runtime_mapping in self.test_container_content.runtime_mappings:
             volumes[runtime_mapping.source.absolute()] = {
                 "bind": runtime_mapping.target,
