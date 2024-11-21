@@ -60,7 +60,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
     certificate_volume_name : Optional[str] = luigi.OptionalParameter(None, significant=False) # type: ignore
     additional_db_parameter : List[str] = luigi.ListParameter() # type: ignore
     ssh_user : str = luigi.Parameter("root") # type: ignore
-    ssh_key_file : str | Path | None = luigi.OptionalParameter(None, significant=False) # type: ignore
+    ssh_key_file : Union[str, Path, None] = luigi.OptionalParameter(None, significant=False) # type: ignore
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
