@@ -56,7 +56,7 @@ class CreateSSLCertificatesTask(DockerBaseTask):
 
         self.return_object(self.volume_info)
 
-    def build_image(self) -> Generator["BaseTask", PickleTarget, Set[str]]:
+    def build_image(self) -> Generator[BaseTask, None, Set[str]]:
         task = self.create_child_task(task_class=DockerCertificateContainerBuild,
                                       certificate_container_root_directory=self._temp_resource_directory.tmp_directory)
         image_infos_future = yield from self.run_dependencies(task)

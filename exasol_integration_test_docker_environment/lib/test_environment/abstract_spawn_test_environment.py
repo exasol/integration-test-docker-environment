@@ -118,7 +118,7 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
         )
 
     def _start_database(self, attempt) \
-            -> Generator[BaseTask, BaseTask, Tuple[DockerNetworkInfo, DatabaseInfo, bool, Optional[ContainerInfo]]]:
+            -> Generator[BaseTask, None, Tuple[DockerNetworkInfo, DatabaseInfo, bool, Optional[ContainerInfo]]]:
         network_info = yield from self._create_network(attempt)
         ssl_volume_info = None
         if self.create_certificates:
@@ -127,7 +127,7 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
         is_database_ready = yield from self._wait_for_database(database_info, attempt) # type: ignore
         return network_info, database_info, is_database_ready, test_container_info # type: ignore
 
-    def _create_ssl_certificates(self) -> Generator:
+    def _create_ssl_certificates(self) -> Generator[BaseTask, None, Optional[DockerVolumeInfo]]:
         ssl_info_future = yield from self.run_dependencies(self.create_ssl_certificates())
         ssl_info = self.get_values_from_future(ssl_info_future)
         return ssl_info # type: ignore
