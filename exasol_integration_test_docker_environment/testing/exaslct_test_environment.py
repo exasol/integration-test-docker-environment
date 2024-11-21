@@ -178,7 +178,7 @@ class ExaslctTestEnvironment:
                 bucketfs_username=on_host_parameter.bucketfs_username,
                 bucketfs_password=on_host_parameter.bucketfs_password,
                 ports=Ports.default_ports,
-                environment_info=on_host_parameter.completed_process, # type: ignore
+                environment_info=on_host_parameter.environment_info,
                 completed_process=on_host_parameter.completed_process
             )
 
