@@ -59,9 +59,10 @@ class SetupExternalDatabaseHost(DependencyLoggerBaseTask,
                 self.logger.info(e)
 
     def get_xml_rpc_object(self, object_name: str = ""):
+        assert self.external_exasol_xmlrpc_user and self.external_exasol_xmlrpc_password
         uri = 'https://{user}:{password}@{host}:{port}/{cluster_name}/{object_name}'.format(
-            user=quote_plus(self.external_exasol_xmlrpc_user or ""),
-            password=quote_plus(self.external_exasol_xmlrpc_password or ""),
+            user=quote_plus(self.external_exasol_xmlrpc_user),
+            password=quote_plus(self.external_exasol_xmlrpc_password),
             host=self.external_exasol_xmlrpc_host,
             port=self.external_exasol_xmlrpc_port,
             cluster_name=self.external_exasol_xmlrpc_cluster_name,

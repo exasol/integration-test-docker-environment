@@ -89,15 +89,16 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             database_info = self._create_database_container(db_ip_address, db_private_network)
         self.return_object(database_info)
 
-    def _try_to_reuse_database(self, db_ip_address: str) -> DatabaseInfo:
+    def _try_to_reuse_database(self, db_ip_address: str) -> Optional[DatabaseInfo]:
         self.logger.info("Try to reuse database container %s",
                          self.db_container_name)
         try:
             database_info = self._create_database_info(db_ip_address=db_ip_address, reused=True)
+            return database_info
         except Exception as e:
             self.logger.warning("Tried to reuse database container %s, but got Exeception %s. "
                                 "Fallback to create new database.", self.db_container_name, e)
-        return database_info
+        return None
 
     def _get_ssh_key(self) -> SshKey:
         if self.ssh_key_file:

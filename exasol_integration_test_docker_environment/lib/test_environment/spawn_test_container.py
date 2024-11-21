@@ -1,4 +1,5 @@
-from typing import List, Optional
+from pathlib import Path
+from typing import List, Optional, Dict
 
 import luigi
 import netaddr
@@ -36,10 +37,10 @@ class SpawnTestContainer(DockerBaseTask, TestContainerParameter):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.ip_address_index_in_subnet < 0: # type: ignore
+        if self.ip_address_index_in_subnet < 0:
             raise Exception(
                 "ip_address_index_in_subnet needs to be greater than 0 got %s"
-                % self.ip_address_index_in_subnet) # type: ignore
+                % self.ip_address_index_in_subnet)
 
     def register_required(self):
         self.test_container_image_future = \
@@ -47,8 +48,8 @@ class SpawnTestContainer(DockerBaseTask, TestContainerParameter):
                                                             test_container_content=self.test_container_content))
 
     def is_reuse_possible(self) -> bool:
-        test_container_image_info = \
-            self.get_values_from_futures(self.test_container_image_future)["test-container"]  # type: ImageInfo
+        test_container_image_info : ImageInfo = \
+            self.get_values_from_futures(self.test_container_image_future)["test-container"]  # type: ignore
         test_container = None
         with self._get_docker_client() as docker_client:
             try:
@@ -64,7 +65,7 @@ class SpawnTestContainer(DockerBaseTask, TestContainerParameter):
 
     def run_task(self):
         subnet = netaddr.IPNetwork(self.network_info.subnet)
-        ip_address = str(subnet[2 + self.ip_address_index_in_subnet]) # type: ignore
+        ip_address = str(subnet[2 + self.ip_address_index_in_subnet])
         container_info = None
 
         if self.is_reuse_possible():
@@ -91,7 +92,7 @@ class SpawnTestContainer(DockerBaseTask, TestContainerParameter):
                     test_container.exec_run(cmd=f"cp -r {runtime_mapping.target} {runtime_mapping.deployment_target}")
 
     def _try_to_reuse_test_container(self, ip_address: str,
-                                     network_info: DockerNetworkInfo) -> ContainerInfo:
+                                     network_info: DockerNetworkInfo) -> Optional[ContainerInfo]:
         self.logger.info("Try to reuse test container %s",
                          self.test_container_name)
         container_info = None
@@ -101,17 +102,17 @@ class SpawnTestContainer(DockerBaseTask, TestContainerParameter):
         except Exception as e:
             self.logger.warning("Tried to reuse test container %s, but got Exeception %s. "
                                 "Fallback to create new database.", self.test_container_name, e)
-        return container_info # type: ignore
+        return container_info
 
     def _create_test_container(self, ip_address,
                                network_info: DockerNetworkInfo) -> ContainerInfo:
-        self._remove_container(self.test_container_name) # type: ignore
+        self._remove_container(self.test_container_name)
         self.logger.info(f"Creating new test container {self.test_container_name}")
         test_container_image_info = \
             self.get_values_from_futures(self.test_container_image_future)["test-container"]
 
-        volumes = dict()
-        for runtime_mapping in self.test_container_content.runtime_mappings: # type: ignore
+        volumes : Dict[str | Path, Dict[str, str]] = dict()
+        for runtime_mapping in self.test_container_content.runtime_mappings:
             volumes[runtime_mapping.source.absolute()] = {
                 "bind": runtime_mapping.target,
                 "mode": "rw"
@@ -160,7 +161,7 @@ class SpawnTestContainer(DockerBaseTask, TestContainerParameter):
             test_container = docker_client.containers.get(self.test_container_name)
             if test_container.status != "running":
                 raise Exception(f"Container {self.test_container_name} not running")
-            container_info = ContainerInfo(container_name=self.test_container_name, # type: ignore
+            container_info = ContainerInfo(container_name=self.test_container_name,
                                            ip_address=ip_address,
                                            network_aliases=network_aliases,
                                            network_info=network_info)
