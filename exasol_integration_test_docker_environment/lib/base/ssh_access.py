@@ -6,8 +6,7 @@ import tempfile
 import portalocker
 from pathlib import Path
 from string import Template
-from typing import Optional
-
+from typing import Optional, Union
 
 _LOCK_FILE = "$TMP/$MODULE-ssh-access.lock"
 _DEFAULT_CACHE_DIR = "$HOME/.cache/exasol/$MODULE"
@@ -84,7 +83,7 @@ class SshKey:
         return self
 
     @classmethod
-    def read_from(cls, private_key_file: Path | str) -> 'SshKey':
+    def read_from(cls, private_key_file: Union[Path, str]) -> 'SshKey':
         with open(private_key_file, "r") as file:
             rsa_key = paramiko.RSAKey.from_private_key(file)
         return SshKey(rsa_key)
