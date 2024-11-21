@@ -1,5 +1,5 @@
 import math
-from typing import Optional, Tuple, List
+from typing import Optional, Tuple, List, Union
 from pathlib import Path
 
 import docker
