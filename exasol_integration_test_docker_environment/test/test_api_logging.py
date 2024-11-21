@@ -239,16 +239,16 @@ class APIClientLoggingTest(unittest.TestCase):
         return logger_infos
 
     def get_logger_info(self, logger: logging.Logger) -> Dict[str, Any]:
-        logger_info = {}
+        logger_info : Dict[str, Any] = dict()
         logger_info[LOGGER_STR] = str(logger)
-        logger_info[LEVEL] = logger.level # type: ignore
+        logger_info[LEVEL] = logger.level
         logger_info[LEVEL_NAME] = logging.getLevelName(logger.level)
-        logger_info[HANDLERS] = list(logger.handlers) # type: ignore
+        logger_info[HANDLERS] = list(logger.handlers)
         logger_info[LOGGER_NAME] = logger.name
-        logger_info[FILTERS] = list(logger.filters) # type: ignore
-        logger_info[DISABLED] = logger.disabled # type: ignore
-        logger_info[PROPAGATE] = logger.propagate # type: ignore
-        logger_info[PARENT] = logger.parent # type: ignore
+        logger_info[FILTERS] = list(logger.filters)
+        logger_info[DISABLED] = logger.disabled
+        logger_info[PROPAGATE] = logger.propagate
+        logger_info[PARENT] = logger.parent
         return logger_info
 
 
