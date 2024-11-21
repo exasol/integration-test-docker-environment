@@ -6,11 +6,11 @@ from exasol_integration_test_docker_environment.lib.data.test_container_content_
 
 
 class TestContainerParameter:
-    test_container_content = JsonPickleParameter(TestContainerContentDescription,
-                                                 visibility=ParameterVisibility.HIDDEN)
+    test_container_content : TestContainerContentDescription = JsonPickleParameter(TestContainerContentDescription,
+                                                 visibility=ParameterVisibility.HIDDEN) # type: ignore
 
 
 class OptionalTestContainerParameter:
-    test_container_content = JsonPickleParameter(TestContainerContentDescription,
+    test_container_content : TestContainerContentDescription = JsonPickleParameter(TestContainerContentDescription,
                                                  visibility=ParameterVisibility.HIDDEN,
-                                                 is_optional=True)
+                                                 is_optional=True) # type: ignore
