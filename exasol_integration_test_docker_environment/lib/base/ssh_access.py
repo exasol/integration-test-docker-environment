@@ -84,7 +84,7 @@ class SshKey:
         return self
 
     @classmethod
-    def read_from(cls, private_key_file: Path) -> 'SshKey':
+    def read_from(cls, private_key_file: Path | str) -> 'SshKey':
         with open(private_key_file, "r") as file:
             rsa_key = paramiko.RSAKey.from_private_key(file)
         return SshKey(rsa_key)

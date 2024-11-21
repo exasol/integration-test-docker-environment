@@ -58,7 +58,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
     certificate_volume_name : Optional[str] = luigi.OptionalParameter(None, significant=False) # type: ignore
     additional_db_parameter : List[str] = luigi.ListParameter() # type: ignore
     ssh_user : str = luigi.Parameter("root") # type: ignore
-    ssh_key_file : Optional[str] = luigi.OptionalParameter(None, significant=False) # type: ignore
+    ssh_key_file : str | Path | None = luigi.OptionalParameter(None, significant=False) # type: ignore
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -102,8 +102,8 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
 
     def _get_ssh_key(self) -> SshKey:
         if self.ssh_key_file:
-            return SshKey.read_from(self.ssh_key_file) # type: ignore
-        self.ssh_key_file = SshKeyCache().private_key # type: ignore
+            return SshKey.read_from(self.ssh_key_file)
+        self.ssh_key_file = SshKeyCache().private_key
         return SshKey.from_cache()
 
     def _handle_output(self, output_generator, image_info: ImageInfo):
