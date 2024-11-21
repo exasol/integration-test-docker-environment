@@ -10,6 +10,7 @@ import importlib_resources
 from docker.models.containers import Container
 from docker.models.volumes import Volume
 from docker.client import DockerClient
+from importlib_resources.abc import Traversable
 from jinja2 import Template
 
 from exasol_integration_test_docker_environment.lib import PACKAGE_NAME
@@ -200,7 +201,8 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                 network_info=self.network_info,
                 volume_name=self._get_db_volume_name(),
             )
-            ssh_info = SshInfo(self.ssh_user, self.ssh_key_file) # type: ignore
+            assert self.ssh_key_file
+            ssh_info = SshInfo(self.ssh_user, str(self.ssh_key_file))
             database_info = DatabaseInfo(
                 host=db_ip_address,
                 ports=self.internal_ports,
@@ -304,7 +306,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         )
         return volume, container
 
-    def _db_file(self, filename: str) -> str:
+    def _db_file(self, filename: str) -> Traversable:
         return (
             importlib_resources.files(PACKAGE_NAME)
             / self.docker_db_config_resource_name
@@ -319,7 +321,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
     ):
         copy = DockerContainerCopy(container)
         init_script = self._db_file("init_db.sh")
-        copy.add_string_to_file("init_db.sh", init_script.read_text()) # type: ignore
+        copy.add_string_to_file("init_db.sh", init_script.read_text())
         self._add_exa_conf(copy, db_private_network, authorized_keys)
         copy.copy("/")
 
