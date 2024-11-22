@@ -66,9 +66,9 @@ def run_minimal_tests(session: nox.Session, db_version: str):
             "test_termination_handler.py",
         ],
         "new-itest": ["test_cli_environment.py", "test_db_container_log_thread.py"],
-        "unit": "./test/unit",
+        "unit": ["./test/unit"],
     }
-    session.run("pytest", minimal_tests["unit"]) #type: ignore
+    session.run("pytest", *minimal_tests["unit"])
     for test in minimal_tests["new-itest"]:
         session.run(
             "pytest",
