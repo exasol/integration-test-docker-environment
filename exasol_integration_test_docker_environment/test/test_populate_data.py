@@ -66,6 +66,7 @@ class TestPopulateData(unittest.TestCase):
     def _execute_sql_on_db(self, sql: str) -> str:
         with ContextDockerClient() as docker_client:
             print(f"Executing sql on db: '{sql}'")
+            #environment is a class variable, need to suppress type check
             environment = self.environment # type: ignore
             test_container = docker_client.containers.get(environment.environment_info.
                                                           test_container_info.container_name)
