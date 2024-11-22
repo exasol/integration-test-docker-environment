@@ -128,9 +128,9 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
         return network_info, database_info, is_database_ready, test_container_info
 
     def _create_ssl_certificates(self) -> Generator[BaseTask, None, Optional[DockerVolumeInfo]]:
-        ssl_info_future = yield from self.run_dependencies(self.create_ssl_certificates())
-        ssl_info : Optional[DockerVolumeInfo] = self.get_values_from_future(ssl_info_future) # type: ignore
-        return ssl_info
+        ssl_volume_info_future = yield from self.run_dependencies(self.create_ssl_certificates())
+        ssl_volume_info : Optional[DockerVolumeInfo] = self.get_values_from_future(ssl_volume_info_future) # type: ignore
+        return ssl_volume_info
 
     def create_ssl_certificates(self):
         raise AbstractMethodException()
