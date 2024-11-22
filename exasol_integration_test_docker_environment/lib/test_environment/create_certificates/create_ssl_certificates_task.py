@@ -56,11 +56,11 @@ class CreateSSLCertificatesTask(DockerBaseTask):
 
         self.return_object(self.volume_info)
 
-    def build_image(self) -> Generator[BaseTask, None, Set[str]]:
+    def build_image(self) -> Generator[BaseTask, None, Set[ImageInfo]]:
         task = self.create_child_task(task_class=DockerCertificateContainerBuild,
                                       certificate_container_root_directory=self._temp_resource_directory.tmp_directory)
         image_infos_future = yield from self.run_dependencies(task)
-        image_infos = self.get_values_from_future(image_infos_future)
+        image_infos: Set[ImageInfo] = self.get_values_from_future(image_infos_future) # type: ignore
         return image_infos
 
     def get_volume_info(self, reused: bool) -> DockerVolumeInfo:
