@@ -337,8 +337,8 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         certificate_dir = CERTIFICATES_MOUNT_DIR if self.certificate_volume_name is not None \
                             else CERTIFICATES_DEFAULT_DIR
         template_file = self._db_file("EXAConf")
-        template = Template(template_file.read_text()) # type: ignore
-        additional_db_parameter_str = " ".join(self.additional_db_parameter) # type: ignore
+        template = Template(template_file.read_text())
+        additional_db_parameter_str = " ".join(self.additional_db_parameter)
         rendered_template = template.render(private_network=db_private_network,
                                             db_version=str(self.db_version),
                                             db_port=self.internal_ports.database,
@@ -347,7 +347,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                                             image_version=self.docker_db_image_version,
                                             mem_size=self.mem_size,
                                             disk_size=self.disk_size,
-                                            name_servers=",".join(self.nameservers), # type: ignore
+                                            name_servers=",".join(self.nameservers),
                                             certificate_dir=certificate_dir,
                                             additional_db_parameters=additional_db_parameter_str,
                                             authorized_keys=authorized_keys)

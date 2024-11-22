@@ -143,7 +143,7 @@ class ExaslctTestEnvironment:
             ports=ports,
         )
 
-        arguments = [
+        arguments : List[str] = [
             f"--environment-name {on_host_parameter.name}",
             f"--database-port-forward {on_host_parameter.ports.database}",
             f"--bucketfs-port-forward {on_host_parameter.ports.bucketfs}",
@@ -154,9 +154,9 @@ class ExaslctTestEnvironment:
             arguments.append(f'--docker-db-image-version "{db_version}"')
         if additional_parameter:
             arguments += additional_parameter
-        arguments = " ".join(arguments) #type: ignore
+        arguments_str = " ".join(arguments)
 
-        command = f"{self.executable} spawn-test-environment {arguments}"
+        command = f"{self.executable} spawn-test-environment {arguments_str}"
         completed_process = self.run_command(command, use_flavor_path=False, use_docker_repository=False,
                                              capture_output=True)
         on_host_parameter.completed_process = completed_process

@@ -53,7 +53,7 @@ def smoke_test_sql(exaplus_path: str, env: ExaslctDockerTestEnvironment) -> str:
 
     assert env.environment_info
     db_info = env.environment_info.database_info
-    command = [
+    command : List[str] = [
         str(exaplus_path),
         "-c", quote(f"{db_info.host}:{db_info.ports.database}"),
         "-u", quote(env.db_username),
@@ -65,8 +65,8 @@ def smoke_test_sql(exaplus_path: str, env: ExaslctDockerTestEnvironment) -> str:
         "-jdbcparam",
         "validateservercertificate=0",
     ]
-    command = " ".join(command) #type: ignore
-    return f'bash -c "{command}" '
+    command_str = " ".join(command)
+    return f'bash -c "{command_str}" '
 
 
 def test_db_container_started(cli_database):
