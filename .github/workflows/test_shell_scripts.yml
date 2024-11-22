@@ -1,6 +1,7 @@
 name: Test Shell Scripts
 
-on: [push]
+on:
+  workflow_call:
 
 jobs:
   build:
@@ -9,6 +10,9 @@ jobs:
     steps:
       - name: SCM Checkout
         uses: actions/checkout@v4
+
+      - name: Run shellcheck
+        run: ./scripts/build/shellcheck.sh
 
       - name: Install Test Dependencies
         run: |
@@ -19,4 +23,6 @@ jobs:
 
       - name: Run Starter Script Tests
         run: starter_scripts/test/test_scripts.sh
+
+
 

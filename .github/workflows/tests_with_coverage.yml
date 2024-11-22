@@ -37,7 +37,14 @@ jobs:
           name: coverage-python${{ matrix.python-version }}
           path: .coverage
           include-hidden-files: true
-
+  Db-Version-Minimal-Tests:
+    uses: ./.github/workflows/test_db_versions_minimal.yml
+  Test-Docker-Starter:
+    uses: ./.github/workflows/test_docker_starter.yml
+  Test-Python-Version:
+    uses: ./.github/workflows/test_python_version.yml
+  Test-Shell-Scripts:
+    uses: ./.github/workflows/test_shell_scripts.yml
   Slow-Tests:
     name: Slow
     runs-on: ubuntu-latest
@@ -55,4 +62,7 @@ jobs:
     steps:
       - name: Tests
         run: |
-          echo "Slow tests ran successfully"
+          echo "Slow tests approved"
+  Test-Db-Versions-All-Tests:
+    needs: Slow-Tests
+    uses: ./.github/workflows/test_db_versions_all_tests.yml
