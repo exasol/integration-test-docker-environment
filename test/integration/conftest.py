@@ -3,11 +3,8 @@ import io
 
 import pytest
 
-from typing import Any, Callable, Dict, Iterator, List, NewType, Optional, Generator
+from typing import Any, Callable, Dict, Iterator, List, NewType, Optional, Generator, ContextManager
 
-from typing_extensions import Never
-
-from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from test.integration.helpers import normalize_request_name
 from exasol_integration_test_docker_environment.testing import utils
 from exasol_integration_test_docker_environment \
@@ -52,7 +49,7 @@ CliContextProvider = NewType( # type: ignore
 
 
 @pytest.fixture
-def cli_database(cli_isolation) -> CliContextProvider:
+def cli_database(cli_isolation) -> Callable[[Optional[str], Optional[list[str]]], ContextManager[SpawnedTestEnvironments]]:
     """
     Returns a method that test case implementations can use to create a
     context with a database.
@@ -65,11 +62,11 @@ def cli_database(cli_isolation) -> CliContextProvider:
             ...
     """
 
-    @contextlib.contextmanager # type: ignore
-    def create_context( # type: ignore
+    @contextlib.contextmanager
+    def create_context(
             name: Optional[str] = None,
             additional_parameters: Optional[List[str]] = None,
-    ) -> SpawnedTestEnvironments:
+    ) -> Iterator[SpawnedTestEnvironments]:
         name = name if name else cli_isolation.name
         spawned = cli_isolation.spawn_docker_test_environments(
             name=name,
@@ -78,7 +75,7 @@ def cli_database(cli_isolation) -> CliContextProvider:
         yield spawned
         utils.close_environments(spawned)
 
-    return create_context # type: ignore
+    return create_context
 
 
 ApiContextProvider = NewType( # type: ignore
