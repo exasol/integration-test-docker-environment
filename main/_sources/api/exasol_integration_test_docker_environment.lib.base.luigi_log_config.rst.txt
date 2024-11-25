@@ -12,3 +12,9 @@ exasol\_integration\_test\_docker\_environment.lib.base.luigi\_log\_config
       get_luigi_log_config
       restore_logger
    
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      LogInfoStorage
+   
