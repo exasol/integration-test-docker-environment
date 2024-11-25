@@ -3,11 +3,21 @@ import json
 import logging
 import shutil
 from pathlib import Path
-from typing import Any, Dict, Generator, List, Set, Union
+from typing import (
+    Any,
+    Dict,
+    Generator,
+    List,
+    Set,
+    Union,
+)
 
 import luigi
 import six
-from luigi import Task, util
+from luigi import (
+    Task,
+    util,
+)
 from luigi.parameter import ParameterVisibility
 from luigi.task import TASK_ID_TRUNCATE_HASH
 

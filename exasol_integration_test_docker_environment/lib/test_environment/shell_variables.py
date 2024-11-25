@@ -1,4 +1,7 @@
-from typing import Dict, Optional
+from typing import (
+    Dict,
+    Optional,
+)
 
 from exasol_integration_test_docker_environment.lib.data.environment_info import (
     EnvironmentInfo,

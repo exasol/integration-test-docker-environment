@@ -1,6 +1,9 @@
 import threading
 import time
-from datetime import datetime, timedelta
+from datetime import (
+    datetime,
+    timedelta,
+)
 
 from exasol_integration_test_docker_environment.lib.config.log_config import log_config
 

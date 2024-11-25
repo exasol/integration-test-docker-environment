@@ -1,5 +1,8 @@
 from pathlib import Path
-from typing import List, Optional
+from typing import (
+    List,
+    Optional,
+)
 
 from exasol_integration_test_docker_environment.lib.base.info import Info
 

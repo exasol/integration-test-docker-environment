@@ -1,6 +1,9 @@
 from inspect import cleandoc
 from test.integration.helpers import get_executor_factory
-from typing import List, Optional
+from typing import (
+    List,
+    Optional,
+)
 
 import docker
 import pytest

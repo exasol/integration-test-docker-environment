@@ -1,6 +1,10 @@
 import contextlib
 import re
-from typing import Any, Union, cast
+from typing import (
+    Any,
+    Union,
+    cast,
+)
 from unittest.mock import Mock
 
 from exasol_integration_test_docker_environment.lib.base.db_os_executor import (

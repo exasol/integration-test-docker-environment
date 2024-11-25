@@ -1,6 +1,10 @@
 import abc
 from pathlib import Path
-from typing import Dict, Optional, Type
+from typing import (
+    Dict,
+    Optional,
+    Type,
+)
 
 import docker
 import git

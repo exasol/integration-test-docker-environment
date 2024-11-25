@@ -2,7 +2,11 @@ import dataclasses
 import io
 import re
 import time
-from contextlib import ExitStack, redirect_stderr, redirect_stdout
+from contextlib import (
+    ExitStack,
+    redirect_stderr,
+    redirect_stdout,
+)
 from test.matchers import regex_matcher
 
 import pytest

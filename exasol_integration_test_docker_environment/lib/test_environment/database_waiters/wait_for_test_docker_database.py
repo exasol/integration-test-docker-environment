@@ -1,7 +1,10 @@
 import gzip
 import pathlib
 import time
-from datetime import datetime, timedelta
+from datetime import (
+    datetime,
+    timedelta,
+)
 
 import luigi
 from docker.models.containers import Container

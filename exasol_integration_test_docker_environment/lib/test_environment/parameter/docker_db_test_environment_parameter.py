@@ -1,5 +1,11 @@
-from enum import Enum, auto
-from typing import List, Optional
+from enum import (
+    Enum,
+    auto,
+)
+from typing import (
+    List,
+    Optional,
+)
 
 import luigi
 from luigi import Config

@@ -1,6 +1,9 @@
 import base64
 import hashlib
-from pathlib import Path, PurePath
+from pathlib import (
+    Path,
+    PurePath,
+)
 from typing import Dict
 
 # TODO add hash config to the hash

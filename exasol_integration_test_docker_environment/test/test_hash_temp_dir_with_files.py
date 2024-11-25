@@ -2,7 +2,10 @@ import base64
 import os
 import tempfile
 import unittest
-from pathlib import Path, PurePath
+from pathlib import (
+    Path,
+    PurePath,
+)
 
 from exasol_integration_test_docker_environment.lib.docker.images.create.utils.file_directory_list_hasher import (
     FileDirectoryListHasher,

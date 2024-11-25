@@ -1,5 +1,10 @@
 from pathlib import Path
-from typing import Any, Generator, Optional, Tuple
+from typing import (
+    Any,
+    Generator,
+    Optional,
+    Tuple,
+)
 
 import luigi
 

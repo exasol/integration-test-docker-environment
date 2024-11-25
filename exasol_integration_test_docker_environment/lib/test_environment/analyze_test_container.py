@@ -1,4 +1,7 @@
-from typing import Dict, Set
+from typing import (
+    Dict,
+    Set,
+)
 
 from exasol_integration_test_docker_environment.lib.config.build_config import (
     build_config,

@@ -4,7 +4,11 @@ import shutil
 import tempfile
 from pathlib import Path
 from sys import stderr
-from typing import Any, Dict, Optional
+from typing import (
+    Any,
+    Dict,
+    Optional,
+)
 
 from exasol_integration_test_docker_environment.lib.api import (
     spawn_test_environment,

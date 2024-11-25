@@ -6,7 +6,11 @@ package and also provide help to find potential fixes.
 import sys
 from collections.abc import Callable
 from enum import Enum
-from typing import Iterable, List, Tuple
+from typing import (
+    Iterable,
+    List,
+    Tuple,
+)
 
 import docker
 from docker.errors import DockerException

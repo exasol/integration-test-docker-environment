@@ -1,5 +1,8 @@
 import logging
-from pathlib import Path, PurePath
+from pathlib import (
+    Path,
+    PurePath,
+)
 
 import luigi
 

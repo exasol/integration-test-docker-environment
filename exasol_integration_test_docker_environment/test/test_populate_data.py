@@ -1,5 +1,8 @@
 import unittest
-from pathlib import Path, PurePath
+from pathlib import (
+    Path,
+    PurePath,
+)
 from sys import stderr
 
 import luigi

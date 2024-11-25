@@ -1,7 +1,10 @@
 import traceback
 from collections import OrderedDict
 from pathlib import Path
-from typing import Dict, List
+from typing import (
+    Dict,
+    List,
+)
 
 from exasol_integration_test_docker_environment.lib.base.timeable_base_task import (
     TimeableBaseTask,
@@ -60,7 +63,7 @@ class StoppableBaseTask(TimeableBaseTask):
                 exception = f.read().strip()
                 prefix = "    "
                 formatted_exception = prefix + prefix.join(exception.splitlines(True))
-                failure_message = "- {}:\n{}".format(self.task_id, formatted_exception)
+                failure_message = f"- {self.task_id}:\n{formatted_exception}"
                 failures[failure_message] = None
 
         return failures

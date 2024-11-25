@@ -1,4 +1,7 @@
-from typing import Any, Dict
+from typing import (
+    Any,
+    Dict,
+)
 
 import luigi
 import pytest

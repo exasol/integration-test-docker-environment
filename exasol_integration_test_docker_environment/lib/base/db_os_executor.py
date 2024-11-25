@@ -1,11 +1,18 @@
 import time
 from abc import abstractmethod
-from typing import Optional, Protocol, runtime_checkable
+from typing import (
+    Optional,
+    Protocol,
+    runtime_checkable,
+)
 
 import docker
 import fabric
 from docker import DockerClient
-from docker.models.containers import Container, ExecResult
+from docker.models.containers import (
+    Container,
+    ExecResult,
+)
 from paramiko.ssh_exception import NoValidConnectionsError
 
 from exasol_integration_test_docker_environment.lib.base.ssh_access import SshKey

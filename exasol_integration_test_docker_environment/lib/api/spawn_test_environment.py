@@ -1,5 +1,10 @@
 import functools
-from typing import Any, Callable, Optional, Tuple
+from typing import (
+    Any,
+    Callable,
+    Optional,
+    Tuple,
+)
 
 import humanfriendly
 

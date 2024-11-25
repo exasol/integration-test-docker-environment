@@ -1,4 +1,9 @@
-from typing import Dict, Generator, Optional, Set
+from typing import (
+    Dict,
+    Generator,
+    Optional,
+    Set,
+)
 
 import docker
 import luigi

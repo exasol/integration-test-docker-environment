@@ -3,7 +3,10 @@ import time
 import unittest
 
 import luigi
-from luigi import Config, Parameter
+from luigi import (
+    Config,
+    Parameter,
+)
 
 from exasol_integration_test_docker_environment.lib.api.common import generate_root_task
 from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import (

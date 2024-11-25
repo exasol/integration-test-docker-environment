@@ -7,7 +7,11 @@ import warnings
 from contextlib import redirect_stderr
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Any, Dict, Optional
+from typing import (
+    Any,
+    Dict,
+    Optional,
+)
 
 LOGGER_STR = "logger_str"
 

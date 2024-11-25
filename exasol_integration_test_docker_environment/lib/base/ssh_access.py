@@ -3,7 +3,10 @@ import os
 import tempfile
 from pathlib import Path
 from string import Template
-from typing import Optional, Union
+from typing import (
+    Optional,
+    Union,
+)
 
 import paramiko
 import portalocker

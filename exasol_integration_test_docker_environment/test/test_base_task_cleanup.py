@@ -2,7 +2,10 @@ import shutil
 import unittest
 
 import luigi
-from luigi import BoolParameter, IntParameter
+from luigi import (
+    BoolParameter,
+    IntParameter,
+)
 
 from exasol_integration_test_docker_environment.lib.api.common import generate_root_task
 from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import (

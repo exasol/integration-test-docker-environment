@@ -7,7 +7,10 @@ import subprocess
 import tempfile
 from pathlib import Path
 from sys import stderr
-from typing import List, Optional
+from typing import (
+    List,
+    Optional,
+)
 
 from exasol_integration_test_docker_environment.lib.data.environment_info import (
     EnvironmentInfo,

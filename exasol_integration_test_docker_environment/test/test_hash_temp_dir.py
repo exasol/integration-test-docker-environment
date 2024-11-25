@@ -3,7 +3,10 @@ import os
 import shutil
 import tempfile
 import unittest
-from pathlib import Path, PurePath
+from pathlib import (
+    Path,
+    PurePath,
+)
 
 from exasol_integration_test_docker_environment.lib.docker.images.create.utils.file_directory_list_hasher import (
     FileDirectoryListHasher,
@@ -50,16 +53,18 @@ class HashTempDirTest(unittest.TestCase):
             for i2 in range(level2):
                 for i3 in range(level3):
                     for i4 in range(level4):
-                        path = "/level0/level1_%s/level2_%s/level3_%s/level4_%s/" % (
-                            i1,
-                            i2,
-                            i3,
-                            i4,
+                        path = (
+                            "/level0/level1_{}/level2_{}/level3_{}/level4_{}/".format(
+                                i1,
+                                i2,
+                                i3,
+                                i4,
+                            )
                         )
                         os.makedirs(test_dir + path)
                         os.makedirs(test_dir + path + "test")
                         for i5 in range(level5):
-                            file = "{}/level5_file_{}".format(path, i5)
+                            file = f"{path}/level5_file_{i5}"
                             with open(test_dir + file, mode="w") as f:
                                 f.write(file)
 

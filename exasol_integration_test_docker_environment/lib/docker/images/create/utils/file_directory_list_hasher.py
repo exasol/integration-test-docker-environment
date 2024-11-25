@@ -3,8 +3,14 @@ import os
 import stat
 from dataclasses import dataclass
 from multiprocessing import Pool
-from pathlib import Path, PurePath
-from typing import Callable, List
+from pathlib import (
+    Path,
+    PurePath,
+)
+from typing import (
+    Callable,
+    List,
+)
 
 import humanfriendly
 

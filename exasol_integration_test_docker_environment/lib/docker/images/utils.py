@@ -1,4 +1,7 @@
-from typing import Callable, List
+from typing import (
+    Callable,
+    List,
+)
 
 
 def find_images_by_tag(docker_client, condition: Callable[[str], bool]) -> List:

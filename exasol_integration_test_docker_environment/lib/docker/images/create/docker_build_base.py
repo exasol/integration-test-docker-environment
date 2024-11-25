@@ -1,5 +1,8 @@
 import copy
-from typing import Dict, Set
+from typing import (
+    Dict,
+    Set,
+)
 
 from exasol_integration_test_docker_environment.abstract_method_exception import (
     AbstractMethodException,

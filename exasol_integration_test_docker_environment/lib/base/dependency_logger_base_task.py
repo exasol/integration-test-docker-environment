@@ -1,5 +1,8 @@
 from pathlib import Path
-from typing import Generator, List
+from typing import (
+    Generator,
+    List,
+)
 
 import luigi
 from luigi import Task

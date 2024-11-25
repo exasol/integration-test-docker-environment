@@ -1,5 +1,9 @@
 from test.integration.helpers import mock_cast
-from unittest.mock import MagicMock, call, create_autospec
+from unittest.mock import (
+    MagicMock,
+    call,
+    create_autospec,
+)
 
 from docker import DockerClient
 from docker.models.containers import Container as DockerContainer

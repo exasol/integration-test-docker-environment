@@ -1,7 +1,11 @@
 import json
 import os
 import unittest
-from typing import Callable, List, Optional
+from typing import (
+    Callable,
+    List,
+    Optional,
+)
 
 import requests
 

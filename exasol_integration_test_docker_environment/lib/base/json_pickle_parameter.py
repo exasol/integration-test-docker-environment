@@ -1,5 +1,9 @@
 import jsonpickle
-from luigi.parameter import Parameter, ParameterVisibility, _no_value
+from luigi.parameter import (
+    Parameter,
+    ParameterVisibility,
+    _no_value,
+)
 
 
 class JsonPickleParameter(Parameter):

@@ -1,7 +1,11 @@
 import shutil
 import unittest
 from pathlib import Path
-from typing import Dict, List, Set
+from typing import (
+    Dict,
+    List,
+    Set,
+)
 
 import luigi
 from luigi import Parameter

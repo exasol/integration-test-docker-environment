@@ -4,7 +4,13 @@ import os
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable, Generator, List, Optional
+from typing import (
+    Any,
+    Callable,
+    Generator,
+    List,
+    Optional,
+)
 
 import jinja2
 

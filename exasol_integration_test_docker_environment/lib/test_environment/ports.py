@@ -1,6 +1,10 @@
 import socket
 from contextlib import ExitStack
-from typing import Generator, List, Optional
+from typing import (
+    Generator,
+    List,
+    Optional,
+)
 
 
 def find_free_ports(num_ports: int) -> List[int]:

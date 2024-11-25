@@ -1,6 +1,10 @@
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, Optional
+from typing import (
+    Any,
+    Dict,
+    Optional,
+)
 
 from exasol_integration_test_docker_environment.lib.base.info import Info
 

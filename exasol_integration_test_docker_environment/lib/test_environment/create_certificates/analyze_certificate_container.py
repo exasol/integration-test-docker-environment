@@ -1,4 +1,7 @@
-from typing import Dict, Set
+from typing import (
+    Dict,
+    Set,
+)
 
 import luigi
 

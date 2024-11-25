@@ -1,5 +1,10 @@
 import inspect
-from typing import Any, List, Optional, Tuple
+from typing import (
+    Any,
+    List,
+    Optional,
+    Tuple,
+)
 
 import click
 
