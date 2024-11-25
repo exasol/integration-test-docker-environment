@@ -23,3 +23,6 @@ jobs:
   metrics:
     needs: [ ci-job ]
     uses: ./.github/workflows/report.yml
+
+  publish-docker-runnmer:
+    uses: ./.github/workflows/publish_docker_runner.yml
