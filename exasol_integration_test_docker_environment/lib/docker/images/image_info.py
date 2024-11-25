@@ -10,17 +10,17 @@ from exasol_integration_test_docker_environment.lib.base.info import Info
 
 
 class ImageState(Enum):
-    NOT_EXISTING = (0,)
+    NOT_EXISTING = 0
     # After analyze phase or if build phase did touch the image
-    NEEDS_TO_BE_BUILD = (1,)
-    TARGET_LOCALLY_AVAILABLE = (2,)
-    SOURCE_LOCALLY_AVAILABLE = (3,)
-    REMOTE_AVAILABLE = (4,)
-    CAN_BE_LOADED = (5,)
+    NEEDS_TO_BE_BUILD = 1
+    TARGET_LOCALLY_AVAILABLE = 2
+    SOURCE_LOCALLY_AVAILABLE = 3
+    REMOTE_AVAILABLE = 4
+    CAN_BE_LOADED = 5
     # After build phase
-    WAS_BUILD = (6,)
-    USED_LOCAL = (7,)
-    WAS_PULLED = (8,)
+    WAS_BUILD = 6
+    USED_LOCAL = 7
+    WAS_PULLED = 8
     WAS_LOADED = 9
     WAS_TAGED = 10
 
