@@ -44,6 +44,7 @@ def get_executor_factory(
     if db_os_access == DbOsAccess.SSH:
         return SshExecFactory.from_database_info(dbinfo)
     client_factory = DockerClientFactory(timeout=100000)
+    assert dbinfo.container_info
     return DockerExecFactory(dbinfo.container_info.container_name, client_factory)
 
 

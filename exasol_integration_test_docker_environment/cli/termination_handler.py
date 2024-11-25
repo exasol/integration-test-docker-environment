@@ -48,7 +48,7 @@ class TerminationHandler:
     def _print_task_failures(task_error: TaskRuntimeError):
         print_err()
         print_err("Task failure message: %s" % task_error.msg)
-        print_err(task_error.__cause__.args[0])
+        print_err(task_error.__cause__.args[0]) # type: ignore
         print_err()
 
     def _handle_success(self):

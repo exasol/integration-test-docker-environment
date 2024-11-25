@@ -46,7 +46,7 @@ class StoppableBaseTask(TimeableBaseTask):
                     f.write("%s" % self.task_id)
 
     def collect_failures(self) -> Dict[str,None]:
-        failures = OrderedDict()
+        failures : Dict[str, None] = OrderedDict()
         failures.update(self.collect_failures_of_child_tasks())
         if self.get_failure_log_path().exists():
             with self.get_failure_log_path().open("r") as f:
@@ -59,7 +59,7 @@ class StoppableBaseTask(TimeableBaseTask):
         return failures
 
     def collect_failures_of_child_tasks(self) -> Dict[str,None]:
-        failures_of_child_tasks = OrderedDict()
+        failures_of_child_tasks : Dict[str, None] = OrderedDict()
         if self._run_dependencies_target.exists():
             _run_dependencies_tasks_from_target = self._run_dependencies_target.read()
         else:

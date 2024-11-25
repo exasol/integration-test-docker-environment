@@ -239,7 +239,7 @@ class APIClientLoggingTest(unittest.TestCase):
         return logger_infos
 
     def get_logger_info(self, logger: logging.Logger) -> Dict[str, Any]:
-        logger_info = {}
+        logger_info : Dict[str, Any] = dict()
         logger_info[LOGGER_STR] = str(logger)
         logger_info[LEVEL] = logger.level
         logger_info[LEVEL_NAME] = logging.getLevelName(logger.level)

@@ -7,7 +7,7 @@ import tempfile
 from pathlib import Path
 import shlex
 from sys import stderr
-from typing import List
+from typing import List, Optional
 
 from exasol_integration_test_docker_environment.lib.data.environment_info import EnvironmentInfo
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
@@ -130,7 +130,7 @@ class ExaslctTestEnvironment:
         except Exception as e:
             print(e, file=stderr)
 
-    def spawn_docker_test_environments(self, name: str, additional_parameter: List[str] = None) \
+    def spawn_docker_test_environments(self, name: str, additional_parameter: Optional[List[str]] = None) \
             -> SpawnedTestEnvironments:
         ports = Ports.random_free()
         on_host_parameter = ExaslctDockerTestEnvironment(
@@ -143,7 +143,7 @@ class ExaslctTestEnvironment:
             ports=ports,
         )
 
-        arguments = [
+        arguments : List[str] = [
             f"--environment-name {on_host_parameter.name}",
             f"--database-port-forward {on_host_parameter.ports.database}",
             f"--bucketfs-port-forward {on_host_parameter.ports.bucketfs}",
@@ -154,9 +154,9 @@ class ExaslctTestEnvironment:
             arguments.append(f'--docker-db-image-version "{db_version}"')
         if additional_parameter:
             arguments += additional_parameter
-        arguments = " ".join(arguments)
+        arguments_str = " ".join(arguments)
 
-        command = f"{self.executable} spawn-test-environment {arguments}"
+        command = f"{self.executable} spawn-test-environment {arguments_str}"
         completed_process = self.run_command(command, use_flavor_path=False, use_docker_repository=False,
                                              capture_output=True)
         on_host_parameter.completed_process = completed_process
@@ -168,7 +168,7 @@ class ExaslctTestEnvironment:
             with environment_info_json_path.open() as f:
                 environment_info = EnvironmentInfo.from_json(f.read())
                 on_host_parameter.environment_info = environment_info
-        on_host_parameter.clean_up = functools.partial(_cleanup, on_host_parameter.name)
+        on_host_parameter.clean_up = functools.partial(_cleanup, on_host_parameter.name) #type: ignore
         if "RUN_SLC_TESTS_WITHIN_CONTAINER" in os.environ:
             slc_test_run_parameter = ExaslctDockerTestEnvironment(
                 name=on_host_parameter.name,
@@ -178,7 +178,7 @@ class ExaslctTestEnvironment:
                 bucketfs_username=on_host_parameter.bucketfs_username,
                 bucketfs_password=on_host_parameter.bucketfs_password,
                 ports=Ports.default_ports,
-                environment_info=on_host_parameter.completed_process,
+                environment_info=on_host_parameter.environment_info,
                 completed_process=on_host_parameter.completed_process
             )
 

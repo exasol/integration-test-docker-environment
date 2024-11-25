@@ -233,6 +233,7 @@ class PathHasher:
     def hash(self, path_mapping: DestinationMapping):
         src_path = path_mapping.source_path
         dest_path = path_mapping.destination_path
+        assert self.hash_func
         hasher = self.hash_func()
         hasher.update(str(dest_path).encode('utf-8'))
         if self.hash_permissions:
@@ -252,6 +253,7 @@ class FileContentHasher:
             raise NotImplementedError('{} not implemented.'.format(hashfunc))
 
     def hash(self, filepath: Path):
+        assert self.hash_func
         hasher = self.hash_func()
         with open(filepath, 'rb') as fp:
             while True:

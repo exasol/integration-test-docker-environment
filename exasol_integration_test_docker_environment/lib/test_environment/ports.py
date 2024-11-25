@@ -1,6 +1,6 @@
 import socket
 from contextlib import ExitStack
-from typing import List, Optional
+from typing import List, Optional, Generator
 
 
 def find_free_ports(num_ports: int) -> List[int]:
@@ -9,7 +9,7 @@ def find_free_ports(num_ports: int) -> List[int]:
     def bind(sock: socket.socket, port: int):
         sock.bind(('', port))
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    def acquire_port_numbers(num_ports: int) -> List[int]:
+    def acquire_port_numbers(num_ports: int) -> Generator[int, None, None]:
         with ExitStack() as stack:
             sockets = [stack.enter_context(new_socket()) for dummy in range(num_ports)]
             for sock in sockets:
@@ -55,5 +55,6 @@ class Ports(metaclass=PortsType):
 
     @classmethod
     def random_free(cls, ssh: bool = True) -> 'Ports':
-        ports = find_free_ports(3 if ssh else 2) + [None]
-        return Ports(*ports[:3])
+        count = 3 if ssh else 2
+        ports = find_free_ports(count)
+        return Ports(ports[0], ports[1], None) if not ssh else Ports(ports[0], ports[1], ports[2])

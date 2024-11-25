@@ -3,7 +3,8 @@ The doctor module provides functionality to check the health of the `exasol_inte
 package and also provide help to find potential fixes.
 """
 import sys
-from typing import Iterable
+from collections.abc import Callable
+from typing import Iterable, List, Tuple
 from exasol import error
 from enum import Enum
 
@@ -78,9 +79,11 @@ def health_checkup() -> Iterable[error.ExaError]:
 
     return an iterator of error codes specifying which problems have been identified.
     """
-    examinations = [
+    check_function = Callable[[],bool]
+    diagnosis_function = Callable[[],Iterable[error.ExaError]]
+    examinations : List[Tuple[check_function, diagnosis_function]] = [
         (is_docker_daemon_available, diagnose_docker_daemon_not_available),
-        (is_supported_platform, lambda: Error.TargetPlatformNotSupported),
+        (is_supported_platform, lambda: [Error.TargetPlatformNotSupported]),
     ]
     for is_fine, diagnosis in examinations:
         if not is_fine():

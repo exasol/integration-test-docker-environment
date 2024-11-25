@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Generator, Tuple, Optional
+from typing import Generator, Tuple, Optional, Any
 from exasol_integration_test_docker_environment.lib.docker.container.utils import default_bridge_ip_address
 
 import luigi
@@ -28,7 +28,7 @@ TEST_CONTAINER = "test_container"
 class AbstractSpawnTestEnvironment(DockerBaseTask,
                                    GeneralSpawnTestEnvironmentParameter,
                                    DatabaseCredentialsParameter):
-    environment_name = luigi.Parameter()  # type: str
+    environment_name : str = luigi.Parameter()  # type: ignore
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -68,6 +68,7 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
             shell_variables: ShellVariables,
             json: str,
     ):
+        assert test_environment_info.test_container_info
         test_container_name = test_environment_info.test_container_info.container_name
         with self._get_docker_client() as docker_client:
             test_container = docker_client.containers.get(test_container_name)
@@ -102,36 +103,34 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
                 json,
             )
 
-    def _default_bridge_ip_address(self, test_environment_info) -> str:
-        if test_environment_info.database_info.container_info is None:
-            return None
-        container_name = test_environment_info.database_info.container_info.container_name
-        with self._get_docker_client() as docker_client:
-            db_container = docker_client.containers.get(container_name)
-            return default_bridge_ip_address(db_container)
+    def _default_bridge_ip_address(self, test_environment_info) -> Optional[str]:
+        if test_environment_info.database_info.container_info is not None:
+            container_name = test_environment_info.database_info.container_info.container_name
+            with self._get_docker_client() as docker_client:
+                db_container = docker_client.containers.get(container_name)
+                return default_bridge_ip_address(db_container)
+        return None
 
     def collect_shell_variables(self, test_environment_info) -> ShellVariables:
-        default_bridge_ip_address = self._default_bridge_ip_address(test_environment_info)
         return ShellVariables.from_test_environment_info(
-            default_bridge_ip_address,
+            self._default_bridge_ip_address(test_environment_info),
             test_environment_info,
         )
 
     def _start_database(self, attempt) \
-            -> Generator[BaseTask, BaseTask, Tuple[DockerNetworkInfo, DatabaseInfo, bool, Optional[ContainerInfo]]]:
+            -> Generator[Any, None, Tuple[DockerNetworkInfo, DatabaseInfo, bool, Optional[ContainerInfo]]]:
         network_info = yield from self._create_network(attempt)
         ssl_volume_info = None
         if self.create_certificates:
             ssl_volume_info = yield from self._create_ssl_certificates()
-        database_info, test_container_info = \
-            yield from self._spawn_database_and_test_container(network_info, ssl_volume_info, attempt)
+        database_info, test_container_info = yield from self._spawn_database_and_test_container(network_info, ssl_volume_info, attempt)
         is_database_ready = yield from self._wait_for_database(database_info, attempt)
         return network_info, database_info, is_database_ready, test_container_info
 
-    def _create_ssl_certificates(self) -> DockerVolumeInfo:
-        ssl_info_future = yield from self.run_dependencies(self.create_ssl_certificates())
-        ssl_info = self.get_values_from_future(ssl_info_future)
-        return ssl_info
+    def _create_ssl_certificates(self) -> Generator[BaseTask, None, Optional[DockerVolumeInfo]]:
+        ssl_volume_info_future = yield from self.run_dependencies(self.create_ssl_certificates())
+        ssl_volume_info : Optional[DockerVolumeInfo] = self.get_values_from_future(ssl_volume_info_future) # type: ignore
+        return ssl_volume_info
 
     def create_ssl_certificates(self):
         raise AbstractMethodException()
@@ -149,7 +148,7 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
             network_info: DockerNetworkInfo,
             certificate_volume_info: Optional[DockerVolumeInfo],
             attempt: int,
-    ) -> Tuple[DatabaseInfo, Optional[ContainerInfo]]:
+    ) -> Generator[BaseTask, None, Tuple[DatabaseInfo, Optional[ContainerInfo]]]:
         def volume_name(info):
             return None if info is None else info.volume_name
 
@@ -169,8 +168,8 @@ class AbstractSpawnTestEnvironment(DockerBaseTask,
             )
         futures = yield from self.run_dependencies(child_tasks)
         results = self.get_values_from_futures(futures)
-        database_info = results[DATABASE]
-        test_container_info = results[TEST_CONTAINER] if self.test_container_content is not None else None
+        database_info : DatabaseInfo = results[DATABASE] # type: ignore
+        test_container_info : Optional[ContainerInfo] = results[TEST_CONTAINER] if self.test_container_content is not None else None  # type: ignore
         return database_info, test_container_info
 
     def create_spawn_database_task(self,

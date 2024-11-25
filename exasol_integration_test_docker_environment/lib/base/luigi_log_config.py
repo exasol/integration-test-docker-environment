@@ -2,10 +2,12 @@ import contextlib
 import os
 import tempfile
 from pathlib import Path
-from typing import Optional, Callable
+from typing import Optional, Callable, Generator, List, Any
+from dataclasses import dataclass
 
 import jinja2
 import logging
+
 from exasol_integration_test_docker_environment.lib import PACKAGE_NAME
 from exasol_integration_test_docker_environment.lib.config.build_config import build_config
 
@@ -40,28 +42,30 @@ def get_log_path(job_id: str) -> Path:
     log_path_dir.mkdir(parents=True, exist_ok=True)
     return log_path
 
+@dataclass
+class LogInfoStorage:
+    level : int
+    handlers: List[logging.Handler]
+    filters: List[Any]
+    propagate: bool
 
 @contextlib.contextmanager
 def restore_logger(logger_creator: Callable[[], logging.Logger]):
     before_logger = logger_creator()
-    logger_info = {
-        LOG_LEVEL: before_logger.level,
-        HANDLERS: list(before_logger.handlers),
-        FILTERS: list(before_logger.filters),
-        PROPAGATE: before_logger.propagate
-    }
+    logger_info_before = LogInfoStorage(level=before_logger.level, handlers=list(before_logger.handlers),
+                                        filters=list(before_logger.filters), propagate=before_logger.propagate)
     yield
     after_logger = logger_creator()
-    after_logger.level = logger_info[LOG_LEVEL]
-    after_logger.handlers = logger_info[HANDLERS]
-    after_logger.filters = logger_info[FILTERS]
-    after_logger.propagate = logger_info[PROPAGATE]
+    after_logger.level = logger_info_before.level
+    after_logger.handlers = logger_info_before.handlers
+    after_logger.filters = logger_info_before.filters
+    after_logger.propagate = logger_info_before.propagate
 
 
 @contextlib.contextmanager
 def get_luigi_log_config(log_file_target: Path,
                          use_job_specific_log_file: bool,
-                         log_level: Optional[str] = None) -> Path:
+                         log_level: Optional[str] = None) -> Generator[Path, None, None]:
     """
     Yields a context manager containing the path of the log-config file.
     log_file_target contains the location of the log-file.

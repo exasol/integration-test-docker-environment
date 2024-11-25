@@ -1,5 +1,6 @@
 import math
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List, Union
+from pathlib import Path
 
 import docker
 import humanfriendly
@@ -10,6 +11,7 @@ import importlib_resources
 from docker.models.containers import Container
 from docker.models.volumes import Volume
 from docker.client import DockerClient
+from importlib_resources.abc import Traversable
 from jinja2 import Template
 
 from exasol_integration_test_docker_environment.lib import PACKAGE_NAME
@@ -49,16 +51,16 @@ def int_or_none(value: str) -> Optional[int]:
 
 
 class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
-    environment_name = luigi.Parameter()  # type: str
-    db_container_name = luigi.Parameter()  # type: str
-    attempt = luigi.IntParameter(1)  # type: int
-    network_info = JsonPickleParameter(DockerNetworkInfo, significant=False)  # type: DockerNetworkInfo
-    ip_address_index_in_subnet = luigi.IntParameter(significant=False)  # type: int
-    docker_runtime = luigi.OptionalParameter(None, significant=False)  # type: str
-    certificate_volume_name = luigi.OptionalParameter(None, significant=False)
-    additional_db_parameter = luigi.ListParameter()
-    ssh_user = luigi.Parameter("root")
-    ssh_key_file = luigi.OptionalParameter(None, significant=False)
+    environment_name : str = luigi.Parameter()  # type: ignore
+    db_container_name : str = luigi.Parameter()  # type: ignore
+    attempt : int = luigi.IntParameter(1)  # type: ignore
+    network_info : DockerNetworkInfo = JsonPickleParameter(DockerNetworkInfo, significant=False)  # type: ignore
+    ip_address_index_in_subnet : int = luigi.IntParameter(significant=False)  # type: ignore
+    docker_runtime : Optional[str] = luigi.OptionalParameter(None, significant=False)  # type: ignore
+    certificate_volume_name : Optional[str] = luigi.OptionalParameter(None, significant=False) # type: ignore
+    additional_db_parameter : List[str] = luigi.ListParameter() # type: ignore
+    ssh_user : str = luigi.Parameter("root") # type: ignore
+    ssh_key_file : Union[str, Path, None] = luigi.OptionalParameter(None, significant=False) # type: ignore
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -89,17 +91,16 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             database_info = self._create_database_container(db_ip_address, db_private_network)
         self.return_object(database_info)
 
-    def _try_to_reuse_database(self, db_ip_address: str) -> DatabaseInfo:
+    def _try_to_reuse_database(self, db_ip_address: str) -> Optional[DatabaseInfo]:
         self.logger.info("Try to reuse database container %s",
                          self.db_container_name)
-        database_info = None
-        ssh_key = self._get_ssh_key()
         try:
             database_info = self._create_database_info(db_ip_address=db_ip_address, reused=True)
+            return database_info
         except Exception as e:
             self.logger.warning("Tried to reuse database container %s, but got Exeception %s. "
                                 "Fallback to create new database.", self.db_container_name, e)
-        return database_info
+        return None
 
     def _get_ssh_key(self) -> SshKey:
         if self.ssh_key_file:
@@ -201,7 +202,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                 network_info=self.network_info,
                 volume_name=self._get_db_volume_name(),
             )
-            ssh_info = SshInfo(self.ssh_user, self.ssh_key_file)
+            ssh_info = SshInfo(self.ssh_user, str(self.ssh_key_file or ""))
             database_info = DatabaseInfo(
                 host=db_ip_address,
                 ports=self.internal_ports,
@@ -305,7 +306,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         )
         return volume, container
 
-    def _db_file(self, filename: str) -> str:
+    def _db_file(self, filename: str) -> Traversable:
         return (
             importlib_resources.files(PACKAGE_NAME)
             / self.docker_db_config_resource_name

@@ -17,11 +17,11 @@ from exasol_integration_test_docker_environment.lib.docker.images.required_task_
 
 
 class DockerCreateImageTask(DockerBaseTask):
-    image_name = luigi.Parameter()
+    image_name : str = luigi.Parameter() # type: ignore
     # ParameterVisibility needs to be hidden instead of private, because otherwise a MissingParameter gets thrown
-    image_info = JsonPickleParameter(ImageInfo,
+    image_info : ImageInfo = JsonPickleParameter(ImageInfo,
                                      visibility=luigi.parameter.ParameterVisibility.HIDDEN,
-                                     significant=True)  # type: ImageInfo
+                                     significant=True)  # type: ignore
 
     def run_task(self):
         new_image_info = yield from self.build(self.image_info)
@@ -70,9 +70,9 @@ class DockerCreateImageTask(DockerBaseTask):
 
 class DockerCreateImageTaskWithDeps(DockerCreateImageTask):
     # ParameterVisibility needs to be hidden instead of private, because otherwise a MissingParameter gets thrown
-    required_task_infos = JsonPickleParameter(RequiredTaskInfoDict,
+    required_task_infos : RequiredTaskInfoDict = JsonPickleParameter(RequiredTaskInfoDict,
                                               visibility=luigi.parameter.ParameterVisibility.HIDDEN,
-                                              significant=True)  # type: RequiredTaskInfoDict
+                                              significant=True)  # type: ignore
 
     def register_required(self):
         self.required_tasks = {key: self.create_required_task(required_task_info)

@@ -2,7 +2,7 @@ import logging
 import tempfile
 import time
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 import pytest
 
@@ -24,7 +24,7 @@ def _build_docker_command(logs: List[str]):
     bash_command = f"while true; do {echo_commdands_str}; sleep 0.1; done"
     return ["bash", "-c", bash_command]
 
-def _run_container_log_thread(logger, logs: List[str]) -> str:
+def _run_container_log_thread(logger, logs: List[str]) -> Optional[str]:
     """
     Starts a dummy docker container which prints logs in an endless loop, and calls DBContainerLogThread on that container.
 
@@ -60,7 +60,7 @@ def test_container_log_thread_error(test_logger) -> None:
     Integration test which verifies that the DBContainerLogThread returns error message if error is logged.
     """
     error_message = _run_container_log_thread(test_logger, ["confd returned with state 1"])
-    assert "confd returned with state 1\n" in error_message
+    assert error_message and "confd returned with state 1\n" in error_message
 
 def test_container_log_thread_ignore_rsyslogd(test_logger) -> None:
     """
@@ -96,4 +96,4 @@ def test_container_log_thread_exception(test_logger) -> None:
         'Exception: bad thing happend'
     ]
     error_message = _run_container_log_thread(test_logger, sshd_logs)
-    assert "exception: bad thing happend\n" in error_message
+    assert error_message and "exception: bad thing happend\n" in error_message

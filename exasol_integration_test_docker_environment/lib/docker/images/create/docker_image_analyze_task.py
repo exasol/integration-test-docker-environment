@@ -1,5 +1,6 @@
+import abc
 from pathlib import Path
-from typing import Dict, Type
+from typing import Dict, Type, Optional
 
 import docker
 import git
@@ -38,6 +39,7 @@ class DockerAnalyzeImageTask(DockerBaseTask):
         )
         self._dockerfile = self.get_dockerfile()
 
+    @abc.abstractmethod
     def get_source_repository_name(self) -> str:
         """
         Called by the constructor to get the image name for pulls. Sub classes need to implement this method.
@@ -45,6 +47,7 @@ class DockerAnalyzeImageTask(DockerBaseTask):
         """
         raise AbstractMethodException()
 
+    @abc.abstractmethod
     def get_target_repository_name(self) -> str:
         """
         Called by the constructor to get the image name for pushs. Sub classes need to implement this method.
@@ -52,6 +55,7 @@ class DockerAnalyzeImageTask(DockerBaseTask):
         """
         raise AbstractMethodException()
 
+    @abc.abstractmethod
     def get_source_image_tag(self) -> str:
         """
         Called by the constructor to get the image tag for pulls. Sub classes need to implement this method.
@@ -59,6 +63,7 @@ class DockerAnalyzeImageTask(DockerBaseTask):
         """
         raise AbstractMethodException()
 
+    @abc.abstractmethod
     def get_target_image_tag(self) -> str:
         """
         Called by the constructor to get the image tag for pushs. Sub classes need to implement this method.
@@ -76,6 +81,7 @@ class DockerAnalyzeImageTask(DockerBaseTask):
         """
         raise AbstractMethodException()
 
+    @abc.abstractmethod
     def get_dockerfile(self) -> str:
         """
         Called by the constructor to get the path to the dockerfile.
@@ -106,6 +112,7 @@ class DockerAnalyzeImageTask(DockerBaseTask):
         """
         return dict()
 
+    @abc.abstractmethod
     def is_rebuild_requested(self) -> bool:
         raise AbstractMethodException()
 
@@ -122,16 +129,16 @@ class DockerAnalyzeImageTask(DockerBaseTask):
             tasks = None
         self.dependencies_futures = self.register_dependencies(tasks)
 
-    def keys_are_string(self, task_classes):
+    def keys_are_string(self, task_classes) -> bool:
         return all(isinstance(key, str)
                    for key in task_classes.keys())
 
-    def values_are_subclass_of_baseclass(self, task_classes):
+    def values_are_subclass_of_baseclass(self, task_classes) -> bool:
         return all(issubclass(value, DockerAnalyzeImageTask)
                    for value in task_classes.values())
 
     def requires_tasks(self) -> Dict[str, Type["DockerAnalyzeImageTask"]]:
-        pass
+        return dict()
 
     def run_task(self):
         image_info_of_dependencies = self.get_values_from_futures(self.dependencies_futures)

@@ -1,5 +1,5 @@
 import functools
-from typing import Tuple, Optional, Callable
+from typing import Tuple, Optional, Callable, Any
 import humanfriendly
 
 from exasol_integration_test_docker_environment.lib.api.common import set_build_config, set_docker_repository_config, \
@@ -22,14 +22,15 @@ from exasol_integration_test_docker_environment \
     .docker_db_test_environment_parameter import DbOsAccess
 
 def _cleanup(environment_info: EnvironmentInfo) -> None:
-    if environment_info.test_container_info is None:
-        remove_docker_container([environment_info.database_info.container_info.container_name])
-    else:
-        remove_docker_container([environment_info.test_container_info.container_name,
-                                 environment_info.database_info.container_info.container_name])
-    remove_docker_volumes([environment_info.database_info.container_info.volume_name])
-    remove_docker_networks([environment_info.network_info.network_name])
+    if test_container_info := environment_info.test_container_info:
+        remove_docker_container([test_container_info.container_name])
 
+    if db_container_info := environment_info.database_info.container_info:
+        remove_docker_container([db_container_info.container_name])
+        if name := db_container_info.volume_name:
+            remove_docker_volumes([name])
+
+    remove_docker_networks([environment_info.network_info.network_name])
 
 @no_cli_function
 def spawn_test_environment_with_test_container(
@@ -71,7 +72,7 @@ def spawn_test_environment_with_test_container(
     raises: TaskRuntimeError if spawning the test environment fails
 
     """
-    def str_or_none(x: any) -> str:
+    def str_or_none(x: Any) -> Optional[str]:
         return str(x) if x is not None else None
     parsed_db_mem_size = humanfriendly.parse_size(db_mem_size)
     if parsed_db_mem_size < humanfriendly.parse_size("1 GiB"):

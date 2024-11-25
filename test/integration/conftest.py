@@ -1,10 +1,10 @@
 import contextlib
 import io
+
 import pytest
 
-from typing import Any, Callable, Dict, Iterator, List, NewType, Optional
+from typing import Any, Callable, Dict, Iterator, List, NewType, Optional, Generator, ContextManager
 
-from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from test.integration.helpers import normalize_request_name
 from exasol_integration_test_docker_environment.testing import utils
 from exasol_integration_test_docker_environment \
@@ -40,7 +40,7 @@ def api_isolation(request) -> Iterator[ApiTestEnvironment]:
     utils.close_environments(environment)
 
 
-CliContextProvider = NewType(
+CliContextProvider = NewType( # type: ignore
     "CliContextProvider", Callable[
         [Optional[str], Optional[List[str]]],
         SpawnedTestEnvironments
@@ -49,7 +49,7 @@ CliContextProvider = NewType(
 
 
 @pytest.fixture
-def cli_database(cli_isolation) -> CliContextProvider:
+def cli_database(cli_isolation) -> Callable[[Optional[str], Optional[list[str]]], ContextManager[SpawnedTestEnvironments]]:
     """
     Returns a method that test case implementations can use to create a
     context with a database.
@@ -66,7 +66,7 @@ def cli_database(cli_isolation) -> CliContextProvider:
     def create_context(
             name: Optional[str] = None,
             additional_parameters: Optional[List[str]] = None,
-    ) -> SpawnedTestEnvironments:
+    ) -> Iterator[SpawnedTestEnvironments]:
         name = name if name else cli_isolation.name
         spawned = cli_isolation.spawn_docker_test_environments(
             name=name,
@@ -78,7 +78,7 @@ def cli_database(cli_isolation) -> CliContextProvider:
     return create_context
 
 
-ApiContextProvider = NewType(
+ApiContextProvider = NewType( # type: ignore
     "ApiContextProvider",
     Callable[
         [Optional[str], Optional[Dict[str, Any]]],
@@ -93,7 +93,7 @@ def api_database(api_isolation: ApiTestEnvironment) -> ApiContextProvider:
     def create_context(
             name: Optional[str] = None,
             additional_parameters: Optional[Dict[str, Any]] = None,
-    ) -> ExaslctDockerTestEnvironment:
+    ) -> Generator[ExaslctDockerTestEnvironment, None, None]:
         name = name if name else api_isolation.name
         spawned = api_isolation.spawn_docker_test_environment(
             name=name,
@@ -102,7 +102,7 @@ def api_database(api_isolation: ApiTestEnvironment) -> ApiContextProvider:
         yield spawned
         utils.close_environments(spawned)
 
-    return create_context
+    return create_context # type: ignore
 
 @pytest.fixture
 def fabric_stdin(monkeypatch):

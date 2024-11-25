@@ -12,13 +12,16 @@ class HealthProblem(RuntimeError):
 class TaskFailures(Exception):
     """Represents a potential cause of a TaskRuntimeError"""
 
-    def __init__(self, inner: List[str] = None):
+    def __init__(self, inner: Optional[List[str]] = None):
         super().__init__(self._construct_exception_message(inner))
         self.inner = inner
 
-    def _construct_exception_message(self, failures: Iterable[str]) -> str:
-        formatted_task_failures = "\n".join(failures)
-        return f"Following task failures were caught during the execution:\n{formatted_task_failures}"
+    def _construct_exception_message(self, failures: Optional[Iterable[str]]) -> str:
+        if failures is not None:
+            formatted_task_failures = "\n".join(failures)
+            return f"Following task failures were caught during the execution:\n{formatted_task_failures}"
+        else:
+            return f"No task failures were caught during the execution:"
 
 
 class TaskRuntimeError(RuntimeError):

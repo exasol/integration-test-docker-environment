@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Dict, Any
+from typing import Dict, Any, List
 
 import luigi
 
@@ -8,7 +8,7 @@ from exasol_integration_test_docker_environment.lib.base.docker_base_task import
 
 
 class FlavorsBaseTask(DependencyLoggerBaseTask):
-    flavor_paths = luigi.ListParameter()
+    flavor_paths : List[str] = luigi.ListParameter() # type: ignore
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

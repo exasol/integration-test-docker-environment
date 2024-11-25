@@ -28,7 +28,7 @@ from exasol_integration_test_docker_environment.lib.base.task_dependency import 
 
 class JobCounterSingleton(object):
     """
-    We use here a Singleton to avoid a unprotected global variable.
+    We use here a Singleton to avoid an unprotected global variable.
     However, this counter needs to be global counter to guarantee unique job ids.
     This is needed in case of task that finish in less than a second, to avoid duplicated job ids
     """
@@ -42,8 +42,9 @@ class JobCounterSingleton(object):
         return cls._instance
 
     def get_next_value(self) -> int:
-        self._counter += 1
-        return self._counter
+        # self._counter is a class variable and because of this we need to suppress type checks
+        self._counter += 1 # type: ignore
+        return self._counter # type: ignore
 
 
 def set_build_config(force_rebuild: bool,
@@ -51,9 +52,9 @@ def set_build_config(force_rebuild: bool,
                      force_pull: bool,
                      log_build_context_content: bool,
                      output_directory: str,
-                     temporary_base_directory: str,
-                     cache_directory: str,
-                     build_name: str, ):
+                     temporary_base_directory: Optional[str],
+                     cache_directory: Optional[str],
+                     build_name: Optional[str], ):
     luigi.configuration.get_config().set('build_config', 'force_rebuild', str(force_rebuild))
     luigi.configuration.get_config().set('build_config', 'force_rebuild_from', json.dumps(force_rebuild_from))
     luigi.configuration.get_config().set('build_config', 'force_pull', str(force_pull))
@@ -72,9 +73,8 @@ def set_output_directory(output_directory):
         luigi.configuration.get_config().set('build_config', 'output_directory', output_directory)
 
 
-def set_docker_repository_config(docker_password: str, docker_repository_name: str, docker_username: str,
-                                 tag_prefix: str,
-                                 kind: str):
+def set_docker_repository_config(docker_password: Optional[str], docker_repository_name: Optional[str],
+                                 docker_username: Optional[str], tag_prefix: str, kind: str):
     config_class = f'{kind}_docker_repository_config'
     luigi.configuration.get_config().set(config_class, 'tag_prefix', tag_prefix)
     if docker_repository_name is not None:
@@ -105,6 +105,7 @@ def import_build_steps(flavor_path: Tuple[str, ...]):
         path_to_build_steps = Path(path).joinpath("flavor_base/build_steps.py")
         module_name_for_build_steps = extract_modulename_for_build_steps(path)
         spec = importlib.util.spec_from_file_location(module_name_for_build_steps, path_to_build_steps)
+        assert spec and spec.loader
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
 
@@ -119,7 +120,7 @@ def generate_root_task(task_class, *args, **kwargs) -> DependencyLoggerBaseTask:
 
 def run_task(task_creator: Callable[[], DependencyLoggerBaseTask], workers: int = 2,
              task_dependencies_dot_file: Optional[str] = None,
-             log_level: str = None, use_job_specific_log_file: bool = False) \
+             log_level: Optional[str] = None, use_job_specific_log_file: bool = False) \
         -> Any:
     setup_worker()
     task = task_creator()
@@ -141,7 +142,6 @@ def run_task(task_creator: Callable[[], DependencyLoggerBaseTask], workers: int 
                 f"The detailed log of the integration-test-docker-environment can be found at: {log_file_path}")
         task.cleanup(success)
 
-
 def _run_task_with_logging_config(
         task: DependencyLoggerBaseTask,
         log_file_path: Path,
@@ -152,7 +152,6 @@ def _run_task_with_logging_config(
         no_scheduling_errors = luigi.build([task], workers=workers,
                                            local_scheduler=True, **run_kwargs)
         return no_scheduling_errors
-
 
 def _handle_task_result(
         no_scheduling_errors: bool,
@@ -199,7 +198,7 @@ def _configure_logging(
             yield run_kwargs
 
 
-def _configure_logging_parameter(log_level: str, luigi_config: Path, use_job_specific_log_file: bool) \
+def _configure_logging_parameter(log_level: Optional[str], luigi_config: Path, use_job_specific_log_file: bool) \
         -> Tuple[bool, Dict[str, str]]:
     if use_job_specific_log_file:
         no_configure_logging = False
@@ -226,13 +225,13 @@ def generate_graph_from_task_dependencies(task: DependencyLoggerBaseTask, task_d
 
 
 def collect_dependencies(task: DependencyLoggerBaseTask) -> Set[TaskDependency]:
-    dependencies = set()
+    dependencies : Set[TaskDependency] = set()
     for root, directories, files in os.walk(task._get_dependencies_path_for_job()):
         for file in files:
             file_path = Path(root).joinpath(file)
             with open(file_path) as f:
                 for line in f.readlines():
-                    task_dependency = TaskDependency.from_json(line)  # type: TaskDependency
+                    task_dependency : TaskDependency = TaskDependency.from_json(line)  # type: ignore
                     if task_dependency.state == DependencyState.requested.name:
                         dependencies.add(task_dependency)
     return dependencies

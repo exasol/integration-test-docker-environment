@@ -1,7 +1,8 @@
 import os
 import unittest
 from contextlib import contextmanager
-from typing import ContextManager, Mapping
+
+from typing import Generator
 from unittest.mock import patch
 
 from exasol_integration_test_docker_environment.doctor import (
@@ -14,7 +15,7 @@ from exasol_integration_test_docker_environment.doctor import (
 
 
 @contextmanager
-def temporary_env(env_vars) -> ContextManager[Mapping[str, str]]:
+def temporary_env(env_vars) -> Generator[os._Environ, None, None]:
     """
     Creates a temporary environment, containing the current environment variables.
 

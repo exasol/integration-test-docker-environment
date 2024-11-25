@@ -1,6 +1,7 @@
 import luigi
 from enum import Enum, auto
 from luigi import Config
+from typing import List, Optional
 
 class DbOsAccess(Enum):
     """
@@ -19,15 +20,15 @@ class DbOsAccess(Enum):
 
 
 class DockerDBTestEnvironmentParameter(Config):
-    docker_db_image_name = luigi.OptionalParameter(None)
-    docker_db_image_version = luigi.OptionalParameter(None)
-    reuse_database = luigi.BoolParameter(False, significant=False)
+    docker_db_image_name : Optional[str] = luigi.OptionalParameter(None) # type: ignore
+    docker_db_image_version : Optional[str] = luigi.OptionalParameter(None) # type: ignore
+    reuse_database : bool = luigi.BoolParameter(False, significant=False) # type: ignore
     db_os_access = luigi.EnumParameter(DbOsAccess.DOCKER_EXEC, enum=DbOsAccess, significant=False)
-    no_database_cleanup_after_success = luigi.BoolParameter(False, significant=False)
-    no_database_cleanup_after_failure = luigi.BoolParameter(False, significant=False)
-    database_port_forward = luigi.OptionalParameter(None, significant=False)
-    bucketfs_port_forward = luigi.OptionalParameter(None, significant=False)
-    ssh_port_forward = luigi.OptionalParameter(None, significant=False)
-    mem_size = luigi.OptionalParameter("2 GiB", significant=False)
-    disk_size = luigi.OptionalParameter("2 GiB", significant=False)
-    nameservers = luigi.ListParameter([], significant=False)
+    no_database_cleanup_after_success : bool = luigi.BoolParameter(False, significant=False) # type: ignore
+    no_database_cleanup_after_failure : bool = luigi.BoolParameter(False, significant=False) # type: ignore
+    database_port_forward : Optional[str] = luigi.OptionalParameter(None, significant=False) # type: ignore
+    bucketfs_port_forward : Optional[str] = luigi.OptionalParameter(None, significant=False) # type: ignore
+    ssh_port_forward : Optional[str] = luigi.OptionalParameter(None, significant=False) # type: ignore
+    mem_size : Optional[str] = luigi.OptionalParameter("2 GiB", significant=False) # type: ignore
+    disk_size : Optional[str] = luigi.OptionalParameter("2 GiB", significant=False) # type: ignore
+    nameservers : List[str] = luigi.ListParameter([], significant=False) # type: ignore
