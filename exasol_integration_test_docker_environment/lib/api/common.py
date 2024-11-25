@@ -42,6 +42,7 @@ class JobCounterSingleton(object):
         return cls._instance
 
     def get_next_value(self) -> int:
+        # self._counter is a class variable and because of this we need to suppress type checks
         self._counter += 1 # type: ignore
         return self._counter # type: ignore
 
