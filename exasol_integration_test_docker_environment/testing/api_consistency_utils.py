@@ -63,8 +63,8 @@ def get_click_and_api_functions(
     api_functions = [
         f[1]
         for f in inspect.getmembers(api_module, inspect.isfunction)
-        if f[1].__cli_function__
-    ]  # type: ignore
+        if f[1].__cli_function__  # type: ignore
+    ]
     return click_commands, api_functions
 
 
@@ -79,6 +79,6 @@ def get_click_and_api_function_names(
     api_function_names = [
         f[0]
         for f in inspect.getmembers(api_module, inspect.isfunction)
-        if f[1].__cli_function__
-    ]  # type: ignore
+        if f[1].__cli_function__  # type: ignore
+    ]
     return click_command_names, api_function_names
