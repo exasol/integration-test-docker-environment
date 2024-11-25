@@ -14,8 +14,8 @@ from exasol_integration_test_docker_environment.doctor import (
 )
 
 
-@contextmanager #type: ignore
-def temporary_env(env_vars) -> Generator: #type: ignore
+@contextmanager
+def temporary_env(env_vars) -> Generator[os._Environ, None, None]:
     """
     Creates a temporary environment, containing the current environment variables.
 
