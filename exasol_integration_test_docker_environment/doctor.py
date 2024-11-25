@@ -2,14 +2,15 @@
 The doctor module provides functionality to check the health of the `exasol_integration_test_docker_environment`
 package and also provide help to find potential fixes.
 """
+
 import sys
 from collections.abc import Callable
-from typing import Iterable, List, Tuple
-from exasol import error
 from enum import Enum
+from typing import Iterable, List, Tuple
 
 import docker
 from docker.errors import DockerException
+from exasol import error
 
 SUPPORTED_PLATFORMS = ["linux", "darwin"]
 
@@ -19,21 +20,21 @@ class Error(Enum):
         "E-ITDE-0",
         "Unknown issue.",
         ["An unknown error occurred, please contact the maintainer."],
-        {}
+        {},
     )
 
     UnixSocketNotAvailable = error.ExaError(
         "E-ITDE-1",
         "Could not find unix socket to connect to.",
         ["Make sure environment variable DOCKER_HOST is configured correctly."],
-        {}
+        {},
     )
 
     TargetPlatformNotSupported = error.ExaError(
         "E-ITDE-2",
         "The platform ITDE is running on is not supported.",
         ["Make sure you are using one of the following platforms: [linux, darwin]."],
-        {}
+        {},
     )
 
 
@@ -79,13 +80,12 @@ def health_checkup() -> Iterable[error.ExaError]:
 
     return an iterator of error codes specifying which problems have been identified.
     """
-    check_function = Callable[[],bool]
-    diagnosis_function = Callable[[],Iterable[error.ExaError]]
-    examinations : List[Tuple[check_function, diagnosis_function]] = [
+    check_function = Callable[[], bool]
+    diagnosis_function = Callable[[], Iterable[error.ExaError]]
+    examinations: List[Tuple[check_function, diagnosis_function]] = [
         (is_docker_daemon_available, diagnose_docker_daemon_not_available),
         (is_supported_platform, lambda: [Error.TargetPlatformNotSupported]),
     ]
     for is_fine, diagnosis in examinations:
         if not is_fine():
-            for error_code in diagnosis():
-                yield error_code
+            yield from diagnosis()

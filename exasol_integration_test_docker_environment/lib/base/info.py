@@ -2,13 +2,15 @@ import json
 
 import jsonpickle
 
-from exasol_integration_test_docker_environment.lib.base.frozendict_to_dict import FrozenDictToDict
+from exasol_integration_test_docker_environment.lib.base.frozendict_to_dict import (
+    FrozenDictToDict,
+)
 
 
 class Info:
     def to_json(self, indent=4):
-        jsonpickle.set_preferred_backend('simplejson')
-        jsonpickle.set_encoder_options('simplejson', sort_keys=True, indent=indent)
+        jsonpickle.set_preferred_backend("simplejson")
+        jsonpickle.set_encoder_options("simplejson", sort_keys=True, indent=indent)
         return jsonpickle.encode(self)
 
     def to_dict(self):
@@ -21,7 +23,11 @@ class Info:
     def from_json(cls, json_string):
         loaded_object = jsonpickle.decode(json_string)
         if not isinstance(loaded_object, cls):
-            raise TypeError("Type %s of loaded object does not match %s" % (type(loaded_object), cls))
+            raise TypeError(
+                "Type {} of loaded object does not match {}".format(
+                    type(loaded_object), cls
+                )
+            )
         return loaded_object
 
     @classmethod

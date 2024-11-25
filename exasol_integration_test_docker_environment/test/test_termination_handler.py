@@ -30,6 +30,7 @@ def run_positive(queue: Queue) -> None:
     with m.TerminationHandler():
         pass
 
+
 def run_with_unknown_error(queue: Queue) -> None:
     stdout_queue = StdoutQueue(queue)
     sys.stdout = stdout_queue
@@ -55,8 +56,10 @@ class TestTerminationHandler(unittest.TestCase):
         p.start()
         p.join()
         res = get_queue_content(q)
-        self.assertTrue(any(re.match(r"^The command took .+ s$", line) for line in res),
-                        f"Result {res} doesn't contain 'The command took'")
+        self.assertTrue(
+            any(re.match(r"^The command took .+ s$", line) for line in res),
+            f"Result {res} doesn't contain 'The command took'",
+        )
         self.assertEqual(p.exitcode, 0)
 
     def test_unknown_error(self):
@@ -65,11 +68,17 @@ class TestTerminationHandler(unittest.TestCase):
         p.start()
         p.join()
         res = get_queue_content(q)
-        self.assertTrue(any(re.match(r"^The command failed after .+ s with:$", line) for line in res))
+        self.assertTrue(
+            any(
+                re.match(r"^The command failed after .+ s with:$", line) for line in res
+            )
+        )
         self.assertTrue(any("Caught exception:unknown error" == line for line in res))
-        self.assertTrue(any('raise RuntimeError("unknown error")' in line for line in res))
+        self.assertTrue(
+            any('raise RuntimeError("unknown error")' in line for line in res)
+        )
         self.assertEqual(p.exitcode, 1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

@@ -22,10 +22,10 @@ class AbstractLogHandler:
 
     def handle_log_lines(self, log_lines, error: bool = False):
         log_lines = log_lines.decode("utf-8")
-        log_lines = log_lines.strip('\r\n')
+        log_lines = log_lines.strip("\r\n")
         result = []
         for log_line in log_lines.split("\n"):
-            log_line = log_line.strip('\r\n')
+            log_line = log_line.strip("\r\n")
             result.append(self.handle_log_line(log_line, error))
         return result
 

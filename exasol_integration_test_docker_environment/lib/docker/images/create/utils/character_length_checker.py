@@ -9,8 +9,14 @@ class CharacterLengthChecker:
     The goal is to avoid high memory consumption for calculation of huge directories
     which contain many sub-directories/files (broad directory trees) and long names.
     """
-    def __init__(self, root_directory: PurePath, max_characters_paths: int,
-                 count_directory_names: bool, count_file_names: bool):
+
+    def __init__(
+        self,
+        root_directory: PurePath,
+        max_characters_paths: int,
+        count_directory_names: bool,
+        count_file_names: bool,
+    ):
         self._num_characters = 0
         self._max_characters_paths = max_characters_paths
         self._root_directory = root_directory
@@ -31,4 +37,6 @@ class CharacterLengthChecker:
             self._num_characters += sum([len(f) for f in files])
 
         if self._num_characters > self._max_characters_paths:
-            raise OSError(f"Walking through too many directories. Aborting. Please verify: {self._root_directory}")
+            raise OSError(
+                f"Walking through too many directories. Aborting. Please verify: {self._root_directory}"
+            )

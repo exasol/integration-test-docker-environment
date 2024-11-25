@@ -3,21 +3,25 @@ from datetime import datetime
 
 from docker.models.containers import Container
 
-from exasol_integration_test_docker_environment \
-    .lib.test_environment.database_setup.bucketfs_sync_checker \
-    import BucketFSSyncChecker
-from exasol_integration_test_docker_environment \
-    .lib.base.db_os_executor import DbOsExecutor
+from exasol_integration_test_docker_environment.lib.base.db_os_executor import (
+    DbOsExecutor,
+)
+from exasol_integration_test_docker_environment.lib.test_environment.database_setup.bucketfs_sync_checker import (
+    BucketFSSyncChecker,
+)
 
 
 class DockerDBLogBasedBucketFSSyncChecker(BucketFSSyncChecker):
 
-    def __init__(self, logger,
-                 database_container: Container,
-                 pattern_to_wait_for: str,
-                 log_file_to_check: str,
-                 bucketfs_write_password: str,
-                 executor: DbOsExecutor):
+    def __init__(
+        self,
+        logger,
+        database_container: Container,
+        pattern_to_wait_for: str,
+        log_file_to_check: str,
+        bucketfs_write_password: str,
+        executor: DbOsExecutor,
+    ):
         self.logger = logger
         self.pattern_to_wait_for = pattern_to_wait_for
         self.log_file_to_check = log_file_to_check
@@ -34,18 +38,21 @@ class DockerDBLogBasedBucketFSSyncChecker(BucketFSSyncChecker):
         ready = False
         while not ready:
             exit_code, output = self.find_pattern_in_logfile()
-            if self.exit_code_changed(exit_code, self.start_exit_code) or \
-                    self.found_new_log_line(exit_code, self.start_exit_code,
-                                            self.start_output, output):
+            if self.exit_code_changed(
+                exit_code, self.start_exit_code
+            ) or self.found_new_log_line(
+                exit_code, self.start_exit_code, self.start_output, output
+            ):
                 ready = True
             time.sleep(1)
 
     def exit_code_changed(self, exit_code, start_exit_code):
         return exit_code == 0 and start_exit_code != 0
 
-    def found_new_log_line(self, exit_code, start_exit_code,
-                           start_output, output):
-        return exit_code == 0 and start_exit_code == 0 and len(start_output) < len(output)
+    def found_new_log_line(self, exit_code, start_exit_code, start_output, output):
+        return (
+            exit_code == 0 and start_exit_code == 0 and len(start_output) < len(output)
+        )
 
     def find_pattern_in_logfile(self):
         cmd = f"""grep '{self.pattern_to_wait_for}' {self.log_file_to_check}"""

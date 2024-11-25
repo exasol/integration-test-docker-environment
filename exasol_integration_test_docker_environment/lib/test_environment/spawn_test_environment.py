@@ -1,13 +1,20 @@
 import luigi
 
-from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import DependencyLoggerBaseTask
-from exasol_integration_test_docker_environment.lib.data.environment_type import EnvironmentType
-from exasol_integration_test_docker_environment.lib.test_environment.parameter.spawn_test_environment_parameter import \
-    SpawnTestEnvironmentParameter
-from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_environment_with_docker_db import \
-    SpawnTestEnvironmentWithDockerDB
-from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_environment_with_external_db import \
-    SpawnTestEnvironmentWithExternalDB
+from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import (
+    DependencyLoggerBaseTask,
+)
+from exasol_integration_test_docker_environment.lib.data.environment_type import (
+    EnvironmentType,
+)
+from exasol_integration_test_docker_environment.lib.test_environment.parameter.spawn_test_environment_parameter import (
+    SpawnTestEnvironmentParameter,
+)
+from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_environment_with_docker_db import (
+    SpawnTestEnvironmentWithDockerDB,
+)
+from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_environment_with_external_db import (
+    SpawnTestEnvironmentWithExternalDB,
+)
 
 
 class SpawnTestEnvironment(DependencyLoggerBaseTask, SpawnTestEnvironmentParameter):
@@ -33,23 +40,21 @@ class SpawnTestEnvironment(DependencyLoggerBaseTask, SpawnTestEnvironmentParamet
             raise Exception("external_exasol_db_port not set")
         if self.external_exasol_bucketfs_port is None:
             raise Exception("external_exasol_bucketfs_port not set")
-        task = \
-            self.create_child_task_with_common_params(
-                SpawnTestEnvironmentWithExternalDB,
-                db_user=self.external_exasol_db_user,
-                db_password=self.external_exasol_db_password,
-                bucketfs_write_password=self.external_exasol_bucketfs_write_password
-            )
+        task = self.create_child_task_with_common_params(
+            SpawnTestEnvironmentWithExternalDB,
+            db_user=self.external_exasol_db_user,
+            db_password=self.external_exasol_db_password,
+            bucketfs_write_password=self.external_exasol_bucketfs_write_password,
+        )
         return task
 
     def _create_docker_db_environment(self):
-        task = \
-            self.create_child_task_with_common_params(
-                SpawnTestEnvironmentWithDockerDB,
-                db_user=self.DEFAULT_DB_USER,
-                db_password=self.DEFAULT_DATABASE_PASSWORD,
-                bucketfs_write_password=self.DEFAULT_BUCKETFS_WRITE_PASSWORD
-            )
+        task = self.create_child_task_with_common_params(
+            SpawnTestEnvironmentWithDockerDB,
+            db_user=self.DEFAULT_DB_USER,
+            db_password=self.DEFAULT_DATABASE_PASSWORD,
+            bucketfs_write_password=self.DEFAULT_BUCKETFS_WRITE_PASSWORD,
+        )
         return task
 
     def run_task(self):

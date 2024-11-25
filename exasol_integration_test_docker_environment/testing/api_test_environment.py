@@ -4,23 +4,26 @@ import shutil
 import tempfile
 from pathlib import Path
 from sys import stderr
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
 
-from exasol_integration_test_docker_environment.lib.api import spawn_test_environment
-from exasol_integration_test_docker_environment.lib.api import spawn_test_environment_with_test_container
-from exasol_integration_test_docker_environment.lib.data.test_container_content_description import \
-    TestContainerContentDescription
-from exasol_integration_test_docker_environment.testing.docker_registry import default_docker_repository_name
-from exasol_integration_test_docker_environment \
-    .testing.exaslct_docker_test_environment import \
-    ExaslctDockerTestEnvironment
-from exasol_integration_test_docker_environment \
-    .testing.exaslct_test_environment import (
-        get_class,
-        get_test_flavor,
+from exasol_integration_test_docker_environment.lib.api import (
+    spawn_test_environment,
+    spawn_test_environment_with_test_container,
 )
-from exasol_integration_test_docker_environment \
-    .lib.test_environment.ports import Ports
+from exasol_integration_test_docker_environment.lib.data.test_container_content_description import (
+    TestContainerContentDescription,
+)
+from exasol_integration_test_docker_environment.lib.test_environment.ports import Ports
+from exasol_integration_test_docker_environment.testing.docker_registry import (
+    default_docker_repository_name,
+)
+from exasol_integration_test_docker_environment.testing.exaslct_docker_test_environment import (
+    ExaslctDockerTestEnvironment,
+)
+from exasol_integration_test_docker_environment.testing.exaslct_test_environment import (
+    get_class,
+    get_test_flavor,
+)
 
 
 class ApiTestEnvironment:
@@ -59,17 +62,17 @@ class ApiTestEnvironment:
         )
 
     def spawn_docker_test_environment_with_test_container(
-            self,
-            name: str,
-            test_container_content: TestContainerContentDescription,
-            additional_parameter: Optional[Dict[str, Any]] = None,
+        self,
+        name: str,
+        test_container_content: TestContainerContentDescription,
+        additional_parameter: Optional[Dict[str, Any]] = None,
     ) -> ExaslctDockerTestEnvironment:
         if additional_parameter is None:
             additional_parameter = dict()
         ports = Ports.random_free()
         on_host_parameter = self._get_default_test_environment(name, ports)
         docker_db_image_version = on_host_parameter.docker_db_image_version
-        on_host_parameter.environment_info, on_host_parameter.clean_up = \
+        on_host_parameter.environment_info, on_host_parameter.clean_up = (
             spawn_test_environment_with_test_container(
                 environment_name=on_host_parameter.name,
                 database_port_forward=ports.database,
@@ -79,12 +82,13 @@ class ApiTestEnvironment:
                 test_container_content=test_container_content,
                 **additional_parameter,
             )
+        )
         return on_host_parameter
 
     def spawn_docker_test_environment(
-            self,
-            name: str,
-            additional_parameter: Optional[Dict[str, Any]] = None,
+        self,
+        name: str,
+        additional_parameter: Optional[Dict[str, Any]] = None,
     ) -> ExaslctDockerTestEnvironment:
         if additional_parameter is None:
             additional_parameter = dict()

@@ -1,35 +1,39 @@
 from datetime import datetime
 from enum import Enum
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
 
 from exasol_integration_test_docker_environment.lib.base.info import Info
 
 
 class ImageState(Enum):
-    NOT_EXISTING = 0,
+    NOT_EXISTING = (0,)
     # After analyze phase or if build phase did touch the image
-    NEEDS_TO_BE_BUILD = 1,
-    TARGET_LOCALLY_AVAILABLE = 2,
-    SOURCE_LOCALLY_AVAILABLE = 3,
-    REMOTE_AVAILABLE = 4,
-    CAN_BE_LOADED = 5,
+    NEEDS_TO_BE_BUILD = (1,)
+    TARGET_LOCALLY_AVAILABLE = (2,)
+    SOURCE_LOCALLY_AVAILABLE = (3,)
+    REMOTE_AVAILABLE = (4,)
+    CAN_BE_LOADED = (5,)
     # After build phase
-    WAS_BUILD = 6,
-    USED_LOCAL = 7,
-    WAS_PULLED = 8,
+    WAS_BUILD = (6,)
+    USED_LOCAL = (7,)
+    WAS_PULLED = (8,)
     WAS_LOADED = 9
     WAS_TAGED = 10
 
 
 class ImageDescription:
-    def __init__(self,
-                 dockerfile: str,
-                 image_changing_build_arguments: Dict[str, Any],
-                 transparent_build_arguments: Dict[str, Any],
-                 mapping_of_build_files_and_directories: Dict[str, str]):
+    def __init__(
+        self,
+        dockerfile: str,
+        image_changing_build_arguments: Dict[str, Any],
+        transparent_build_arguments: Dict[str, Any],
+        mapping_of_build_files_and_directories: Dict[str, str],
+    ):
         self.transparent_build_arguments = transparent_build_arguments
         self.image_changing_build_arguments = image_changing_build_arguments
-        self.mapping_of_build_files_and_directories = mapping_of_build_files_and_directories
+        self.mapping_of_build_files_and_directories = (
+            mapping_of_build_files_and_directories
+        )
         self.dockerfile = dockerfile
 
     def __repr__(self):
@@ -40,15 +44,20 @@ class ImageInfo(Info):
     DOCKER_TAG_LENGTH_LIMIT = 128
     MAX_TAG_SURPLUS = 30
 
-    def __init__(self,
-                 source_repository_name: str, target_repository_name: str,
-                 source_tag: str, target_tag: str,
-                 hash_value: str, commit: str,
-                 image_description: ImageDescription,
-                 build_name: str = "",
-                 build_date_time: datetime = datetime.utcnow(),
-                 image_state: ImageState = ImageState.NOT_EXISTING,
-                 depends_on_images: Optional[Dict[str, "ImageInfo"]] = None):
+    def __init__(
+        self,
+        source_repository_name: str,
+        target_repository_name: str,
+        source_tag: str,
+        target_tag: str,
+        hash_value: str,
+        commit: str,
+        image_description: ImageDescription,
+        build_name: str = "",
+        build_date_time: datetime = datetime.utcnow(),
+        image_state: ImageState = ImageState.NOT_EXISTING,
+        depends_on_images: Optional[Dict[str, "ImageInfo"]] = None,
+    ):
         self.build_name = build_name
         self.date_time = str(build_date_time)
         self.commit = commit
@@ -74,7 +83,9 @@ class ImageInfo(Info):
         complete_tag_length_limit = self.DOCKER_TAG_LENGTH_LIMIT + self.MAX_TAG_SURPLUS
         complete_tag = self._create_complete_tag(tag)
         if len(complete_tag) > complete_tag_length_limit:
-            raise Exception(f"Complete Tag to long by {len(complete_tag) - complete_tag_length_limit}:  {complete_tag}")
+            raise Exception(
+                f"Complete Tag to long by {len(complete_tag) - complete_tag_length_limit}:  {complete_tag}"
+            )
 
     def get_target_complete_name(self):
         return f"{self.target_repository_name}:{self.get_target_complete_tag()}"

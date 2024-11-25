@@ -2,8 +2,9 @@ import unittest
 
 from docker.errors import DockerException
 
-from exasol_integration_test_docker_environment.lib.docker.images.create.utils.docker_registry_image_checker import \
-    DockerRegistryImageChecker
+from exasol_integration_test_docker_environment.lib.docker.images.create.utils.docker_registry_image_checker import (
+    DockerRegistryImageChecker,
+)
 
 
 class MyTestCase(unittest.TestCase):
@@ -21,5 +22,5 @@ class MyTestCase(unittest.TestCase):
         self.assertRaises(DockerException, exists)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

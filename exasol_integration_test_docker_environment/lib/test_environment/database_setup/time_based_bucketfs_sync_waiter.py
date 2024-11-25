@@ -1,7 +1,8 @@
 import time
 
-from exasol_integration_test_docker_environment.lib.test_environment.database_setup.bucketfs_sync_checker import \
-    BucketFSSyncChecker
+from exasol_integration_test_docker_environment.lib.test_environment.database_setup.bucketfs_sync_checker import (
+    BucketFSSyncChecker,
+)
 
 
 class TimeBasedBucketFSSyncWaiter(BucketFSSyncChecker):

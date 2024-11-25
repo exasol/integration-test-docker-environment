@@ -1,4 +1,4 @@
-from typing import Optional, List, Iterable
+from typing import Iterable, List, Optional
 
 
 class ArgumentConstraintError(ValueError):

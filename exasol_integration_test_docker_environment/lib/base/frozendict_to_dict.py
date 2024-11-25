@@ -1,7 +1,7 @@
 from collections.abc import Mapping
 
 
-class FrozenDictToDict():
+class FrozenDictToDict:
     def convert(self, obj):
         if isinstance(obj, Mapping):
             return {k: self.convert(v) for k, v in obj.items()}

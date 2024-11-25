@@ -30,10 +30,14 @@ class StillRunningLogger:
 
     def log(self, message=None):
 
-        timedelta_between = timedelta(seconds=self._log_config.seconds_between_still_running_logs)
+        timedelta_between = timedelta(
+            seconds=self._log_config.seconds_between_still_running_logs
+        )
         if self._previous_time + timedelta_between <= datetime.now():
             if message is None:
                 self._logger.info("Still running %s.", self._description)
             else:
-                self._logger.info("Still running %s. Message: %s", self._description, message)
+                self._logger.info(
+                    "Still running %s. Message: %s", self._description, message
+                )
             self._previous_time = datetime.now()

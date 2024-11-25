@@ -1,9 +1,11 @@
-import pyexasol
-
 from inspect import cleandoc
 from time import sleep
 
-from exasol_integration_test_docker_environment.lib.test_environment.db_version import DbVersion
+import pyexasol
+
+from exasol_integration_test_docker_environment.lib.test_environment.db_version import (
+    DbVersion,
+)
 
 
 def test_udf_execution(api_database):
