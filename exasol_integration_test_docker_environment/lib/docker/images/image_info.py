@@ -1,5 +1,8 @@
 from datetime import datetime
-from enum import Enum
+from enum import (
+    Enum,
+    auto,
+)
 from typing import (
     Any,
     Dict,
@@ -10,19 +13,19 @@ from exasol_integration_test_docker_environment.lib.base.info import Info
 
 
 class ImageState(Enum):
-    NOT_EXISTING = 0
+    NOT_EXISTING = auto()
     # After analyze phase or if build phase did touch the image
-    NEEDS_TO_BE_BUILD = 1
-    TARGET_LOCALLY_AVAILABLE = 2
-    SOURCE_LOCALLY_AVAILABLE = 3
-    REMOTE_AVAILABLE = 4
-    CAN_BE_LOADED = 5
+    NEEDS_TO_BE_BUILD = auto()
+    TARGET_LOCALLY_AVAILABLE = auto()
+    SOURCE_LOCALLY_AVAILABLE = auto()
+    REMOTE_AVAILABLE = auto()
+    CAN_BE_LOADED = auto()
     # After build phase
-    WAS_BUILD = 6
-    USED_LOCAL = 7
-    WAS_PULLED = 8
-    WAS_LOADED = 9
-    WAS_TAGED = 10
+    WAS_BUILD = auto()
+    USED_LOCAL = auto()
+    WAS_PULLED = auto()
+    WAS_LOADED = auto()
+    WAS_TAGED = auto()
 
 
 class ImageDescription:
