@@ -2,22 +2,32 @@ import dataclasses
 import io
 import re
 import time
-from contextlib import redirect_stdout, redirect_stderr, ExitStack
+from contextlib import (
+    ExitStack,
+    redirect_stderr,
+    redirect_stdout,
+)
+from test.matchers import regex_matcher
 
 import pytest
 
-from exasol_integration_test_docker_environment.cli.termination_handler import TerminationHandler
-from exasol_integration_test_docker_environment.lib.api.common import generate_root_task, run_task
-from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import DependencyLoggerBaseTask
-from test.matchers import regex_matcher
+from exasol_integration_test_docker_environment.cli.termination_handler import (
+    TerminationHandler,
+)
+from exasol_integration_test_docker_environment.lib.api.common import (
+    generate_root_task,
+    run_task,
+)
+from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import (
+    DependencyLoggerBaseTask,
+)
 
 
 class CompositeFailingTask(DependencyLoggerBaseTask):
 
     def register_required(self):
         self.dependencies = self.register_dependencies(
-            [self.create_child_task(FailingTask1),
-             self.create_child_task(FailingTask2)]
+            [self.create_child_task(FailingTask1), self.create_child_task(FailingTask2)]
         )
         return self.dependencies
 
@@ -69,27 +79,34 @@ def capture_output_of_test() -> Capture:
 
 
 def test_command_runtime(capture_output_of_test):
-    assert capture_output_of_test.err == regex_matcher("The command failed after .* s with:")
+    assert capture_output_of_test.err == regex_matcher(
+        "The command failed after .* s with:"
+    )
 
 
 def test_composite_task_failed(capture_output_of_test):
     assert capture_output_of_test.err == regex_matcher(
-        r".*Task failure message: Task CompositeFailingTask.* \(or any of it's subtasks\) failed\.", re.DOTALL)
+        r".*Task failure message: Task CompositeFailingTask.* \(or any of it's subtasks\) failed\.",
+        re.DOTALL,
+    )
 
 
 def test_sub_tasks_failed(capture_output_of_test):
     assert capture_output_of_test.err == regex_matcher(
-        r".*Following task failures were caught during the execution:", re.DOTALL)
+        r".*Following task failures were caught during the execution:", re.DOTALL
+    )
 
 
 def test_sub_task1_error(capture_output_of_test):
     assert capture_output_of_test.err == regex_matcher(
-        r".*RuntimeError: Error in FailingTask1 occurred.", re.DOTALL)
+        r".*RuntimeError: Error in FailingTask1 occurred.", re.DOTALL
+    )
 
 
 def test_sub_task2_error(capture_output_of_test):
     assert capture_output_of_test.err == regex_matcher(
-        r".*RuntimeError: Error in FailingTask2 occurred.", re.DOTALL)
+        r".*RuntimeError: Error in FailingTask2 occurred.", re.DOTALL
+    )
 
 
 def test_out_empty(capture_output_of_test):

@@ -1,8 +1,14 @@
 import traceback
-from pathlib import Path
-from typing import List, Dict
 from collections import OrderedDict
-from exasol_integration_test_docker_environment.lib.base.timeable_base_task import TimeableBaseTask
+from pathlib import Path
+from typing import (
+    Dict,
+    List,
+)
+
+from exasol_integration_test_docker_environment.lib.base.timeable_base_task import (
+    TimeableBaseTask,
+)
 
 
 class StoppingFurtherExecution(Exception):
@@ -34,8 +40,12 @@ class StoppableBaseTask(TimeableBaseTask):
         if self.failed_target.exists():
             with self.failed_target.open("r") as f:
                 failed_task = f.read()
-            self.logger.error("Task %s failed. Stopping further execution." % failed_task)
-            raise StoppingFurtherExecution("Task %s failed. Stopping further execution." % failed_task)
+            self.logger.error(
+                "Task %s failed. Stopping further execution." % failed_task
+            )
+            raise StoppingFurtherExecution(
+                "Task %s failed. Stopping further execution." % failed_task
+            )
 
     def handle_failure(self, exception, exception_tb):
         if not isinstance(exception, StoppingFurtherExecution):
@@ -45,26 +55,28 @@ class StoppableBaseTask(TimeableBaseTask):
                 with self.failed_target.open("w") as f:
                     f.write("%s" % self.task_id)
 
-    def collect_failures(self) -> Dict[str,None]:
-        failures : Dict[str, None] = OrderedDict()
+    def collect_failures(self) -> Dict[str, None]:
+        failures: Dict[str, None] = OrderedDict()
         failures.update(self.collect_failures_of_child_tasks())
         if self.get_failure_log_path().exists():
             with self.get_failure_log_path().open("r") as f:
                 exception = f.read().strip()
-                prefix = '    '
+                prefix = "    "
                 formatted_exception = prefix + prefix.join(exception.splitlines(True))
-                failure_message = "- %s:\n%s" % (self.task_id, formatted_exception)
+                failure_message = f"- {self.task_id}:\n{formatted_exception}"
                 failures[failure_message] = None
 
         return failures
 
-    def collect_failures_of_child_tasks(self) -> Dict[str,None]:
-        failures_of_child_tasks : Dict[str, None] = OrderedDict()
+    def collect_failures_of_child_tasks(self) -> Dict[str, None]:
+        failures_of_child_tasks: Dict[str, None] = OrderedDict()
         if self._run_dependencies_target.exists():
             _run_dependencies_tasks_from_target = self._run_dependencies_target.read()
         else:
             _run_dependencies_tasks_from_target = []
-        _run_dependencies_tasks = self._run_dependencies_tasks + _run_dependencies_tasks_from_target
+        _run_dependencies_tasks = (
+            self._run_dependencies_tasks + _run_dependencies_tasks_from_target
+        )
         reversed_run_dependencies_task_list = list(_run_dependencies_tasks)
         reversed_run_dependencies_task_list.reverse()
         for task in reversed_run_dependencies_task_list:

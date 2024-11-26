@@ -1,18 +1,27 @@
 import unittest
-from pathlib import Path, PurePath
+from pathlib import (
+    Path,
+    PurePath,
+)
 from sys import stderr
 
 import luigi
 
 from exasol_integration_test_docker_environment.lib.api.common import generate_root_task
-from exasol_integration_test_docker_environment.lib.data.test_container_content_description import \
-    TestContainerRuntimeMapping
+from exasol_integration_test_docker_environment.lib.data.test_container_content_description import (
+    TestContainerRuntimeMapping,
+)
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
-from exasol_integration_test_docker_environment.lib.test_environment.database_setup.populate_data import \
-    PopulateTestDataToDatabase
-from exasol_integration_test_docker_environment.test.get_test_container_content import get_test_container_content
+from exasol_integration_test_docker_environment.lib.test_environment.database_setup.populate_data import (
+    PopulateTestDataToDatabase,
+)
+from exasol_integration_test_docker_environment.test.get_test_container_content import (
+    get_test_container_content,
+)
 from exasol_integration_test_docker_environment.testing import utils
-from exasol_integration_test_docker_environment.testing.api_test_environment import ApiTestEnvironment
+from exasol_integration_test_docker_environment.testing.api_test_environment import (
+    ApiTestEnvironment,
+)
 
 
 class TestDataPopulateData(PopulateTestDataToDatabase):
@@ -32,28 +41,36 @@ class TestPopulateData(unittest.TestCase):
         cls.test_environment = ApiTestEnvironment(cls)
         cls.docker_environment_name = cls.__name__
         test_data_folder = Path(__file__).parent / "resources" / "test_data"
-        test_container_runtime_mapping = TestContainerRuntimeMapping(source=test_data_folder, target="/test_data")
-        test_container_content = get_test_container_content(runtime_mapping=(test_container_runtime_mapping,))
-        cls.environment = \
+        test_container_runtime_mapping = TestContainerRuntimeMapping(
+            source=test_data_folder, target="/test_data"
+        )
+        test_container_content = get_test_container_content(
+            runtime_mapping=(test_container_runtime_mapping,)
+        )
+        cls.environment = (
             cls.test_environment.spawn_docker_test_environment_with_test_container(
                 name=cls.docker_environment_name,
-                test_container_content=test_container_content
+                test_container_content=test_container_content,
             )
+        )
 
     @classmethod
     def tearDownClass(cls):
         utils.close_environments(cls.environment, cls.test_environment)
 
     def _populate_data(self, reuse=False):
-        task = generate_root_task(task_class=TestDataPopulateData,
-                                  environment_name=self.environment.name,
-                                  db_user=self.environment.db_username,
-                                  db_password=self.environment.db_password,
-                                  bucketfs_write_password=self.environment.bucketfs_password,
-                                  test_environment_info=self.environment.environment_info,
-                                  )
+        task = generate_root_task(
+            task_class=TestDataPopulateData,
+            environment_name=self.environment.name,
+            db_user=self.environment.db_username,
+            db_password=self.environment.db_password,
+            bucketfs_write_password=self.environment.bucketfs_password,
+            test_environment_info=self.environment.environment_info,
+        )
         try:
-            success = luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
+            success = luigi.build(
+                [task], workers=1, local_scheduler=True, log_level="INFO"
+            )
             if not success:
                 raise Exception("Task failed")
         except Exception as e:
@@ -66,16 +83,19 @@ class TestPopulateData(unittest.TestCase):
     def _execute_sql_on_db(self, sql: str) -> str:
         with ContextDockerClient() as docker_client:
             print(f"Executing sql on db: '{sql}'")
-            #environment is a class variable, need to suppress type check
-            environment = self.environment # type: ignore
-            test_container = docker_client.containers.get(environment.environment_info.
-                                                          test_container_info.container_name)
+            # environment is a class variable, need to suppress type check
+            environment = self.environment  # type: ignore
+            test_container = docker_client.containers.get(
+                environment.environment_info.test_container_info.container_name
+            )
             db_info = environment.environment_info.database_info
             db_user_name = environment.db_username
             db_password = environment.db_password
-            cmd = f"$EXAPLUS -x -q -c '{db_info.host}:{db_info.ports.database}' " \
-                  f"-u '{db_user_name}' -p '{db_password}' -sql '{sql}' " \
-                  f"-jdbcparam 'validateservercertificate=0'"
+            cmd = (
+                f"$EXAPLUS -x -q -c '{db_info.host}:{db_info.ports.database}' "
+                f"-u '{db_user_name}' -p '{db_password}' -sql '{sql}' "
+                f"-jdbcparam 'validateservercertificate=0'"
+            )
 
             bash_cmd = f"""bash -c "{cmd}" """
             exit_code, output = test_container.exec_run(cmd=bash_cmd)
@@ -88,8 +108,10 @@ class TestPopulateData(unittest.TestCase):
     def test_populate_data(self):
         self._populate_data()
         result = self._execute_sql_on_db("SELECT count(*) FROM TEST.ENGINETABLE;")
-        expected_result = '\nCOUNT(*)             \n---------------------\n                  100\n\n'
-        self.assertEquals(result, expected_result)
+        expected_result = (
+            "\nCOUNT(*)             \n---------------------\n                  100\n\n"
+        )
+        self.assertEqual(result, expected_result)
 
     def test_populate_twice_throws_exception(self):
         self._populate_data()
@@ -101,5 +123,5 @@ class TestPopulateData(unittest.TestCase):
         self.assertTrue(exception_thrown)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

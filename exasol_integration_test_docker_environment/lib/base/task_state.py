@@ -1,12 +1,15 @@
-from enum import Enum
+from enum import (
+    Enum,
+    auto,
+)
 
 
 class TaskState(Enum):
-    NONE = 0,
-    INIT = 1,
-    AFTER_INIT =2,
-    RUN = 3,
-    FINISHED = 4,
-    CLEANUP = 5,
-    CLEANED = 6,
-    ERROR = 7
+    NONE = auto()
+    INIT = auto()
+    AFTER_INIT = auto()
+    RUN = auto()
+    FINISHED = auto()
+    CLEANUP = auto()
+    CLEANED = auto()
+    ERROR = auto()

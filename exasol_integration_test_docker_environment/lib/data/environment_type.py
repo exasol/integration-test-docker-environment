@@ -1,6 +1,9 @@
-from enum import Enum
+from enum import (
+    Enum,
+    auto,
+)
 
 
 class EnvironmentType(Enum):
-    docker_db = 1,
-    external_db = 2
+    docker_db = auto()
+    external_db = auto()

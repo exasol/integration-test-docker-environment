@@ -1,7 +1,11 @@
 import json
 import os
 import unittest
-from typing import Optional, List, Callable
+from typing import (
+    Callable,
+    List,
+    Optional,
+)
 
 import requests
 
@@ -35,5 +39,5 @@ def multiassert(assert_list: List[Callable], unit_test: unittest.TestCase):
             failure_log.append(f"\nFailure {len(failure_log)}: {str(e)}")
 
     if len(failure_log) != 0:
-        res_failure_log = '\n'.join(failure_log)
+        res_failure_log = "\n".join(failure_log)
         unit_test.fail(f"{len(failure_log)} failures within test.\n {res_failure_log}")

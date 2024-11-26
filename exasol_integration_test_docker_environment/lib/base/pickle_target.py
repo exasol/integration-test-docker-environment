@@ -6,6 +6,7 @@ from luigi.format import NopFormat
 
 FORMAT = NopFormat()
 
+
 class PickleTarget(LocalTarget):
 
     def __init__(self, path: Path, is_tmp: bool = False):

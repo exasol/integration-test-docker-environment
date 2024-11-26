@@ -5,8 +5,12 @@ import time
 import requests
 
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
-from exasol_integration_test_docker_environment.lib.docker.container.utils import remove_docker_container
-from exasol_integration_test_docker_environment.lib.test_environment.ports import find_free_ports
+from exasol_integration_test_docker_environment.lib.docker.container.utils import (
+    remove_docker_container,
+)
+from exasol_integration_test_docker_environment.lib.test_environment.ports import (
+    find_free_ports,
+)
 
 
 def default_docker_repository_name(env_name: str) -> str:
@@ -25,14 +29,18 @@ class LocalDockerRegistry:
 
     @property
     def images(self):
-        url = f"http://localhost:{self._registry_port}/v2/{self._name.lower()}/tags/list"
+        url = (
+            f"http://localhost:{self._registry_port}/v2/{self._name.lower()}/tags/list"
+        )
         result = requests.request("GET", url)
         images = json.loads(result.content.decode("UTF-8"))
         return images
 
     @property
     def repositories(self):
-        result = requests.request("GET", f"http://localhost:{self._registry_port}/v2/_catalog/")
+        result = requests.request(
+            "GET", f"http://localhost:{self._registry_port}/v2/_catalog/"
+        )
         repositories_ = json.loads(result.content.decode("UTF-8"))["repositories"]
         return repositories_
 
@@ -54,13 +62,16 @@ class LocalDockerRegistryContextManager:
             except:
                 pass
             registry_container = docker_client.containers.run(
-                image="registry:2", name=registry_container_name,
+                image="registry:2",
+                name=registry_container_name,
                 ports={5000: registry_port},
-                detach=True
+                detach=True,
             )
             time.sleep(10)
             logging.debug(f"Finished start container of {registry_container_name}")
-            self._local_docker_registry = LocalDockerRegistry(self._name, registry_container, registry_port)
+            self._local_docker_registry = LocalDockerRegistry(
+                self._name, registry_container, registry_port
+            )
             return self._local_docker_registry
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -68,4 +79,6 @@ class LocalDockerRegistryContextManager:
 
     def close(self):
         if self._local_docker_registry is not None:
-            remove_docker_container([self._local_docker_registry._registry_container.id])
+            remove_docker_container(
+                [self._local_docker_registry._registry_container.id]
+            )

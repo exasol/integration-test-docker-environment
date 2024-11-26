@@ -1,15 +1,26 @@
-from typing import Set, Dict
+from typing import (
+    Dict,
+    Set,
+)
 
 import luigi
 
-from exasol_integration_test_docker_environment.lib.config.docker_config import target_docker_repository_config, \
-    source_docker_repository_config
-from exasol_integration_test_docker_environment.lib.docker.images.create.docker_build_base import DockerBuildBase
-from exasol_integration_test_docker_environment.lib.docker.images.create.docker_image_analyze_task import \
-    DockerAnalyzeImageTask
-from exasol_integration_test_docker_environment.lib.docker.images.push.docker_push_parameter import DockerPushParameter
-from exasol_integration_test_docker_environment.lib.docker.images.push.push_task_creator_for_build_tasks import \
-    PushTaskCreatorFromBuildTasks
+from exasol_integration_test_docker_environment.lib.config.docker_config import (
+    source_docker_repository_config,
+    target_docker_repository_config,
+)
+from exasol_integration_test_docker_environment.lib.docker.images.create.docker_build_base import (
+    DockerBuildBase,
+)
+from exasol_integration_test_docker_environment.lib.docker.images.create.docker_image_analyze_task import (
+    DockerAnalyzeImageTask,
+)
+from exasol_integration_test_docker_environment.lib.docker.images.push.docker_push_parameter import (
+    DockerPushParameter,
+)
+from exasol_integration_test_docker_environment.lib.docker.images.push.push_task_creator_for_build_tasks import (
+    PushTaskCreatorFromBuildTasks,
+)
 
 TAG_SUFFIX = "certificate_resources"
 
@@ -36,7 +47,9 @@ class AnalyzeCertificateContainer(DockerAnalyzeImageTask):
             return TAG_SUFFIX
 
     def get_mapping_of_build_files_and_directories(self):
-        return {"create_certificates.sh": f"{self.certificate_container_root_directory}/create_certificates.sh"}
+        return {
+            "create_certificates.sh": f"{self.certificate_container_root_directory}/create_certificates.sh"
+        }
 
     def get_dockerfile(self):
         return f"{self.certificate_container_root_directory}/Dockerfile"
@@ -50,9 +63,12 @@ class DockerCertificateBuildBase(DockerBuildBase):
     certificate_container_root_directory = luigi.Parameter()
 
     def get_goal_class_map(self) -> Dict[str, DockerAnalyzeImageTask]:
-        goal_class_map = {self.GOAL: self.create_child_task(task_class=AnalyzeCertificateContainer,
-                                                            certificate_container_root_directory=
-                                                            self.certificate_container_root_directory)}
+        goal_class_map = {
+            self.GOAL: self.create_child_task(
+                task_class=AnalyzeCertificateContainer,
+                certificate_container_root_directory=self.certificate_container_root_directory,
+            )
+        }
         return goal_class_map
 
     def get_default_goals(self) -> Set[str]:

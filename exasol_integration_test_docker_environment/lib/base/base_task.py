@@ -3,21 +3,43 @@ import json
 import logging
 import shutil
 from pathlib import Path
-from typing import Dict, List, Generator, Any, Union, Set
+from typing import (
+    Any,
+    Dict,
+    Generator,
+    List,
+    Set,
+    Union,
+)
 
 import luigi
 import six
-from luigi import Task, util
+from luigi import (
+    Task,
+    util,
+)
 from luigi.parameter import ParameterVisibility
 from luigi.task import TASK_ID_TRUNCATE_HASH
 
-from exasol_integration_test_docker_environment.abstract_method_exception import AbstractMethodException
-from exasol_integration_test_docker_environment.lib.base.abstract_task_future import AbstractTaskFuture
-from exasol_integration_test_docker_environment.lib.base.pickle_target import PickleTarget
-from exasol_integration_test_docker_environment.lib.base.task_logger_wrapper import TaskLoggerWrapper
+from exasol_integration_test_docker_environment.abstract_method_exception import (
+    AbstractMethodException,
+)
+from exasol_integration_test_docker_environment.lib.base.abstract_task_future import (
+    AbstractTaskFuture,
+)
+from exasol_integration_test_docker_environment.lib.base.pickle_target import (
+    PickleTarget,
+)
+from exasol_integration_test_docker_environment.lib.base.task_logger_wrapper import (
+    TaskLoggerWrapper,
+)
 from exasol_integration_test_docker_environment.lib.base.task_state import TaskState
-from exasol_integration_test_docker_environment.lib.base.wrong_task_state_exception import WrongTaskStateException
-from exasol_integration_test_docker_environment.lib.config.build_config import build_config
+from exasol_integration_test_docker_environment.lib.base.wrong_task_state_exception import (
+    WrongTaskStateException,
+)
+from exasol_integration_test_docker_environment.lib.config.build_config import (
+    build_config,
+)
 
 RETURN_TARGETS = "return_targets"
 
@@ -57,7 +79,9 @@ class RequiresTaskFuture(AbstractTaskFuture):
                 self._outputs_cache = completion_target.read()
             return self._outputs_cache
         else:
-            raise WrongTaskStateException(self._current_task._task_state, "RequiresTaskFuture.read_outputs_dict")
+            raise WrongTaskStateException(
+                self._current_task._task_state, "RequiresTaskFuture.read_outputs_dict"
+            )
 
 
 class RunTaskFuture(AbstractTaskFuture):
@@ -85,26 +109,31 @@ class RunTaskFuture(AbstractTaskFuture):
 
 
 class BaseTask(Task):
-    caller_output_path : List[str] = luigi.ListParameter([], significant=False, visibility=ParameterVisibility.HIDDEN) # type: ignore
-    job_id : str = luigi.Parameter() # type: ignore
+    caller_output_path: List[str] = luigi.ListParameter([], significant=False, visibility=ParameterVisibility.HIDDEN)  # type: ignore
+    job_id: str = luigi.Parameter()  # type: ignore
 
     def __init__(self, *args, **kwargs):
         self._registered_tasks = []
         self._run_dependencies_tasks = []
         self._task_state = TaskState.INIT
         super().__init__(*args, **kwargs)
-        self.task_id = self.task_id_str(self.get_task_family(),
-                                        self.get_parameter_as_string_dict())
+        self.task_id = self.task_id_str(
+            self.get_task_family(), self.get_parameter_as_string_dict()
+        )
         self.__hash = hash(self.task_id)
         self._init_non_pickle_attributes()
         self.register_required()
         self._task_state = TaskState.AFTER_INIT
 
     def _init_non_pickle_attributes(self):
-        logger = logging.getLogger(f'luigi-interface.{self.__class__.__name__}')
+        logger = logging.getLogger(f"luigi-interface.{self.__class__.__name__}")
         self.logger = TaskLoggerWrapper(logger, self.__repr__())
-        self._run_dependencies_target = PickleTarget(path=self._get_tmp_path_for_run_dependencies())
-        self._complete_target = PickleTarget(path=self._get_tmp_path_for_completion_target())
+        self._run_dependencies_target = PickleTarget(
+            path=self._get_tmp_path_for_run_dependencies()
+        )
+        self._complete_target = PickleTarget(
+            path=self._get_tmp_path_for_completion_target()
+        )
         self._registered_return_target = None
 
     def __getstate__(self):
@@ -128,10 +157,10 @@ class BaseTask(Task):
         """
         # task_id is a concatenation of task family, the first values of the first 3 parameters
         # sorted by parameter name and a md5hash of the family/parameters as a cananocalised json.
-        param_str = json.dumps(params, separators=(',', ':'), sort_keys=True)
+        param_str = json.dumps(params, separators=(",", ":"), sort_keys=True)
         hash_input = param_str
-        param_hash = hashlib.sha3_256(hash_input.encode('utf-8')).hexdigest()
-        return '{}_{}'.format(task_family, param_hash[:TASK_ID_TRUNCATE_HASH])
+        param_hash = hashlib.sha3_256(hash_input.encode("utf-8")).hexdigest()
+        return f"{task_family}_{param_hash[:TASK_ID_TRUNCATE_HASH]}"
 
     def get_parameter_as_string_dict(self):
         """
@@ -139,21 +168,22 @@ class BaseTask(Task):
         """
         params_str = {}
         params = dict(self.get_params())
-        for param_name, param_value in six.iteritems(self.param_kwargs):
-            if (params[param_name].significant):
+        for param_name, param_value in self.param_kwargs.items():
+            if params[param_name].significant:
                 params_str[param_name] = params[param_name].serialize(param_value)
         return params_str
 
     def get_output_path(self) -> Path:
-        path = Path(self._get_output_path_for_job(),
-                    "outputs",
-                    Path(*self._extend_output_path()))
+        path = Path(
+            self._get_output_path_for_job(),
+            "outputs",
+            Path(*self._extend_output_path()),
+        )
         path.mkdir(parents=True, exist_ok=True)
         return path
 
     def _get_output_path_for_job(self) -> Path:
-        return Path(build_config().output_directory,
-                    "jobs", self.job_id)
+        return Path(build_config().output_directory, "jobs", self.job_id)
 
     def _extend_output_path(self):
         extension = self.extend_output_path()
@@ -169,8 +199,7 @@ class BaseTask(Task):
         return Path(self._get_output_path_for_job(), "temp")
 
     def _get_tmp_path_for_task(self) -> Path:
-        return Path(self._get_tmp_path_for_job(),
-                    self.task_id)
+        return Path(self._get_tmp_path_for_job(), self.task_id)
 
     def _get_tmp_path_for_completion_target(self) -> Path:
         return Path(self._get_tmp_path_for_task(), COMPLETION_TARGET)
@@ -206,7 +235,9 @@ class BaseTask(Task):
 
     def register_dependencies(self, tasks):
         if isinstance(tasks, dict):
-            return {key: self.register_dependencies(task) for key, task in tasks.items()}
+            return {
+                key: self.register_dependencies(task) for key, task in tasks.items()
+            }
         elif isinstance(tasks, list):
             return [self.register_dependencies(task) for task in tasks]
         elif isinstance(tasks, BaseTask):
@@ -216,7 +247,9 @@ class BaseTask(Task):
 
     def get_values_from_futures(self, futures):
         if isinstance(futures, dict):
-            return {key: self.get_values_from_futures(task) for key, task in futures.items()}
+            return {
+                key: self.get_values_from_futures(task) for key, task in futures.items()
+            }
         elif isinstance(futures, list):
             return [self.get_values_from_futures(task) for task in futures]
         elif isinstance(futures, AbstractTaskFuture):
@@ -224,7 +257,9 @@ class BaseTask(Task):
         else:
             return futures
 
-    def get_values_from_future(self, future: AbstractTaskFuture) -> Union[Any, Set[str]]:
+    def get_values_from_future(
+        self, future: AbstractTaskFuture
+    ) -> Union[Any, Set[str]]:
         return future.get_output()
 
     def requires(self):
@@ -276,12 +311,18 @@ class BaseTask(Task):
         elif isinstance(tasks, BaseTask):
             self._run_dependencies_tasks.append(tasks)
 
-    def _generate_run_task_futures(self, completion_targets: Union[Any]) -> Union[
-        List[Any], Dict[Any, Any], RunTaskFuture, Any]:
+    def _generate_run_task_futures(
+        self, completion_targets: Union[Any]
+    ) -> Union[List[Any], Dict[Any, Any], RunTaskFuture, Any]:
         if isinstance(completion_targets, dict):
-            return {key: self._generate_run_task_futures(task) for key, task in completion_targets.items()}
+            return {
+                key: self._generate_run_task_futures(task)
+                for key, task in completion_targets.items()
+            }
         elif isinstance(completion_targets, list):
-            return [self._generate_run_task_futures(task) for task in completion_targets]
+            return [
+                self._generate_run_task_futures(task) for task in completion_targets
+            ]
         elif isinstance(completion_targets, PickleTarget):
             return RunTaskFuture(completion_targets)
         else:
@@ -320,11 +361,17 @@ class BaseTask(Task):
         repr_parts = []
         param_objs = dict(params)
         for param_name, param_value in param_values:
-            if param_objs[param_name].significant and \
-                    param_objs[param_name].visibility == ParameterVisibility.PUBLIC:
-                repr_parts.append('%s=%s' % (param_name, param_objs[param_name].serialize(param_value)))
+            if (
+                param_objs[param_name].significant
+                and param_objs[param_name].visibility == ParameterVisibility.PUBLIC
+            ):
+                repr_parts.append(
+                    "{}={}".format(
+                        param_name, param_objs[param_name].serialize(param_value)
+                    )
+                )
 
-        task_str = '{}({})'.format(self.task_id, ', '.join(repr_parts))
+        task_str = "{}({})".format(self.task_id, ", ".join(repr_parts))
 
         return task_str
 
@@ -349,7 +396,10 @@ class BaseTask(Task):
         self.logger.debug("Cleaning up")
         if str(self) not in cleanup_checklist:
             cleanup_checklist.add(str(self))
-            if self._task_state != TaskState.CLEANUP and self._task_state != TaskState.CLEANED:
+            if (
+                self._task_state != TaskState.CLEANUP
+                and self._task_state != TaskState.CLEANED
+            ):
                 self._task_state = TaskState.CLEANUP
                 try:
                     self.cleanup_child_task(success, cleanup_checklist)
@@ -371,7 +421,9 @@ class BaseTask(Task):
             _run_dependencies_tasks_from_target = self._run_dependencies_target.read()
         else:
             _run_dependencies_tasks_from_target = []
-        _run_dependencies_tasks = self._run_dependencies_tasks + _run_dependencies_tasks_from_target
+        _run_dependencies_tasks = (
+            self._run_dependencies_tasks + _run_dependencies_tasks_from_target
+        )
         reversed_run_dependencies_task_list = list(_run_dependencies_tasks)
         reversed_run_dependencies_task_list.reverse()
         for task in reversed_run_dependencies_task_list:

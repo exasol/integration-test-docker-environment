@@ -2,7 +2,9 @@ import sys
 from datetime import datetime
 from traceback import print_tb
 
-from exasol_integration_test_docker_environment.lib.api.api_errors import TaskRuntimeError
+from exasol_integration_test_docker_environment.lib.api.api_errors import (
+    TaskRuntimeError,
+)
 
 
 def print_err(*args, **kwargs):
@@ -48,7 +50,7 @@ class TerminationHandler:
     def _print_task_failures(task_error: TaskRuntimeError):
         print_err()
         print_err("Task failure message: %s" % task_error.msg)
-        print_err(task_error.__cause__.args[0]) # type: ignore
+        print_err(task_error.__cause__.args[0])  # type: ignore
         print_err()
 
     def _handle_success(self):

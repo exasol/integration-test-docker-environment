@@ -3,9 +3,12 @@ import unittest
 
 from exasol_integration_test_docker_environment.cli import commands
 from exasol_integration_test_docker_environment.lib import api
-
-from exasol_integration_test_docker_environment.testing.api_consistency_utils import \
-    param_names_of_click_call, get_click_and_api_functions, defaults_of_click_call, get_click_and_api_function_names
+from exasol_integration_test_docker_environment.testing.api_consistency_utils import (
+    defaults_of_click_call,
+    get_click_and_api_function_names,
+    get_click_and_api_functions,
+    param_names_of_click_call,
+)
 from exasol_integration_test_docker_environment.testing.utils import multiassert
 
 
@@ -28,12 +31,23 @@ class ClickApiConsistencyTest(unittest.TestCase):
                 del api_spec.annotations["return"]
 
             loop = f"cli: {cli_call}, api: {api_call}"
+
             def cli_spec_names():
                 self.assertEqual(api_spec.args, cli_spec.args, msg=f"{loop} - cli spec")
+
             def type_annotations():
-                self.assertEqual(api_spec.annotations, cli_spec.annotations, msg=f"{loop} - type annotations")
+                self.assertEqual(
+                    api_spec.annotations,
+                    cli_spec.annotations,
+                    msg=f"{loop} - type annotations",
+                )
+
             def cli_param_names():
-                self.assertEqual(api_spec.args, param_names_of_click_call(cli_call), msg=f"{loop} - cli param names")
+                self.assertEqual(
+                    api_spec.args,
+                    param_names_of_click_call(cli_call),
+                    msg=f"{loop} - cli param names",
+                )
 
             multiassert([cli_spec_names, type_annotations, cli_param_names], self)
 
@@ -52,11 +66,16 @@ class ClickApiConsistencyTest(unittest.TestCase):
             self.assertEqual(len(cli_defaults), len(api_spec_defaults))
             for api_default_value, cli_default in zip(api_spec_defaults, cli_defaults):
                 cli_param_name, cli_default_value = cli_default
-                if api_default_value != cli_default_value and cli_param_name != "use_job_specific_log_file":
-                    self.fail(f"Default value for parameter '{cli_param_name}' "
-                              f"for method '{api_call.__name__}' does not match. "
-                              f"API method has default value '{api_default_value}' "
-                              f"while CLI method has default value '{cli_default_value}'")
+                if (
+                    api_default_value != cli_default_value
+                    and cli_param_name != "use_job_specific_log_file"
+                ):
+                    self.fail(
+                        f"Default value for parameter '{cli_param_name}' "
+                        f"for method '{api_call.__name__}' does not match. "
+                        f"API method has default value '{api_default_value}' "
+                        f"while CLI method has default value '{cli_default_value}'"
+                    )
 
     def test_same_functions(self):
         """
@@ -64,9 +83,11 @@ class ClickApiConsistencyTest(unittest.TestCase):
         For that we use inspect to get all classes of type click.Command in module 'commands',
         and on the other hand get all functions in module 'api'. The list of names from both most be identical.
         """
-        click_command_names, api_function_names = get_click_and_api_function_names(commands, api)
+        click_command_names, api_function_names = get_click_and_api_function_names(
+            commands, api
+        )
         self.assertEqual(click_command_names, api_function_names)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

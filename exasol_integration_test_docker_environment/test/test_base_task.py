@@ -3,26 +3,37 @@ import time
 import unittest
 
 import luigi
-from luigi import Parameter, Config
+from luigi import (
+    Config,
+    Parameter,
+)
 
 from exasol_integration_test_docker_environment.lib.api.common import generate_root_task
-from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import DependencyLoggerBaseTask
-from exasol_integration_test_docker_environment.lib.base.json_pickle_parameter import JsonPickleParameter
+from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import (
+    DependencyLoggerBaseTask,
+)
+from exasol_integration_test_docker_environment.lib.base.json_pickle_parameter import (
+    JsonPickleParameter,
+)
 
 TestBaseTask = DependencyLoggerBaseTask
 
 
 class TestTask1(TestBaseTask):
     def register_required(self):
-        self.task2 = self.register_dependency(self.create_child_task(task_class=TestTask2))
+        self.task2 = self.register_dependency(
+            self.create_child_task(task_class=TestTask2)
+        )
 
     def run_task(self):
         self.logger.info("RUN")
         self.logger.info(f"task2 {self.task2.get_output()}")
-        tasks_3 = yield from self.run_dependencies({
-            "1": TestTask3(input_param="e"),
-            "2": TestTask3(input_param="d"),
-        })
+        tasks_3 = yield from self.run_dependencies(
+            {
+                "1": TestTask3(input_param="e"),
+                "2": TestTask3(input_param="d"),
+            }
+        )
         self.logger.info(f"""task3_1 {tasks_3["1"].get_output("output")}""")
         self.logger.info(f"""task3_2 {tasks_3["2"].get_output("output")}""")
 
@@ -45,9 +56,7 @@ class TestTask3(TestBaseTask):
 class TestTask4(TestBaseTask):
 
     def run_task(self):
-        yield from self.run_dependencies([
-            TestTask5(),
-            TestTask6()])
+        yield from self.run_dependencies([TestTask5(), TestTask6()])
 
 
 class TestTask5(TestBaseTask):
@@ -69,7 +78,9 @@ class TestParameter(Config):
 class TestTask7(TestBaseTask, TestParameter):
 
     def register_required(self):
-        task8 = self.create_child_task_with_common_params(task_class=TestTask8, new_parameter="new")
+        task8 = self.create_child_task_with_common_params(
+            task_class=TestTask8, new_parameter="new"
+        )
         self.task8_future = self.register_dependency(task8)
 
     def run_task(self):
@@ -103,11 +114,16 @@ class TestTask9_Success(TestBaseTask):
 
     def register_required(self):
         inputs = [Data(i, f"{i}") for i in range(2)]
-        tasks = [self.create_child_task(task_class=TestTask10, parameter_1=input) for input in inputs]
+        tasks = [
+            self.create_child_task(task_class=TestTask10, parameter_1=input)
+            for input in inputs
+        ]
         self.register_dependencies(tasks)
 
     def run_task(self):
-        yield from self.run_dependencies(self.create_child_task(task_class=TestTask10, parameter_1=Data(3, "3")))
+        yield from self.run_dependencies(
+            self.create_child_task(task_class=TestTask10, parameter_1=Data(3, "3"))
+        )
 
 
 class TestTask10(TestBaseTask):
@@ -127,13 +143,17 @@ class TestTask9_Fail(TestBaseTask):
         pass
 
     def run_task(self):
-        yield from self.run_dependencies(self.create_child_task(task_class=TestTask10, parameter_1=Data1()))
+        yield from self.run_dependencies(
+            self.create_child_task(task_class=TestTask10, parameter_1=Data1())
+        )
 
 
 class TestTask11(TestBaseTask):
 
     def run_task(self):
-        tasks = [self.create_child_task(task_class=TestTask12, p=f"{i}") for i in range(10)]
+        tasks = [
+            self.create_child_task(task_class=TestTask12, p=f"{i}") for i in range(10)
+        ]
         self.logger.info(tasks)
         yield from self.run_dependencies(tasks)
 
@@ -144,6 +164,7 @@ class TestTask12(TestBaseTask):
     def run_task(self):
         self.logger.info("Start and wait")
         import time
+
         time.sleep(5)
         self.logger.info("Finished wait and fail")
         raise Exception("%s" % self.task_id)
@@ -152,7 +173,9 @@ class TestTask12(TestBaseTask):
 class TestTask13(TestBaseTask):
 
     def register_required(self):
-        tasks = [self.create_child_task(task_class=TestTask14, p=f"{i}") for i in range(10)]
+        tasks = [
+            self.create_child_task(task_class=TestTask14, p=f"{i}") for i in range(10)
+        ]
         self.register_dependencies(tasks)
 
     def run_task(self):
@@ -201,7 +224,7 @@ class BaseTaskTest(unittest.TestCase):
         finally:
             if task._get_tmp_path_for_job().exists():
                 shutil.rmtree(str(task._get_tmp_path_for_job()))
-    
+
     def test_json_pickle_parameter_fail(self):
         task = generate_root_task(task_class=TestTask9_Fail)
         try:
@@ -239,11 +262,11 @@ class BaseTaskTest(unittest.TestCase):
                 print(failure)
                 print()
             print()
-            self.assertEquals(len(failures), 1)
+            self.assertEqual(len(failures), 1)
         finally:
             if task._get_tmp_path_for_job().exists():
                 shutil.rmtree(str(task._get_tmp_path_for_job()))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

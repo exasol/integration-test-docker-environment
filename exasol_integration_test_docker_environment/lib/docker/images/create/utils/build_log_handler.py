@@ -3,9 +3,15 @@ from pathlib import Path
 
 import docker
 
-from exasol_integration_test_docker_environment.lib.config.log_config import WriteLogFilesToConsole
-from exasol_integration_test_docker_environment.lib.docker.images.image_info import ImageInfo
-from exasol_integration_test_docker_environment.lib.logging.abstract_log_handler import AbstractLogHandler
+from exasol_integration_test_docker_environment.lib.config.log_config import (
+    WriteLogFilesToConsole,
+)
+from exasol_integration_test_docker_environment.lib.docker.images.image_info import (
+    ImageInfo,
+)
+from exasol_integration_test_docker_environment.lib.logging.abstract_log_handler import (
+    AbstractLogHandler,
+)
 
 
 class BuildLogHandler(AbstractLogHandler):
@@ -21,7 +27,7 @@ class BuildLogHandler(AbstractLogHandler):
             self._log_file.write(json_output["stream"])
             self._log_file.write("\n")
             self._log_file.flush()
-        if 'errorDetail' in json_output:
+        if "errorDetail" in json_output:
             self._error_message = json_output["errorDetail"]["message"]
 
     def finish(self):
@@ -30,23 +36,33 @@ class BuildLogHandler(AbstractLogHandler):
 
     def write_log_to_console_if_requested(self):
         if self._log_config.write_log_files_to_console == WriteLogFilesToConsole.all:
-            self._logger.info("Build Log of image %s\n%s",
-                              self._image_info.get_target_complete_name(),
-                              "\n".join(self._complete_log))
+            self._logger.info(
+                "Build Log of image %s\n%s",
+                self._image_info.get_target_complete_name(),
+                "\n".join(self._complete_log),
+            )
 
     def handle_error(self):
         if self._error_message is not None:
             self.write_error_log_to_console_if_requested()
             raise docker.errors.BuildError(
-                "Error occurred during the build of the image %s. Received error \"%s\" ."
+                'Error occurred during the build of the image %s. Received error "%s" .'
                 "The whole log can be found in %s"
-                % (self._image_info.get_target_complete_name(),
-                   self._error_message,
-                   self._log_file_path.absolute()),
-                self._log_file_path.absolute())
+                % (
+                    self._image_info.get_target_complete_name(),
+                    self._error_message,
+                    self._log_file_path.absolute(),
+                ),
+                self._log_file_path.absolute(),
+            )
 
     def write_error_log_to_console_if_requested(self):
-        if self._log_config.write_log_files_to_console == WriteLogFilesToConsole.only_error:
-            self._logger.error("Build of image %s failed\nBuild Log:\n%s",
-                               self._image_info.get_target_complete_name(),
-                               "\n".join(self._complete_log))
+        if (
+            self._log_config.write_log_files_to_console
+            == WriteLogFilesToConsole.only_error
+        ):
+            self._logger.error(
+                "Build of image %s failed\nBuild Log:\n%s",
+                self._image_info.get_target_complete_name(),
+                "\n".join(self._complete_log),
+            )

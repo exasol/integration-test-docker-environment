@@ -1,7 +1,8 @@
 import unittest
 
-from exasol_integration_test_docker_environment.lib.test_environment.db_version import \
-    db_version_supports_custom_certificates
+from exasol_integration_test_docker_environment.lib.test_environment.db_version import (
+    db_version_supports_custom_certificates,
+)
 
 
 class TestDbVersionSupportCustomCertificates(unittest.TestCase):
@@ -34,5 +35,5 @@ class TestDbVersionSupportCustomCertificates(unittest.TestCase):
         self.assertRaises(ValueError, db_version_supports_custom_certificates, "7abc")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

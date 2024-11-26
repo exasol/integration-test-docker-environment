@@ -1,7 +1,11 @@
 from typing import List
 
-from exasol_integration_test_docker_environment.lib.config.log_config import WriteLogFilesToConsole
-from exasol_integration_test_docker_environment.lib.logging.abstract_log_handler import AbstractLogHandler
+from exasol_integration_test_docker_environment.lib.config.log_config import (
+    WriteLogFilesToConsole,
+)
+from exasol_integration_test_docker_environment.lib.logging.abstract_log_handler import (
+    AbstractLogHandler,
+)
 
 
 class ContainerLogHandler(AbstractLogHandler):
@@ -19,5 +23,6 @@ class ContainerLogHandler(AbstractLogHandler):
 
     def finish(self):
         if self._log_config.write_log_files_to_console == WriteLogFilesToConsole.all:
-            self._logger.info("Log %s\n%s", self.db_container_name,
-                              "\n".join(self._complete_log))
+            self._logger.info(
+                "Log %s\n%s", self.db_container_name, "\n".join(self._complete_log)
+            )

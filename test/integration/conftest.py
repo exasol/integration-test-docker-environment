@@ -1,19 +1,28 @@
 import contextlib
 import io
+from test.integration.helpers import normalize_request_name
+from typing import (
+    Any,
+    Callable,
+    ContextManager,
+    Dict,
+    Generator,
+    Iterator,
+    List,
+    NewType,
+    Optional,
+)
 
 import pytest
 
-from typing import Any, Callable, Dict, Iterator, List, NewType, Optional, Generator, ContextManager
-
-from test.integration.helpers import normalize_request_name
 from exasol_integration_test_docker_environment.testing import utils
-from exasol_integration_test_docker_environment \
-    .testing.api_test_environment import ApiTestEnvironment
-from exasol_integration_test_docker_environment \
-    .testing.exaslct_docker_test_environment import \
-    ExaslctDockerTestEnvironment
-from exasol_integration_test_docker_environment.testing \
-    .exaslct_test_environment import (
+from exasol_integration_test_docker_environment.testing.api_test_environment import (
+    ApiTestEnvironment,
+)
+from exasol_integration_test_docker_environment.testing.exaslct_docker_test_environment import (
+    ExaslctDockerTestEnvironment,
+)
+from exasol_integration_test_docker_environment.testing.exaslct_test_environment import (
     ExaslctTestEnvironment,
     SpawnedTestEnvironments,
 )
@@ -40,16 +49,18 @@ def api_isolation(request) -> Iterator[ApiTestEnvironment]:
     utils.close_environments(environment)
 
 
-CliContextProvider = NewType( # type: ignore
-    "CliContextProvider", Callable[
-        [Optional[str], Optional[List[str]]],
-        SpawnedTestEnvironments
-    ],
+CliContextProvider = NewType(  # type: ignore
+    "CliContextProvider",
+    Callable[[Optional[str], Optional[List[str]]], SpawnedTestEnvironments],
 )
 
 
 @pytest.fixture
-def cli_database(cli_isolation) -> Callable[[Optional[str], Optional[list[str]]], ContextManager[SpawnedTestEnvironments]]:
+def cli_database(
+    cli_isolation,
+) -> Callable[
+    [Optional[str], Optional[list[str]]], ContextManager[SpawnedTestEnvironments]
+]:
     """
     Returns a method that test case implementations can use to create a
     context with a database.
@@ -64,8 +75,8 @@ def cli_database(cli_isolation) -> Callable[[Optional[str], Optional[list[str]]]
 
     @contextlib.contextmanager
     def create_context(
-            name: Optional[str] = None,
-            additional_parameters: Optional[List[str]] = None,
+        name: Optional[str] = None,
+        additional_parameters: Optional[List[str]] = None,
     ) -> Iterator[SpawnedTestEnvironments]:
         name = name if name else cli_isolation.name
         spawned = cli_isolation.spawn_docker_test_environments(
@@ -78,12 +89,9 @@ def cli_database(cli_isolation) -> Callable[[Optional[str], Optional[list[str]]]
     return create_context
 
 
-ApiContextProvider = NewType( # type: ignore
+ApiContextProvider = NewType(  # type: ignore
     "ApiContextProvider",
-    Callable[
-        [Optional[str], Optional[Dict[str, Any]]],
-        ExaslctDockerTestEnvironment
-    ],
+    Callable[[Optional[str], Optional[Dict[str, Any]]], ExaslctDockerTestEnvironment],
 )
 
 
@@ -91,8 +99,8 @@ ApiContextProvider = NewType( # type: ignore
 def api_database(api_isolation: ApiTestEnvironment) -> ApiContextProvider:
     @contextlib.contextmanager
     def create_context(
-            name: Optional[str] = None,
-            additional_parameters: Optional[Dict[str, Any]] = None,
+        name: Optional[str] = None,
+        additional_parameters: Optional[Dict[str, Any]] = None,
     ) -> Generator[ExaslctDockerTestEnvironment, None, None]:
         name = name if name else api_isolation.name
         spawned = api_isolation.spawn_docker_test_environment(
@@ -102,7 +110,8 @@ def api_database(api_isolation: ApiTestEnvironment) -> ApiContextProvider:
         yield spawned
         utils.close_environments(spawned)
 
-    return create_context # type: ignore
+    return create_context  # type: ignore
+
 
 @pytest.fixture
 def fabric_stdin(monkeypatch):
@@ -112,4 +121,4 @@ def fabric_stdin(monkeypatch):
     output is captured!  Consider using ``-s``.
     See https://github.com/fabric/fabric/issues/2005
     """
-    monkeypatch.setattr('sys.stdin', io.StringIO(''))
+    monkeypatch.setattr("sys.stdin", io.StringIO(""))

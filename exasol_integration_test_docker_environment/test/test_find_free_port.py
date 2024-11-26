@@ -1,6 +1,8 @@
 import unittest
 
-from exasol_integration_test_docker_environment.lib.test_environment.ports import find_free_ports
+from exasol_integration_test_docker_environment.lib.test_environment.ports import (
+    find_free_ports,
+)
 
 
 class FindFreePortTest(unittest.TestCase):
@@ -9,7 +11,7 @@ class FindFreePortTest(unittest.TestCase):
         ports = find_free_ports(num_ports)
         self.assertNotIn(0, ports)
         self.assertEqual(len(ports), num_ports)
-        #Check that there are no duplicates!
+        # Check that there are no duplicates!
         ports_set = set(ports)
         self.assertEqual(len(ports), len(ports_set))
 
@@ -19,5 +21,5 @@ class FindFreePortTest(unittest.TestCase):
             self.run_it(num_port)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

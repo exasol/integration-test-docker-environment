@@ -1,9 +1,10 @@
 import json
 import multiprocessing as mp
 
-
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
-from exasol_integration_test_docker_environment.lib.logging.abstract_log_handler import AbstractLogHandler
+from exasol_integration_test_docker_environment.lib.logging.abstract_log_handler import (
+    AbstractLogHandler,
+)
 
 
 class DockerRegistryImageCheckerPullLogHandler(AbstractLogHandler):
@@ -35,7 +36,7 @@ class DockerRegistryImageChecker:
 
     def check(self, image: str):
         log_handler = DockerRegistryImageCheckerPullLogHandler()
-        queue : mp.Queue = mp.Queue()
+        queue: mp.Queue = mp.Queue()
         process = mp.Process(target=self.map, args=(image, queue))
         process.start()
         try:
@@ -48,6 +49,8 @@ class DockerRegistryImageChecker:
                 elif value is None:
                     return False
                 else:
-                    raise RuntimeError(f"Should not happen. Programming Error. Unknown value {value}")
+                    raise RuntimeError(
+                        f"Should not happen. Programming Error. Unknown value {value}"
+                    )
         finally:
             process.terminate()

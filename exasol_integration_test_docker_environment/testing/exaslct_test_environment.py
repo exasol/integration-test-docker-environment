@@ -1,30 +1,44 @@
 import functools
 import inspect
 import os
+import shlex
 import shutil
 import subprocess
 import tempfile
 from pathlib import Path
-import shlex
 from sys import stderr
-from typing import List, Optional
+from typing import (
+    List,
+    Optional,
+)
 
-from exasol_integration_test_docker_environment.lib.data.environment_info import EnvironmentInfo
+from exasol_integration_test_docker_environment.lib.data.environment_info import (
+    EnvironmentInfo,
+)
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
-from exasol_integration_test_docker_environment.lib.docker.container.utils import remove_docker_container
-from exasol_integration_test_docker_environment.lib.docker.volumes.utils import remove_docker_volumes
-from exasol_integration_test_docker_environment.testing.docker_registry import default_docker_repository_name
-from exasol_integration_test_docker_environment.testing.exaslct_docker_test_environment import \
-    ExaslctDockerTestEnvironment
-from exasol_integration_test_docker_environment.testing.spawned_test_environments import SpawnedTestEnvironments
-from exasol_integration_test_docker_environment \
-    .lib.test_environment.ports import Ports
-from exasol_integration_test_docker_environment.testing.utils import check_db_version_from_env
+from exasol_integration_test_docker_environment.lib.docker.container.utils import (
+    remove_docker_container,
+)
+from exasol_integration_test_docker_environment.lib.docker.volumes.utils import (
+    remove_docker_volumes,
+)
+from exasol_integration_test_docker_environment.lib.test_environment.ports import Ports
+from exasol_integration_test_docker_environment.testing.docker_registry import (
+    default_docker_repository_name,
+)
+from exasol_integration_test_docker_environment.testing.exaslct_docker_test_environment import (
+    ExaslctDockerTestEnvironment,
+)
+from exasol_integration_test_docker_environment.testing.spawned_test_environments import (
+    SpawnedTestEnvironments,
+)
+from exasol_integration_test_docker_environment.testing.utils import (
+    check_db_version_from_env,
+)
 
 
 def _cleanup(env_name: str):
-    remove_docker_container([f"test_container_{env_name}",
-                             f"db_container_{env_name}"])
+    remove_docker_container([f"test_container_{env_name}", f"db_container_{env_name}"])
     remove_docker_volumes([f"db_container_{env_name}_volume"])
 
 
@@ -42,12 +56,15 @@ def get_test_flavor(test_class):
         return None
     source_file_of_test_object = inspect.getsourcefile(test_class)
     return Path(os.path.realpath(source_file_of_test_object)).parent.joinpath(
-        "resources/test-flavor")
+        "resources/test-flavor"
+    )
 
 
 class ExaslctTestEnvironment:
 
-    def __init__(self, test_object, executable="./exaslct", clean_images_at_close=True, name=None):
+    def __init__(
+        self, test_object, executable="./exaslct", clean_images_at_close=True, name=None
+    ):
         self.clean_images_at_close = clean_images_at_close
         self.executable = executable
         self.test_object = test_object
@@ -79,22 +96,33 @@ class ExaslctTestEnvironment:
     def _update_attributes(self):
         self.flavor_path_argument = f"--flavor-path {self.flavor_path}"
         repository_name = self.repository_name
-        self.docker_repository_arguments = f"--source-docker-repository-name {repository_name} " \
-                                           f"--target-docker-repository-name {repository_name}"
-        self.clean_docker_repository_arguments = f"--docker-repository-name {repository_name}"
+        self.docker_repository_arguments = (
+            f"--source-docker-repository-name {repository_name} "
+            f"--target-docker-repository-name {repository_name}"
+        )
+        self.clean_docker_repository_arguments = (
+            f"--docker-repository-name {repository_name}"
+        )
         self.output_directory_arguments = f"--output-directory {self.temp_dir}"
-        self.task_dependencies_argument = " ".join([f"--task-dependencies-dot-file {self.name}.dot", ])
+        self.task_dependencies_argument = " ".join(
+            [
+                f"--task-dependencies-dot-file {self.name}.dot",
+            ]
+        )
 
     def clean_images(self):
         self.run_command(f"{self.executable} clean-flavor-images", clean=True)
 
-    def run_command(self, command: str,
-                    use_output_directory: bool = True,
-                    use_flavor_path: bool = True,
-                    use_docker_repository: bool = True,
-                    track_task_dependencies: bool = False,
-                    clean: bool = False,
-                    capture_output: bool = False):
+    def run_command(
+        self,
+        command: str,
+        use_output_directory: bool = True,
+        use_flavor_path: bool = True,
+        use_docker_repository: bool = True,
+        track_task_dependencies: bool = False,
+        clean: bool = False,
+        capture_output: bool = False,
+    ):
         if use_output_directory:
             command = f"{command} {self.output_directory_arguments}"
         if track_task_dependencies:
@@ -108,7 +136,9 @@ class ExaslctTestEnvironment:
         print(file=stderr)
         print(f"command: {command}", file=stderr)
         if capture_output:
-            completed_process = subprocess.run(shlex.split(command), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            completed_process = subprocess.run(
+                shlex.split(command), stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+            )
         else:
             completed_process = subprocess.run(shlex.split(command))
         try:
@@ -130,8 +160,9 @@ class ExaslctTestEnvironment:
         except Exception as e:
             print(e, file=stderr)
 
-    def spawn_docker_test_environments(self, name: str, additional_parameter: Optional[List[str]] = None) \
-            -> SpawnedTestEnvironments:
+    def spawn_docker_test_environments(
+        self, name: str, additional_parameter: Optional[List[str]] = None
+    ) -> SpawnedTestEnvironments:
         ports = Ports.random_free()
         on_host_parameter = ExaslctDockerTestEnvironment(
             name=self.name + "_" + name,
@@ -143,7 +174,7 @@ class ExaslctTestEnvironment:
             ports=ports,
         )
 
-        arguments : List[str] = [
+        arguments: List[str] = [
             f"--environment-name {on_host_parameter.name}",
             f"--database-port-forward {on_host_parameter.ports.database}",
             f"--bucketfs-port-forward {on_host_parameter.ports.bucketfs}",
@@ -157,8 +188,12 @@ class ExaslctTestEnvironment:
         arguments_str = " ".join(arguments)
 
         command = f"{self.executable} spawn-test-environment {arguments_str}"
-        completed_process = self.run_command(command, use_flavor_path=False, use_docker_repository=False,
-                                             capture_output=True)
+        completed_process = self.run_command(
+            command,
+            use_flavor_path=False,
+            use_docker_repository=False,
+            capture_output=True,
+        )
         on_host_parameter.completed_process = completed_process
         environment_info_json_path = Path(
             self.temp_dir,
@@ -168,7 +203,7 @@ class ExaslctTestEnvironment:
             with environment_info_json_path.open() as f:
                 environment_info = EnvironmentInfo.from_json(f.read())
                 on_host_parameter.environment_info = environment_info
-        on_host_parameter.clean_up = functools.partial(_cleanup, on_host_parameter.name) #type: ignore
+        on_host_parameter.clean_up = functools.partial(_cleanup, on_host_parameter.name)  # type: ignore
         if "RUN_SLC_TESTS_WITHIN_CONTAINER" in os.environ:
             slc_test_run_parameter = ExaslctDockerTestEnvironment(
                 name=on_host_parameter.name,
@@ -179,17 +214,21 @@ class ExaslctTestEnvironment:
                 bucketfs_password=on_host_parameter.bucketfs_password,
                 ports=Ports.default_ports,
                 environment_info=on_host_parameter.environment_info,
-                completed_process=on_host_parameter.completed_process
+                completed_process=on_host_parameter.completed_process,
             )
 
             with ContextDockerClient() as docker_client:
-                db_container = docker_client.containers.get(f"db_container_{slc_test_run_parameter.name}")
+                db_container = docker_client.containers.get(
+                    f"db_container_{slc_test_run_parameter.name}"
+                )
                 cloudbuild_network = docker_client.networks.get("cloudbuild")
                 cloudbuild_network.connect(db_container)
                 db_container.reload()
-                slc_test_run_parameter.database_host = \
-                    db_container.attrs["NetworkSettings"]["Networks"][cloudbuild_network.name]["IPAddress"]
-                return SpawnedTestEnvironments(on_host_parameter, slc_test_run_parameter)
+                slc_test_run_parameter.database_host = db_container.attrs[
+                    "NetworkSettings"
+                ]["Networks"][cloudbuild_network.name]["IPAddress"]
+                return SpawnedTestEnvironments(
+                    on_host_parameter, slc_test_run_parameter
+                )
         else:
             return SpawnedTestEnvironments(on_host_parameter, None)
-

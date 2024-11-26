@@ -1,5 +1,10 @@
 import inspect
-from typing import Any, List, Tuple, Optional
+from typing import (
+    Any,
+    List,
+    Optional,
+    Tuple,
+)
 
 import click
 
@@ -29,11 +34,17 @@ def is_click_command(obj: Any) -> bool:
     return isinstance(obj, click.Command)
 
 
-def defaults_of_click_call(click_call: click.Command) -> List[Tuple[Optional[str] , Any]]:
+def defaults_of_click_call(
+    click_call: click.Command,
+) -> List[Tuple[Optional[str], Any]]:
     """
     Returns the default values of all None-required parameters of a click-command.
     """
-    return [(o.name, adjust_default_value_for_multiple(o)) for o in click_call.params if not o.required]
+    return [
+        (o.name, adjust_default_value_for_multiple(o))
+        for o in click_call.params
+        if not o.required
+    ]
 
 
 def param_names_of_click_call(click_call: click.Command) -> List[Optional[str]]:
@@ -43,19 +54,31 @@ def param_names_of_click_call(click_call: click.Command) -> List[Optional[str]]:
     return [o.name for o in click_call.params]
 
 
-def get_click_and_api_functions(click_module, api_module) -> Tuple[List[Any], List[Any]]:
+def get_click_and_api_functions(
+    click_module, api_module
+) -> Tuple[List[Any], List[Any]]:
     # Get all click commands in module 'click_module'
     click_commands = [c[1] for c in inspect.getmembers(click_module, is_click_command)]
     # Get all functions in module 'api_module'
-    api_functions = [f[1] for f in inspect.getmembers(api_module, inspect.isfunction)
-                     if f[1].__cli_function__] # type: ignore
+    api_functions = [
+        f[1]
+        for f in inspect.getmembers(api_module, inspect.isfunction)
+        if f[1].__cli_function__  # type: ignore
+    ]
     return click_commands, api_functions
 
 
-def get_click_and_api_function_names(click_module, api_module) -> Tuple[List[Any], List[Any]]:
+def get_click_and_api_function_names(
+    click_module, api_module
+) -> Tuple[List[Any], List[Any]]:
     # Get all click command names in module 'click_module'
-    click_command_names = [c[0] for c in inspect.getmembers(click_module, is_click_command)]
+    click_command_names = [
+        c[0] for c in inspect.getmembers(click_module, is_click_command)
+    ]
     # Get all function names in module 'api_module'
-    api_function_names = [f[0] for f in inspect.getmembers(api_module, inspect.isfunction)
-                          if f[1].__cli_function__] # type: ignore
+    api_function_names = [
+        f[0]
+        for f in inspect.getmembers(api_module, inspect.isfunction)
+        if f[1].__cli_function__  # type: ignore
+    ]
     return click_command_names, api_function_names

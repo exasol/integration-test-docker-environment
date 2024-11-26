@@ -98,30 +98,41 @@ def release(session: nox.Session):
     session.run("git", "tag", version)
     session.run("git", "push", "origin", version)
 
+
 @nox.session(name="starter-scripts-checksums", python=False)
 def starter_scripts_checksums(session: nox.Session):
     start_script_dir = ROOT / "starter_scripts"
     with session.chdir(start_script_dir):
         for start_script_entry in start_script_dir.iterdir():
             if start_script_entry.is_file():
-                sha512 : str = session.run("sha512sum", start_script_entry.name, silent=True) # type: ignore
-                with open( start_script_dir /"checksums" / f"{start_script_entry.name}.sha512sum", "w") as f:
+                sha512: str = session.run("sha512sum", start_script_entry.name, silent=True)  # type: ignore
+                with open(
+                    start_script_dir
+                    / "checksums"
+                    / f"{start_script_entry.name}.sha512sum",
+                    "w",
+                ) as f:
                     f.write(sha512)
     session.run("git", "add", "starter_scripts/checksums")
 
+
 @nox.session(name="copy-docker-db-config-templates", python=False)
 def copy_docker_db_config_templates(session: nox.Session):
-    target_path = ROOT / "exasol_integration_test_docker_environment" / "docker_db_config"
+    target_path = (
+        ROOT / "exasol_integration_test_docker_environment" / "docker_db_config"
+    )
     if target_path.is_dir():
         shutil.rmtree(target_path)
     with session.chdir(ROOT):
         session.run("cp", "-rL", "docker_db_config_template", str(target_path))
     session.run("git", "add", str(target_path))
 
+
 @nox.session(name="test:unit", python=False)
 def unit_tests(session: nox.Session) -> None:
     """Runs all unit tests"""
     from exasol.toolbox.nox._shared import _context
     from exasol.toolbox.nox._test import _unit_tests
+
     context = _context(session, coverage=True)
     _unit_tests(session, PROJECT_CONFIG, context)

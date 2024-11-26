@@ -1,16 +1,30 @@
-from typing import Set, Dict
+from typing import (
+    Dict,
+    Set,
+)
 
-from exasol_integration_test_docker_environment.lib.config.build_config import build_config
-from exasol_integration_test_docker_environment.lib.config.docker_config import target_docker_repository_config, \
-    source_docker_repository_config
-from exasol_integration_test_docker_environment.lib.docker.images.create.docker_build_base import DockerBuildBase
-from exasol_integration_test_docker_environment.lib.docker.images.create.docker_image_analyze_task import \
-    DockerAnalyzeImageTask
-from exasol_integration_test_docker_environment.lib.docker.images.push.docker_push_parameter import DockerPushParameter
-from exasol_integration_test_docker_environment.lib.docker.images.push.push_task_creator_for_build_tasks import \
-    PushTaskCreatorFromBuildTasks
-from exasol_integration_test_docker_environment.lib.test_environment.parameter.test_container_parameter import \
-    TestContainerParameter
+from exasol_integration_test_docker_environment.lib.config.build_config import (
+    build_config,
+)
+from exasol_integration_test_docker_environment.lib.config.docker_config import (
+    source_docker_repository_config,
+    target_docker_repository_config,
+)
+from exasol_integration_test_docker_environment.lib.docker.images.create.docker_build_base import (
+    DockerBuildBase,
+)
+from exasol_integration_test_docker_environment.lib.docker.images.create.docker_image_analyze_task import (
+    DockerAnalyzeImageTask,
+)
+from exasol_integration_test_docker_environment.lib.docker.images.push.docker_push_parameter import (
+    DockerPushParameter,
+)
+from exasol_integration_test_docker_environment.lib.docker.images.push.push_task_creator_for_build_tasks import (
+    PushTaskCreatorFromBuildTasks,
+)
+from exasol_integration_test_docker_environment.lib.test_environment.parameter.test_container_parameter import (
+    TestContainerParameter,
+)
 
 
 class AnalyzeTestContainer(DockerAnalyzeImageTask, TestContainerParameter):
@@ -34,8 +48,10 @@ class AnalyzeTestContainer(DockerAnalyzeImageTask, TestContainerParameter):
             return f"db-test-container"
 
     def get_mapping_of_build_files_and_directories(self):
-        return {mapping.target: str(mapping.source) for mapping
-                in self.test_container_content.build_files_and_directories}
+        return {
+            mapping.target: str(mapping.source)
+            for mapping in self.test_container_content.build_files_and_directories
+        }
 
     def get_dockerfile(self):
         return str(self.test_container_content.docker_file)
@@ -48,8 +64,12 @@ class AnalyzeTestContainer(DockerAnalyzeImageTask, TestContainerParameter):
 class DockerTestContainerBuildBase(DockerBuildBase, TestContainerParameter):
 
     def get_goal_class_map(self) -> Dict[str, DockerAnalyzeImageTask]:
-        goal_class_map = {"test-container": self.create_child_task(task_class=AnalyzeTestContainer,
-                                                                   test_container_content=self.test_container_content)}
+        goal_class_map = {
+            "test-container": self.create_child_task(
+                task_class=AnalyzeTestContainer,
+                test_container_content=self.test_container_content,
+            )
+        }
         return goal_class_map
 
     def get_default_goals(self) -> Set[str]:

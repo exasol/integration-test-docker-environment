@@ -7,8 +7,9 @@ def main():
     # required so the cli will print the available subcommands
     from exasol_integration_test_docker_environment.cli.commands import (
         health,
-        spawn_test_environment
+        spawn_test_environment,
     )
+
     cli()
 
 

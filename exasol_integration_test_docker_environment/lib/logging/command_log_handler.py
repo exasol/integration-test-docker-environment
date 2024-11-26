@@ -1,7 +1,11 @@
 import pathlib
 
-from exasol_integration_test_docker_environment.lib.config.log_config import WriteLogFilesToConsole
-from exasol_integration_test_docker_environment.lib.logging.abstract_log_handler import AbstractLogHandler
+from exasol_integration_test_docker_environment.lib.config.log_config import (
+    WriteLogFilesToConsole,
+)
+from exasol_integration_test_docker_environment.lib.logging.abstract_log_handler import (
+    AbstractLogHandler,
+)
 
 
 class CommandLogHandler(AbstractLogHandler):
@@ -18,18 +22,28 @@ class CommandLogHandler(AbstractLogHandler):
 
     def finish(self):
         if self._log_config.write_log_files_to_console == WriteLogFilesToConsole.all:
-            self._logger.info("Command log for %s \n%s",
-                              self._description,
-                              "".join(self._complete_log))
+            self._logger.info(
+                "Command log for %s \n%s",
+                self._description,
+                "".join(self._complete_log),
+            )
         if self._error_message is not None:
-            if self._log_config.write_log_files_to_console == WriteLogFilesToConsole.only_error:
-                self._logger.error("Command failed %s failed\nCommand Log:\n%s",
-                                   self._description,
-                                   "\n".join(self._complete_log))
+            if (
+                self._log_config.write_log_files_to_console
+                == WriteLogFilesToConsole.only_error
+            ):
+                self._logger.error(
+                    "Command failed %s failed\nCommand Log:\n%s",
+                    self._description,
+                    "\n".join(self._complete_log),
+                )
             raise Exception(
-                "Error occurred during %s. Received error \"%s\" ."
+                'Error occurred during %s. Received error "%s" .'
                 "The whole log can be found in %s"
-                % (self._description,
-                   self._error_message,
-                   self._log_file_path.absolute()),
-                self._log_file_path.absolute())
+                % (
+                    self._description,
+                    self._error_message,
+                    self._log_file_path.absolute(),
+                ),
+                self._log_file_path.absolute(),
+            )

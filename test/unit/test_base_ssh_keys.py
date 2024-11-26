@@ -1,9 +1,13 @@
 import os
 import platform
+from pathlib import Path
+
 import pytest
 
-from pathlib import Path
-from exasol_integration_test_docker_environment.lib.base.ssh_access import SshKeyCache, SshKey
+from exasol_integration_test_docker_environment.lib.base.ssh_access import (
+    SshKey,
+    SshKeyCache,
+)
 
 
 def test_create_file_and_permissions(tmp_path):

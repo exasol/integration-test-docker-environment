@@ -1,14 +1,24 @@
-import pytest
 import os.path
 from pathlib import Path
 from unittest import mock
 
 import luigi
+import pytest
 
-from exasol_integration_test_docker_environment.lib.base.luigi_log_config import LOG_ENV_VARIABLE_NAME, get_log_path
-from exasol_integration_test_docker_environment.lib.api.common import generate_root_task, run_task
-from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import DependencyLoggerBaseTask
-from exasol_integration_test_docker_environment.lib.config.build_config import build_config
+from exasol_integration_test_docker_environment.lib.api.common import (
+    generate_root_task,
+    run_task,
+)
+from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import (
+    DependencyLoggerBaseTask,
+)
+from exasol_integration_test_docker_environment.lib.base.luigi_log_config import (
+    LOG_ENV_VARIABLE_NAME,
+    get_log_path,
+)
+from exasol_integration_test_docker_environment.lib.config.build_config import (
+    build_config,
+)
 
 
 @pytest.fixture
@@ -31,8 +41,10 @@ class UsedLogPath:
         self.task_input_parameter = task["in_parameter"]
 
     def __repr__(self):
-        return f"log path: {str(self.log_path)}" \
-               f"\nlog content: '{self.log_path.read_text()}'"
+        return (
+            f"log path: {str(self.log_path)}"
+            f"\nlog content: '{self.log_path.read_text()}'"
+        )
 
 
 class LogPathCorrectnessMatcher:
@@ -43,19 +55,23 @@ class LogPathCorrectnessMatcher:
 
     def __eq__(self, used_log_path: object):
         if not isinstance(used_log_path, UsedLogPath):
-              return False
+            return False
         log_path = used_log_path.log_path
-        if not (log_path == self.expected_log_path
-                and log_path.exists()
-                and log_path.is_file()):
+        if not (
+            log_path == self.expected_log_path
+            and log_path.exists()
+            and log_path.is_file()
+        ):
             return False
 
         log_content = log_path.read_text()
         return f"Logging: {used_log_path.task_input_parameter}" in log_content
 
     def __repr__(self):
-        return f"log path: {str(self.expected_log_path)}"  \
-                    f"\nlog content: '.*Logging: {self.task_input_parameter}.*'"
+        return (
+            f"log path: {str(self.expected_log_path)}"
+            f"\nlog content: '.*Logging: {self.task_input_parameter}.*'"
+        )
 
 
 def default_log_path(job_id):
@@ -79,10 +95,17 @@ def run_n_simple_tasks(task_number):
         return generate_root_task(task_class=TestTask, x=f"{next(task_id_generator)}")
 
     for j in range(NUMBER_TASK):
-        output = run_task(create_task, workers=5, task_dependencies_dot_file=None, use_job_specific_log_file=True)
+        output = run_task(
+            create_task,
+            workers=5,
+            task_dependencies_dot_file=None,
+            use_job_specific_log_file=True,
+        )
         jobid = output["job_id"]
         log_path = get_log_path(jobid)
-        tasks.append({"jobid": jobid, "log_path": log_path, "in_parameter": output["parameter"]})
+        tasks.append(
+            {"jobid": jobid, "log_path": log_path, "in_parameter": output["parameter"]}
+        )
 
     return tasks
 
@@ -90,7 +113,12 @@ def run_n_simple_tasks(task_number):
 def use_specific_log_file(task_creator, temp_dir, test_name):
     log_path = Path(temp_dir) / (test_name + ".log")
     os.environ[LOG_ENV_VARIABLE_NAME] = str(log_path)
-    run_task(task_creator, workers=5, task_dependencies_dot_file=None, use_job_specific_log_file=True)
+    run_task(
+        task_creator,
+        workers=5,
+        task_dependencies_dot_file=None,
+        use_job_specific_log_file=True,
+    )
     return log_path
 
 
@@ -150,7 +178,7 @@ def test_preexisting_custom_log_file(set_tempdir, mock_settings_env_vars):
     log_path = UsedLogPath(tasks[0])
     assert log_path == log_path_matcher
 
-    with open(custom_log_path, "r") as f:
+    with open(custom_log_path) as f:
         log_content = f.read()
         assert file_content in log_content
 
@@ -183,7 +211,7 @@ def test_different_custom_logging_file(set_tempdir, mock_settings_env_vars):
 
     for log_path in [log_path_1, log_path_2]:
         assert log_path.exists()
-        with open(log_path, "r") as f:
+        with open(log_path) as f:
             log_content = f.read()
             assert f"Logging: Test" in log_content
 
