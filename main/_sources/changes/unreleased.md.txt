@@ -11,3 +11,4 @@ Code name:
 * #418: Use exasol/python-toolbox
 * #411: Removed usage of exasol-bucketfs
 * #425: Fixed type checks found by MyPy
+* #423: Updated formatting
