@@ -4,6 +4,10 @@ Code name:
 
 ## Summary
 
+## Bugfixes
+
+* #432: Fixed localhost ip address
+
 ## Refactorings
 
 * #119: Refactored `pkg_resources` usage to `importlib.resources`
