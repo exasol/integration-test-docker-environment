@@ -103,9 +103,9 @@ function _format_parameters() {
   for param in "${@}"; do
     local found=0
     for check_param in "${!relevant_mount_point_arguments[@]}"; do
-      if [[ $param == "${check_param}"=* ]]; then
-        first_part="$(echo $param | cut -d= -f 1)"
-        second_part="$(echo $param | cut -d= -f 2-)"
+      if [[ "$param" == "${check_param}"=* ]]; then
+        first_part="$(echo "$param" | cut -d= -f 1)"
+        second_part="$(echo "$param" | cut -d= -f 2-)"
         result="$result $first_part $second_part"
         found=1
         break
