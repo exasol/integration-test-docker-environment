@@ -22,14 +22,14 @@ jobs:
       - name: SCM Checkout
         uses: actions/checkout@v4
 
-      - name: Allow Unprivileged User Namespaces
-        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
-
       - name: Setup Python & Poetry Environment
         uses: exasol/python-toolbox/.github/actions/python-environment@0.17.0
         with:
           python-version: ${{ matrix.python_version }}
           poetry-version: '1.8.2'
+
+      - name: Allow unprivileged user namespaces
+        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
       - name: Run all tests
         run: poetry run nox -s "run-tests(db_version='${{ matrix.exasol_version }}')"
