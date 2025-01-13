@@ -8,6 +8,7 @@ on:
 
 jobs:
   test-python-version-all-tests:
+    name: Run Tests with Python ${{ matrix.python_version }} and Exasol ${{ matrix.exasol_version }}
     strategy:
       fail-fast: false
       matrix:
@@ -16,15 +17,19 @@ jobs:
         python_version:
         - "3.9"
         - "3.10"
-    name: Run tests with Python ${{ matrix.python_version }} and Exasol ${{ matrix.exasol_version }}
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+      - name: SCM Checkout
+        uses: actions/checkout@v4
 
-    - name: Setup Python & Poetry Environment
-      uses: exasol/python-toolbox/.github/actions/python-environment@0.17.0
-      with:
-        python-version: ${{ matrix.python_version }}
-        poetry-version: '1.8.2'
-    - name: Run all tests
-      run: poetry run nox -s "run-tests(db_version='${{ matrix.exasol_version }}')"
+      - name: Allow Unprivileged User Namespaces
+        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+
+      - name: Setup Python & Poetry Environment
+        uses: exasol/python-toolbox/.github/actions/python-environment@0.17.0
+        with:
+          python-version: ${{ matrix.python_version }}
+          poetry-version: '1.8.2'
+
+      - name: Run all tests
+        run: poetry run nox -s "run-tests(db_version='${{ matrix.exasol_version }}')"

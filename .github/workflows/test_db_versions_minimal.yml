@@ -12,21 +12,26 @@ jobs:
     uses: ./.github/workflows/get_exasol_versions.yml
 
   test-db-versions-minimal:
+    name: Run Minimal Tests for Exasol ${{ matrix.exasol_version }}
     needs: get_exasol_versions
     strategy:
       fail-fast: false
       matrix:
         exasol_version: ${{fromJson(needs.get_exasol_versions.outputs.matrix)}}
     runs-on: ubuntu-latest
-    name: Run minimum tests for Exasol ${{ matrix.exasol_version }}
     steps:
-    - uses: actions/checkout@v4
+      - name: SCM Checkout
+        uses: actions/checkout@v4
 
-    - name: Setup Python & Poetry Environment
-      uses: exasol/python-toolbox/.github/actions/python-environment@0.17.0
-      with:
-        python-version: "3.10"
-        poetry-version: '1.8.2'
+      - name: Allow Unprivileged User Namespaces
+        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
-    - name: Run minimal tests
-      run: poetry run nox -s "run-minimal-tests(db_version='${{ matrix.exasol_version }}')"
+      - name: Setup Python & Poetry Environment
+        uses: exasol/python-toolbox/.github/actions/python-environment@0.17.0
+        with:
+          python-version: "3.10"
+          poetry-version: '1.8.2'
+
+      - name: Run Minimal Tests
+        run: poetry run nox -s "run-minimal-tests(db_version='${{ matrix.exasol_version }}')"
+
