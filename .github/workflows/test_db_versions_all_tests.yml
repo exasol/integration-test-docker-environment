@@ -48,5 +48,7 @@ jobs:
         # We want to deactivate running all tests only for pull_requests
         if: ${{ github.event_name == 'pull_request' }}
 
-      - name: Run all tests
+      - name: Allow unprivileged user namespaces
+      run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+    - name: Run all tests
         run: poetry run nox -s "run-tests(db_version='${{ matrix.exasol_version }}')"
