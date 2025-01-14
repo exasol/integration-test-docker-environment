@@ -48,7 +48,7 @@ jobs:
     uses: ./.github/workflows/test_shell_scripts.yml
   Slow-Tests:
     name: Slow
-    if: github.event_name != 'pull_request'
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
 
     # Even though the environment "manual-approval" will be created automatically,
