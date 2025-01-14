@@ -7,35 +7,39 @@ on:
         required: false
 
 jobs:
+  build-matrix:
+    name: Generate Build Matrix
+    uses: ./.github/workflows/matrix-python.yml
 
   Tests:
-    name: Tests (Python-${{ matrix.python-version }}, Exasol-${{ matrix.exasol-version}})
+    name: Unit-Tests (Python-${{ matrix.python-version }}, Exasol-${{ matrix.exasol-version}})
+    needs: [ build-matrix ]
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.ALTERNATIVE_GITHUB_TOKEN ||  secrets.GITHUB_TOKEN }}
     strategy:
       fail-fast: false
-      matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
+      matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
 
     steps:
       - name: SCM Checkout
         uses: actions/checkout@v4
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@0.17.0
+        uses: exasol/python-toolbox/.github/actions/python-environment@0.20.0
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Run Unit Tests
-        run: poetry run nox -s test:unit
+      - name: Run Tests and Collect Coverage
+        run: poetry run nox -s test:unit -- -- --coverage
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4.4.0
         with:
-          name: coverage-python${{ matrix.python-version }}
+          name: coverage-python${{ matrix.python-version }}-fast
           path: .coverage
           include-hidden-files: true
+
   Db-Version-Minimal-Tests:
     uses: ./.github/workflows/test_db_versions_minimal.yml
   Test-Docker-Starter:
