@@ -1,8 +1,10 @@
 # 3.3.0 - 2025-01-14
 
-Code name:
+Code name: Python3.12 support and toolbox support
 
 ## Summary
+
+This release removed the usage of `pkg_resources` which enables clients to run the integration-test-docker-environment with Python3.12. Also, now the Exasol toolbox is used to run several CI checks. Besides this, the formatting was updated and missing type hints reported by MyPy were fixed. 
 
 ## Bugfixes
 
