@@ -223,7 +223,9 @@ class APIClientLoggingTest(unittest.TestCase):
             catched_stderr.seek(0)
             stderr_output = catched_stderr.read()
             self.assert_loggers_are_equal(logger_infos_after, logger_infos_before)
-            self.assertEqual(stderr_output, "")
+            #Python3.12 (and later?) prints a deprecation warning.
+            if sys.version_info[1] < 12:
+                self.assertEqual(stderr_output, "")
             main_log_glob = list(
                 Path(self._build_output_temp_dir.name).glob("**/main.log")
             )
