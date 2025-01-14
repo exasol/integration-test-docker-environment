@@ -12,7 +12,7 @@ from exasol_integration_test_docker_environment.lib.test_environment.db_version 
 
 def test_udf_execution(api_database):
     if "EXASOL_VERSION" in os.environ and os.environ["EXASOL_VERSION"].startswith("7"):
-        pytest.skip("Test is unstable with Exasol 7.x")
+        pytest.skip("Test is unstable with Exasol 7.x on newer Linux Kernel")
 
     def wait_until_container_is_unpacked():
         sleep(5 * 60)
