@@ -6,7 +6,7 @@
     function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
     setColorMode(localStorage._theme||"auto");
   </script><link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=397bb51e" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/shibuya.css?v=83eaa723" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/shibuya.css?v=10d1008b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/tabs.css?v=4c969af8" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
@@ -116,17 +116,17 @@ data-aria-dark="Switch to auto color mode">
       <div class="min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
         <article class="yue" role="main">
           <h1>Source code for exasol_integration_test_docker_environment.lib.api.health</h1><div class="highlight"><pre>
-<span></span><span data-line="1"><span class="kn">from</span> <span class="nn">inspect</span> <span class="kn">import</span> <span class="n">cleandoc</span>
+<span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">inspect</span><span class="w"> </span><span class="kn">import</span> <span class="n">cleandoc</span>
 </span><span data-line="2">
-</span><span data-line="3"><span class="kn">from</span> <span class="nn">exasol_integration_test_docker_environment.doctor</span> <span class="kn">import</span> <span class="n">health_checkup</span>
-</span><span data-line="4"><span class="kn">from</span> <span class="nn">exasol_integration_test_docker_environment.lib.api.api_errors</span> <span class="kn">import</span> <span class="n">HealthProblem</span>
-</span><span data-line="5"><span class="kn">from</span> <span class="nn">exasol_integration_test_docker_environment.lib.api.common</span> <span class="kn">import</span> <span class="n">cli_function</span>
+</span><span data-line="3"><span class="kn">from</span><span class="w"> </span><span class="nn">exasol_integration_test_docker_environment.doctor</span><span class="w"> </span><span class="kn">import</span> <span class="n">health_checkup</span>
+</span><span data-line="4"><span class="kn">from</span><span class="w"> </span><span class="nn">exasol_integration_test_docker_environment.lib.api.api_errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">HealthProblem</span>
+</span><span data-line="5"><span class="kn">from</span><span class="w"> </span><span class="nn">exasol_integration_test_docker_environment.lib.api.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">cli_function</span>
 </span><span data-line="6">
 </span><span data-line="7">
 <div class="viewcode-block" id="health">
 <a class="viewcode-back" href="../../../../api/exasol_integration_test_docker_environment.lib.api.health.html#exasol_integration_test_docker_environment.lib.api.health">[docs]</a>
 </span><span data-line="8"><span class="nd">@cli_function</span>
-</span><span data-line="9"><span class="k">def</span> <span class="nf">health</span><span class="p">():</span>
+</span><span data-line="9"><span class="k">def</span><span class="w"> </span><span class="nf">health</span><span class="p">():</span>
 </span><span data-line="10"><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span data-line="11"><span class="sd">    Check the health of the execution environment.</span>
 </span><span data-line="12">
@@ -190,5 +190,5 @@ data-aria-dark="Switch to auto color mode">
       <script src="../../../../_static/copybutton.js?v=f281be69"></script>
       <script src="../../../../_static/tabs.js?v=3ee01567"></script>
       <script src="../../../../_static/design-tabs.js?v=f930bc37"></script>
-      <script src="../../../../_static/shibuya.js?v=e2e99575"></script></body>
+      <script src="../../../../_static/shibuya.js?v=55e26b35"></script></body>
 </html>

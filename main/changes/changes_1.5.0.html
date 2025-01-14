@@ -6,7 +6,7 @@
     function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
     setColorMode(localStorage._theme||"auto");
   </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=397bb51e" />
-    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=83eaa723" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=10d1008b" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/tabs.css?v=4c969af8" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
@@ -157,7 +157,7 @@ data-aria-dark="Switch to auto color mode">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="c1"># In order to use itde, just request it as fixture</span>
 </span><span data-line="2"><span class="c1"># ATTENTION: initial startup may be up to ~1-2 minutes</span>
 </span><span data-line="3"><span class="c1"># (Somtimes even longer if images must be fetched for the first time)</span>
-</span><span data-line="4"><span class="k">def</span> <span class="nf">test_smoke_test_plugin</span><span class="p">(</span><span class="n">itde</span><span class="p">):</span>
+</span><span data-line="4"><span class="k">def</span><span class="w"> </span><span class="nf">test_smoke_test_plugin</span><span class="p">(</span><span class="n">itde</span><span class="p">):</span>
 </span><span data-line="5">    <span class="n">db</span> <span class="o">=</span> <span class="n">itde</span><span class="o">.</span><span class="n">exasol_config</span><span class="p">,</span>
 </span><span data-line="6">    <span class="n">bucketfs</span> <span class="o">=</span> <span class="n">itde</span><span class="o">.</span><span class="n">bucketfs_config</span><span class="p">,</span>
 </span><span data-line="7">    <span class="n">itde_cfg</span> <span class="o">=</span> <span class="n">itde</span><span class="o">.</span><span class="n">itde_config</span><span class="p">,</span>
@@ -247,5 +247,5 @@ data-aria-dark="Switch to auto color mode">
       <script src="../_static/copybutton.js?v=f281be69"></script>
       <script src="../_static/tabs.js?v=3ee01567"></script>
       <script src="../_static/design-tabs.js?v=f930bc37"></script>
-      <script src="../_static/shibuya.js?v=e2e99575"></script></body>
+      <script src="../_static/shibuya.js?v=55e26b35"></script></body>
 </html>

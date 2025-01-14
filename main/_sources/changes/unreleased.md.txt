@@ -4,6 +4,10 @@ Code name:
 
 ## Summary
 
+## Bugfixes
+
+* #432: Fixed localhost ip address
+
 ## Refactorings
 
 * #119: Refactored `pkg_resources` usage to `importlib.resources`
@@ -12,3 +16,7 @@ Code name:
 * #411: Removed usage of exasol-bucketfs
 * #425: Fixed type checks found by MyPy
 * #423: Updated formatting
+
+## Bugs
+
+* #432: Fixed localhost ip address

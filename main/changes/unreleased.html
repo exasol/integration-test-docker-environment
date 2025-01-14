@@ -6,7 +6,7 @@
     function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
     setColorMode(localStorage._theme||"auto");
   </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=397bb51e" />
-    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=83eaa723" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=10d1008b" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/tabs.css?v=4c969af8" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
@@ -85,7 +85,9 @@ data-aria-dark="Switch to auto color mode">
     </button>
     <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
 <li><a class="reference internal" href="#summary">Summary</a></li>
+<li><a class="reference internal" href="#bugfixes">Bugfixes</a></li>
 <li><a class="reference internal" href="#refactorings">Refactorings</a></li>
+<li><a class="reference internal" href="#bugs">Bugs</a></li>
 </ul>
 </div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
   </aside>
@@ -125,6 +127,12 @@ data-aria-dark="Switch to auto color mode">
 <section id="summary">
 <h2>Summary<a class="headerlink" href="#summary" title="Link to this heading">¶</a></h2>
 </section>
+<section id="bugfixes">
+<h2>Bugfixes<a class="headerlink" href="#bugfixes" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>#432: Fixed localhost ip address</p></li>
+</ul>
+</section>
 <section id="refactorings">
 <h2>Refactorings<a class="headerlink" href="#refactorings" title="Link to this heading">¶</a></h2>
 <ul class="simple">
@@ -134,6 +142,12 @@ data-aria-dark="Switch to auto color mode">
 <li><p>#411: Removed usage of exasol-bucketfs</p></li>
 <li><p>#425: Fixed type checks found by MyPy</p></li>
 <li><p>#423: Updated formatting</p></li>
+</ul>
+</section>
+<section id="bugs">
+<h2>Bugs<a class="headerlink" href="#bugs" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>#432: Fixed localhost ip address</p></li>
 </ul>
 </section>
 </section>
@@ -180,5 +194,5 @@ data-aria-dark="Switch to auto color mode">
       <script src="../_static/copybutton.js?v=f281be69"></script>
       <script src="../_static/tabs.js?v=3ee01567"></script>
       <script src="../_static/design-tabs.js?v=f930bc37"></script>
-      <script src="../_static/shibuya.js?v=e2e99575"></script></body>
+      <script src="../_static/shibuya.js?v=55e26b35"></script></body>
 </html>
