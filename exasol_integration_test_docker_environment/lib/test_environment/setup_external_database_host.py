@@ -41,7 +41,7 @@ class SetupExternalDatabaseHost(
         database_host = self.external_exasol_db_host
         if (
             self.external_exasol_db_host == "localhost"
-            or self.external_exasol_db_host == "127.0.01"
+            or self.external_exasol_db_host == "127.0.0.1"
         ):
             database_host = self.network_info.gateway
         self.setup_database()
