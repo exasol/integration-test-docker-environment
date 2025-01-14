@@ -15,10 +15,29 @@ on:
 
 jobs:
 
-  CI:
-    uses: ./.github/workflows/merge-gate.yml
-    secrets: inherit
+  checks:
+    name: Checks
+    uses: ./.github/workflows/checks.yml
+
+  # This job ensures inputs have been executed successfully.
+  approve-merge:
+    name: Allow Merge
+    runs-on: ubuntu-latest
+    environment: manual-approval
+    # If you need additional jobs to be part of the merge gate, add them below
+    needs: [ checks ]
+
+    # Each job requires a step, so we added this dummy step.
+    steps:
+      - name: Approve
+        run: |
+          echo "Merge Approved"
+
+  Tests:
+    needs: [ approve-merge ]
+    name: Tests
+    uses: ./.github/workflows/tests_with_coverage.yml
 
   Metrics:
-    needs: [ CI ]
+    needs: [ Tests ]
     uses: ./.github/workflows/report.yml

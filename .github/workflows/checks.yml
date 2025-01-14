@@ -117,7 +117,3 @@ jobs:
           name: security-python${{ matrix.python-version }}
           path: .security.json
           include-hidden-files: true
-
-  Tests:
-    name: Tests
-    uses: ./.github/workflows/tests_with_coverage.yml
