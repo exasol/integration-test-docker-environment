@@ -17,7 +17,6 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12"]
-        exasol-version: ["7.1.9"]
 
     steps:
       - name: SCM Checkout
@@ -41,8 +40,6 @@ jobs:
     uses: ./.github/workflows/test_db_versions_minimal.yml
   Test-Docker-Starter:
     uses: ./.github/workflows/test_docker_starter.yml
-  Test-Python-Version:
-    uses: ./.github/workflows/test_python_version.yml
   Test-Shell-Scripts:
     uses: ./.github/workflows/test_shell_scripts.yml
   Slow-Tests:
@@ -66,3 +63,6 @@ jobs:
   Test-Db-Versions-All-Tests:
     needs: Slow-Tests
     uses: ./.github/workflows/test_db_versions_all_tests.yml
+  Test-Python-Versions:
+    needs: Slow-Tests
+    uses: ./.github/workflows/test_python_version.yml

@@ -23,6 +23,19 @@ jobs:
     name: Tests
     uses: ./.github/workflows/tests_with_coverage.yml
 
+  # This job ensures inputs have been executed successfully.
+  approve-merge:
+    name: Allow Merge
+    runs-on: ubuntu-latest
+    # If you need additional jobs to be part of the merge gate, add them below
+    needs: [ Tests ]
+
+    # Each job requires a step, so we added this dummy step.
+    steps:
+      - name: Approve
+        run: |
+          echo "Merge Approved"
+
   Metrics:
     needs: [ Tests ]
     uses: ./.github/workflows/report.yml

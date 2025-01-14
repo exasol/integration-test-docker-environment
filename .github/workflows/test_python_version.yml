@@ -4,18 +4,17 @@ on:
   workflow_call:
 
 jobs:
+
+  build-matrix:
+    name: Generate Build Matrix
+    uses: ./.github/workflows/matrix-python.yml
+
   test-python-version-all-tests:
     name: Run Tests with Python ${{ matrix.python_version }} and Exasol ${{ matrix.exasol_version }}
+    needs: [ build-matrix ]
     strategy:
       fail-fast: false
-      matrix:
-        exasol_version:
-        - "default"
-        python_version:
-        - "3.9"
-        - "3.10"
-        - "3.11"
-        - "3.12"
+      matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
     runs-on: ubuntu-latest
     steps:
       - name: SCM Checkout
@@ -24,11 +23,11 @@ jobs:
       - name: Setup Python & Poetry Environment
         uses: exasol/python-toolbox/.github/actions/python-environment@0.17.0
         with:
-          python-version: ${{ matrix.python_version }}
+          python-version: ${{ matrix.python-version }}
           poetry-version: '1.8.2'
 
       - name: Allow unprivileged user namespaces
         run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
       - name: Run all tests
-        run: poetry run nox -s "run-tests(db_version='${{ matrix.exasol_version }}')"
+        run: poetry run nox -s "run-tests(db_version='default')"
