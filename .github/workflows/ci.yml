@@ -34,7 +34,7 @@ jobs:
     uses: ./.github/workflows/slow_tests.yml
 
   fast-tests:
-    name: Slow Tests
+    name: Fast Tests
     uses: ./.github/workflows/fast_tests.yml
 
   metrics:
