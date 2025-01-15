@@ -20,6 +20,10 @@ jobs:
     name: Publish Documentation
     uses: ./.github/workflows/gh-pages.yml
 
+  fast-tests:
+    name: Slow Tests
+    uses: ./.github/workflows/fast_tests.yml
+
   metrics:
     needs: [ ci-job ]
     uses: ./.github/workflows/report.yml

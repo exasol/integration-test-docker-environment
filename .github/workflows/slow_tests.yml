@@ -1,0 +1,14 @@
+name: Slow Tests
+
+on:
+  workflow_call:
+    secrets:
+      ALTERNATIVE_GITHUB_TOKEN:
+        required: false
+
+jobs:
+
+  Test-Db-Versions-All-Tests:
+    uses: ./.github/workflows/test_db_versions_all_tests.yml
+  Test-Python-Versions:
+    uses: ./.github/workflows/test_python_version.yml
