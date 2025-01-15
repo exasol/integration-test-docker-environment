@@ -31,7 +31,7 @@ class ShellVariables:
         assert info.database_info.ports.bucketfs is not None
         env: Dict[str, str] = {
             "NAME": info.name,
-            "TYPE": info.type,
+            "TYPE": info.type if isinstance(info.type, str) else info.type.name,
             "DATABASE_HOST": info.database_info.host,
             "DATABASE_DB_PORT": str(info.database_info.ports.database),
             "DATABASE_BUCKETFS_PORT": str(info.database_info.ports.bucketfs),
