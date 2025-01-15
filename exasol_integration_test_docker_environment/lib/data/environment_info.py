@@ -10,6 +10,7 @@ from exasol_integration_test_docker_environment.lib.data.database_info import (
 from exasol_integration_test_docker_environment.lib.data.docker_network_info import (
     DockerNetworkInfo,
 )
+from exasol_integration_test_docker_environment.lib.data.environment_type import EnvironmentType
 
 
 class EnvironmentInfo(Info):
@@ -17,7 +18,7 @@ class EnvironmentInfo(Info):
     def __init__(
         self,
         name: str,
-        env_type: str,
+        env_type: str | EnvironmentType,
         database_info: DatabaseInfo,
         test_container_info: Optional[ContainerInfo],
         network_info: DockerNetworkInfo,
