@@ -223,13 +223,16 @@ class APIClientLoggingTest(unittest.TestCase):
             catched_stderr.seek(0)
             stderr_output = catched_stderr.read()
             self.assert_loggers_are_equal(logger_infos_after, logger_infos_before)
-            #Python3.12 (and later?) prints a deprecation warning.
+            # Python3.12 (and later?) prints a deprecation warning.
             if sys.version_info[1] < 12:
                 self.assertEqual(stderr_output, "")
             else:
                 stderr_output_lines = stderr_output.split("\n")
                 self.assertEqual(len(stderr_output_lines), 3)
-                self.assertIn(" is multi-threaded, use of fork() may lead to deadlocks in the child", stderr_output_lines[0])
+                self.assertIn(
+                    " is multi-threaded, use of fork() may lead to deadlocks in the child",
+                    stderr_output_lines[0],
+                )
                 self.assertEqual(stderr_output_lines[1], "  self.pid = os.fork()")
                 self.assertEqual(stderr_output_lines[2], "")
             main_log_glob = list(
