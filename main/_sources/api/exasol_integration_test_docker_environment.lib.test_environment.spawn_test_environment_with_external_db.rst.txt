@@ -1,0 +1,12 @@
+exasol\_integration\_test\_docker\_environment.lib.test\_environment.spawn\_test\_environment\_with\_external\_db
+=================================================================================================================
+
+.. automodule:: exasol_integration_test_docker_environment.lib.test_environment.spawn_test_environment_with_external_db
+
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      SpawnTestEnvironmentWithExternalDB
+   

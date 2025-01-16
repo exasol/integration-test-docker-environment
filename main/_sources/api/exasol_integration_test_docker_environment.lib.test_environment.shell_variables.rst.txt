@@ -1,0 +1,12 @@
+exasol\_integration\_test\_docker\_environment.lib.test\_environment.shell\_variables
+=====================================================================================
+
+.. automodule:: exasol_integration_test_docker_environment.lib.test_environment.shell_variables
+
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      ShellVariables
+   
