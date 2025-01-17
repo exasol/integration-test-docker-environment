@@ -11,7 +11,7 @@ jobs:
 
   fast-tests:
     name: Fast Tests
-    uses: fast-tests.yml
+    uses: ./.github/workflows/fast-tests.yml
 
   slow-tests-approval:
     name: Slow Approval
