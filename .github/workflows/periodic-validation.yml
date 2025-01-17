@@ -1,0 +1,27 @@
+name: Periodic Validation
+
+on:
+  schedule:
+    # “At 00:00 on every 7th day-of-month from 1 through 31.” (https://crontab.guru)
+    - cron: "0 0 1/7 * *"
+
+jobs:
+
+  checks:
+    name: Checks
+    uses: ./.github/workflows/checks.yml
+
+  fast-tests:
+    name: Fast Tests
+    uses: ./.github/workflows/fast-tests.yml
+
+  slow-tests:
+    name: Slow Tests
+    uses: ./.github/workflows/slow-tests.yml
+    #Do not inherit secrets because ITDE Slow Tests does not need it
+
+  metrics:
+    name: Report Metrics
+    needs: [ checks, fast-tests ]
+    uses: ./.github/workflows/report.yml
+

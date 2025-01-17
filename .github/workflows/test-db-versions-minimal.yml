@@ -1,15 +1,19 @@
 name: Test DB Versions with minimal tests
 
-on:
-  push:
-    branches:
-      - main
-  pull_request:
+# python-version: default as specified
+# database-version: all supported by ITDE
+# tests: minimal (subset of all tests)
+#
+# Use the specified default version of python and call nox task
+# run_minimal_tests to execute a few selected tests for all versions of Exasol
+# database currently supported by the ITDE.
 
+on:
+ workflow_call:
 
 jobs:
   get_exasol_versions:
-    uses: ./.github/workflows/get_exasol_versions.yml
+    uses: ./.github/workflows/get-exasol-versions.yml
 
   test-db-versions-minimal:
     name: Run Minimal Tests for Exasol ${{ matrix.exasol_version }}
@@ -24,7 +28,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@0.17.0
+        uses: exasol/python-toolbox/.github/actions/python-environment@0.20.0
         with:
           python-version: "3.10"
           poetry-version: '1.8.2'
@@ -34,4 +38,3 @@ jobs:
 
       - name: Run Minimal Tests
         run: poetry run nox -s "run-minimal-tests(db_version='${{ matrix.exasol_version }}')"
-
