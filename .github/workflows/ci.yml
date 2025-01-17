@@ -14,7 +14,7 @@ jobs:
     uses: ./.github/workflows/fast-tests.yml
 
   slow-tests-approval:
-    name: Slow Approval
+    name: Approve Slow Tests
     runs-on: ubuntu-latest
 
     # Even though the environment "manual-approval" will be created automatically,

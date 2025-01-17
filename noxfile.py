@@ -38,11 +38,11 @@ def get_db_versions() -> List[str]:
 @nox.parametrize("db_version", get_db_versions())
 def run_all_tests(session: nox.Session, db_version: str):
     """
-        Run all tests using the specified version of Exasol database or all versions currently supported by the ITDE.
-        This nox tasks runs 3 different groups of tests for the ITDE:
-        1. new unit tests (using pytest framework)
-        2. new integration tests (also using pytest)
-        3. old tests (mainly integration tests) using python module "unitest"
+    Run all tests using the specified version of Exasol database or all versions currently supported by the ITDE.
+    This nox tasks runs 3 different groups of tests for the ITDE:
+    1. new unit tests (using pytest framework)
+    2. new integration tests (also using pytest)
+    3. old tests (mainly integration tests) using python module "unitest"
     """
     env = {"EXASOL_VERSION": db_version}
     session.run("pytest", "./test/unit")
