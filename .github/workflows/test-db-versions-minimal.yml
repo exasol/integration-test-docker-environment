@@ -13,7 +13,7 @@ on:
 
 jobs:
   get_exasol_versions:
-    uses: get-exasol-versions.yml
+    uses: ./.github/workflows/get-exasol-versions.yml
 
   test-db-versions-minimal:
     name: Run Minimal Tests for Exasol ${{ matrix.exasol_version }}

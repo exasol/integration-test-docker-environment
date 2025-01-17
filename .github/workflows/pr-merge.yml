@@ -17,7 +17,7 @@ jobs:
 
   fast-tests:
     name: Fast Tests
-    uses: fast-tests.yml
+    uses: ./.github/workflows/fast-tests.yml
 
   metrics:
     name: Report Metrics
@@ -30,7 +30,7 @@ jobs:
 
   publish-docker-runner:
     name: Publish Runner Docker Image to Dockerhub
-    uses: publish-docker-runner.yml
+    uses: ./.github/workflows/publish-docker-runner.yml
     secrets:
       DOCKER_USER_NAME: ${{ secrets.DOCKER_USER_NAME }}
       DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}

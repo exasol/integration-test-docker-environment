@@ -34,7 +34,7 @@ jobs:
   slow-tests:
     name: Slow Tests
     needs: slow-tests-approval
-    uses: slow-tests.yml
+    uses: ./.github/workflows/slow-tests.yml
     #Do not inherit secrets because ITDE Slow Tests does not need it
 
   metrics:

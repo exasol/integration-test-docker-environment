@@ -42,12 +42,12 @@ jobs:
 
   db-version-minimal-tests:
     name: Run Db Versions Minimal Tests
-    uses: test-db-versions-minimal.yml
+    uses: ./.github/workflows/test-db-versions-minimal.yml
 
   test-docker-starter:
     name: Test Docker Starter
-    uses: test-docker-starter.yml
+    uses: ./.github/workflows/test-docker-starter.yml
 
   test-shell-scripts:
     name: Test Shell Scripts
-    uses: test-shell-scripts.yml
+    uses: ./.github/workflows/test-shell-scripts.yml
