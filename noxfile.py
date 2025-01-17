@@ -34,10 +34,16 @@ def get_db_versions() -> List[str]:
     return db_versions
 
 
-@nox.session(name="run-tests", python=False)
+@nox.session(name="run-all-tests", python=False)
 @nox.parametrize("db_version", get_db_versions())
-def run_tests(session: nox.Session, db_version: str):
-    """Run the tests in the poetry environment"""
+def run_all_tests(session: nox.Session, db_version: str):
+    """
+        Run all tests using the specified version of Exasol database or all versions currently supported by the ITDE.
+        This nox tasks runs 3 different groups of tests for the ITDE:
+        1. new unit tests (using pytest framework)
+        2. new integration tests (also using pytest)
+        3. old tests (mainly integration tests) using python module "unitest"
+    """
     env = {"EXASOL_VERSION": db_version}
     session.run("pytest", "./test/unit")
     session.run("pytest", "./test/integration", env=env)
@@ -56,7 +62,10 @@ def run_tests(session: nox.Session, db_version: str):
 @nox.session(name="run-minimal-tests", python=False)
 @nox.parametrize("db_version", get_db_versions())
 def run_minimal_tests(session: nox.Session, db_version: str):
-    """Run the minimal tests in the poetry environment"""
+    """
+    This nox task runs selected tests from new unit tests and selected old and new integration tests using the
+    specified version of Exasol database or all versions currently supported by the ITDE.
+    """
     env = {"EXASOL_VERSION": db_version}
     minimal_tests = {
         "old-itest": [

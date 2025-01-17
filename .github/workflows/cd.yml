@@ -21,4 +21,3 @@ jobs:
     needs: [ cd-job ]
     name: Publish Documentation
     uses: ./.github/workflows/gh-pages.yml
-

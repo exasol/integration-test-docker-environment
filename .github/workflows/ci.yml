@@ -9,8 +9,12 @@ jobs:
     name: Checks
     uses: ./.github/workflows/checks.yml
 
+  fast-tests:
+    name: Fast Tests
+    uses: fast-tests.yml
+
   slow-tests-approval:
-    name: Slow
+    name: Slow Approval
     runs-on: ubuntu-latest
 
     # Even though the environment "manual-approval" will be created automatically,
@@ -25,20 +29,17 @@ jobs:
     #   to the approve-merge job's input requirements (needs).
     steps:
       - name: Tests
-        run: |
-          echo "Slow tests approved"
+        run: echo "Slow tests approved"
 
   slow-tests:
-    needs: slow-tests-approval
     name: Slow Tests
-    uses: ./.github/workflows/slow_tests.yml
-
-  fast-tests:
-    name: Fast Tests
-    uses: ./.github/workflows/fast_tests.yml
+    needs: slow-tests-approval
+    uses: slow-tests.yml
+    #Do not inherit secrets because ITDE Slow Tests does not need it
 
   metrics:
-    needs: [ fast-tests, checks ]
+    name: Report Metrics
+    needs: [ checks, fast-tests ]
     uses: ./.github/workflows/report.yml
 
   # This job ensures inputs have been executed successfully.
@@ -46,11 +47,10 @@ jobs:
     name: Allow Merge
     runs-on: ubuntu-latest
     # If you need additional jobs to be part of the merge gate, add them below
-    needs: [ metrics, slow-tests ]
+    needs: [ checks, fast-tests, slow-tests ]
 
     # Each job requires a step, so we added this dummy step.
     steps:
       - name: Approve
-        run: |
-          echo "Merge Approved"
+        run: echo "Merge Approved"
 

@@ -1,0 +1,14 @@
+name: Slow Tests
+
+on:
+  workflow_call:
+
+jobs:
+
+  test-db-versions-all-tests:
+    name: Run all tests with all supported Db Versions
+    uses: test-db-versions-all-tests.yml
+
+  test-python-versions:
+    name: Run all tests with all supported Python versions
+    uses: test-python-versions.yml

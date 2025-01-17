@@ -41,8 +41,13 @@ jobs:
           include-hidden-files: true
 
   db-version-minimal-tests:
-    uses: ./.github/workflows/test_db_versions_minimal.yml
+    name: Run Db Versions Minimal Tests
+    uses: test-db-versions-minimal.yml
+
   test-docker-starter:
-    uses: ./.github/workflows/test_docker_starter.yml
+    name: Test Docker Starter
+    uses: test-docker-starter.yml
+
   test-shell-scripts:
-    uses: ./.github/workflows/test_shell_scripts.yml
+    name: Test Shell Scripts
+    uses: test-shell-scripts.yml

@@ -2,6 +2,11 @@ name: Publish Docker Runner
 
 on:
  workflow_call:
+    secrets:
+      DOCKER_USER_NAME:
+          required: true
+      DOCKER_TOKEN:
+          required: true
 
 jobs:
   publish:
