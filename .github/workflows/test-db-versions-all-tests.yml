@@ -1,0 +1,41 @@
+name: Test DB Versions with all tests
+
+# python-version: default as specified
+# database-version: all supported by ITDE
+# tests: all
+#
+# Use the specified default version of python and call nox task run_all_tests for
+# all versions of Exasol database currently supported by the ITDE.
+
+on:
+ workflow_call:
+
+jobs:
+  get_exasol_versions:
+    name: Read all supported Exasol DB versions
+    uses: ./.github/workflows/get-exasol-versions.yml
+
+  test-db-versions-all-tests:
+    needs: get_exasol_versions
+    strategy:
+      fail-fast: false
+      matrix:
+        exasol_version: ${{fromJson(needs.get_exasol_versions.outputs.matrix)}}
+    runs-on: ubuntu-latest
+    name: Run all tests for Exasol ${{ matrix.exasol_version }}
+
+    steps:
+      - name: SCM Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python & Poetry Environment
+        uses: exasol/python-toolbox/.github/actions/python-environment@0.20.0
+        with:
+          python-version: "3.10"
+          poetry-version: '1.8.2'
+
+      - name: Allow unprivileged user namespaces
+        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+
+      - name: Run all tests
+        run: poetry run nox -s "run-all-tests(db_version='${{ matrix.exasol_version }}')"

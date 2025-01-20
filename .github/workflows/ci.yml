@@ -1,24 +1,56 @@
 name: CI
 
 on:
-  push:
-    branches-ignore:
-      - "github-pages/*"
-      - "gh-pages/*"
-      - "main"
-      - "master"
   pull_request:
-    types: [opened, reopened]
-  schedule:
-    # “At 00:00 on every 7th day-of-month from 1 through 31.” (https://crontab.guru)
-    - cron: "0 0 1/7 * *"
 
 jobs:
 
-  CI:
-    uses: ./.github/workflows/merge-gate.yml
-    secrets: inherit
+  checks:
+    name: Checks
+    uses: ./.github/workflows/checks.yml
 
-  Metrics:
-    needs: [ CI ]
+  fast-tests:
+    name: Fast Tests
+    uses: ./.github/workflows/fast-tests.yml
+
+  slow-tests-approval:
+    name: Approve Slow Tests
+    runs-on: ubuntu-latest
+
+    # Even though the environment "manual-approval" will be created automatically,
+    # it still needs to be configured to require interactive review.
+    # See project settings on GitHub (Settings / Environments / manual-approval).
+    environment: manual-approval
+
+    # Replace the steps below with the required actions
+    # and/or add additional jobs if required
+    # Note:
+    #   If you add additional jobs, make sure they are added as a requirement
+    #   to the approve-merge job's input requirements (needs).
+    steps:
+      - name: Tests
+        run: echo "Slow tests approved"
+
+  slow-tests:
+    name: Slow Tests
+    needs: slow-tests-approval
+    uses: ./.github/workflows/slow-tests.yml
+    #Do not inherit secrets because ITDE Slow Tests does not need it
+
+  metrics:
+    name: Report Metrics
+    needs: [ checks, fast-tests ]
     uses: ./.github/workflows/report.yml
+
+  # This job ensures inputs have been executed successfully.
+  approve-merge:
+    name: Allow Merge
+    runs-on: ubuntu-latest
+    # If you need additional jobs to be part of the merge gate, add them below
+    needs: [ checks, fast-tests, slow-tests ]
+
+    # Each job requires a step, so we added this dummy step.
+    steps:
+      - name: Approve
+        run: echo "Merge Approved"
+

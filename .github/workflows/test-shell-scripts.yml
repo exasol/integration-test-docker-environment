@@ -1,6 +1,7 @@
 name: Test Shell Scripts
 
-on: [push]
+on:
+  workflow_call:
 
 jobs:
   build:
@@ -10,13 +11,14 @@ jobs:
       - name: SCM Checkout
         uses: actions/checkout@v4
 
+      - name: Run shellcheck
+        run: ./scripts/build/shellcheck.sh
+
       - name: Install Test Dependencies
-        run: |
-          sudo apt-get install -y shunit2
+        run: sudo apt-get install -y shunit2
 
       - name: Run shunit2 based Shell Tests
         run: shunit2 scripts/health_test.sh
 
       - name: Run Starter Script Tests
         run: starter_scripts/test/test_scripts.sh
-

@@ -1,0 +1,40 @@
+name: Test Python Versions with all tests
+
+# python-version: All supported Python version
+# database-version: Default
+# tests: all
+#
+# Call nox task run_tests for all version of Python as defined in the
+# python-toolbox (PTB) using the default version of the Exasol database.
+
+on:
+  workflow_call:
+
+jobs:
+
+  build-matrix:
+    name: Generate Build Matrix
+    uses: ./.github/workflows/matrix-python.yml
+
+  test-python-version-all-tests:
+    name: Run Tests with Python ${{ matrix.python_version }} and Default Exasol Version
+    needs: [ build-matrix ]
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: SCM Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python & Poetry Environment
+        uses: exasol/python-toolbox/.github/actions/python-environment@0.20.0
+        with:
+          python-version: ${{ matrix.python-version }}
+          poetry-version: '1.8.2'
+
+      - name: Allow unprivileged user namespaces
+        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+
+      - name: Run all tests
+        run: poetry run nox -s "run-all-tests(db_version='default')"
