@@ -8,6 +8,8 @@
     SSHPort = {{ ssh_port }}
     IssueTracker = Jira
     XMLRPCPort = 443
+    RESTAPIPort = 8000
+    RESTAPIEnabled = False
     WebUIBackendPort = 4444
     WebUIDomain = exacluster.local
     EnableLoadBalancer = False
@@ -19,6 +21,7 @@
     # Path to c4 unix domain socket, used for deployments of new clusters and nodes.
     C4Socket = /var/run/c4_socket
     Timezone = Europe/Berlin
+    LegacyPlatformManager = True
     LicenseRAWMEMWarnThreshold = 80
     # Nr. of hugepages ('0' = disabled, 'host' = manually configured on the host, 'auto' = set automatically based on DB config)
     Hugepages = 0
@@ -31,12 +34,13 @@
     DBVersion = {{ db_version }}
     ImageVersion = {{ db_version }}
     # Cored only accepts incomming messages from privileged ports (port number less than 1024).
-    CoredUsePrivilegedPorts = True
+    CoredUsePrivilegedPorts = False
     # Cored only accepts incomming messages from its own subnet.
     CoredAllowOnlySameSubnet = True
     # Which subnets Cored will allow messages from. Each subnet must be sepparated by a comma.
     # A subnet is either an IPv4 or IPv6 address in CIDR notation.
     CoredSubnets =
+    BuiltinScriptLanguageName = slc-9.0.0-c4-6-standard-EXASOL-all/ScriptLanguages-standard-EXASOL-all-slc-v9.0.0-CHBGAKUM
 
 # SSL options
 [SSL]
@@ -166,6 +170,9 @@
     NumActiveNodes = 1
     # Name of the data volume to be used by this database.
     DataVolume = DataVolume1
+    # Time in seconds after which a volume should be moved to an online database node.
+    # Setting it to 0 turns off this feature.
+    VolumeMoveDelay = 600
     EnableAuditing = True
     BuiltinScriptLanguageName = slc-6.0.0-c4-5-standard-EXASOL-8.0.0/ScriptLanguages-standard-EXASOL-8.0.0-slc-v6.0.0-PB5EHDLN
     AutoStart = True
