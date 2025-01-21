@@ -209,7 +209,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             if self.certificate_volume_name is not None:
                 volumes[self.certificate_volume_name] = {
                     "bind": CERTIFICATES_MOUNT_DIR,
-                    "mode": "ro",
+                    "mode": "rw",
                 }
             db_container = docker_client.containers.create(
                 image="%s" % (docker_db_image_info.get_source_complete_name()),
