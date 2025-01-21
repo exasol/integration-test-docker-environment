@@ -174,7 +174,6 @@
     # Setting it to 0 turns off this feature.
     VolumeMoveDelay = 600
     EnableAuditing = True
-    BuiltinScriptLanguageName = slc-6.0.0-c4-5-standard-EXASOL-8.0.0/ScriptLanguages-standard-EXASOL-8.0.0-slc-v6.0.0-PB5EHDLN
     AutoStart = True
     {% if additional_db_parameters %}
     Params = {{ additional_db_parameters }}
