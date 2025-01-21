@@ -1,4 +1,4 @@
-# 3.4.0 - 2025-01-17
+# 3.4.0 - 2025-01-21
 
 ## Bugfixes
 
@@ -10,5 +10,6 @@
  - **8**: Added support for 8.29.6
 
 ## Refactorings
+
  - #427: Use GH approval required for slow tests
 
