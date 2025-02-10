@@ -340,7 +340,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             self._remove_volume(volume_name)
         volume = docker_client.volumes.create(volume_name)
         container = docker_client.containers.run(
-            image="ubuntu:18.04",
+            image="ubuntu:22.04",
             name=container_name,
             auto_remove=True,
             command="sleep infinity",

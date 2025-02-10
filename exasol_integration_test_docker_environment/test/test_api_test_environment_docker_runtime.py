@@ -26,7 +26,7 @@ def assert_container_runtime(self, container_name, expected_runtime):
 
 def get_default_docker_runtime():
     with ContextDockerClient() as docker_client:
-        tmp_container = docker_client.containers.create("ubuntu:18.04", "echo")
+        tmp_container = docker_client.containers.create("ubuntu:22.04", "echo")
         try:
             tmp_container.reload()
             default_docker_runtime = tmp_container.attrs["HostConfig"]["Runtime"]

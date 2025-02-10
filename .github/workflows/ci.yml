@@ -15,7 +15,7 @@ jobs:
 
   slow-tests-approval:
     name: Approve Slow Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     # Even though the environment "manual-approval" will be created automatically,
     # it still needs to be configured to require interactive review.
@@ -45,7 +45,7 @@ jobs:
   # This job ensures inputs have been executed successfully.
   approve-merge:
     name: Allow Merge
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # If you need additional jobs to be part of the merge gate, add them below
     needs: [ checks, fast-tests, slow-tests ]
 

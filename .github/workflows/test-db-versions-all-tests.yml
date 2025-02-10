@@ -21,7 +21,7 @@ jobs:
       fail-fast: false
       matrix:
         exasol_version: ${{fromJson(needs.get_exasol_versions.outputs.matrix)}}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     name: Run all tests for Exasol ${{ matrix.exasol_version }}
 
     steps:
