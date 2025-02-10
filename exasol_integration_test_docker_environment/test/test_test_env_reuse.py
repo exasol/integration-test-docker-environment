@@ -11,7 +11,7 @@ from exasol_integration_test_docker_environment.lib.base.run_task import (
 from exasol_integration_test_docker_environment.lib.config.docker_config import (
     set_docker_repository_config,
 )
-from exasol_integration_test_docker_environment.lib.data.environment_type import (
+from exasol_integration_test_docker_environment.lib.models.data.environment_type import (
     EnvironmentType,
 )
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient

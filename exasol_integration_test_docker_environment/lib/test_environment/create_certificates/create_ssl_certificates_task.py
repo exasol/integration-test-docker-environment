@@ -13,10 +13,7 @@ from exasol_integration_test_docker_environment.lib.base.base_task import BaseTa
 from exasol_integration_test_docker_environment.lib.base.docker_base_task import (
     DockerBaseTask,
 )
-from exasol_integration_test_docker_environment.lib.base.pickle_target import (
-    PickleTarget,
-)
-from exasol_integration_test_docker_environment.lib.data.docker_volume_info import (
+from exasol_integration_test_docker_environment.lib.models.data.docker_volume_info import (
     DockerVolumeInfo,
 )
 from exasol_integration_test_docker_environment.lib.docker.images.image_info import (

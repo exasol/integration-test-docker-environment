@@ -6,7 +6,6 @@ from typing import (
     runtime_checkable,
 )
 
-import docker
 import fabric
 from docker import DockerClient
 from docker.models.containers import (
@@ -16,7 +15,7 @@ from docker.models.containers import (
 from paramiko.ssh_exception import NoValidConnectionsError
 
 from exasol_integration_test_docker_environment.lib.base.ssh_access import SshKey
-from exasol_integration_test_docker_environment.lib.data.database_info import (
+from exasol_integration_test_docker_environment.lib.models.data.database_info import (
     DatabaseInfo,
 )
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient

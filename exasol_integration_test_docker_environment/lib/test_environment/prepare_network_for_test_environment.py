@@ -6,7 +6,7 @@ import luigi
 from exasol_integration_test_docker_environment.lib.base.docker_base_task import (
     DockerBaseTask,
 )
-from exasol_integration_test_docker_environment.lib.data.docker_network_info import (
+from exasol_integration_test_docker_environment.lib.models.data.docker_network_info import (
     DockerNetworkInfo,
 )
 

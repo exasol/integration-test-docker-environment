@@ -5,10 +5,10 @@ from exasol_integration_test_docker_environment.lib.base.run_task import (
     generate_root_task,
     run_task,
 )
-from exasol_integration_test_docker_environment.lib.data.environment_info import (
+from exasol_integration_test_docker_environment.lib.models.data.environment_info import (
     EnvironmentInfo,
 )
-from exasol_integration_test_docker_environment.lib.data.environment_type import (
+from exasol_integration_test_docker_environment.lib.models.data.environment_type import (
     EnvironmentType,
 )
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient

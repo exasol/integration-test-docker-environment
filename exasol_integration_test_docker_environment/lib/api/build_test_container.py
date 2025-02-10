@@ -19,12 +19,11 @@ from exasol_integration_test_docker_environment.lib.config.build_config import (
 from exasol_integration_test_docker_environment.lib.config.docker_config import (
     set_docker_repository_config,
 )
-from exasol_integration_test_docker_environment.lib.data.test_container_content_description import (
-    TestContainerContentDescription,
-)
 from exasol_integration_test_docker_environment.lib.docker.images.image_info import (
     ImageInfo,
 )
+from exasol_integration_test_docker_environment.lib.models.data.test_container_content_description import \
+    TestContainerContentDescription
 from exasol_integration_test_docker_environment.lib.test_environment.analyze_test_container import (
     AnalyzeTestContainer,
     DockerTestContainerBuild,

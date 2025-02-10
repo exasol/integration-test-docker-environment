@@ -1,6 +1,4 @@
 import contextlib
-import os
-import time
 from test.integration.helpers import (
     container_named,
     get_executor_factory,
@@ -16,13 +14,13 @@ from exasol_integration_test_docker_environment.lib.base.ssh_access import (
     SshKey,
     SshKeyCache,
 )
-from exasol_integration_test_docker_environment.lib.data.container_info import (
+from exasol_integration_test_docker_environment.lib.models.data.container_info import (
     ContainerInfo,
 )
-from exasol_integration_test_docker_environment.lib.data.database_info import (
+from exasol_integration_test_docker_environment.lib.models.data.database_info import (
     DatabaseInfo,
 )
-from exasol_integration_test_docker_environment.lib.data.ssh_info import SshInfo
+from exasol_integration_test_docker_environment.lib.models.data.ssh_info import SshInfo
 from exasol_integration_test_docker_environment.lib.test_environment.parameter.docker_db_test_environment_parameter import (
     DbOsAccess,
 )

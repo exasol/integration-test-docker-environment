@@ -1,6 +1,6 @@
 import luigi
 
-from exasol_integration_test_docker_environment.lib.data.environment_type import (
+from exasol_integration_test_docker_environment.lib.models.data.environment_type import (
     EnvironmentType,
 )
 from exasol_integration_test_docker_environment.lib.test_environment.parameter.docker_db_test_environment_parameter import (

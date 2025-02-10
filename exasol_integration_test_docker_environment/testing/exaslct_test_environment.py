@@ -12,7 +12,7 @@ from typing import (
     Optional,
 )
 
-from exasol_integration_test_docker_environment.lib.data.environment_info import (
+from exasol_integration_test_docker_environment.lib.models.data.environment_info import (
     EnvironmentInfo,
 )
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient

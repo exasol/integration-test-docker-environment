@@ -2,7 +2,6 @@ import contextlib
 import re
 from typing import (
     Any,
-    Union,
     cast,
 )
 from unittest.mock import Mock
@@ -13,7 +12,7 @@ from exasol_integration_test_docker_environment.lib.base.db_os_executor import (
     DockerExecFactory,
     SshExecFactory,
 )
-from exasol_integration_test_docker_environment.lib.data.database_info import (
+from exasol_integration_test_docker_environment.lib.models.data.database_info import (
     DatabaseInfo,
 )
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
