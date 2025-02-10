@@ -5,7 +5,9 @@ from datetime import (
     timedelta,
 )
 
-from exasol_integration_test_docker_environment.lib.config.log_config import log_config
+from exasol_integration_test_docker_environment.lib.models.config.log_config import (
+    log_config,
+)
 
 
 class StillRunningLoggerThread(threading.Thread):

@@ -21,7 +21,7 @@ from exasol_integration_test_docker_environment.lib.base.json_pickle_parameter i
 from exasol_integration_test_docker_environment.lib.models.data.database_credentials import (
     DatabaseCredentialsParameter,
 )
-from exasol_integration_test_docker_environment.lib.models.data import (
+from exasol_integration_test_docker_environment.lib.models.data.database_info import (
     DatabaseInfo,
 )
 from exasol_integration_test_docker_environment.lib.test_environment.database_waiters.db_container_log_thread import (

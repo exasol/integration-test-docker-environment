@@ -15,6 +15,9 @@ from exasol_integration_test_docker_environment.lib.base.base_task import BaseTa
 from exasol_integration_test_docker_environment.lib.base.docker_base_task import (
     DockerBaseTask,
 )
+from exasol_integration_test_docker_environment.lib.docker.container.utils import (
+    default_bridge_ip_address,
+)
 from exasol_integration_test_docker_environment.lib.models.data.container_info import (
     ContainerInfo,
 )
@@ -32,9 +35,6 @@ from exasol_integration_test_docker_environment.lib.models.data.docker_volume_in
 )
 from exasol_integration_test_docker_environment.lib.models.data.environment_info import (
     EnvironmentInfo,
-)
-from exasol_integration_test_docker_environment.lib.docker.container.utils import (
-    default_bridge_ip_address,
 )
 from exasol_integration_test_docker_environment.lib.test_environment.docker_container_copy import (
     DockerContainerCopy,

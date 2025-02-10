@@ -19,15 +19,15 @@ from exasol_integration_test_docker_environment.lib.base.docker_base_task import
 from exasol_integration_test_docker_environment.lib.base.json_pickle_parameter import (
     JsonPickleParameter,
 )
+from exasol_integration_test_docker_environment.lib.docker.images.image_info import (
+    ImageInfo,
+    ImageState,
+)
 from exasol_integration_test_docker_environment.lib.models.data.container_info import (
     ContainerInfo,
 )
 from exasol_integration_test_docker_environment.lib.models.data.docker_network_info import (
     DockerNetworkInfo,
-)
-from exasol_integration_test_docker_environment.lib.docker.images.image_info import (
-    ImageInfo,
-    ImageState,
 )
 from exasol_integration_test_docker_environment.lib.test_environment.analyze_test_container import (
     DockerTestContainerBuild,

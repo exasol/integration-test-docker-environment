@@ -13,10 +13,6 @@ import luigi
 import networkx
 from networkx.classes import DiGraph
 
-from exasol_integration_test_docker_environment.lib.models.api_errors import (
-    TaskFailures,
-    TaskRuntimeError,
-)
 from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import (
     DependencyLoggerBaseTask,
 )
@@ -29,6 +25,10 @@ from exasol_integration_test_docker_environment.lib.logging.configure_logging im
 )
 from exasol_integration_test_docker_environment.lib.logging.luigi_log_config import (
     get_log_path,
+)
+from exasol_integration_test_docker_environment.lib.models.api_errors import (
+    TaskFailures,
+    TaskRuntimeError,
 )
 from exasol_integration_test_docker_environment.lib.utils.job_counter_singleton import (
     JobCounterSingleton,

@@ -6,15 +6,15 @@ import exasol_integration_test_docker_environment.certificate_resources.containe
 from exasol_integration_test_docker_environment.lib.base.run_task import (
     generate_root_task,
 )
-from exasol_integration_test_docker_environment.lib.config.docker_config import (
-    set_docker_repository_config,
-)
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.lib.docker.images.clean.clean_images import (
     CleanImagesStartingWith,
 )
 from exasol_integration_test_docker_environment.lib.docker.images.utils import (
     find_images_by_tag,
+)
+from exasol_integration_test_docker_environment.lib.models.config.docker_config import (
+    set_docker_repository_config,
 )
 from exasol_integration_test_docker_environment.lib.test_environment.create_certificates.analyze_certificate_container import (
     DockerCertificateContainerBuild,

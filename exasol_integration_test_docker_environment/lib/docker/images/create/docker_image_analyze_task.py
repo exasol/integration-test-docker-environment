@@ -2,7 +2,6 @@ import abc
 from pathlib import Path
 from typing import (
     Dict,
-    Optional,
     Type,
 )
 
@@ -14,12 +13,6 @@ from exasol_integration_test_docker_environment.abstract_method_exception import
 )
 from exasol_integration_test_docker_environment.lib.base.docker_base_task import (
     DockerBaseTask,
-)
-from exasol_integration_test_docker_environment.lib.config.build_config import (
-    build_config,
-)
-from exasol_integration_test_docker_environment.lib.config.docker_config import (
-    docker_build_arguments,
 )
 from exasol_integration_test_docker_environment.lib.docker.images.create.utils.build_context_hasher import (
     BuildContextHasher,
@@ -34,6 +27,12 @@ from exasol_integration_test_docker_environment.lib.docker.images.image_info imp
     ImageDescription,
     ImageInfo,
     ImageState,
+)
+from exasol_integration_test_docker_environment.lib.models.config.build_config import (
+    build_config,
+)
+from exasol_integration_test_docker_environment.lib.models.config.docker_config import (
+    docker_build_arguments,
 )
 
 

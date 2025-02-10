@@ -12,15 +12,15 @@ from typing import (
     Optional,
 )
 
-from exasol_integration_test_docker_environment.lib.models.data.environment_info import (
-    EnvironmentInfo,
-)
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.lib.docker.container.utils import (
     remove_docker_container,
 )
 from exasol_integration_test_docker_environment.lib.docker.volumes.utils import (
     remove_docker_volumes,
+)
+from exasol_integration_test_docker_environment.lib.models.data.environment_info import (
+    EnvironmentInfo,
 )
 from exasol_integration_test_docker_environment.lib.test_environment.ports import Ports
 from exasol_integration_test_docker_environment.testing.docker_registry import (

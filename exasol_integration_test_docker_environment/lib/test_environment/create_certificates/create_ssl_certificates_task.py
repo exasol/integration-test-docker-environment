@@ -13,11 +13,11 @@ from exasol_integration_test_docker_environment.lib.base.base_task import BaseTa
 from exasol_integration_test_docker_environment.lib.base.docker_base_task import (
     DockerBaseTask,
 )
-from exasol_integration_test_docker_environment.lib.models.data.docker_volume_info import (
-    DockerVolumeInfo,
-)
 from exasol_integration_test_docker_environment.lib.docker.images.image_info import (
     ImageInfo,
+)
+from exasol_integration_test_docker_environment.lib.models.data.docker_volume_info import (
+    DockerVolumeInfo,
 )
 from exasol_integration_test_docker_environment.lib.test_environment.create_certificates.analyze_certificate_container import (
     DockerCertificateBuildBase,

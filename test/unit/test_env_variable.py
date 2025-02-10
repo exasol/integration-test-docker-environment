@@ -5,19 +5,19 @@ from unittest import mock
 import luigi
 import pytest
 
+from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import (
+    DependencyLoggerBaseTask,
+)
 from exasol_integration_test_docker_environment.lib.base.run_task import (
     generate_root_task,
     run_task,
 )
-from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import (
-    DependencyLoggerBaseTask,
-)
-from exasol_integration_test_docker_environment.lib.config.build_config import (
-    build_config,
-)
 from exasol_integration_test_docker_environment.lib.logging.luigi_log_config import (
     LOG_ENV_VARIABLE_NAME,
     get_log_path,
+)
+from exasol_integration_test_docker_environment.lib.models.config.build_config import (
+    build_config,
 )
 
 

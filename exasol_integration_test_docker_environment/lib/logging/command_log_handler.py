@@ -1,10 +1,10 @@
 import pathlib
 
-from exasol_integration_test_docker_environment.lib.config.log_config import (
-    WriteLogFilesToConsole,
-)
 from exasol_integration_test_docker_environment.lib.logging.abstract_log_handler import (
     AbstractLogHandler,
+)
+from exasol_integration_test_docker_environment.lib.models.config.log_config import (
+    WriteLogFilesToConsole,
 )
 
 
