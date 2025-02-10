@@ -13,7 +13,7 @@ import luigi
 import networkx
 from networkx.classes import DiGraph
 
-from exasol_integration_test_docker_environment.lib.api.api_errors import (
+from exasol_integration_test_docker_environment.lib.models.api_errors import (
     TaskFailures,
     TaskRuntimeError,
 )

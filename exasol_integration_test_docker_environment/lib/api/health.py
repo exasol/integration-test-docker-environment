@@ -1,7 +1,7 @@
 from inspect import cleandoc
 
 from exasol_integration_test_docker_environment.doctor import health_checkup
-from exasol_integration_test_docker_environment.lib.api.api_errors import HealthProblem
+from exasol_integration_test_docker_environment.lib.models.api_errors import HealthProblem
 from exasol_integration_test_docker_environment.lib.utils.api_function_decorators import (
     cli_function,
 )

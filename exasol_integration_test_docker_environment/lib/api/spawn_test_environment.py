@@ -17,10 +17,10 @@ from exasol_integration_test_docker_environment.cli.options.system_options impor
 from exasol_integration_test_docker_environment.cli.options.test_environment_options import (
     LATEST_DB_VERSION,
 )
-from exasol_integration_test_docker_environment.lib.api.api_errors import (
+from exasol_integration_test_docker_environment.lib.models.api_errors import (
     ArgumentConstraintError,
 )
-from exasol_integration_test_docker_environment.lib.api.run_task import (
+from exasol_integration_test_docker_environment.lib.base.run_task import (
     generate_root_task,
     run_task,
 )

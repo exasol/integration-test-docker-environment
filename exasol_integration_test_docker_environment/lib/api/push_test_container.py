@@ -9,7 +9,7 @@ from exasol_integration_test_docker_environment.cli.options.docker_repository_op
 from exasol_integration_test_docker_environment.cli.options.system_options import (
     DEFAULT_OUTPUT_DIRECTORY,
 )
-from exasol_integration_test_docker_environment.lib.api.run_task import (
+from exasol_integration_test_docker_environment.lib.base.run_task import (
     generate_root_task,
     run_task,
 )

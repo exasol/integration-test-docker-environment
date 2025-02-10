@@ -5,7 +5,7 @@ from pathlib import Path
 
 import luigi
 
-from exasol_integration_test_docker_environment.lib.api.run_task import (
+from exasol_integration_test_docker_environment.lib.base.run_task import (
     generate_root_task,
 )
 from exasol_integration_test_docker_environment.lib.base.docker_base_task import (
