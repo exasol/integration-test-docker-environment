@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: SCM Checkout
         uses: actions/checkout@v4

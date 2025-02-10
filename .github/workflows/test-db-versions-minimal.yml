@@ -22,7 +22,7 @@ jobs:
       fail-fast: false
       matrix:
         exasol_version: ${{fromJson(needs.get_exasol_versions.outputs.matrix)}}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: SCM Checkout
         uses: actions/checkout@v4
