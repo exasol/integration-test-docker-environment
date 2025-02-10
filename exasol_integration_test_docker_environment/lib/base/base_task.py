@@ -109,7 +109,7 @@ class RunTaskFuture(AbstractTaskFuture):
 
 
 class BaseTask(Task):
-    caller_output_path: List[str] = luigi.ListParameter([])  # type: ignore
+    caller_output_path: List[str] = luigi.ListParameter([], significant=False, visibility=ParameterVisibility.HIDDEN)  # type: ignore
     job_id: str = luigi.Parameter()  # type: ignore
 
     def __init__(self, *args, **kwargs):
