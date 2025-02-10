@@ -103,7 +103,7 @@ docker_check_version () {
 docker_check_pull () {
   local docker_cmd=$1
   local details
-  details=$("docker" pull ubuntu:18.04 2>&1)
+  details=$("docker" pull ubuntu:22.04 2>&1)
   # We want to store the details of the command, for error reporting. Therefore we won't check within the if.
   # shellcheck disable=SC2181
   if [ $? -ne 0 ]; then
@@ -117,7 +117,7 @@ docker_check_pull () {
 docker_check_connectivity () {
   local docker_cmd=$1
   local details
-  details=$(docker run --rm ubuntu:18.04 bash -c ": >/dev/tcp/1.1.1.1/53")
+  details=$(docker run --rm ubuntu:22.04 bash -c ": >/dev/tcp/1.1.1.1/53")
   # We want to store the details of the command, for error reporting. Therefore we won't check within the if.
   # shellcheck disable=SC2181
   if [ $? -ne 0 ]; then

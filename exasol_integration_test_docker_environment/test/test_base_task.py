@@ -1,4 +1,5 @@
 import shutil
+import tempfile
 import time
 import unittest
 
@@ -195,6 +196,15 @@ class TestTask14(TestBaseTask):
 class TestTask15(TestBaseTask):
     def run_task(self):
         raise Exception("%s" % self.task_id)
+
+class TestTask16(TestBaseTask):
+    def run_task(self):
+        temp_directory = tempfile.mkdtemp(
+            prefix="release_archive_",
+        )
+        self.return_object(temp_directory)
+
+
 
 
 class BaseTaskTest(unittest.TestCase):
