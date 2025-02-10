@@ -2,18 +2,37 @@ import logging
 import os
 from datetime import datetime
 from pathlib import Path
-from typing import Callable, Optional, Any, Set
+from typing import (
+    Any,
+    Callable,
+    Optional,
+    Set,
+)
 
 import luigi
 import networkx
 from networkx.classes import DiGraph
 
-from exasol_integration_test_docker_environment.lib.api.api_errors import TaskRuntimeError, TaskFailures
-from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import DependencyLoggerBaseTask
-from exasol_integration_test_docker_environment.lib.base.task_dependency import TaskDependency, DependencyState
-from exasol_integration_test_docker_environment.lib.logging.configure_logging import configure_logging
-from exasol_integration_test_docker_environment.lib.logging.luigi_log_config import get_log_path
-from exasol_integration_test_docker_environment.lib.utils.job_counter_singleton import JobCounterSingleton
+from exasol_integration_test_docker_environment.lib.api.api_errors import (
+    TaskFailures,
+    TaskRuntimeError,
+)
+from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import (
+    DependencyLoggerBaseTask,
+)
+from exasol_integration_test_docker_environment.lib.base.task_dependency import (
+    DependencyState,
+    TaskDependency,
+)
+from exasol_integration_test_docker_environment.lib.logging.configure_logging import (
+    configure_logging,
+)
+from exasol_integration_test_docker_environment.lib.logging.luigi_log_config import (
+    get_log_path,
+)
+from exasol_integration_test_docker_environment.lib.utils.job_counter_singleton import (
+    JobCounterSingleton,
+)
 
 
 def generate_root_task(task_class, *args, **kwargs) -> DependencyLoggerBaseTask:
@@ -92,8 +111,6 @@ def _handle_task_result(
         )
 
 
-
-
 def generate_graph_from_task_dependencies(
     task: DependencyLoggerBaseTask, task_dependencies_dot_file: Optional[str]
 ):
@@ -136,7 +153,3 @@ def collect_dependencies(task: DependencyLoggerBaseTask) -> Set[TaskDependency]:
 def setup_worker():
     luigi.configuration.get_config().set("worker", "wait_interval", str(0.1))
     luigi.configuration.get_config().set("worker", "wait_jitter", str(0.5))
-
-
-
-

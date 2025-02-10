@@ -1,4 +1,3 @@
-
 def cli_function(func):
     """Decorator: Register a function as having a cli equivalent"""
     func.__cli_function__ = True

@@ -1,7 +1,8 @@
 import json
 from typing import (
     List,
-    Optional, Tuple,
+    Optional,
+    Tuple,
 )
 
 import luigi
@@ -29,7 +30,6 @@ def _set_output_directory(output_directory: Optional[str]):
         luigi.configuration.get_config().set(
             "build_config", "output_directory", output_directory
         )
-
 
 
 def set_build_config(
@@ -63,4 +63,3 @@ def set_build_config(
     luigi.configuration.get_config().set(
         "build_config", "log_build_context_content", str(log_build_context_content)
     )
-

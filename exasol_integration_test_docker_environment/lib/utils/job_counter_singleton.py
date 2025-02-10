@@ -1,5 +1,3 @@
-
-
 class JobCounterSingleton:
     """
     We use here a Singleton to avoid an unprotected global variable.

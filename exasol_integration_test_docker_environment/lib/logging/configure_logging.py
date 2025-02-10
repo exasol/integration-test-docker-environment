@@ -1,13 +1,20 @@
 import contextlib
 import warnings
 from pathlib import Path
-from typing import Optional, Iterator, Dict, Tuple
+from typing import (
+    Dict,
+    Iterator,
+    Optional,
+    Tuple,
+)
 
 import luigi
 from luigi.parameter import UnconsumedParameterWarning
 from luigi.setup_logging import InterfaceLogging
 
-from exasol_integration_test_docker_environment.lib.logging.luigi_log_config import get_luigi_log_config
+from exasol_integration_test_docker_environment.lib.logging.luigi_log_config import (
+    get_luigi_log_config,
+)
 
 
 @contextlib.contextmanager

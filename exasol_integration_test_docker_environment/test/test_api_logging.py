@@ -13,8 +13,13 @@ from typing import (
     Optional,
 )
 
-from exasol_integration_test_docker_environment.lib.api.run_task import generate_root_task, run_task
-from exasol_integration_test_docker_environment.lib.config.build_config import set_build_config
+from exasol_integration_test_docker_environment.lib.api.run_task import (
+    generate_root_task,
+    run_task,
+)
+from exasol_integration_test_docker_environment.lib.config.build_config import (
+    set_build_config,
+)
 
 LOGGER_STR = "logger_str"
 

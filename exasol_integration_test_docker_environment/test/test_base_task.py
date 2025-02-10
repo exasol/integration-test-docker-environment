@@ -8,13 +8,15 @@ from luigi import (
     Parameter,
 )
 
+from exasol_integration_test_docker_environment.lib.api.run_task import (
+    generate_root_task,
+)
 from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import (
     DependencyLoggerBaseTask,
 )
 from exasol_integration_test_docker_environment.lib.base.json_pickle_parameter import (
     JsonPickleParameter,
 )
-from exasol_integration_test_docker_environment.lib.api.run_task import generate_root_task
 
 TestBaseTask = DependencyLoggerBaseTask
 

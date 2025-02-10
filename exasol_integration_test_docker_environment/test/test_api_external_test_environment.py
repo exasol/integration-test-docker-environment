@@ -1,7 +1,10 @@
 import unittest
 from sys import stderr
 
-from exasol_integration_test_docker_environment.lib.api.run_task import generate_root_task, run_task
+from exasol_integration_test_docker_environment.lib.api.run_task import (
+    generate_root_task,
+    run_task,
+)
 from exasol_integration_test_docker_environment.lib.data.environment_info import (
     EnvironmentInfo,
 )

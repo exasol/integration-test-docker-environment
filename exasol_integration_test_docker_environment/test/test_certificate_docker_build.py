@@ -4,8 +4,12 @@ import unittest
 import luigi
 
 import exasol_integration_test_docker_environment.certificate_resources.container
-from exasol_integration_test_docker_environment.lib.api.run_task import generate_root_task
-from exasol_integration_test_docker_environment.lib.config.docker_config import set_docker_repository_config
+from exasol_integration_test_docker_environment.lib.api.run_task import (
+    generate_root_task,
+)
+from exasol_integration_test_docker_environment.lib.config.docker_config import (
+    set_docker_repository_config,
+)
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.lib.docker.images.clean.clean_images import (
     CleanImagesStartingWith,

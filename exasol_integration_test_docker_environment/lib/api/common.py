@@ -1,7 +1,9 @@
 from pathlib import Path
 from typing import Tuple
 
-from exasol_integration_test_docker_environment.lib import extract_modulename_for_build_steps
+from exasol_integration_test_docker_environment.lib import (
+    extract_modulename_for_build_steps,
+)
 
 
 def import_build_steps(flavor_path: Tuple[str, ...]):
@@ -23,5 +25,3 @@ def import_build_steps(flavor_path: Tuple[str, ...]):
         assert spec and spec.loader
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
-
-
