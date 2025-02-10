@@ -5,10 +5,9 @@ import luigi
 from exasol_integration_test_docker_environment.cli.options import (
     test_environment_options,
 )
-from exasol_integration_test_docker_environment.lib.api.common import (
-    generate_root_task,
-    set_docker_repository_config,
-)
+from exasol_integration_test_docker_environment.lib.api.run_task import generate_root_task
+from exasol_integration_test_docker_environment.lib.config.docker_config import set_docker_repository_config
+
 from exasol_integration_test_docker_environment.lib.data.environment_type import (
     EnvironmentType,
 )

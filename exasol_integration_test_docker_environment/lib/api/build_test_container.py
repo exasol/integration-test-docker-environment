@@ -9,13 +9,9 @@ from exasol_integration_test_docker_environment.cli.options.docker_repository_op
 from exasol_integration_test_docker_environment.cli.options.system_options import (
     DEFAULT_OUTPUT_DIRECTORY,
 )
-from exasol_integration_test_docker_environment.lib.api.common import (
-    generate_root_task,
-    no_cli_function,
-    run_task,
-    set_build_config,
-    set_docker_repository_config,
-)
+from exasol_integration_test_docker_environment.lib.api.run_task import generate_root_task, run_task
+from exasol_integration_test_docker_environment.lib.config.build_config import set_build_config
+from exasol_integration_test_docker_environment.lib.config.docker_config import set_docker_repository_config
 from exasol_integration_test_docker_environment.lib.data.test_container_content_description import (
     TestContainerContentDescription,
 )
@@ -26,6 +22,7 @@ from exasol_integration_test_docker_environment.lib.test_environment.analyze_tes
     AnalyzeTestContainer,
     DockerTestContainerBuild,
 )
+from exasol_integration_test_docker_environment.lib.utils.api_function_decorators import no_cli_function
 
 
 @no_cli_function

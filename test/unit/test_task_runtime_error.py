@@ -1,6 +1,8 @@
 import re
 import time
 import traceback
+
+from exasol_integration_test_docker_environment.lib.api.run_task import generate_root_task, run_task
 from test.matchers import regex_matcher
 
 import pytest
@@ -11,10 +13,7 @@ from exasol_integration_test_docker_environment.lib.api.api_errors import (
     TaskFailures,
     TaskRuntimeError,
 )
-from exasol_integration_test_docker_environment.lib.api.common import (
-    generate_root_task,
-    run_task,
-)
+
 from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import (
     DependencyLoggerBaseTask,
 )

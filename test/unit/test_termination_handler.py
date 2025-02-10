@@ -7,16 +7,14 @@ from contextlib import (
     redirect_stderr,
     redirect_stdout,
 )
+
+from exasol_integration_test_docker_environment.lib.api.run_task import generate_root_task, run_task
 from test.matchers import regex_matcher
 
 import pytest
 
 from exasol_integration_test_docker_environment.cli.termination_handler import (
     TerminationHandler,
-)
-from exasol_integration_test_docker_environment.lib.api.common import (
-    generate_root_task,
-    run_task,
 )
 from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import (
     DependencyLoggerBaseTask,

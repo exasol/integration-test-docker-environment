@@ -4,14 +4,10 @@ from pathlib import Path
 
 import luigi
 
-from exasol_integration_test_docker_environment.lib.api.common import (
-    generate_root_task,
-    run_task,
-    set_build_config,
-)
 from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import (
     DependencyLoggerBaseTask,
 )
+from exasol_integration_test_docker_environment.lib.api.run_task import generate_root_task, run_task
 
 
 class TestTask(DependencyLoggerBaseTask):

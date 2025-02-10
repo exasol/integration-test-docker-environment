@@ -20,13 +20,9 @@ from exasol_integration_test_docker_environment.cli.options.test_environment_opt
 from exasol_integration_test_docker_environment.lib.api.api_errors import (
     ArgumentConstraintError,
 )
-from exasol_integration_test_docker_environment.lib.api.common import (
-    cli_function,
-    generate_root_task,
-    run_task,
-    set_build_config,
-    set_docker_repository_config,
-)
+from exasol_integration_test_docker_environment.lib.api.run_task import generate_root_task, run_task
+from exasol_integration_test_docker_environment.lib.config.build_config import set_build_config
+from exasol_integration_test_docker_environment.lib.config.docker_config import set_docker_repository_config
 from exasol_integration_test_docker_environment.lib.data.environment_info import (
     EnvironmentInfo,
 )
@@ -45,6 +41,7 @@ from exasol_integration_test_docker_environment.lib.test_environment.parameter.d
 from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_environment_with_docker_db import (
     SpawnTestEnvironmentWithDockerDB,
 )
+from exasol_integration_test_docker_environment.lib.utils.api_function_decorators import cli_function
 
 
 def _cleanup(environment_info: EnvironmentInfo) -> None:
