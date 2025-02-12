@@ -145,3 +145,9 @@ def unit_tests(session: nox.Session) -> None:
 
     context = _context(session, coverage=True)
     _unit_tests(session, PROJECT_CONFIG, context)
+
+@nox.session(name="build-executable", python=False)
+def build_executable(session: nox.Session):
+    with session.chdir(ROOT):
+        session.run("poetry", "run", "pyinstaller", "-F", "exasol_integration_test_docker_environment/main.py", "--collect-datas", "exasol_integration_test_docker_environment.templates", "--collect-datas", "exasol_integration_test_docker_environment.docker_db_config")
+
