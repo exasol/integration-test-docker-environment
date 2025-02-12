@@ -3,9 +3,6 @@ import time
 from exasol_integration_test_docker_environment.lib.base.still_running_logger import (
     StillRunningLogger,
 )
-from exasol_integration_test_docker_environment.lib.config.docker_config import (
-    source_docker_repository_config,
-)
 from exasol_integration_test_docker_environment.lib.docker.images.create.docker_image_creator_base_task import (
     DockerImageCreatorBaseTask,
 )
@@ -14,6 +11,9 @@ from exasol_integration_test_docker_environment.lib.docker.images.create.utils.d
 )
 from exasol_integration_test_docker_environment.lib.docker.images.create.utils.pull_log_handler import (
     PullLogHandler,
+)
+from exasol_integration_test_docker_environment.lib.models.config.docker_config import (
+    source_docker_repository_config,
 )
 
 

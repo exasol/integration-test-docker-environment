@@ -13,7 +13,6 @@ from typing import (
 )
 
 import luigi
-import six
 from luigi import (
     Task,
     util,
@@ -37,7 +36,7 @@ from exasol_integration_test_docker_environment.lib.base.task_state import TaskS
 from exasol_integration_test_docker_environment.lib.base.wrong_task_state_exception import (
     WrongTaskStateException,
 )
-from exasol_integration_test_docker_environment.lib.config.build_config import (
+from exasol_integration_test_docker_environment.lib.models.config.build_config import (
     build_config,
 )
 

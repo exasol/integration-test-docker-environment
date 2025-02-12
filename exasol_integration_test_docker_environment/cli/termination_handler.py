@@ -2,7 +2,7 @@ import sys
 from datetime import datetime
 from traceback import print_tb
 
-from exasol_integration_test_docker_environment.lib.api.api_errors import (
+from exasol_integration_test_docker_environment.lib.models.api_errors import (
     TaskRuntimeError,
 )
 

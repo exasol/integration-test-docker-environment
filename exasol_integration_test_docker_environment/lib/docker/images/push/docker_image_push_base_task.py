@@ -11,15 +11,15 @@ from exasol_integration_test_docker_environment.lib.base.docker_base_task import
 from exasol_integration_test_docker_environment.lib.base.still_running_logger import (
     StillRunningLogger,
 )
-from exasol_integration_test_docker_environment.lib.config.docker_config import (
-    target_docker_repository_config,
-)
 from exasol_integration_test_docker_environment.lib.docker.images.image_info import (
     ImageInfo,
     ImageState,
 )
 from exasol_integration_test_docker_environment.lib.docker.images.push.push_log_handler import (
     PushLogHandler,
+)
+from exasol_integration_test_docker_environment.lib.models.config.docker_config import (
+    target_docker_repository_config,
 )
 
 

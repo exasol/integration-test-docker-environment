@@ -22,10 +22,12 @@ from exasol_integration_test_docker_environment.cli.termination_handler import (
     TerminationHandler,
 )
 from exasol_integration_test_docker_environment.lib import api
-from exasol_integration_test_docker_environment.lib.api.api_errors import (
+from exasol_integration_test_docker_environment.lib.models.api_errors import (
     ArgumentConstraintError,
 )
-from exasol_integration_test_docker_environment.lib.api.common import add_options
+from exasol_integration_test_docker_environment.lib.utils.cli_function_decorators import (
+    add_options,
+)
 
 
 @cli.command()

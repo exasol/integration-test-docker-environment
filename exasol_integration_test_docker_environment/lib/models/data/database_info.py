@@ -1,10 +1,10 @@
 from typing import Optional
 
 from exasol_integration_test_docker_environment.lib.base.info import Info
-from exasol_integration_test_docker_environment.lib.data.container_info import (
+from exasol_integration_test_docker_environment.lib.models.data.container_info import (
     ContainerInfo,
 )
-from exasol_integration_test_docker_environment.lib.data.ssh_info import SshInfo
+from exasol_integration_test_docker_environment.lib.models.data.ssh_info import SshInfo
 from exasol_integration_test_docker_environment.lib.test_environment.ports import Ports
 
 

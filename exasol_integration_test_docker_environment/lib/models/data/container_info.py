@@ -4,7 +4,7 @@ from typing import (
 )
 
 from exasol_integration_test_docker_environment.lib.base.info import Info
-from exasol_integration_test_docker_environment.lib.data.docker_network_info import (
+from exasol_integration_test_docker_environment.lib.models.data.docker_network_info import (
     DockerNetworkInfo,
 )
 

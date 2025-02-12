@@ -6,12 +6,12 @@ from pathlib import Path
 
 from jinja2 import Template
 
-from exasol_integration_test_docker_environment.lib.config.build_config import (
-    build_config,
-)
 from exasol_integration_test_docker_environment.lib.docker.images.image_info import (
     ImageInfo,
     ImageState,
+)
+from exasol_integration_test_docker_environment.lib.models.config.build_config import (
+    build_config,
 )
 
 

@@ -15,7 +15,7 @@ from typing import (
 import jinja2
 
 from exasol_integration_test_docker_environment.lib import PACKAGE_NAME
-from exasol_integration_test_docker_environment.lib.config.build_config import (
+from exasol_integration_test_docker_environment.lib.models.config.build_config import (
     build_config,
 )
 

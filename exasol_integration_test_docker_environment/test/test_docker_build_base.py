@@ -10,7 +10,9 @@ from typing import (
 import luigi
 from luigi import Parameter
 
-from exasol_integration_test_docker_environment.lib.api.common import generate_root_task
+from exasol_integration_test_docker_environment.lib.base.run_task import (
+    generate_root_task,
+)
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.lib.docker.images.clean.clean_images import (
     CleanImagesStartingWith,

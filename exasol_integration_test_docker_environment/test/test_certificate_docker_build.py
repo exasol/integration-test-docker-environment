@@ -1,12 +1,10 @@
-import shutil
 import unittest
 
 import luigi
 
 import exasol_integration_test_docker_environment.certificate_resources.container
-from exasol_integration_test_docker_environment.lib.api.common import (
+from exasol_integration_test_docker_environment.lib.base.run_task import (
     generate_root_task,
-    set_docker_repository_config,
 )
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.lib.docker.images.clean.clean_images import (
@@ -14,6 +12,9 @@ from exasol_integration_test_docker_environment.lib.docker.images.clean.clean_im
 )
 from exasol_integration_test_docker_environment.lib.docker.images.utils import (
     find_images_by_tag,
+)
+from exasol_integration_test_docker_environment.lib.models.config.docker_config import (
+    set_docker_repository_config,
 )
 from exasol_integration_test_docker_environment.lib.test_environment.create_certificates.analyze_certificate_container import (
     DockerCertificateContainerBuild,

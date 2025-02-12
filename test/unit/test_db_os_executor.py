@@ -16,11 +16,10 @@ from exasol_integration_test_docker_environment.lib.base.db_os_executor import (
     SshExecFactory,
     SshExecutor,
 )
-from exasol_integration_test_docker_environment.lib.data.database_info import (
+from exasol_integration_test_docker_environment.lib.models.data.database_info import (
     DatabaseInfo,
 )
-from exasol_integration_test_docker_environment.lib.data.ssh_info import SshInfo
-from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
+from exasol_integration_test_docker_environment.lib.models.data.ssh_info import SshInfo
 from exasol_integration_test_docker_environment.lib.test_environment.ports import Ports
 
 

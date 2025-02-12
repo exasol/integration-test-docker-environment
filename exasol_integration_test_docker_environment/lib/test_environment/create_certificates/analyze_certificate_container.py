@@ -5,10 +5,6 @@ from typing import (
 
 import luigi
 
-from exasol_integration_test_docker_environment.lib.config.docker_config import (
-    source_docker_repository_config,
-    target_docker_repository_config,
-)
 from exasol_integration_test_docker_environment.lib.docker.images.create.docker_build_base import (
     DockerBuildBase,
 )
@@ -20,6 +16,10 @@ from exasol_integration_test_docker_environment.lib.docker.images.push.docker_pu
 )
 from exasol_integration_test_docker_environment.lib.docker.images.push.push_task_creator_for_build_tasks import (
     PushTaskCreatorFromBuildTasks,
+)
+from exasol_integration_test_docker_environment.lib.models.config.docker_config import (
+    source_docker_repository_config,
+    target_docker_repository_config,
 )
 
 TAG_SUFFIX = "certificate_resources"

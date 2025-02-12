@@ -3,7 +3,7 @@ name = "exasol-integration-test-docker-environment"
 packages = [
     { include = "exasol_integration_test_docker_environment" },
 ]
-version = "3.4.0"
+version = "4.0.0"
 description = "Integration Test Docker Environment for Exasol"
 
 license = "MIT"
@@ -60,7 +60,7 @@ itde = 'exasol_integration_test_docker_environment.main:main'
 [[tool.mypy.overrides]]
 module = [ "luigi.*", "docker.*", "humanfriendly", "configobj", "toml", "netaddr", "joblib.testing", "networkx",
             "fabric", "requests", "pyexasol", "paramiko.ssh_exception", "six", "jsonpickle", "exasol.toolbox.*",
-            "paramiko", "exasol"]
+            "paramiko", "exasol", "networkx.classes"]
 ignore_missing_imports = true
 
 [tool.pylint.master]

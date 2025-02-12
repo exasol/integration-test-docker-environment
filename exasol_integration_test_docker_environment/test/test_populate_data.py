@@ -7,11 +7,13 @@ from sys import stderr
 
 import luigi
 
-from exasol_integration_test_docker_environment.lib.api.common import generate_root_task
-from exasol_integration_test_docker_environment.lib.data.test_container_content_description import (
-    TestContainerRuntimeMapping,
+from exasol_integration_test_docker_environment.lib.base.run_task import (
+    generate_root_task,
 )
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
+from exasol_integration_test_docker_environment.lib.models.data.test_container_content_description import (
+    TestContainerRuntimeMapping,
+)
 from exasol_integration_test_docker_environment.lib.test_environment.database_setup.populate_data import (
     PopulateTestDataToDatabase,
 )

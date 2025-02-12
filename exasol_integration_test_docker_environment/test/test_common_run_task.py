@@ -2,12 +2,12 @@ import unittest
 
 import luigi
 
-from exasol_integration_test_docker_environment.lib.api.common import (
-    generate_root_task,
-    run_task,
-)
 from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import (
     DependencyLoggerBaseTask,
+)
+from exasol_integration_test_docker_environment.lib.base.run_task import (
+    generate_root_task,
+    run_task,
 )
 
 

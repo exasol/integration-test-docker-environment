@@ -3,13 +3,6 @@ from typing import (
     Set,
 )
 
-from exasol_integration_test_docker_environment.lib.config.build_config import (
-    build_config,
-)
-from exasol_integration_test_docker_environment.lib.config.docker_config import (
-    source_docker_repository_config,
-    target_docker_repository_config,
-)
 from exasol_integration_test_docker_environment.lib.docker.images.create.docker_build_base import (
     DockerBuildBase,
 )
@@ -21,6 +14,13 @@ from exasol_integration_test_docker_environment.lib.docker.images.push.docker_pu
 )
 from exasol_integration_test_docker_environment.lib.docker.images.push.push_task_creator_for_build_tasks import (
     PushTaskCreatorFromBuildTasks,
+)
+from exasol_integration_test_docker_environment.lib.models.config.build_config import (
+    build_config,
+)
+from exasol_integration_test_docker_environment.lib.models.config.docker_config import (
+    source_docker_repository_config,
+    target_docker_repository_config,
 )
 from exasol_integration_test_docker_environment.lib.test_environment.parameter.test_container_parameter import (
     TestContainerParameter,
