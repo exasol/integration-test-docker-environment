@@ -17,21 +17,9 @@ from exasol_integration_test_docker_environment.cli.options.system_options impor
 from exasol_integration_test_docker_environment.cli.options.test_environment_options import (
     LATEST_DB_VERSION,
 )
-from exasol_integration_test_docker_environment.lib.api.api_errors import (
-    ArgumentConstraintError,
-)
-from exasol_integration_test_docker_environment.lib.api.common import (
+from exasol_integration_test_docker_environment.lib.base.run_task import (
     generate_root_task,
-    no_cli_function,
     run_task,
-    set_build_config,
-    set_docker_repository_config,
-)
-from exasol_integration_test_docker_environment.lib.data.environment_info import (
-    EnvironmentInfo,
-)
-from exasol_integration_test_docker_environment.lib.data.test_container_content_description import (
-    TestContainerContentDescription,
 )
 from exasol_integration_test_docker_environment.lib.docker.container.utils import (
     remove_docker_container,
@@ -42,11 +30,29 @@ from exasol_integration_test_docker_environment.lib.docker.networks.utils import
 from exasol_integration_test_docker_environment.lib.docker.volumes.utils import (
     remove_docker_volumes,
 )
+from exasol_integration_test_docker_environment.lib.models.api_errors import (
+    ArgumentConstraintError,
+)
+from exasol_integration_test_docker_environment.lib.models.config.build_config import (
+    set_build_config,
+)
+from exasol_integration_test_docker_environment.lib.models.config.docker_config import (
+    set_docker_repository_config,
+)
+from exasol_integration_test_docker_environment.lib.models.data.environment_info import (
+    EnvironmentInfo,
+)
+from exasol_integration_test_docker_environment.lib.models.data.test_container_content_description import (
+    TestContainerContentDescription,
+)
 from exasol_integration_test_docker_environment.lib.test_environment.parameter.docker_db_test_environment_parameter import (
     DbOsAccess,
 )
 from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_environment_with_docker_db import (
     SpawnTestEnvironmentWithDockerDB,
+)
+from exasol_integration_test_docker_environment.lib.utils.api_function_decorators import (
+    no_cli_function,
 )
 
 

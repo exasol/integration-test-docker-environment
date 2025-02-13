@@ -4,19 +4,18 @@ import traceback
 from test.matchers import regex_matcher
 
 import pytest
-from _pytest._code import ExceptionInfo
 from joblib.testing import fixture
 
-from exasol_integration_test_docker_environment.lib.api.api_errors import (
-    TaskFailures,
-    TaskRuntimeError,
+from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import (
+    DependencyLoggerBaseTask,
 )
-from exasol_integration_test_docker_environment.lib.api.common import (
+from exasol_integration_test_docker_environment.lib.base.run_task import (
     generate_root_task,
     run_task,
 )
-from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import (
-    DependencyLoggerBaseTask,
+from exasol_integration_test_docker_environment.lib.models.api_errors import (
+    TaskFailures,
+    TaskRuntimeError,
 )
 
 

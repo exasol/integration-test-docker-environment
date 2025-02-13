@@ -5,14 +5,16 @@ import luigi
 from exasol_integration_test_docker_environment.cli.options import (
     test_environment_options,
 )
-from exasol_integration_test_docker_environment.lib.api.common import (
+from exasol_integration_test_docker_environment.lib.base.run_task import (
     generate_root_task,
-    set_docker_repository_config,
-)
-from exasol_integration_test_docker_environment.lib.data.environment_type import (
-    EnvironmentType,
 )
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
+from exasol_integration_test_docker_environment.lib.models.config.docker_config import (
+    set_docker_repository_config,
+)
+from exasol_integration_test_docker_environment.lib.models.data.environment_type import (
+    EnvironmentType,
+)
 from exasol_integration_test_docker_environment.lib.test_environment.ports import Ports
 from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_environment import (
     SpawnTestEnvironment,

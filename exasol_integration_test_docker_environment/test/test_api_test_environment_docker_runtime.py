@@ -1,8 +1,8 @@
 import subprocess
 import unittest
 
-from exasol_integration_test_docker_environment.lib.api import api_errors
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
+from exasol_integration_test_docker_environment.lib.models import api_errors
 from exasol_integration_test_docker_environment.test.get_test_container_content import (
     get_test_container_content,
 )

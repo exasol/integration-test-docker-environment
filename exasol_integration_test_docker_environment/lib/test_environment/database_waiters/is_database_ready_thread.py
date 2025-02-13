@@ -8,10 +8,10 @@ from docker.models.containers import Container
 from exasol_integration_test_docker_environment.lib.base.db_os_executor import (
     DbOsExecFactory,
 )
-from exasol_integration_test_docker_environment.lib.data.database_credentials import (
+from exasol_integration_test_docker_environment.lib.models.data.database_credentials import (
     DatabaseCredentials,
 )
-from exasol_integration_test_docker_environment.lib.data.database_info import (
+from exasol_integration_test_docker_environment.lib.models.data.database_info import (
     DatabaseInfo,
 )
 from exasol_integration_test_docker_environment.lib.test_environment.database_setup.find_exaplus_in_db_container import (

@@ -13,6 +13,14 @@ from typing import (
     Optional,
 )
 
+from exasol_integration_test_docker_environment.lib.base.run_task import (
+    generate_root_task,
+    run_task,
+)
+from exasol_integration_test_docker_environment.lib.models.config.build_config import (
+    set_build_config,
+)
+
 LOGGER_STR = "logger_str"
 
 LEVEL_NAME = "level_name"
@@ -43,11 +51,6 @@ ROOT_LOGGER = "root"
 
 TEST_FORMAT = "TEST_FORMAT"
 
-from exasol_integration_test_docker_environment.lib.api.common import (
-    generate_root_task,
-    run_task,
-    set_build_config,
-)
 from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import (
     DependencyLoggerBaseTask,
 )

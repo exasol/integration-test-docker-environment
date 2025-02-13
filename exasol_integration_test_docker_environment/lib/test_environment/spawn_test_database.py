@@ -32,22 +32,22 @@ from exasol_integration_test_docker_environment.lib.base.ssh_access import (
 from exasol_integration_test_docker_environment.lib.base.still_running_logger import (
     StillRunningLogger,
 )
-from exasol_integration_test_docker_environment.lib.data.container_info import (
-    ContainerInfo,
-)
-from exasol_integration_test_docker_environment.lib.data.database_info import (
-    DatabaseInfo,
-)
-from exasol_integration_test_docker_environment.lib.data.docker_network_info import (
-    DockerNetworkInfo,
-)
-from exasol_integration_test_docker_environment.lib.data.ssh_info import SshInfo
 from exasol_integration_test_docker_environment.lib.docker.images.create.utils.pull_log_handler import (
     PullLogHandler,
 )
 from exasol_integration_test_docker_environment.lib.docker.images.image_info import (
     ImageInfo,
 )
+from exasol_integration_test_docker_environment.lib.models.data.container_info import (
+    ContainerInfo,
+)
+from exasol_integration_test_docker_environment.lib.models.data.database_info import (
+    DatabaseInfo,
+)
+from exasol_integration_test_docker_environment.lib.models.data.docker_network_info import (
+    DockerNetworkInfo,
+)
+from exasol_integration_test_docker_environment.lib.models.data.ssh_info import SshInfo
 from exasol_integration_test_docker_environment.lib.test_environment.db_version import (
     DbVersion,
 )

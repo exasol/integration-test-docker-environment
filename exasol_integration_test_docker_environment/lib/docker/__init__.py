@@ -1,6 +1,6 @@
 import docker
 
-from exasol_integration_test_docker_environment.lib.config.docker_config import (
+from exasol_integration_test_docker_environment.lib.models.config.docker_config import (
     source_docker_repository_config,
     target_docker_repository_config,
 )

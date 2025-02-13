@@ -5,21 +5,25 @@ from pathlib import Path
 
 import luigi
 
-from exasol_integration_test_docker_environment.lib.api.common import (
-    generate_root_task,
-    set_build_config,
-    set_docker_repository_config,
-)
 from exasol_integration_test_docker_environment.lib.base.docker_base_task import (
     DockerBaseTask,
 )
-from exasol_integration_test_docker_environment.lib.data.container_info import (
-    ContainerInfo,
-)
-from exasol_integration_test_docker_environment.lib.data.test_container_content_description import (
-    TestContainerContentDescription,
+from exasol_integration_test_docker_environment.lib.base.run_task import (
+    generate_root_task,
 )
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
+from exasol_integration_test_docker_environment.lib.models.config.build_config import (
+    set_build_config,
+)
+from exasol_integration_test_docker_environment.lib.models.config.docker_config import (
+    set_docker_repository_config,
+)
+from exasol_integration_test_docker_environment.lib.models.data.container_info import (
+    ContainerInfo,
+)
+from exasol_integration_test_docker_environment.lib.models.data.test_container_content_description import (
+    TestContainerContentDescription,
+)
 from exasol_integration_test_docker_environment.lib.test_environment.parameter.test_container_parameter import (
     TestContainerParameter,
 )

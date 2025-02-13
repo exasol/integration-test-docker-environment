@@ -4,13 +4,13 @@ from pathlib import Path
 from sys import stderr
 from typing import Optional
 
-from exasol_integration_test_docker_environment.lib.data.environment_info import (
+from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
+from exasol_integration_test_docker_environment.lib.models.data.environment_info import (
     EnvironmentInfo,
 )
-from exasol_integration_test_docker_environment.lib.data.test_container_content_description import (
+from exasol_integration_test_docker_environment.lib.models.data.test_container_content_description import (
     TestContainerRuntimeMapping,
 )
-from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.test.get_test_container_content import (
     get_test_container_content,
 )

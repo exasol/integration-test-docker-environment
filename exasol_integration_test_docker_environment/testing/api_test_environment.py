@@ -1,8 +1,5 @@
-import inspect
-import os
 import shutil
 import tempfile
-from pathlib import Path
 from sys import stderr
 from typing import (
     Any,
@@ -14,7 +11,7 @@ from exasol_integration_test_docker_environment.lib.api import (
     spawn_test_environment,
     spawn_test_environment_with_test_container,
 )
-from exasol_integration_test_docker_environment.lib.data.test_container_content_description import (
+from exasol_integration_test_docker_environment.lib.models.data.test_container_content_description import (
     TestContainerContentDescription,
 )
 from exasol_integration_test_docker_environment.lib.test_environment.ports import Ports

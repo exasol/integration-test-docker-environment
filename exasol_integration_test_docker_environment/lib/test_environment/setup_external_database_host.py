@@ -11,13 +11,13 @@ from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_
 from exasol_integration_test_docker_environment.lib.base.json_pickle_parameter import (
     JsonPickleParameter,
 )
-from exasol_integration_test_docker_environment.lib.data.database_credentials import (
+from exasol_integration_test_docker_environment.lib.models.data.database_credentials import (
     DatabaseCredentialsParameter,
 )
-from exasol_integration_test_docker_environment.lib.data.database_info import (
+from exasol_integration_test_docker_environment.lib.models.data.database_info import (
     DatabaseInfo,
 )
-from exasol_integration_test_docker_environment.lib.data.docker_network_info import (
+from exasol_integration_test_docker_environment.lib.models.data.docker_network_info import (
     DockerNetworkInfo,
 )
 from exasol_integration_test_docker_environment.lib.test_environment.parameter.external_test_environment_parameter import (

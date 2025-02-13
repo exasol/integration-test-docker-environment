@@ -15,26 +15,26 @@ from exasol_integration_test_docker_environment.lib.base.base_task import BaseTa
 from exasol_integration_test_docker_environment.lib.base.docker_base_task import (
     DockerBaseTask,
 )
-from exasol_integration_test_docker_environment.lib.data.container_info import (
-    ContainerInfo,
-)
-from exasol_integration_test_docker_environment.lib.data.database_credentials import (
-    DatabaseCredentialsParameter,
-)
-from exasol_integration_test_docker_environment.lib.data.database_info import (
-    DatabaseInfo,
-)
-from exasol_integration_test_docker_environment.lib.data.docker_network_info import (
-    DockerNetworkInfo,
-)
-from exasol_integration_test_docker_environment.lib.data.docker_volume_info import (
-    DockerVolumeInfo,
-)
-from exasol_integration_test_docker_environment.lib.data.environment_info import (
-    EnvironmentInfo,
-)
 from exasol_integration_test_docker_environment.lib.docker.container.utils import (
     default_bridge_ip_address,
+)
+from exasol_integration_test_docker_environment.lib.models.data.container_info import (
+    ContainerInfo,
+)
+from exasol_integration_test_docker_environment.lib.models.data.database_credentials import (
+    DatabaseCredentialsParameter,
+)
+from exasol_integration_test_docker_environment.lib.models.data.database_info import (
+    DatabaseInfo,
+)
+from exasol_integration_test_docker_environment.lib.models.data.docker_network_info import (
+    DockerNetworkInfo,
+)
+from exasol_integration_test_docker_environment.lib.models.data.docker_volume_info import (
+    DockerVolumeInfo,
+)
+from exasol_integration_test_docker_environment.lib.models.data.environment_info import (
+    EnvironmentInfo,
 )
 from exasol_integration_test_docker_environment.lib.test_environment.docker_container_copy import (
     DockerContainerCopy,

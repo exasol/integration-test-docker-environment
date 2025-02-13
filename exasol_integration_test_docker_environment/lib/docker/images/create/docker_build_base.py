@@ -10,9 +10,6 @@ from exasol_integration_test_docker_environment.abstract_method_exception import
 from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import (
     DependencyLoggerBaseTask,
 )
-from exasol_integration_test_docker_environment.lib.config.build_config import (
-    build_config,
-)
 from exasol_integration_test_docker_environment.lib.docker.images.create.docker_image_analyze_task import (
     DockerAnalyzeImageTask,
 )
@@ -27,6 +24,9 @@ from exasol_integration_test_docker_environment.lib.docker.images.image_info imp
 from exasol_integration_test_docker_environment.lib.docker.images.required_task_info import (
     RequiredTaskInfo,
     RequiredTaskInfoDict,
+)
+from exasol_integration_test_docker_environment.lib.models.config.build_config import (
+    build_config,
 )
 
 

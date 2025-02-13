@@ -1,19 +1,19 @@
 import unittest
 from sys import stderr
 
-from exasol_integration_test_docker_environment.lib.api.common import (
+from exasol_integration_test_docker_environment.lib.base.run_task import (
     generate_root_task,
     run_task,
-)
-from exasol_integration_test_docker_environment.lib.data.environment_info import (
-    EnvironmentInfo,
-)
-from exasol_integration_test_docker_environment.lib.data.environment_type import (
-    EnvironmentType,
 )
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.lib.docker.container.utils import (
     remove_docker_container,
+)
+from exasol_integration_test_docker_environment.lib.models.data.environment_info import (
+    EnvironmentInfo,
+)
+from exasol_integration_test_docker_environment.lib.models.data.environment_type import (
+    EnvironmentType,
 )
 from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_environment import (
     SpawnTestEnvironment,

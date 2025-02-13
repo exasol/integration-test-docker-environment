@@ -1,15 +1,15 @@
 from typing import Optional
 
-from exasol_integration_test_docker_environment.lib.data.database_info import (
+from exasol_integration_test_docker_environment.lib.models.data.database_info import (
     DatabaseInfo,
 )
-from exasol_integration_test_docker_environment.lib.data.docker_network_info import (
+from exasol_integration_test_docker_environment.lib.models.data.docker_network_info import (
     DockerNetworkInfo,
 )
-from exasol_integration_test_docker_environment.lib.data.docker_volume_info import (
+from exasol_integration_test_docker_environment.lib.models.data.docker_volume_info import (
     DockerVolumeInfo,
 )
-from exasol_integration_test_docker_environment.lib.data.environment_type import (
+from exasol_integration_test_docker_environment.lib.models.data.environment_type import (
     EnvironmentType,
 )
 from exasol_integration_test_docker_environment.lib.test_environment.abstract_spawn_test_environment import (
