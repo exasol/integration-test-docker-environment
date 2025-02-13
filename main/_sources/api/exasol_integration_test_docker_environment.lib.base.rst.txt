@@ -18,11 +18,12 @@ exasol\_integration\_test\_docker\_environment.lib.base
    docker_parameter
    flavor_task
    frozendict_to_dict
+   import_build_step
    info
    json_pickle_parameter
    json_pickle_target
-   luigi_log_config
    pickle_target
+   run_task
    ssh_access
    still_running_logger
    stoppable_base_task
