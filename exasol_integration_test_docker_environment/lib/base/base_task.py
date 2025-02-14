@@ -11,7 +11,7 @@ from typing import (
     Set,
     Type,
     TypeVar,
-    Union,
+    Union, Tuple,
 )
 
 import luigi
@@ -113,7 +113,7 @@ BaseTaskType = TypeVar("BaseTaskType", bound="BaseTask")
 
 
 class BaseTask(Task):
-    caller_output_path: List[str] = luigi.ListParameter([], significant=False, visibility=ParameterVisibility.HIDDEN)  # type: ignore
+    caller_output_path: Tuple[str] = luigi.ListParameter([], significant=False, visibility=ParameterVisibility.HIDDEN)  # type: ignore
     job_id: str = luigi.Parameter()  # type: ignore
 
     def __init__(self, *args, **kwargs) -> None:
@@ -196,8 +196,8 @@ class BaseTask(Task):
         else:
             return extension
 
-    def extend_output_path(self) -> List[str]:
-        return list(self.caller_output_path) + [self.task_id]
+    def extend_output_path(self) -> Tuple[str, ...]:
+        return tuple(self.caller_output_path) + (self.task_id,)
 
     def _get_tmp_path_for_job(self) -> Path:
         return Path(self._get_output_path_for_job(), "temp")
