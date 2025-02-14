@@ -1,10 +1,10 @@
 from pathlib import Path
 from typing import (
-    Any,
     Generator,
     Iterator,
     Optional,
     Tuple,
+    Union,
 )
 
 import luigi
@@ -40,11 +40,23 @@ from exasol_integration_test_docker_environment.lib.models.data.docker_volume_in
 from exasol_integration_test_docker_environment.lib.models.data.environment_info import (
     EnvironmentInfo,
 )
+from exasol_integration_test_docker_environment.lib.test_environment.create_certificates.create_ssl_certificates_task import (
+    CreateSSLCertificatesTask,
+)
+from exasol_integration_test_docker_environment.lib.test_environment.database_waiters.wait_for_external_database import (
+    WaitForTestExternalDatabase,
+)
+from exasol_integration_test_docker_environment.lib.test_environment.database_waiters.wait_for_test_docker_database import (
+    WaitForTestDockerDatabase,
+)
 from exasol_integration_test_docker_environment.lib.test_environment.docker_container_copy import (
     DockerContainerCopy,
 )
 from exasol_integration_test_docker_environment.lib.test_environment.parameter.general_spawn_test_environment_parameter import (
     GeneralSpawnTestEnvironmentParameter,
+)
+from exasol_integration_test_docker_environment.lib.test_environment.prepare_network_for_test_environment import (
+    PrepareDockerNetworkForTestEnvironment,
 )
 from exasol_integration_test_docker_environment.lib.test_environment.shell_variables import (
     ShellVariables,
@@ -71,11 +83,31 @@ class AbstractSpawnTestEnvironment(
     def get_environment_type(self):
         raise AbstractMethodException()
 
-    def run_task(self) -> Iterator[BaseTaskType]:
+    def run_task(
+        self,
+    ) -> Iterator[
+        Union[
+            PrepareDockerNetworkForTestEnvironment,
+            CreateSSLCertificatesTask,
+            WaitForTestDockerDatabase,
+            WaitForTestExternalDatabase,
+        ]
+    ]:
         test_environment_info = yield from self._attempt_database_start()
         self.return_object(test_environment_info)
 
-    def _attempt_database_start(self) -> Generator[BaseTaskType, None, EnvironmentInfo]:
+    def _attempt_database_start(
+        self,
+    ) -> Generator[
+        Union[
+            PrepareDockerNetworkForTestEnvironment,
+            CreateSSLCertificatesTask,
+            WaitForTestDockerDatabase,
+            WaitForTestExternalDatabase,
+        ],
+        None,
+        EnvironmentInfo,
+    ]:
         is_database_ready = False
         attempt = 0
         database_info = None
@@ -165,7 +197,12 @@ class AbstractSpawnTestEnvironment(
         )
 
     def _start_database(self, attempt) -> Generator[
-        BaseTaskType,
+        Union[
+            PrepareDockerNetworkForTestEnvironment,
+            CreateSSLCertificatesTask,
+            WaitForTestDockerDatabase,
+            WaitForTestExternalDatabase,
+        ],
         None,
         Tuple[DockerNetworkInfo, DatabaseInfo, bool, Optional[ContainerInfo]],
     ]:
@@ -183,7 +220,7 @@ class AbstractSpawnTestEnvironment(
 
     def _create_ssl_certificates(
         self,
-    ) -> Generator[BaseTaskType, None, Optional[DockerVolumeInfo]]:
+    ) -> Generator[CreateSSLCertificatesTask, None, Optional[DockerVolumeInfo]]:
         ssl_volume_info_future = yield from self.run_dependencies(
             self.create_ssl_certificates()
         )
@@ -193,14 +230,18 @@ class AbstractSpawnTestEnvironment(
     def create_ssl_certificates(self):
         raise AbstractMethodException()
 
-    def _create_network(self, attempt):
+    def _create_network(
+        self, attempt
+    ) -> Generator[PrepareDockerNetworkForTestEnvironment, None, DockerNetworkInfo]:
         network_info_future = yield from self.run_dependencies(
             self.create_network_task(attempt)
         )
         network_info = self.get_values_from_future(network_info_future)
         return network_info
 
-    def create_network_task(self, attempt: int):
+    def create_network_task(
+        self, attempt: int
+    ) -> Iterator[PrepareDockerNetworkForTestEnvironment]:
         raise AbstractMethodException()
 
     def _spawn_database_and_test_container(
@@ -256,12 +297,20 @@ class AbstractSpawnTestEnvironment(
             test_container_content=self.test_container_content,
         )
 
-    def _wait_for_database(self, database_info: DatabaseInfo, attempt: int):
+    def _wait_for_database(
+        self, database_info: DatabaseInfo, attempt: int
+    ) -> Generator[
+        Union[WaitForTestDockerDatabase, WaitForTestExternalDatabase], None, bool
+    ]:
         database_ready_target_future = yield from self.run_dependencies(
             self.create_wait_for_database_task(attempt, database_info)
         )
-        is_database_ready = self.get_values_from_futures(database_ready_target_future)
+        is_database_ready: bool = self.get_values_from_futures(
+            database_ready_target_future
+        )
         return is_database_ready
 
-    def create_wait_for_database_task(self, attempt: int, database_info: DatabaseInfo):
+    def create_wait_for_database_task(
+        self, attempt: int, database_info: DatabaseInfo
+    ) -> Union[WaitForTestDockerDatabase, WaitForTestExternalDatabase]:
         raise AbstractMethodException()

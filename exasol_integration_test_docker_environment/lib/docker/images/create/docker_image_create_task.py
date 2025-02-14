@@ -3,6 +3,7 @@ import importlib
 from typing import (
     Generator,
     Iterator,
+    Union,
 )
 
 import luigi
@@ -42,11 +43,19 @@ class DockerCreateImageTask(DockerBaseTask):
         significant=True,
     )  # type: ignore
 
-    def run_task(self) -> Iterator[BaseTaskType]:
+    def run_task(
+        self,
+    ) -> Iterator[
+        Union[DockerBuildImageTask, DockerLoadImageTask, DockerPullImageTask]
+    ]:
         new_image_info = yield from self.build(self.image_info)
         self.return_object(new_image_info)
 
-    def build(self, image_info: ImageInfo) -> Generator[BaseTaskType, None, ImageInfo]:
+    def build(self, image_info: ImageInfo) -> Generator[
+        Union[DockerBuildImageTask, DockerLoadImageTask, DockerPullImageTask],
+        None,
+        ImageInfo,
+    ]:
         if image_info.image_state == ImageState.NEEDS_TO_BE_BUILD.name:
             build_img_task: DockerBuildImageTask = self.create_child_task(
                 DockerBuildImageTask, image_name=self.image_name, image_info=image_info
@@ -114,7 +123,11 @@ class DockerCreateImageTaskWithDeps(DockerCreateImageTask):
         instance = self.create_child_task(class_, **required_task_info.params)
         return instance
 
-    def run_task(self) -> Iterator[BaseTaskType]:
+    def run_task(
+        self,
+    ) -> Iterator[
+        Union[DockerBuildImageTask, DockerLoadImageTask, DockerPullImageTask]
+    ]:
         image_infos = self.get_values_from_futures(self.futures)
         image_info = copy.copy(self.image_info)
         image_info.depends_on_images = image_infos

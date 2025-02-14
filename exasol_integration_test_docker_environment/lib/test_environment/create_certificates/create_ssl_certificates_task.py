@@ -60,7 +60,7 @@ class CreateSSLCertificatesTask(DockerBaseTask):
         super().on_success()
         self._temp_resource_directory.cleanup()
 
-    def run_task(self) -> Iterator[BaseTaskType]:
+    def run_task(self) -> Iterator[DockerCertificateContainerBuild]:
         self.volume_info = None
         image_infos = yield from self.build_image()
         if self.reuse:
@@ -78,7 +78,9 @@ class CreateSSLCertificatesTask(DockerBaseTask):
 
         self.return_object(self.volume_info)
 
-    def build_image(self) -> Generator[BaseTaskType, None, Dict[str, ImageInfo]]:
+    def build_image(
+        self,
+    ) -> Generator[DockerCertificateContainerBuild, None, Dict[str, ImageInfo]]:
         task = self.create_child_task(
             task_class=DockerCertificateContainerBuild,
             certificate_container_root_directory=self._temp_resource_directory.tmp_directory,

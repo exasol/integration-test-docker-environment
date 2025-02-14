@@ -112,7 +112,9 @@ class SpawnTestEnvironmentWithDockerDB(
             additional_db_parameter=self.additional_db_parameter,
         )
 
-    def create_wait_for_database_task(self, attempt: int, database_info: DatabaseInfo):
+    def create_wait_for_database_task(
+        self, attempt: int, database_info: DatabaseInfo
+    ) -> WaitForTestDockerDatabase:
         return self.create_child_task_with_common_params(
             WaitForTestDockerDatabase,
             database_info=database_info,

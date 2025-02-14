@@ -13,6 +13,9 @@ from exasol_integration_test_docker_environment.lib.docker.images.create.docker_
 from exasol_integration_test_docker_environment.lib.docker.images.create.docker_image_analyze_task import (
     DockerAnalyzeImageTask,
 )
+from exasol_integration_test_docker_environment.lib.docker.images.create.docker_image_create_task import (
+    DockerCreateImageTask,
+)
 from exasol_integration_test_docker_environment.lib.docker.images.push.docker_push_parameter import (
     DockerPushParameter,
 )
@@ -84,7 +87,7 @@ class DockerCertificateBuildBase(DockerBuildBase):
 
 class DockerCertificateContainerBuild(DockerCertificateBuildBase):
 
-    def run_task(self) -> Iterator[BaseTaskType]:
+    def run_task(self) -> Iterator[DockerCreateImageTask]:
         build_tasks = self.create_build_tasks(False)
         image_infos_futures = yield from self.run_dependencies(build_tasks)
         image_infos = self.get_values_from_futures(image_infos_futures)
@@ -93,7 +96,7 @@ class DockerCertificateContainerBuild(DockerCertificateBuildBase):
 
 class DockerTestContainerPush(DockerCertificateBuildBase, DockerPushParameter):
 
-    def run_task(self) -> Iterator[BaseTaskType]:
+    def run_task(self) -> Iterator[DockerCreateImageTask]:
         build_tasks = self.create_build_tasks(shortcut_build=not self.push_all)
         push_task_creator = PushTaskCreatorFromBuildTasks(self)
         push_tasks = push_task_creator.create_tasks_for_build_tasks(build_tasks)

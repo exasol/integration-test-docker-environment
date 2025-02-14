@@ -9,9 +9,10 @@ from typing import (
     Generator,
     List,
     Set,
+    Tuple,
     Type,
     TypeVar,
-    Union, Tuple,
+    Union,
 )
 
 import luigi
@@ -189,9 +190,9 @@ class BaseTask(Task):
     def _get_output_path_for_job(self) -> Path:
         return Path(build_config().output_directory, "jobs", self.job_id)
 
-    def _extend_output_path(self) -> Union[List[str], str]:
+    def _extend_output_path(self) -> Union[Tuple[str, ...], str]:
         extension = self.extend_output_path()
-        if extension is None or extension == []:
+        if extension is None or extension == tuple():
             return self.task_id
         else:
             return extension

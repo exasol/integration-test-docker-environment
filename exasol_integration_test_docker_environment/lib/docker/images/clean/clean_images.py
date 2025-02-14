@@ -1,4 +1,7 @@
-from typing import Iterator
+from typing import (
+    Iterator,
+    List,
+)
 
 import luigi
 
@@ -17,7 +20,7 @@ class CleanImageTask(DockerBaseTask):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
-    def run_task(self) -> Iterator[BaseTaskType]:
+    def run_task(self) -> Iterator["CleanImageTask"]:
         self.logger.info("Try to remove dependent images of %s" % self.image_id)
         yield from self.run_dependencies(
             self.get_clean_image_tasks_for_dependent_images()
@@ -36,7 +39,7 @@ class CleanImageTask(DockerBaseTask):
                     )
                 )
 
-    def get_clean_image_tasks_for_dependent_images(self):
+    def get_clean_image_tasks_for_dependent_images(self) -> List["CleanImageTask"]:
         with self._get_docker_client() as docker_client:
             image_ids = [
                 str(possible_child).replace("sha256:", "")
