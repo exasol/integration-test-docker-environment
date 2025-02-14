@@ -1,0 +1,28 @@
+name: Test EXAConf files
+
+on:
+  workflow_call:
+
+jobs:
+  test-docker-starter:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: SCM Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python & Poetry Environment
+        uses: exasol/python-toolbox/.github/actions/python-environment@0.20.0
+
+      - name: Run Update of EXAConf files
+        run: poetry run nox -s copy-docker-db-config-templates
+
+      - name: Show changes on working copy
+        run: git status --porcelain=v1 -uno
+
+      - name: Show diff on working copy
+        run: git diff --cached; git diff --cached --summary;
+
+      - name: Fail if git working tree is not clean
+        run: |
+          [ -z "$(git status --porcelain=v1 -uno 2>/dev/null)" ]
+  
