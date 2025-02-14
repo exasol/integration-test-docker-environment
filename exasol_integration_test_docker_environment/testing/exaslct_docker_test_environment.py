@@ -25,7 +25,7 @@ class ExaslctDockerTestEnvironment:
         ports: Ports,
         environment_info: Optional[EnvironmentInfo] = None,
         completed_process: Optional[subprocess.CompletedProcess] = None,
-    ):
+    ) -> None:
         self.db_password = db_password
         self.db_username = db_username
         self.ports = ports

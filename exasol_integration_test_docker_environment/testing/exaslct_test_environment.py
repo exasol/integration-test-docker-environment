@@ -64,7 +64,7 @@ class ExaslctTestEnvironment:
 
     def __init__(
         self, test_object, executable="./exaslct", clean_images_at_close=True, name=None
-    ):
+    ) -> None:
         self.clean_images_at_close = clean_images_at_close
         self.executable = executable
         self.test_object = test_object

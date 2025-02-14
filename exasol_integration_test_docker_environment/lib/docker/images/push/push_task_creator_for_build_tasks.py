@@ -9,7 +9,7 @@ from exasol_integration_test_docker_environment.lib.docker.images.task_creator_f
 
 class PushTaskCreatorFromBuildTasks(TaskCreatorFromBuildTasks):
 
-    def __init__(self, task: BaseTask):
+    def __init__(self, task: BaseTask) -> None:
         self.task = task
 
     def create_task_with_required_tasks(self, build_task, required_task_info):

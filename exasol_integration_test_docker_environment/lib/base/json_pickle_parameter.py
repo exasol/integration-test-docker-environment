@@ -1,3 +1,5 @@
+from typing import Any
+
 import jsonpickle
 from luigi.parameter import (
     Parameter,
@@ -21,7 +23,7 @@ class JsonPickleParameter(Parameter):
         batch_method=None,
         is_optional=False,
         visibility=ParameterVisibility.PUBLIC,
-    ):
+    ) -> None:
         super().__init__(
             default,
             is_global,
@@ -36,7 +38,7 @@ class JsonPickleParameter(Parameter):
         self.cls = cls
         self._is_optional = is_optional
 
-    def parse(self, s):
+    def parse(self, s) -> None:
         jsonpickle.set_preferred_backend("simplejson")
         loaded_object = jsonpickle.decode(s)
         if self._is_optional and loaded_object is None:

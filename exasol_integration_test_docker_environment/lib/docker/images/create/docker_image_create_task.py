@@ -1,8 +1,13 @@
 import copy
 import importlib
+from typing import (
+    Generator,
+    Iterator,
+)
 
 import luigi
 
+from exasol_integration_test_docker_environment.lib.base.base_task import BaseTaskType
 from exasol_integration_test_docker_environment.lib.base.docker_base_task import (
     DockerBaseTask,
 )
@@ -37,30 +42,30 @@ class DockerCreateImageTask(DockerBaseTask):
         significant=True,
     )  # type: ignore
 
-    def run_task(self):
+    def run_task(self) -> Iterator[BaseTaskType]:
         new_image_info = yield from self.build(self.image_info)
         self.return_object(new_image_info)
 
-    def build(self, image_info: ImageInfo):
+    def build(self, image_info: ImageInfo) -> Generator[BaseTaskType, None, ImageInfo]:
         if image_info.image_state == ImageState.NEEDS_TO_BE_BUILD.name:
-            task = self.create_child_task(
+            build_img_task: DockerBuildImageTask = self.create_child_task(
                 DockerBuildImageTask, image_name=self.image_name, image_info=image_info
             )
-            yield from self.run_dependencies(task)
+            yield from self.run_dependencies(build_img_task)
             image_info.image_state = ImageState.WAS_BUILD.name  # TODO clone and change
             return image_info
         elif image_info.image_state == ImageState.CAN_BE_LOADED.name:
-            task = self.create_child_task(
+            load_img_task: DockerLoadImageTask = self.create_child_task(
                 DockerLoadImageTask, image_name=self.image_name, image_info=image_info
             )
-            yield from self.run_dependencies(task)
+            yield from self.run_dependencies(load_img_task)
             image_info.image_state = ImageState.WAS_LOADED.name
             return image_info
         elif image_info.image_state == ImageState.REMOTE_AVAILABLE.name:
-            task = self.create_child_task(
+            pull_img_task: DockerPullImageTask = self.create_child_task(
                 DockerPullImageTask, image_name=self.image_name, image_info=image_info
             )
-            yield from self.run_dependencies(task)
+            yield from self.run_dependencies(pull_img_task)
             image_info.image_state = ImageState.WAS_PULLED.name
             return image_info
         elif image_info.image_state == ImageState.TARGET_LOCALLY_AVAILABLE.name:
@@ -78,7 +83,7 @@ class DockerCreateImageTask(DockerBaseTask):
                 image_info.get_target_complete_name(),
             )
 
-    def rename_source_image_to_target_image(self, image_info):
+    def rename_source_image_to_target_image(self, image_info) -> None:
         with self._get_docker_client() as docker_client:
             docker_client.images.get(image_info.get_source_complete_name()).tag(
                 repository=image_info.target_repository_name,
@@ -94,7 +99,7 @@ class DockerCreateImageTaskWithDeps(DockerCreateImageTask):
         significant=True,
     )  # type: ignore
 
-    def register_required(self):
+    def register_required(self) -> None:
         self.required_tasks = {
             key: self.create_required_task(required_task_info)
             for key, required_task_info in self.required_task_infos.infos.items()
@@ -109,7 +114,7 @@ class DockerCreateImageTaskWithDeps(DockerCreateImageTask):
         instance = self.create_child_task(class_, **required_task_info.params)
         return instance
 
-    def run_task(self):
+    def run_task(self) -> Iterator[BaseTaskType]:
         image_infos = self.get_values_from_futures(self.futures)
         image_info = copy.copy(self.image_info)
         image_info.depends_on_images = image_infos

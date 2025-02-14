@@ -1,5 +1,8 @@
+from typing import Iterator
+
 import luigi
 
+from exasol_integration_test_docker_environment.lib.base.base_task import BaseTaskType
 from exasol_integration_test_docker_environment.lib.base.docker_base_task import (
     DockerBaseTask,
 )
@@ -9,12 +12,12 @@ from exasol_integration_test_docker_environment.lib.docker.images.utils import (
 
 
 class CleanImageTask(DockerBaseTask):
-    image_id = luigi.Parameter()
+    image_id: str = luigi.Parameter()  # type: ignore
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
-    def run_task(self):
+    def run_task(self) -> Iterator[BaseTaskType]:
         self.logger.info("Try to remove dependent images of %s" % self.image_id)
         yield from self.run_dependencies(
             self.get_clean_image_tasks_for_dependent_images()
@@ -58,7 +61,7 @@ class CleanImageTask(DockerBaseTask):
 
 class CleanImagesStartingWith(DockerBaseTask):
 
-    starts_with_pattern = luigi.Parameter()
+    starts_with_pattern: str = luigi.Parameter()  # type: ignore
 
     def register_required(self):
         image_ids = [
@@ -84,5 +87,5 @@ class CleanImagesStartingWith(DockerBaseTask):
                 self.logger.info("Going to remove following image: %s" % i.tags)
             return filter_images
 
-    def run_task(self):
+    def run_task(self) -> None:
         pass

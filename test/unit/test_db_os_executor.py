@@ -1,4 +1,5 @@
 from test.integration.helpers import mock_cast
+from typing import Union
 from unittest.mock import (
     MagicMock,
     call,

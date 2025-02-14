@@ -16,7 +16,9 @@ from exasol_integration_test_docker_environment.lib.models.config.build_config i
 
 
 class BuildContextCreator:
-    def __init__(self, temp_directory, image_info: ImageInfo, log_file_path: Path):
+    def __init__(
+        self, temp_directory, image_info: ImageInfo, log_file_path: Path
+    ) -> None:
         self._image_info = image_info
         self._log_file_path = log_file_path
         self._image_info_of_dependencies = self._image_info.depends_on_images

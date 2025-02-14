@@ -19,7 +19,7 @@ from exasol_integration_test_docker_environment.lib.docker.images.image_info imp
 
 class BuildContextHasher:
 
-    def __init__(self, logger, image_description: ImageDescription):
+    def __init__(self, logger, image_description: ImageDescription) -> None:
         self.image_description = image_description
         self.logger = logger
 

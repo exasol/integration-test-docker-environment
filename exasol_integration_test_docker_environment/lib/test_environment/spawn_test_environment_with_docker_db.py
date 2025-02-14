@@ -46,7 +46,7 @@ class SpawnTestEnvironmentWithDockerDB(
     AbstractSpawnTestEnvironment, DockerDBTestEnvironmentParameter
 ):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.db_container_name = f"""db_container_{self.environment_name}"""
         self.certificate_volume_name = f"""certificates_{self.environment_name}"""

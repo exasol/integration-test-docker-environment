@@ -5,11 +5,11 @@ from exasol_integration_test_docker_environment.lib.docker import ContextDockerC
 
 
 class DockerImageTarget(luigi.Target):
-    def __init__(self, image_name: str, image_tag: str):
+    def __init__(self, image_name: str, image_tag: str) -> None:
         self.image_name = image_name
         self.image_tag = image_tag
 
-    def get_complete_name(self):
+    def get_complete_name(self) -> str:
         return f"{self.image_name}:{self.image_tag}"
 
     def exists(self) -> bool:

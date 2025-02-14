@@ -1,76 +1,77 @@
 from datetime import datetime
 from pathlib import Path
+from typing import List
 
 from exasol_integration_test_docker_environment.lib.base.base_task import BaseTask
 
 
 class TimeableBaseTask(BaseTask):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.write_creation_time()
 
-    def _get_timers_path_for_job(self):
+    def _get_timers_path_for_job(self) -> Path:
         return Path(super()._get_output_path_for_job(), "timers")
 
-    def _get_timers_path(self):
+    def _get_timers_path(self) -> Path:
         return Path(self._get_timers_path_for_job(), self.task_id)
 
-    def _get_timers_state_path(self):
+    def _get_timers_state_path(self) -> Path:
         path = Path(self._get_timers_path(), "state")
         path.mkdir(parents=True, exist_ok=True)
         return path
 
-    def _get_timers_result_path(self):
+    def _get_timers_result_path(self) -> Path:
         path = Path(self._get_timers_path(), "result")
         path.mkdir(parents=True, exist_ok=True)
         return path
 
-    def _get_timers_creation_state_path(self):
+    def _get_timers_creation_state_path(self) -> Path:
         return Path(self._get_timers_state_path(), "creation")
 
-    def _get_timers_first_run_state_path(self):
+    def _get_timers_first_run_state_path(self) -> Path:
         return Path(self._get_timers_state_path(), "first_run")
 
-    def _get_timers_runs_state_path(self):
+    def _get_timers_runs_state_path(self) -> Path:
         return Path(self._get_timers_state_path(), "runs")
 
-    def _get_timers_creation_result_path(self):
+    def _get_timers_creation_result_path(self) -> Path:
         return Path(self._get_timers_result_path(), "time_since_creation")
 
-    def _get_timers_first_run_result_path(self):
+    def _get_timers_first_run_result_path(self) -> Path:
         return Path(self._get_timers_result_path(), "time_since_first_run")
 
-    def _get_timers_runs_result_path(self):
+    def _get_timers_runs_result_path(self) -> Path:
         return Path(self._get_timers_result_path(), "total_time_of_runs")
 
-    def write_creation_time(self):
+    def write_creation_time(self) -> None:
         state_path = self._get_timers_creation_state_path()
         if not state_path.exists():
             with state_path.open("w") as f:
                 f.write(str(datetime.now().timestamp()))
 
-    def write_first_run_start_time(self, start_time):
+    def write_first_run_start_time(self, start_time: datetime) -> None:
         state_path = self._get_timers_first_run_state_path()
         if not state_path.exists():
             with state_path.open("w") as f:
                 f.write(str(start_time.timestamp()))
 
-    def write_runs_time(self, start_time):
+    def write_runs_time(self, start_time: datetime) -> None:
         state_path = self._get_timers_runs_state_path()
         timedelta = datetime.now() - start_time
         with state_path.open("a") as f:
             f.write(str(timedelta.total_seconds()))
             f.write("\n")
 
-    def on_success(self):
+    def on_success(self) -> None:
         super().on_success()
         now = datetime.now()
         self.log_time_since_first_run(now)
         self.log_time_since_creation(now)
         self.log_time_of_runs()
 
-    def log_time_since_creation(self, now):
+    def log_time_since_creation(self, now: datetime) -> None:
         state_path = self._get_timers_creation_state_path()
         if state_path.exists():
             with state_path.open("r") as f:
@@ -82,7 +83,7 @@ class TimeableBaseTask(BaseTask):
                 f.write(str(timedelta.total_seconds()))
                 f.write("\n")
 
-    def log_time_since_first_run(self, now):
+    def log_time_since_first_run(self, now: datetime) -> None:
         state_path = self._get_timers_first_run_state_path()
         if state_path.exists():
             with state_path.open("r") as f:
@@ -94,7 +95,7 @@ class TimeableBaseTask(BaseTask):
                 f.write(str(timedelta.total_seconds()))
                 f.write("\n")
 
-    def log_time_of_runs(self):
+    def log_time_of_runs(self) -> None:
         state_path = self._get_timers_runs_state_path()
         if state_path.exists():
             with state_path.open("r") as f:
@@ -104,8 +105,8 @@ class TimeableBaseTask(BaseTask):
                 f.write(str(total_runtime))
                 f.write("\n")
 
-    def calculate_total_runtime(self, lines):
-        total_runtime = 0
+    def calculate_total_runtime(self, lines: List[str]) -> float:
+        total_runtime: float = 0.0
         for line in lines:
             seconds_of_run = float(line)
             total_runtime += seconds_of_run

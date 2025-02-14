@@ -36,7 +36,7 @@ def mock_settings_env_vars():
 
 
 class UsedLogPath:
-    def __init__(self, task):
+    def __init__(self, task) -> None:
         self.log_path = Path(task["log_path"])
         self.task_input_parameter = task["in_parameter"]
 
@@ -50,7 +50,7 @@ class UsedLogPath:
 class LogPathCorrectnessMatcher:
     """Assert that a given path meets some expectations."""
 
-    def __init__(self, expected_log_path: Path):
+    def __init__(self, expected_log_path: Path) -> None:
         self.expected_log_path = expected_log_path
 
     def __eq__(self, used_log_path: object):

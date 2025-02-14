@@ -13,11 +13,11 @@ from exasol_integration_test_docker_environment.lib.models.config.log_config imp
 
 class PushLogHandler(AbstractLogHandler):
 
-    def __init__(self, log_file_path, logger, image_info: ImageInfo):
+    def __init__(self, log_file_path, logger, image_info: ImageInfo) -> None:
         super().__init__(log_file_path, logger)
         self._image_info = image_info
 
-    def handle_log_line(self, log_line, error: bool = False):
+    def handle_log_line(self, log_line, error: bool = False) -> None:
         json_output = json.loads(log_line)
         if "status" in json_output and json_output["status"] != "Pushing":
             self._complete_log.append(json_output["status"])
@@ -26,7 +26,7 @@ class PushLogHandler(AbstractLogHandler):
         if "errorDetail" in json_output:
             self._error_message = json_output["errorDetail"]["message"]
 
-    def finish(self):
+    def finish(self) -> None:
         self.write_log_to_console_if_requested()
         if self._error_message is not None:
             self.write_error_log_to_console_if_requested()
@@ -40,7 +40,7 @@ class PushLogHandler(AbstractLogHandler):
                 )
             )
 
-    def write_error_log_to_console_if_requested(self):
+    def write_error_log_to_console_if_requested(self) -> None:
         if (
             self._log_config.write_log_files_to_console
             == WriteLogFilesToConsole.only_error
@@ -51,7 +51,7 @@ class PushLogHandler(AbstractLogHandler):
                 "\n".join(self._complete_log),
             )
 
-    def write_log_to_console_if_requested(self):
+    def write_log_to_console_if_requested(self) -> None:
         if self._log_config.write_log_files_to_console == WriteLogFilesToConsole.all:
             self._logger.info(
                 "Push Log of image %s\n%s",

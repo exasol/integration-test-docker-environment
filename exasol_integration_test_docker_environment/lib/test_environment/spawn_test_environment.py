@@ -21,7 +21,7 @@ class SpawnTestEnvironment(DependencyLoggerBaseTask, SpawnTestEnvironmentParamet
     DEFAULT_DB_USER = "sys"
     DEFAULT_DATABASE_PASSWORD = "exasol"
     DEFAULT_BUCKETFS_WRITE_PASSWORD = "write"
-    environment_name = luigi.Parameter()
+    environment_name: str = luigi.Parameter()  # type: ignore
 
     def register_required(self):
         task = self._create_spawn_environment_task()
@@ -57,6 +57,6 @@ class SpawnTestEnvironment(DependencyLoggerBaseTask, SpawnTestEnvironmentParamet
         )
         return task
 
-    def run_task(self):
+    def run_task(self) -> None:
         environment_info = self.get_values_from_future(self._environment_info_future)
         self.return_object(environment_info)
