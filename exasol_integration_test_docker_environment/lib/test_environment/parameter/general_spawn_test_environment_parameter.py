@@ -1,10 +1,9 @@
 from typing import (
-    List,
+    Tuple,
     Optional,
 )
 
 import luigi
-from luigi import Config
 
 from exasol_integration_test_docker_environment.lib.test_environment.parameter.test_container_parameter import (
     OptionalTestContainerParameter,
