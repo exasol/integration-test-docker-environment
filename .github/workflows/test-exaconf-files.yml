@@ -23,6 +23,8 @@ jobs:
         run: git diff --cached; git diff --cached --summary;
 
       - name: Fail if git working tree is not clean
+        # If this check fails, you need to run `poetry run nox -s copy-docker-db-config-templates` before commiting
+        # or alternatively activate the commit hooks (see developer guide).
         run: |
           [ -z "$(git status --porcelain=v1 -uno 2>/dev/null)" ]
   
