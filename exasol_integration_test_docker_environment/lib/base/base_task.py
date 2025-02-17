@@ -109,13 +109,12 @@ class RunTaskFuture(AbstractTaskFuture):
             self._outputs_cache = self.completion_target.read()
         return self._outputs_cache
 
-"""
-We define this generic type here, because we want to define `BaseTask.run_dependencies` to return a Generator with
-this type as yield type. This allows us to define the specific types later when using `run_dependencies` in the subclasses,
-which makes maintenance of the code much easier.
-If we would use `BaseTask` as yield type in the return type of `run_dependencies`, we would be limited to use
-`BaseTask` in the subclasses, too.
-"""
+
+# We define this generic type here, because we want to define `BaseTask.run_dependencies` to return a Generator with
+# this type as yield type. This allows us to define the specific types later when using `run_dependencies` in the subclasses,
+# which makes maintenance of the code much easier.
+# If we would use `BaseTask` as yield type in the return type of `run_dependencies`, we would be limited to use
+# `BaseTask` in the subclasses, too.
 BaseTaskType = TypeVar("BaseTaskType", bound="BaseTask")
 
 
