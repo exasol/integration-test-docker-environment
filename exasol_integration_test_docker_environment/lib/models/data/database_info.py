@@ -17,7 +17,7 @@ class DatabaseInfo(Info):
         container_info: Optional[ContainerInfo] = None,
         ssh_info: Optional[SshInfo] = None,
         forwarded_ports: Optional[Ports] = None,
-    ):
+    ) -> None:
         self.container_info = container_info
         self.ports = ports
         self.host = host

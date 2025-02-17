@@ -20,7 +20,7 @@ class WaitForTestExternalDatabase(DockerBaseTask, DatabaseCredentialsParameter):
     db_startup_timeout_in_seconds: int = luigi.IntParameter(1 * 60, significant=False)  # type: ignore
     attempt: int = luigi.IntParameter(1)  # type: ignore
 
-    def run_task(self):
+    def run_task(self) -> None:
         # Since we can't assume that the test container exists, we cannot connect easily here
         # to the external database (correct way would be by using an SQL client).
         # For now, we simply assume that the external database is already ready and return just True.

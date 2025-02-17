@@ -54,7 +54,7 @@ class SpawnTestContainer(DockerBaseTask, TestContainerParameter):
     docker_runtime: Optional[str] = luigi.OptionalParameter(None, significant=False)  # type: ignore
     certificate_volume_name: Optional[str] = luigi.OptionalParameter(None, significant=False)  # type: ignore
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         if self.ip_address_index_in_subnet < 0:
             raise Exception(
@@ -62,7 +62,7 @@ class SpawnTestContainer(DockerBaseTask, TestContainerParameter):
                 % self.ip_address_index_in_subnet
             )
 
-    def register_required(self):
+    def register_required(self) -> None:
         self.test_container_image_future = self.register_dependency(
             self.create_child_task(
                 task_class=DockerTestContainerBuild,
@@ -93,7 +93,7 @@ class SpawnTestContainer(DockerBaseTask, TestContainerParameter):
 
         return ret_val
 
-    def run_task(self):
+    def run_task(self) -> None:
         subnet = netaddr.IPNetwork(self.network_info.subnet)
         ip_address = str(subnet[2 + self.ip_address_index_in_subnet])
         container_info = None
@@ -109,7 +109,7 @@ class SpawnTestContainer(DockerBaseTask, TestContainerParameter):
         self._copy_runtime_targets()
         self.return_object(container_info)
 
-    def _copy_runtime_targets(self):
+    def _copy_runtime_targets(self) -> None:
         self.logger.info(
             "Copy runtime targets in test container %s.", self.test_container_name
         )
@@ -208,7 +208,7 @@ class SpawnTestContainer(DockerBaseTask, TestContainerParameter):
             )
             return container_info
 
-    def _get_network_aliases(self):
+    def _get_network_aliases(self) -> List[str]:
         network_aliases = ["test_container", self.test_container_name]
         return network_aliases
 
@@ -244,7 +244,7 @@ class SpawnTestContainer(DockerBaseTask, TestContainerParameter):
         except Exception as e:
             pass
 
-    def register_certificates(self, test_container: Container):
+    def register_certificates(self, test_container: Container) -> None:
         if self.certificate_volume_name is not None:
             script_name = "install_root_certificate.sh"
             script = (
@@ -267,7 +267,7 @@ class SpawnTestContainer(DockerBaseTask, TestContainerParameter):
                     f"Error installing certificates:{output.decode('utf-8')}"
                 )
 
-    def cleanup_task(self, success: bool):
+    def cleanup_task(self, success: bool) -> None:
         if (success and not self.no_test_container_cleanup_after_success) or (
             not success and not self.no_test_container_cleanup_after_failure
         ):

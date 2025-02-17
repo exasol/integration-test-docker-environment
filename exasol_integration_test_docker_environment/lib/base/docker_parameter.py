@@ -8,7 +8,7 @@ class DockerParameter(Config):
     Docker parameters used for Tasks accessing Docker client.
     """
 
-    timeout = luigi.IntParameter(
+    timeout: int = luigi.IntParameter(
         100000, significant=False, visibility=ParameterVisibility.PRIVATE
-    )
-    no_cache = luigi.BoolParameter(False)
+    )  # type: ignore
+    no_cache: bool = luigi.BoolParameter(False)  # type: ignore

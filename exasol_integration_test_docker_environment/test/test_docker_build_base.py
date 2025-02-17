@@ -10,6 +10,7 @@ from typing import (
 import luigi
 from luigi import Parameter
 
+from exasol_integration_test_docker_environment.lib.base.base_task import BaseTask
 from exasol_integration_test_docker_environment.lib.base.run_task import (
     generate_root_task,
 )
@@ -61,7 +62,7 @@ class TestDockerBuildBase(DockerBuildBase):
     goals: List[str] = luigi.ListParameter([])  # type: ignore
 
     def get_goal_class_map(self) -> Dict[str, DockerAnalyzeImageTask]:
-        goal_class_map = {
+        goal_class_map: Dict[str, DockerAnalyzeImageTask] = {
             "test-analyze-image-1": self.create_child_task(
                 task_class=TestDockerBuildBaseTestAnalyzeImage,
                 task_name="test-analyze-image-1",

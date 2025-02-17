@@ -11,7 +11,7 @@ from exasol_integration_test_docker_environment.lib.models.config.log_config imp
 
 
 class StillRunningLoggerThread(threading.Thread):
-    def __init__(self, still_running_logger: "StillRunningLogger"):
+    def __init__(self, still_running_logger: "StillRunningLogger") -> None:
         super().__init__()
         self.still_running_logger = still_running_logger
         self.finish = False
@@ -27,7 +27,7 @@ class StillRunningLoggerThread(threading.Thread):
 
 class StillRunningLogger:
 
-    def __init__(self, logger, description):
+    def __init__(self, logger, description) -> None:
         self._description = description
         self._logger = logger
         self._log_config = log_config()

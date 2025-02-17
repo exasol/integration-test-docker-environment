@@ -7,7 +7,7 @@ from exasol_integration_test_docker_environment.lib.test_environment.database_se
 
 class TimeBasedBucketFSSyncWaiter(BucketFSSyncChecker):
 
-    def __init__(self, sync_time_estimation):
+    def __init__(self, sync_time_estimation) -> None:
         self.sync_time_estimation = sync_time_estimation
 
     def prepare_upload(self):

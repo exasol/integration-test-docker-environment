@@ -4,7 +4,7 @@ import re
 class regex_matcher:
     """Assert that a given string meets some expectations."""
 
-    def __init__(self, pattern, flags=0):
+    def __init__(self, pattern, flags=0) -> None:
         self._regex = re.compile(pattern, flags)
 
     def __eq__(self, actual):

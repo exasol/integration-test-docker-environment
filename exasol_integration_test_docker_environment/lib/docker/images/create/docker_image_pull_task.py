@@ -20,7 +20,7 @@ from exasol_integration_test_docker_environment.lib.models.config.docker_config 
 class DockerPullImageTask(DockerImageCreatorBaseTask):
     RETRIES = 3
 
-    def run_task(self):
+    def run_task(self) -> None:
         image_target = DockerImageTarget(
             image_name=self.image_info.source_repository_name,
             image_tag=self.image_info.get_source_complete_tag(),

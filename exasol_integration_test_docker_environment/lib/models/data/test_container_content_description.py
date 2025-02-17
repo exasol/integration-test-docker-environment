@@ -14,7 +14,7 @@ class TestContainerBuildMapping(Info):
     from within the Dockerfile during the build time of the test-container.
     """
 
-    def __init__(self, source: Path, target: str):
+    def __init__(self, source: Path, target: str) -> None:
         self.source = source
         self.target = target
 
@@ -29,7 +29,7 @@ class TestContainerRuntimeMapping(Info):
 
     def __init__(
         self, source: Path, target: str, deployment_target: Optional[str] = None
-    ):
+    ) -> None:
         self.source = source
         self.target = target
         self.deployment_target = deployment_target
@@ -46,7 +46,7 @@ class TestContainerContentDescription(Info):
         docker_file: Optional[str],
         build_files_and_directories: List[TestContainerBuildMapping],
         runtime_mappings: List[TestContainerRuntimeMapping],
-    ):
+    ) -> None:
         self.docker_file = docker_file
         self.build_files_and_directories = build_files_and_directories
         self.runtime_mappings = runtime_mappings

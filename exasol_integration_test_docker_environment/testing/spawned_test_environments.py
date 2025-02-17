@@ -10,7 +10,7 @@ class SpawnedTestEnvironments:
         self,
         on_host_environment: ExaslctDockerTestEnvironment,
         slc_test_run_environment: Optional[ExaslctDockerTestEnvironment],
-    ):
+    ) -> None:
         self.on_host_docker_environment = on_host_environment
         self.slc_test_run_environment = slc_test_run_environment
 

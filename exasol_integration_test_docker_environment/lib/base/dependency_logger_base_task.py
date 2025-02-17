@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import (
     Generator,
     List,
+    Union,
 )
 
 import luigi
@@ -20,21 +21,23 @@ from exasol_integration_test_docker_environment.lib.base.task_dependency import 
 
 class DependencyLoggerBaseTask(StoppableBaseTask):
 
-    def _get_dependencies_path_for_job(self):
+    def _get_dependencies_path_for_job(self) -> Path:
         return Path(super()._get_output_path_for_job(), "dependencies")
 
-    def _get_dependencies_path(self):
+    def _get_dependencies_path(self) -> Path:
         path = Path(self._get_dependencies_path_for_job(), self.task_id)
         path.mkdir(parents=True, exist_ok=True)
         return path
 
-    def _get_dependencies_requires_path(self):
+    def _get_dependencies_requires_path(self) -> Path:
         return Path(self._get_dependencies_path(), "requires")
 
-    def _get_dependencies_dynamic_path(self):
+    def _get_dependencies_dynamic_path(self) -> Path:
         return Path(self._get_dependencies_path(), "dynamic")
 
-    def handle_requires_value(self, tasks):
+    def handle_requires_value(
+        self, tasks: Union[Task, list, tuple, dict]
+    ) -> Union[Task, list, tuple, dict]:
         dependency_path = self._get_dependencies_requires_path()
         if not dependency_path.exists():
             with dependency_path.open("w") as dependencies_file:

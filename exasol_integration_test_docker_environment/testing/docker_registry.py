@@ -18,7 +18,7 @@ def default_docker_repository_name(env_name: str) -> str:
 
 
 class LocalDockerRegistry:
-    def __init__(self, name: str, registry_container, registry_port):
+    def __init__(self, name: str, registry_container, registry_port) -> None:
         self._name = name
         self._registry_container = registry_container
         self._registry_port = registry_port
@@ -46,7 +46,7 @@ class LocalDockerRegistry:
 
 
 class LocalDockerRegistryContextManager:
-    def __init__(self, name: str):
+    def __init__(self, name: str) -> None:
         self._name = name
         self._local_docker_registry = None
 
