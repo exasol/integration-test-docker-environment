@@ -30,7 +30,7 @@ class FlavorsBaseTask(DependencyLoggerBaseTask):
         self, cls, **kwargs
     ) -> Dict[str, Any]:
         return {
-            flavor_path: self._create_task_for_with_common_params(
+            flavor_path: self._create_task_with_common_params(
                 cls, flavor_path, kwargs
             )
             for flavor_path in self.flavor_paths
