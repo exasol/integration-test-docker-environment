@@ -131,3 +131,7 @@ jobs:
 
       - name: Run format check
         run: poetry run nox -s project:format
+
+  EXAConf-files:
+    name: Test EXAConf files
+    uses: ./.github/workflows/test-exaconf-files.yml
