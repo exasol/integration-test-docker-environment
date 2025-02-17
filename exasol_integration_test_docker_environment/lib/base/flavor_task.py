@@ -36,7 +36,7 @@ class FlavorsBaseTask(DependencyLoggerBaseTask):
             for flavor_path in self.flavor_paths
         }
 
-    def _create_task_for_with_common_params(
+    def _create_task_with_common_params(
         self, cls: Type[BaseTaskType], flavor_path, kwargs
     ) -> BaseTaskType:
         params = {**kwargs, "flavor_path": flavor_path}

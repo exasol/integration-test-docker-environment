@@ -288,7 +288,7 @@ class BaseTask(Task):
     def run_task(self):
         raise AbstractMethodException()
 
-    def run_dependencies(self, tasks) -> Generator[BaseTaskType, None, Any]:
+    def run_dependencies(self, tasks) -> Generator[BaseTaskType, Any, Any]:
         """
         Runs a 'run' (a dynamic) dependency
         (that means a dependencies which was evaluated during the runtime of the task), and returns a RunTaskFuture.
