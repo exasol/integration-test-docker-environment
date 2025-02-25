@@ -1,6 +1,7 @@
 import math
 from pathlib import Path
 from typing import (
+    Dict,
     List,
     Optional,
     Tuple,
@@ -67,7 +68,7 @@ CERTIFICATES_MOUNT_DIR = "/certificates"
 CERTIFICATES_DEFAULT_DIR = "/exa/etc/ssl/"
 
 
-def int_or_none(value: str) -> Optional[int]:
+def int_or_none(value: Optional[str]) -> Optional[int]:
     return None if value is None else int(value)
 
 
@@ -79,11 +80,11 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
     ip_address_index_in_subnet: int = luigi.IntParameter(significant=False)  # type: ignore
     docker_runtime: Optional[str] = luigi.OptionalParameter(None, significant=False)  # type: ignore
     certificate_volume_name: Optional[str] = luigi.OptionalParameter(None, significant=False)  # type: ignore
-    additional_db_parameter: List[str] = luigi.ListParameter()  # type: ignore
+    additional_db_parameter: Tuple[str] = luigi.ListParameter()  # type: ignore
     ssh_user: str = luigi.Parameter("root")  # type: ignore
     ssh_key_file: Union[str, Path, None] = luigi.OptionalParameter(None, significant=False)  # type: ignore
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         if self.ip_address_index_in_subnet < 0:
             raise Exception(
@@ -102,7 +103,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             ssh=int_or_none(self.ssh_port_forward),
         )
 
-    def run_task(self):
+    def run_task(self) -> None:
         subnet = netaddr.IPNetwork(self.network_info.subnet)
         db_ip_address = str(subnet[2 + self.ip_address_index_in_subnet])
         db_private_network = f"{db_ip_address}/{subnet.prefixlen}"
@@ -137,7 +138,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         self.ssh_key_file = SshKeyCache().private_key
         return SshKey.from_cache()
 
-    def _handle_output(self, output_generator, image_info: ImageInfo):
+    def _handle_output(self, output_generator, image_info: ImageInfo) -> None:
         log_file_path = self.get_log_path().joinpath("pull_docker_db_image.log")
         with PullLogHandler(log_file_path, self.logger, image_info) as log_handler:
             still_running_logger = StillRunningLogger(
@@ -147,7 +148,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                 still_running_logger.log()
                 log_handler.handle_log_lines(log_line)
 
-    def _get_network_aliases(self):
+    def _get_network_aliases(self) -> List[str]:
         network_aliases = [
             "exasol_test_database",
             "exasol-test-database",
@@ -160,12 +161,14 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         docker_client: DockerClient,
         container: Container,
         ip_address: str,
-    ):
+    ) -> None:
         network = docker_client.networks.get(self.network_info.network_name)
         aliases = self._get_network_aliases()
         network.connect(container, ipv4_address=ip_address, aliases=aliases)
 
-    def _port_mapping(self, internal_ports, forwarded_ports):
+    def _port_mapping(
+        self, internal_ports, forwarded_ports
+    ) -> Dict[str, Tuple[str, str]]:
         result = {}
         for name, internal in internal_ports.__dict__.items():
             forward = forwarded_ports.__getattribute__(name)
@@ -173,7 +176,9 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                 result[f"{internal}/tcp"] = ("0.0.0.0", forward)
         return result
 
-    def _create_database_container(self, db_ip_address: str, db_private_network: str):
+    def _create_database_container(
+        self, db_ip_address: str, db_private_network: str
+    ) -> DatabaseInfo:
         def get_authorized_keys(ssh_key) -> str:
             """
             Multiple authorized_keys can be comma-separated.
@@ -253,8 +258,9 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             )
             return database_info
 
-    def _pull_docker_db_images_if_necessary(self):
+    def _pull_docker_db_images_if_necessary(self) -> ImageInfo:
         image_name = "exasol/docker-db"
+        assert self.docker_db_image_version is not None
         docker_db_image_info = ImageInfo(
             target_repository_name=image_name,
             source_repository_name=image_name,
@@ -308,7 +314,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
     def _get_db_volume_name(self):
         return f"""{self.db_container_name}_volume"""
 
-    def _remove_container(self, container_name: str):
+    def _remove_container(self, container_name: str) -> None:
         try:
             with self._get_docker_client() as docker_client:
                 docker_client.containers.get(container_name).remove(force=True)
@@ -316,7 +322,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         except docker.errors.NotFound:
             pass
 
-    def _remove_volume(self, volume_name: str):
+    def _remove_volume(self, volume_name: str) -> None:
         try:
             with self._get_docker_client() as docker_client:
                 docker_client.volumes.get(volume_name).remove(force=True)
@@ -365,7 +371,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         container: Container,
         db_private_network: str,
         authorized_keys: str,
-    ):
+    ) -> None:
         copy = DockerContainerCopy(container)
         init_script = self._db_file("init_db.sh")
         copy.add_string_to_file("init_db.sh", init_script.read_text())
@@ -377,7 +383,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         copy: DockerContainerCopy,
         db_private_network: str,
         authorized_keys: str,
-    ):
+    ) -> None:
         """
         Multiple authorized_keys can be comma-separated.
         """
@@ -405,7 +411,9 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         )
         copy.add_string_to_file("EXAConf", rendered_template)
 
-    def _execute_init_db(self, db_volume: Volume, preparation_container: Container):
+    def _execute_init_db(
+        self, db_volume: Volume, preparation_container: Container
+    ) -> None:
         disk_size_in_bytes = humanfriendly.parse_size(self.disk_size)
         min_overhead_in_gigabyte = 2  # Exasol needs at least a 2 GB larger device than the configured disk size
         overhead_factor = max(
@@ -428,7 +436,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                 )
             )
 
-    def cleanup_task(self, success):
+    def cleanup_task(self, success) -> None:
         if (success and not self.no_database_cleanup_after_success) or (
             not success and not self.no_database_cleanup_after_failure
         ):

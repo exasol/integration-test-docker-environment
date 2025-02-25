@@ -61,7 +61,7 @@ class ResourceDirectory:
     :resource_package The module whose content should be copied to a temporary directory.
     """
 
-    def __init__(self, resource_package: ModuleType):
+    def __init__(self, resource_package: ModuleType) -> None:
         # We need to transform the module to a string and later back to a module
         # because this class will be pickled by luigi and modules are not supported for serialization
         self._resource_package_str = resource_package.__name__

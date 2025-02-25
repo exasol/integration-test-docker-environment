@@ -86,7 +86,7 @@ class FileDirectoryListHasher:
         blocksize: str = "64kb",
         workers: int = 4,
         max_characters_paths: int = 500000000,
-    ):
+    ) -> None:
         self.MAX_CHARACTERS_PATHS = max_characters_paths
         self.workers = workers
         self.excluded_files = excluded_files
@@ -223,7 +223,7 @@ class FileDirectoryListHasher:
 
     def compute_hashes(
         self, directory_mapping_result: DirectoryMappingResult
-    ) -> List[str]:
+    ) -> List[bytes]:
         paths_for_hashing = directory_mapping_result.paths_for_hashing
         collected_src_files = directory_mapping_result.sources
         pool = Pool(processes=self.workers)
@@ -288,13 +288,13 @@ class FileDirectoryListHasher:
 
 
 class PathHasher:
-    def __init__(self, hashfunc: str = "md5", hash_permissions: bool = False):
+    def __init__(self, hashfunc: str = "md5", hash_permissions: bool = False) -> None:
         self.hash_permissions = hash_permissions
         self.hash_func = HASH_FUNCTIONS.get(hashfunc)
         if not self.hash_func:
             raise NotImplementedError(f"{hashfunc} not implemented.")
 
-    def hash(self, path_mapping: DestinationMapping):
+    def hash(self, path_mapping: DestinationMapping) -> bytes:
         src_path = path_mapping.source_path
         dest_path = path_mapping.destination_path
         assert self.hash_func
@@ -310,13 +310,13 @@ class PathHasher:
 
 class FileContentHasher:
 
-    def __init__(self, hashfunc: str = "md5", blocksize: str = "64kb"):
+    def __init__(self, hashfunc: str = "md5", blocksize: str = "64kb") -> None:
         self.blocksize = humanfriendly.parse_size(blocksize)
         self.hash_func = HASH_FUNCTIONS.get(hashfunc)
         if not self.hash_func:
             raise NotImplementedError(f"{hashfunc} not implemented.")
 
-    def hash(self, filepath: Path):
+    def hash(self, filepath: Path) -> bytes:
         assert self.hash_func
         hasher = self.hash_func()
         with open(filepath, "rb") as fp:

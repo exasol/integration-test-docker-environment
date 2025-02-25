@@ -21,7 +21,7 @@ class PrepareDockerNetworkForTestEnvironment(DockerBaseTask):
     no_cleanup_after_failure: bool = luigi.BoolParameter(False, significant=False)  # type: ignore
     attempt: int = luigi.IntParameter(-1)  # type: ignore
 
-    def run_task(self):
+    def run_task(self) -> None:
         self.network_info = None
         if self.reuse:
             self.logger.info("Try to reuse network %s", self.network_name)

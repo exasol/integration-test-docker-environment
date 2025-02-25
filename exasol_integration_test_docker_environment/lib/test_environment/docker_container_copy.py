@@ -8,7 +8,7 @@ from docker.models.containers import Container
 
 class DockerContainerCopy:
 
-    def __init__(self, container: Container):
+    def __init__(self, container: Container) -> None:
         super().__init__()
         self.open = True
         self.file_like_object: Optional[io.BytesIO] = io.BytesIO()

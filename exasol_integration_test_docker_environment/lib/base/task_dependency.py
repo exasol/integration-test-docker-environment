@@ -6,7 +6,7 @@ import jsonpickle
 
 class TaskDescription:
 
-    def __init__(self, id: str, representation: str):
+    def __init__(self, id: str, representation: str) -> None:
         self.representation = representation
         self.id = id
 
@@ -40,7 +40,7 @@ class TaskDependency:
         type: DependencyType,
         index: int,
         state: DependencyState,
-    ):
+    ) -> None:
         self.state = state.name
         self.index = index
         self.type = type.name

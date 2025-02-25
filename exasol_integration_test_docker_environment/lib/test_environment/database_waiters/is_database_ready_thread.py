@@ -1,5 +1,4 @@
 import time
-from logging import Logger
 from pathlib import PurePath
 from threading import Thread
 
@@ -7,6 +6,9 @@ from docker.models.containers import Container
 
 from exasol_integration_test_docker_environment.lib.base.db_os_executor import (
     DbOsExecFactory,
+)
+from exasol_integration_test_docker_environment.lib.base.task_logger_wrapper import (
+    TaskLoggerWrapper,
 )
 from exasol_integration_test_docker_environment.lib.models.data.database_credentials import (
     DatabaseCredentials,
@@ -22,13 +24,13 @@ from exasol_integration_test_docker_environment.lib.test_environment.database_se
 class IsDatabaseReadyThread(Thread):
     def __init__(
         self,
-        logger: Logger,
+        logger: TaskLoggerWrapper,
         database_info: DatabaseInfo,
         database_container: Container,
         database_credentials: DatabaseCredentials,
         docker_db_image_version: str,
         executor_factory: DbOsExecFactory,
-    ):
+    ) -> None:
         super().__init__()
         self.logger = logger
         self.database_credentials = database_credentials

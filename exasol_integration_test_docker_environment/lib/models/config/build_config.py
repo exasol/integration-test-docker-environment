@@ -25,7 +25,7 @@ class build_config(luigi.Config):
     build_name: Optional[str] = luigi.OptionalParameter("")  # type: ignore
 
 
-def _set_output_directory(output_directory: Optional[str]):
+def set_output_directory(output_directory: Optional[str]):
     if output_directory is not None:
         luigi.configuration.get_config().set(
             "build_config", "output_directory", output_directory
@@ -49,7 +49,7 @@ def set_build_config(
         "build_config", "force_rebuild_from", json.dumps(force_rebuild_from)
     )
     luigi.configuration.get_config().set("build_config", "force_pull", str(force_pull))
-    _set_output_directory(output_directory)
+    set_output_directory(output_directory)
     if temporary_base_directory is not None:
         luigi.configuration.get_config().set(
             "build_config", "temporary_base_directory", temporary_base_directory

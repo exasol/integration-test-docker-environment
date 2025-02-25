@@ -1,4 +1,5 @@
 import os
+from typing import Set
 
 
 class SymlinkLoopChecker:
@@ -7,8 +8,8 @@ class SymlinkLoopChecker:
     Can be used to check for symlink loops.
     """
 
-    def __init__(self):
-        self._inodes = set()
+    def __init__(self) -> None:
+        self._inodes: Set[int] = set()
 
     def check_and_add(self, directory: str) -> None:
         """

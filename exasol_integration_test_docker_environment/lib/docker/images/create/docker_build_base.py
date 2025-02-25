@@ -31,7 +31,7 @@ from exasol_integration_test_docker_environment.lib.models.config.build_config i
 
 
 class DockerBuildBase(DependencyLoggerBaseTask):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
     def _get_build_steps_to_rebuild(self):

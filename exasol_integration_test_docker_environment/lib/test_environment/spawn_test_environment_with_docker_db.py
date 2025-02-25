@@ -46,7 +46,7 @@ class SpawnTestEnvironmentWithDockerDB(
     AbstractSpawnTestEnvironment, DockerDBTestEnvironmentParameter
 ):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.db_container_name = f"""db_container_{self.environment_name}"""
         self.certificate_volume_name = f"""certificates_{self.environment_name}"""
@@ -112,7 +112,9 @@ class SpawnTestEnvironmentWithDockerDB(
             additional_db_parameter=self.additional_db_parameter,
         )
 
-    def create_wait_for_database_task(self, attempt: int, database_info: DatabaseInfo):
+    def create_wait_for_database_task(
+        self, attempt: int, database_info: DatabaseInfo
+    ) -> WaitForTestDockerDatabase:
         return self.create_child_task_with_common_params(
             WaitForTestDockerDatabase,
             database_info=database_info,

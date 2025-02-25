@@ -65,7 +65,9 @@ class SpawnTestEnvironmentWithExternalDB(
             SetupExternalDatabaseHost, network_info=network_info, attempt=attempt
         )
 
-    def create_wait_for_database_task(self, attempt: int, database_info: DatabaseInfo):
+    def create_wait_for_database_task(
+        self, attempt: int, database_info: DatabaseInfo
+    ) -> WaitForTestExternalDatabase:
         return self.create_child_task_with_common_params(
             WaitForTestExternalDatabase, database_info=database_info, attempt=attempt
         )

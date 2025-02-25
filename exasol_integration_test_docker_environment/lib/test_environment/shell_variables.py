@@ -13,7 +13,7 @@ class ShellVariables:
     Represents a collection of unix shell environment variables.
     """
 
-    def __init__(self, env: Dict[str, str]):
+    def __init__(self, env: Dict[str, str]) -> None:
         self.env = env
 
     @classmethod

@@ -17,7 +17,7 @@ class StoppingFurtherExecution(Exception):
 
 class StoppableBaseTask(TimeableBaseTask):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.failed_target = Path(super()._get_output_path_for_job(), "TASK_FAILED")
 

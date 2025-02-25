@@ -37,7 +37,7 @@ class SetupExternalDatabaseHost(
     network_info: DockerNetworkInfo = JsonPickleParameter(DockerNetworkInfo, significant=False)  # type: ignore
     attempt: int = luigi.IntParameter(1)  # type: ignore
 
-    def run_task(self):
+    def run_task(self) -> None:
         database_host = self.external_exasol_db_host
         if (
             self.external_exasol_db_host == "localhost"
@@ -50,10 +50,11 @@ class SetupExternalDatabaseHost(
             bucketfs=self.external_exasol_bucketfs_port,
             ssh=self.external_exasol_ssh_port,
         )
+        assert database_host is not None
         database_info = DatabaseInfo(host=database_host, ports=ports, reused=False)
         self.return_object(database_info)
 
-    def setup_database(self):
+    def setup_database(self) -> None:
         if self.external_exasol_xmlrpc_host is not None:
             # TODO add option to use unverified ssl
             cluster = self.get_xml_rpc_object()
@@ -84,7 +85,7 @@ class SetupExternalDatabaseHost(
             except Exception as e:
                 self.logger.info(e)
 
-    def get_xml_rpc_object(self, object_name: str = ""):
+    def get_xml_rpc_object(self, object_name: str = "") -> ServerProxy:
         assert self.external_exasol_xmlrpc_user and self.external_exasol_xmlrpc_password
         uri = "https://{user}:{password}@{host}:{port}/{cluster_name}/{object_name}".format(
             user=quote_plus(self.external_exasol_xmlrpc_user),
@@ -97,7 +98,7 @@ class SetupExternalDatabaseHost(
         server = ServerProxy(uri, context=ssl._create_unverified_context())
         return server
 
-    def start_database(self, cluster: ServerProxy):
+    def start_database(self, cluster: ServerProxy) -> None:
         storage = self.get_xml_rpc_object("storage")
         # wait until all nodes are online
         self.logger.info("Waiting until all nodes are online")
@@ -105,7 +106,7 @@ class SetupExternalDatabaseHost(
         while not all_nodes_online:
             all_nodes_online = True
             for nodeName in cluster.getNodeList():  # type: ignore
-                node_state = self.get_xml_rpc_object(nodeName).getNodeState()  # type: ignore
+                node_state: Dict[str, str] = self.get_xml_rpc_object(nodeName).getNodeState()  # type: ignore
                 if node_state["status"] != "Running":
                     all_nodes_online = False
                     break
