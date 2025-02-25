@@ -13,6 +13,9 @@ from docker.models.containers import Container
 from exasol_integration_test_docker_environment.lib.base.still_running_logger import (
     StillRunningLogger,
 )
+from exasol_integration_test_docker_environment.lib.base.task_logger_wrapper import (
+    TaskLoggerWrapper,
+)
 from exasol_integration_test_docker_environment.lib.logging.container_log_handler import (
     ContainerLogHandler,
 )
@@ -20,7 +23,11 @@ from exasol_integration_test_docker_environment.lib.logging.container_log_handle
 
 class DBContainerLogThread(Thread):
     def __init__(
-        self, container: Container, logger, log_file: Path, description: str
+        self,
+        container: Container,
+        logger: TaskLoggerWrapper,
+        log_file: Path,
+        description: str,
     ) -> None:
         super().__init__()
         self.complete_log: List[str] = list()

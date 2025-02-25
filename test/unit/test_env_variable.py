@@ -1,5 +1,9 @@
 import os.path
 from pathlib import Path
+from typing import (
+    Any,
+    Dict,
+)
 from unittest import mock
 
 import luigi
@@ -36,7 +40,7 @@ def mock_settings_env_vars():
 
 
 class UsedLogPath:
-    def __init__(self, task) -> None:
+    def __init__(self, task: Dict[str, Any]) -> None:
         self.log_path = Path(task["log_path"])
         self.task_input_parameter = task["in_parameter"]
 

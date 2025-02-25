@@ -63,7 +63,11 @@ def get_test_flavor(test_class):
 class ExaslctTestEnvironment:
 
     def __init__(
-        self, test_object, executable="./exaslct", clean_images_at_close=True, name=None
+        self,
+        test_object,
+        executable: str = "./exaslct",
+        clean_images_at_close: bool = True,
+        name: Optional[str] = None,
     ) -> None:
         self.clean_images_at_close = clean_images_at_close
         self.executable = executable
