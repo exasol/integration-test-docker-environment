@@ -64,7 +64,7 @@ class ExaslctTestEnvironment:
 
     def __init__(
         self,
-        test_object,
+        test_object:Object,
         executable: str = "./exaslct",
         clean_images_at_close: bool = True,
         name: Optional[str] = None,
