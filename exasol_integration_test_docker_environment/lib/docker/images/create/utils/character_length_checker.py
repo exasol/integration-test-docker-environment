@@ -16,7 +16,7 @@ class CharacterLengthChecker:
         max_characters_paths: int,
         count_directory_names: bool,
         count_file_names: bool,
-    ):
+    ) -> None:
         self._num_characters = 0
         self._max_characters_paths = max_characters_paths
         self._root_directory = root_directory

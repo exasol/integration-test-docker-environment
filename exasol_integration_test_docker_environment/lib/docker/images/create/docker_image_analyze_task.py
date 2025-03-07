@@ -38,7 +38,7 @@ from exasol_integration_test_docker_environment.lib.models.config.docker_config 
 
 class DockerAnalyzeImageTask(DockerBaseTask):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self._source_repository_name = self.get_source_repository_name()
         self._target_repository_name = self.get_target_repository_name()
@@ -167,7 +167,7 @@ class DockerAnalyzeImageTask(DockerBaseTask):
     def requires_tasks(self) -> Dict[str, Type["DockerAnalyzeImageTask"]]:
         return dict()
 
-    def run_task(self):
+    def run_task(self) -> None:
         image_info_of_dependencies = self.get_values_from_futures(
             self.dependencies_futures
         )
@@ -177,6 +177,7 @@ class DockerAnalyzeImageTask(DockerBaseTask):
         image_hash = _build_context_hasher.generate_image_hash(
             image_info_of_dependencies
         )
+        build_name = build_config().build_name
         image_info = ImageInfo(
             source_repository_name=self._source_repository_name,
             target_repository_name=self._target_repository_name,
@@ -184,7 +185,7 @@ class DockerAnalyzeImageTask(DockerBaseTask):
             target_tag=self._target_image_tag,
             hash_value=image_hash,
             commit=self.get_commit_id(),
-            build_name=build_config().build_name,
+            build_name=build_name if build_name else "",
             depends_on_images=image_info_of_dependencies,
             image_state=None,
             image_description=self.image_description,

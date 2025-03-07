@@ -65,7 +65,7 @@ class SshKey:
     accessed only by a single process at a time.
     """
 
-    def __init__(self, private_key: paramiko.RSAKey):
+    def __init__(self, private_key: paramiko.RSAKey) -> None:
         self.private = private_key
 
     def write_private_key(self, path: str) -> "SshKey":

@@ -27,7 +27,7 @@ class EnvironmentInfo(Info):
         database_info: DatabaseInfo,
         test_container_info: Optional[ContainerInfo],
         network_info: DockerNetworkInfo,
-    ):
+    ) -> None:
         self.name = name
         self.type = env_type
         self.test_container_info = test_container_info

@@ -27,7 +27,7 @@ from exasol_integration_test_docker_environment.testing.spawned_test_environment
 
 
 class NumberCheck:
-    def __init__(self, db: SpawnedTestEnvironments, all: List[str]):
+    def __init__(self, db: SpawnedTestEnvironments, all: List[str]) -> None:
         self.db = db
         self.all = all
 

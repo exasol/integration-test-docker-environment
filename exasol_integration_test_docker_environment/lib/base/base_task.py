@@ -9,6 +9,9 @@ from typing import (
     Generator,
     List,
     Set,
+    Tuple,
+    Type,
+    TypeVar,
     Union,
 )
 
@@ -66,7 +69,7 @@ class RequiresTaskFuture(AbstractTaskFuture):
     - It then reads the completion target to get the list of return value targets and reads the requested one.
     """
 
-    def __init__(self, current_task: "BaseTask", child_task_index: int):
+    def __init__(self, current_task: "BaseTask", child_task_index: int) -> None:
         self._child_task_index = child_task_index
         self._current_task = current_task
         self._outputs_cache = None
@@ -97,7 +100,7 @@ class RunTaskFuture(AbstractTaskFuture):
 
     """
 
-    def __init__(self, completion_target: PickleTarget):
+    def __init__(self, completion_target: PickleTarget) -> None:
         self._outputs_cache = None
         self.completion_target = completion_target
 
@@ -107,13 +110,21 @@ class RunTaskFuture(AbstractTaskFuture):
         return self._outputs_cache
 
 
+# We define this generic type here, because we want to define `BaseTask.run_dependencies` to return a Generator with
+# this type as yield type. This allows us to define the specific types later when using `run_dependencies` in the subclasses,
+# which makes maintenance of the code much easier.
+# If we would use `BaseTask` as yield type in the return type of `run_dependencies`, we would be limited to use
+# `BaseTask` in the subclasses, too.
+BaseTaskType = TypeVar("BaseTaskType", bound="BaseTask")
+
+
 class BaseTask(Task):
-    caller_output_path: List[str] = luigi.ListParameter([], significant=False, visibility=ParameterVisibility.HIDDEN)  # type: ignore
+    caller_output_path: Tuple[str] = luigi.ListParameter([], significant=False, visibility=ParameterVisibility.HIDDEN)  # type: ignore
     job_id: str = luigi.Parameter()  # type: ignore
 
-    def __init__(self, *args, **kwargs):
-        self._registered_tasks = []
-        self._run_dependencies_tasks = []
+    def __init__(self, *args, **kwargs) -> None:
+        self._registered_tasks: List["BaseTask"] = []
+        self._run_dependencies_tasks: List["BaseTask"] = []
         self._task_state = TaskState.INIT
         super().__init__(*args, **kwargs)
         self.task_id = self.task_id_str(
@@ -124,7 +135,7 @@ class BaseTask(Task):
         self.register_required()
         self._task_state = TaskState.AFTER_INIT
 
-    def _init_non_pickle_attributes(self):
+    def _init_non_pickle_attributes(self) -> None:
         logger = logging.getLogger(f"luigi-interface.{self.__class__.__name__}")
         self.logger = TaskLoggerWrapper(logger, self.__repr__())
         self._run_dependencies_target = PickleTarget(
@@ -146,7 +157,7 @@ class BaseTask(Task):
         self.__dict__ = new_dict
         self._init_non_pickle_attributes()
 
-    def task_id_str(self, task_family, params):
+    def task_id_str(self, task_family: str, params: Dict[str, str]) -> str:
         """
         Returns a canonical string used to identify a particular task
 
@@ -161,7 +172,7 @@ class BaseTask(Task):
         param_hash = hashlib.sha3_256(hash_input.encode("utf-8")).hexdigest()
         return f"{task_family}_{param_hash[:TASK_ID_TRUNCATE_HASH]}"
 
-    def get_parameter_as_string_dict(self):
+    def get_parameter_as_string_dict(self) -> Dict[str, str]:
         """
         Convert all parameters to a str->str hash.
         """
@@ -184,15 +195,15 @@ class BaseTask(Task):
     def _get_output_path_for_job(self) -> Path:
         return Path(build_config().output_directory, "jobs", self.job_id)
 
-    def _extend_output_path(self):
+    def _extend_output_path(self) -> Union[Tuple[str, ...], str]:
         extension = self.extend_output_path()
-        if extension is None or extension == []:
+        if extension is None or extension == tuple():
             return self.task_id
         else:
             return extension
 
-    def extend_output_path(self):
-        return list(self.caller_output_path) + [self.task_id]
+    def extend_output_path(self) -> Tuple[str, ...]:
+        return tuple(self.caller_output_path) + (self.task_id,)
 
     def _get_tmp_path_for_job(self) -> Path:
         return Path(self._get_output_path_for_job(), "temp")
@@ -216,10 +227,10 @@ class BaseTask(Task):
         path.mkdir(parents=True, exist_ok=True)
         return path
 
-    def register_required(self):
+    def register_required(self) -> None:
         pass
 
-    def register_dependency(self, task: "BaseTask") -> RequiresTaskFuture:
+    def register_dependency(self, task: BaseTaskType) -> RequiresTaskFuture:
         """
         Registers a 'requires' (a static) dependency of the task. It returns a future which can be used in the
         run_task() method via BaseTask.get_values_from_future() to get access to the result of the child task.
@@ -232,7 +243,7 @@ class BaseTask(Task):
         else:
             raise WrongTaskStateException(self._task_state, "register_dependency")
 
-    def register_dependencies(self, tasks):
+    def register_dependencies(self, tasks) -> Any:
         if isinstance(tasks, dict):
             return {
                 key: self.register_dependencies(task) for key, task in tasks.items()
@@ -244,7 +255,7 @@ class BaseTask(Task):
         else:
             return tasks
 
-    def get_values_from_futures(self, futures):
+    def get_values_from_futures(self, futures) -> Any:
         if isinstance(futures, dict):
             return {
                 key: self.get_values_from_futures(task) for key, task in futures.items()
@@ -256,9 +267,7 @@ class BaseTask(Task):
         else:
             return futures
 
-    def get_values_from_future(
-        self, future: AbstractTaskFuture
-    ) -> Union[Any, Set[str]]:
+    def get_values_from_future(self, future: AbstractTaskFuture) -> Any:
         return future.get_output()
 
     def requires(self):
@@ -284,7 +293,7 @@ class BaseTask(Task):
     def run_task(self):
         raise AbstractMethodException()
 
-    def run_dependencies(self, tasks) -> Generator["BaseTask", PickleTarget, Any]:
+    def run_dependencies(self, tasks) -> Generator[BaseTaskType, Any, Any]:
         """
         Runs a 'run' (a dynamic) dependency
         (that means a dependencies which was evaluated during the runtime of the task), and returns a RunTaskFuture.
@@ -300,7 +309,10 @@ class BaseTask(Task):
         else:
             raise WrongTaskStateException(self._task_state, "run_dependency")
 
-    def _register_run_dependencies(self, tasks):
+    def _register_run_dependencies(
+        self,
+        tasks: Any,
+    ) -> None:
         if isinstance(tasks, dict):
             for key, task in tasks.items():
                 self._register_run_dependencies(task)
@@ -327,7 +339,7 @@ class BaseTask(Task):
         else:
             return completion_targets
 
-    def return_object(self, object: Any):
+    def return_object(self, object: Any) -> None:
         """Returns the object to the calling task. The object needs to be pickleable"""
         if self._task_state == TaskState.RUN:
             if self._registered_return_target is None:
@@ -349,7 +361,7 @@ class BaseTask(Task):
             raise WrongTaskStateException(TaskState.NONE, "get_result")
         return self.output().read()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """
         Build a task representation like `MyTask(param1=1.5, param2='5')`
         """
@@ -374,24 +386,28 @@ class BaseTask(Task):
 
         return task_str
 
-    def create_child_task_with_common_params(self, task_class, **kwargs):
+    def create_child_task_with_common_params(
+        self, task_class: Type[BaseTaskType], **kwargs
+    ) -> BaseTaskType:
         params = util.common_params(self, task_class)
         params["caller_output_path"] = self._extend_output_path()
         params["job_id"] = self.job_id
         params.update(kwargs)
         return task_class(**params)
 
-    def create_child_task(self, task_class, **kwargs):
-        params = {}
+    def create_child_task(
+        self, task_class: Type[BaseTaskType], **kwargs
+    ) -> BaseTaskType:
+        params: Dict[str, Any] = {}
         params["caller_output_path"] = self._extend_output_path()
         params["job_id"] = self.job_id
         params.update(kwargs)
         return task_class(**params)
 
-    def cleanup(self, success: bool):
+    def cleanup(self, success: bool) -> None:
         self.cleanup_internal(success, set())
 
-    def cleanup_internal(self, success: bool, cleanup_checklist: Set[str]):
+    def cleanup_internal(self, success: bool, cleanup_checklist: Set[str]) -> None:
         self.logger.debug("Cleaning up")
         if str(self) not in cleanup_checklist:
             cleanup_checklist.add(str(self))
@@ -415,7 +431,7 @@ class BaseTask(Task):
         else:
             self.logger.debug("Cleanup skipped")
 
-    def cleanup_child_task(self, success: bool, cleanup_checklist: Set[str]):
+    def cleanup_child_task(self, success: bool, cleanup_checklist: Set[str]) -> None:
         if self._run_dependencies_target.exists():
             _run_dependencies_tasks_from_target = self._run_dependencies_target.read()
         else:
@@ -433,5 +449,5 @@ class BaseTask(Task):
         for task in reversed_registered_task_list:
             task.cleanup_internal(success, cleanup_checklist)
 
-    def cleanup_task(self, success: bool):
+    def cleanup_task(self, success: bool) -> None:
         pass

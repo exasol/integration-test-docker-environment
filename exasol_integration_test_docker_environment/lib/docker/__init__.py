@@ -7,7 +7,7 @@ from exasol_integration_test_docker_environment.lib.models.config.docker_config 
 
 
 class ContextDockerClient:
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         self.kwargs = kwargs
         self._client = None
 

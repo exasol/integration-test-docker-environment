@@ -24,25 +24,25 @@ from exasol_integration_test_docker_environment.lib.models.data.environment_info
 
 
 class PopulateTestDataToDatabase(DockerBaseTask, DatabaseCredentialsParameter):
-    logger = logging.getLogger("luigi-interface")
 
     environment_name: str = luigi.Parameter()  # type: ignore
     test_environment_info: EnvironmentInfo = JsonPickleParameter(
         EnvironmentInfo, significant=False
     )  # type: ignore
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self._test_container_info = self.test_environment_info.test_container_info
         self._database_info = self.test_environment_info.database_info
 
-    def run_task(self):
+    def run_task(self) -> None:
         self.logger.warning("Uploading data")
         username = self.db_user
         password = self.db_password
         data_path_within_test_container = self.get_data_path_within_test_container()
         data_file_within_data_path = self.get_data_file_within_data_path()
         with self._get_docker_client() as docker_client:
+            assert self._test_container_info is not None
             test_container = docker_client.containers.get(
                 self._test_container_info.container_name
             )

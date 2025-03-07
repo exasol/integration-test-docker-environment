@@ -11,7 +11,7 @@ DEFAULT_VERSION = "default"
 
 
 class DbVersion:
-    def __init__(self, major, minor, stable):
+    def __init__(self, major: int, minor: int, stable: int) -> None:
         self.major = major
         self.minor = minor
         self.stable = stable

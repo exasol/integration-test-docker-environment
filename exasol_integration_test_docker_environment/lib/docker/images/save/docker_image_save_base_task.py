@@ -24,11 +24,11 @@ DOCKER_HUB_REGISTRY_URL_REGEX = r"^.*docker.io/"
 
 # TODO align and extract save_path of DockerSaveImageTask and load_path of DockerLoadImageTask
 class DockerSaveImageBaseTask(DockerBaseTask):
-    image_name = luigi.Parameter()
-    force_save = luigi.BoolParameter(
+    image_name: str = luigi.Parameter()  # type: ignore
+    force_save: bool = luigi.BoolParameter(
         False, visibility=luigi.parameter.ParameterVisibility.HIDDEN
-    )
-    save_path = luigi.Parameter(visibility=luigi.parameter.ParameterVisibility.HIDDEN)
+    )  # type: ignore
+    save_path: str = luigi.Parameter(visibility=luigi.parameter.ParameterVisibility.HIDDEN)  # type: ignore
 
     def register_required(self):
         task = self.get_docker_image_task()
@@ -37,9 +37,9 @@ class DockerSaveImageBaseTask(DockerBaseTask):
     def get_docker_image_task(self):
         raise AbstractMethodException()
 
-    def run_task(self):
-        image_info = self.get_values_from_future(self._image_info_future)
-        tag_for_save = self.get_tag_for_save(image_info)
+    def run_task(self) -> None:
+        image_info: ImageInfo = self.get_values_from_future(self._image_info_future)
+        tag_for_save: str = self.get_tag_for_save(image_info)
         save_file_path = pathlib.Path(
             self.save_path, f"{image_info.get_target_complete_name()}.tar"
         )

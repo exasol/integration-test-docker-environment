@@ -30,7 +30,7 @@ class TaskCreatorFromBuildTasks:
 
     def _create_tasks_for_build_task(
         self, build_task: DockerCreateImageTask
-    ) -> List[BaseTask]:
+    ) -> List[DockerCreateImageTaskWithDeps]:
         if isinstance(build_task, DockerCreateImageTaskWithDeps):
             tasks = self.create_tasks_for_build_tasks(build_task.required_tasks)
             task = self._create_task(build_task)

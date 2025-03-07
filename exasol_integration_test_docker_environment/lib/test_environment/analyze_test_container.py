@@ -1,13 +1,18 @@
 from typing import (
     Dict,
+    Iterator,
     Set,
 )
 
+from exasol_integration_test_docker_environment.lib.base.base_task import BaseTaskType
 from exasol_integration_test_docker_environment.lib.docker.images.create.docker_build_base import (
     DockerBuildBase,
 )
 from exasol_integration_test_docker_environment.lib.docker.images.create.docker_image_analyze_task import (
     DockerAnalyzeImageTask,
+)
+from exasol_integration_test_docker_environment.lib.docker.images.create.docker_image_create_task import (
+    DockerCreateImageTask,
 )
 from exasol_integration_test_docker_environment.lib.docker.images.push.docker_push_parameter import (
     DockerPushParameter,
@@ -64,7 +69,7 @@ class AnalyzeTestContainer(DockerAnalyzeImageTask, TestContainerParameter):
 class DockerTestContainerBuildBase(DockerBuildBase, TestContainerParameter):
 
     def get_goal_class_map(self) -> Dict[str, DockerAnalyzeImageTask]:
-        goal_class_map = {
+        goal_class_map: Dict[str, DockerAnalyzeImageTask] = {
             "test-container": self.create_child_task(
                 task_class=AnalyzeTestContainer,
                 test_container_content=self.test_container_content,
@@ -83,7 +88,7 @@ class DockerTestContainerBuildBase(DockerBuildBase, TestContainerParameter):
 
 class DockerTestContainerBuild(DockerTestContainerBuildBase):
 
-    def run_task(self):
+    def run_task(self) -> Iterator[DockerCreateImageTask]:
         build_tasks = self.create_build_tasks(False)
         image_infos_futures = yield from self.run_dependencies(build_tasks)
         image_infos = self.get_values_from_futures(image_infos_futures)
@@ -92,7 +97,7 @@ class DockerTestContainerBuild(DockerTestContainerBuildBase):
 
 class DockerTestContainerPush(DockerTestContainerBuildBase, DockerPushParameter):
 
-    def run_task(self):
+    def run_task(self) -> Iterator[DockerCreateImageTask]:
         build_tasks = self.create_build_tasks(shortcut_build=not self.push_all)
         push_task_creator = PushTaskCreatorFromBuildTasks(self)
         push_tasks = push_task_creator.create_tasks_for_build_tasks(build_tasks)

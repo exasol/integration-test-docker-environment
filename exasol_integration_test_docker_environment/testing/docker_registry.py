@@ -3,6 +3,7 @@ import logging
 import time
 
 import requests
+from docker.models.containers import Container
 
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.lib.docker.container.utils import (
@@ -18,7 +19,9 @@ def default_docker_repository_name(env_name: str) -> str:
 
 
 class LocalDockerRegistry:
-    def __init__(self, name: str, registry_container, registry_port):
+    def __init__(
+        self, name: str, registry_container: Container, registry_port: int
+    ) -> None:
         self._name = name
         self._registry_container = registry_container
         self._registry_port = registry_port
@@ -46,7 +49,7 @@ class LocalDockerRegistry:
 
 
 class LocalDockerRegistryContextManager:
-    def __init__(self, name: str):
+    def __init__(self, name: str) -> None:
         self._name = name
         self._local_docker_registry = None
 
@@ -61,7 +64,7 @@ class LocalDockerRegistryContextManager:
                 docker_client.containers.get(registry_container_name).remove(force=True)
             except:
                 pass
-            registry_container = docker_client.containers.run(
+            registry_container: Container = docker_client.containers.run(
                 image="registry:2",
                 name=registry_container_name,
                 ports={5000: registry_port},
