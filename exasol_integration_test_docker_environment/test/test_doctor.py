@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 from exasol_integration_test_docker_environment.doctor import (
     SUPPORTED_PLATFORMS,
-    Error,
+    HealthProblem,
     diagnose_docker_daemon_not_available,
     is_docker_daemon_available,
     is_supported_platform,
@@ -56,13 +56,13 @@ class DiagnoseDockerDaemonNotAvailable(unittest.TestCase):
     """
 
     def test_non_existing_unix_socket(self):
-        expected = [Error.UnixSocketNotAvailable]
+        expected = [HealthProblem.UnixSocketNotAvailable]
         env = {"DOCKER_HOST": "unix:///var/non/existent/path"}
         with temporary_env(env):
             self.assertEqual(expected, diagnose_docker_daemon_not_available())
 
-    def test_unknown_error(self):
-        expected = [Error.Unknown]
+    def test_unknown_health_problem(self):
+        expected = [HealthProblem.Unknown]
         env = {"DOCKER_HOST": "https://foobar"}
         with temporary_env(env):
             self.assertEqual(expected, diagnose_docker_daemon_not_available())
