@@ -11,3 +11,4 @@ dist/
 TAGS
 /.lint.json
 /.lint.txt
+doc/api/
