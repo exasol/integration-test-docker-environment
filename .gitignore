@@ -12,4 +12,4 @@ TAGS
 /.lint.json
 /.lint.txt
 doc/api/
-.html-documentation
+.html-documentation/
