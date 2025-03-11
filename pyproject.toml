@@ -41,7 +41,7 @@ importlib_resources = ">=5.4.0" #Needed to copy resource files, can be removed a
 "stopwatch.py" = ">=1.0.0"
 fabric = "^3.0.1"
 portalocker = "^2.7.0"
-exasol-error-reporting = ">=0.4.0"
+exasol-error-reporting = "^1.0.0"
 docutils = ">=0.21.2"
 
 [tool.poetry.group.dev.dependencies]
@@ -59,8 +59,8 @@ itde = 'exasol_integration_test_docker_environment.main:main'
 
 [[tool.mypy.overrides]]
 module = [ "luigi.*", "docker.*", "humanfriendly", "configobj", "toml", "netaddr", "joblib.testing", "networkx",
-            "fabric", "requests", "pyexasol", "paramiko.ssh_exception", "six", "jsonpickle", "exasol.toolbox.*",
-            "paramiko", "exasol", "networkx.classes"]
+            "fabric", "requests", "pyexasol", "paramiko.ssh_exception", "six", "jsonpickle",
+            "paramiko", "networkx.classes"]
 ignore_missing_imports = true
 
 [tool.pylint.master]
