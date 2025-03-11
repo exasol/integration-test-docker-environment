@@ -6,7 +6,4 @@
  - #430: Splitted up api/common.py which changes the imports for its parts in breaking way
  - #443: Added GH workflow which validates that the Exaconf files in the package are up-to-date
  - #445: Fixed Type hints in BaseTask and FlavorBaseTask
-
-## Security
-
- - Relocked poetry.lock
+ - #456: Updated dependencies
