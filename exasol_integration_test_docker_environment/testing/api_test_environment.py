@@ -29,7 +29,7 @@ from exasol_integration_test_docker_environment.testing.exaslct_test_environment
 
 class ApiTestEnvironment:
 
-    def __init__(self, test_object, name=None):
+    def __init__(self, test_object, name=None) -> None:
         self.test_object = test_object
         self.test_class = get_class(test_object)
         self.flavor_path = get_test_flavor(self.test_class)

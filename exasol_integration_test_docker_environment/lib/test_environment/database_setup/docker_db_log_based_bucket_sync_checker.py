@@ -21,7 +21,7 @@ class DockerDBLogBasedBucketFSSyncChecker(BucketFSSyncChecker):
         log_file_to_check: str,
         bucketfs_write_password: str,
         executor: DbOsExecutor,
-    ):
+    ) -> None:
         self.logger = logger
         self.pattern_to_wait_for = pattern_to_wait_for
         self.log_file_to_check = log_file_to_check

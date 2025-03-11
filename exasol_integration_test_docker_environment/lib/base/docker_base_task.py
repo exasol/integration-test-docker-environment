@@ -9,5 +9,5 @@ from exasol_integration_test_docker_environment.lib.docker import ContextDockerC
 
 class DockerBaseTask(DependencyLoggerBaseTask, DockerParameter):
 
-    def _get_docker_client(self):
+    def _get_docker_client(self) -> ContextDockerClient:
         return ContextDockerClient(timeout=self.timeout)

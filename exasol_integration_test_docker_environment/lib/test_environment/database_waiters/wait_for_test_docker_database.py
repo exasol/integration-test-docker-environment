@@ -5,6 +5,7 @@ from datetime import (
     datetime,
     timedelta,
 )
+from typing import Tuple
 
 import luigi
 from docker.models.containers import Container
@@ -40,8 +41,9 @@ class WaitForTestDockerDatabase(DockerBaseTask, DatabaseCredentialsParameter):
     docker_db_image_version: str = luigi.Parameter()  # type: ignore
     executor_factory: DbOsExecFactory = JsonPickleParameter(DbOsExecFactory, significant=False)  # type: ignore
 
-    def run_task(self):
+    def run_task(self) -> None:
         with self._get_docker_client() as docker_client:
+            assert self.database_info.container_info is not None
             db_container_name = self.database_info.container_info.container_name
             db_container = docker_client.containers.get(db_container_name)
             is_database_ready = self.wait_for_database_startup(db_container)
@@ -51,7 +53,7 @@ class WaitForTestDockerDatabase(DockerBaseTask, DatabaseCredentialsParameter):
             self.save_db_log_files_as_gzip_tar(after_startup_db_log_file, db_container)
             self.return_object(is_database_ready)
 
-    def wait_for_database_startup(self, db_container: Container):
+    def wait_for_database_startup(self, db_container: Container) -> bool:
         container_log_thread, is_database_ready_thread = self.start_wait_threads(
             db_container
         )
@@ -61,7 +63,9 @@ class WaitForTestDockerDatabase(DockerBaseTask, DatabaseCredentialsParameter):
         self.join_threads(container_log_thread, is_database_ready_thread)
         return is_database_ready
 
-    def start_wait_threads(self, db_container: Container):
+    def start_wait_threads(
+        self, db_container: Container
+    ) -> Tuple[DBContainerLogThread, IsDatabaseReadyThread]:
         startup_log_file = self.get_log_path().joinpath("startup.log")
         container_log_thread = DBContainerLogThread(
             db_container,
@@ -85,7 +89,7 @@ class WaitForTestDockerDatabase(DockerBaseTask, DatabaseCredentialsParameter):
         self,
         container_log_thread: DBContainerLogThread,
         is_database_ready_thread: IsDatabaseReadyThread,
-    ):
+    ) -> None:
         container_log_thread.stop()
         is_database_ready_thread.stop()
         container_log_thread.join()
@@ -95,7 +99,7 @@ class WaitForTestDockerDatabase(DockerBaseTask, DatabaseCredentialsParameter):
         self,
         container_log_thread: DBContainerLogThread,
         is_database_ready_thread: IsDatabaseReadyThread,
-    ):
+    ) -> bool:
         is_database_ready = False
         reason = None
         start_time = datetime.now()
@@ -130,7 +134,7 @@ class WaitForTestDockerDatabase(DockerBaseTask, DatabaseCredentialsParameter):
         container_log_thread: DBContainerLogThread,
         is_database_ready_thread: IsDatabaseReadyThread,
         reason,
-    ):
+    ) -> None:
         container_log = "\n".join(container_log_thread.complete_log)
         log_information = f"""
 ========== IsDatabaseReadyThread output db connection: ============
@@ -146,18 +150,18 @@ class WaitForTestDockerDatabase(DockerBaseTask, DatabaseCredentialsParameter):
             log_information,
         )
 
-    def timeout_occured(self, start_time):
+    def timeout_occured(self, start_time: datetime) -> bool:
         timeout = timedelta(seconds=self.db_startup_timeout_in_seconds)
         return datetime.now() - start_time > timeout
 
     def save_db_log_files_as_gzip_tar(
         self, path: pathlib.Path, database_container: Container
-    ):
+    ) -> None:
         stream, stat = database_container.get_archive("/exa/logs")
         with gzip.open(path, "wb") as file:
             for chunk in stream:
                 file.write(chunk)
 
-    def write_output(self, is_database_ready: bool):
+    def write_output(self, is_database_ready: bool) -> None:
         with self.output().open("w") as file:
             file.write(str(is_database_ready))

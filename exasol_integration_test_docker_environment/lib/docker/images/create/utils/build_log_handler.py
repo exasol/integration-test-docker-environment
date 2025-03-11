@@ -16,7 +16,7 @@ from exasol_integration_test_docker_environment.lib.models.config.log_config imp
 
 class BuildLogHandler(AbstractLogHandler):
 
-    def __init__(self, log_file_path: Path, logger, image_info: ImageInfo):
+    def __init__(self, log_file_path: Path, logger, image_info: ImageInfo) -> None:
         super().__init__(log_file_path, logger)
         self._image_info = image_info
 

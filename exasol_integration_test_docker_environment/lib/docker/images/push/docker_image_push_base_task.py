@@ -24,10 +24,10 @@ from exasol_integration_test_docker_environment.lib.models.config.docker_config 
 
 
 class DockerPushImageBaseTask(DockerBaseTask):
-    image_name = luigi.Parameter()
-    force_push = luigi.BoolParameter(
+    image_name: str = luigi.Parameter()  # type: ignore
+    force_push: bool = luigi.BoolParameter(
         False, visibility=luigi.parameter.ParameterVisibility.HIDDEN
-    )
+    )  # type: ignore
 
     def register_required(self):
         task = self.get_docker_image_task()
@@ -36,7 +36,7 @@ class DockerPushImageBaseTask(DockerBaseTask):
     def get_docker_image_task(self):
         raise AbstractMethodException()
 
-    def run_task(self):
+    def run_task(self) -> None:
         image_info = self.get_values_from_future(self._image_info_future)
         was_build = image_info.image_state == ImageState.WAS_BUILD.name
         if was_build or self.force_push:

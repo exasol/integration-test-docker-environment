@@ -9,10 +9,10 @@ FORMAT = NopFormat()
 
 class PickleTarget(LocalTarget):
 
-    def __init__(self, path: Path, is_tmp: bool = False):
+    def __init__(self, path: Path, is_tmp: bool = False) -> None:
         super().__init__(path=str(path), is_tmp=is_tmp, format=FORMAT)
 
-    def write(self, obj):
+    def write(self, obj) -> None:
         with self.open("w") as f:
             pickle.dump(obj, f)
 

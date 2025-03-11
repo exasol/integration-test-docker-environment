@@ -27,7 +27,7 @@ from exasol_integration_test_docker_environment.lib.models.config.docker_config 
 
 class DockerBuildImageTask(DockerImageCreatorBaseTask):
 
-    def run_task(self):
+    def run_task(self) -> None:
         self.logger.info(
             "Build docker image %s, log file can be found here %s",
             self.image_info.get_target_complete_name(),
@@ -43,6 +43,7 @@ class DockerBuildImageTask(DockerImageCreatorBaseTask):
                 temp_directory, self.image_info, self.get_log_path()
             )
             build_context_creator.prepare_build_context_to_temp_dir()
+            assert image_description is not None
             with self._get_docker_client() as docker_client:
                 output_generator = docker_client.api.build(
                     path=temp_directory,

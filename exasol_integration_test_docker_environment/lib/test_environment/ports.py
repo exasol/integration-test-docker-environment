@@ -58,9 +58,20 @@ class PortsType(type):
 
 
 class Ports(metaclass=PortsType):
-    def __init__(self, database: int, bucketfs: int, ssh: Optional[int] = None):
-        self.database = database
-        self.bucketfs = bucketfs
+    def __init__(
+        self,
+        database: Optional[int],
+        bucketfs: Optional[int],
+        ssh: Optional[int] = None,
+    ) -> None:
+        if database is None:
+            self.database: int = Ports.default_ports.database
+        else:
+            self.database = database
+        if bucketfs is None:
+            self.bucketfs: int = Ports.default_ports.bucketfs
+        else:
+            self.bucketfs = bucketfs
         self.ssh = ssh
 
     @classmethod

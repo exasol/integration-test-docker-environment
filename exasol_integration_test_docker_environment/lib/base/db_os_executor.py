@@ -26,7 +26,7 @@ class DockerClientFactory:
     Create a Docker client.
     """
 
-    def __init__(self, timeout: int = 100000):
+    def __init__(self, timeout: int = 100000) -> None:
         self._timeout = timeout
 
     def client(self) -> DockerClient:
@@ -52,7 +52,7 @@ class DbOsExecutor(Protocol):
 
 
 class DockerExecutor(DbOsExecutor):
-    def __init__(self, docker_client: DockerClient, container_name: str):
+    def __init__(self, docker_client: DockerClient, container_name: str) -> None:
         self._client = docker_client
         self._container_name = container_name
         self._container: Optional[Container] = None
@@ -82,7 +82,7 @@ class DockerExecutor(DbOsExecutor):
 
 
 class SshExecutor(DbOsExecutor):
-    def __init__(self, connect_string: str, key_file: str):
+    def __init__(self, connect_string: str, key_file: str) -> None:
         self._connect_string = connect_string
         self._key_file = key_file
         self._connection: Optional[fabric.Connection] = None
@@ -145,7 +145,9 @@ class DbOsExecFactory(Protocol):
 
 
 class DockerExecFactory(DbOsExecFactory):
-    def __init__(self, container_name: str, client_factory: DockerClientFactory):
+    def __init__(
+        self, container_name: str, client_factory: DockerClientFactory
+    ) -> None:
         self._container_name = container_name
         self._client_factory = client_factory
 
@@ -163,7 +165,7 @@ class SshExecFactory(DbOsExecFactory):
             info.ssh_info.key_file,
         )
 
-    def __init__(self, connect_string: str, ssh_key_file: str):
+    def __init__(self, connect_string: str, ssh_key_file: str) -> None:
         self._connect_string = connect_string
         self._key_file = ssh_key_file
 
