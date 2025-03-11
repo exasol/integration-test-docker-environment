@@ -14,27 +14,27 @@ from typing import (
 
 import docker
 from docker.errors import DockerException
-from exasol import error
+from exasol.error import ExaError
 
 SUPPORTED_PLATFORMS = ["linux", "darwin"]
 
 
-class Error(Enum):
-    Unknown = error.ExaError(
+class HealthProblem(Enum):
+    Unknown = ExaError(
         "E-ITDE-0",
         "Unknown issue.",
         ["An unknown error occurred, please contact the maintainer."],
         {},
     )
 
-    UnixSocketNotAvailable = error.ExaError(
+    UnixSocketNotAvailable = ExaError(
         "E-ITDE-1",
         "Could not find unix socket to connect to.",
         ["Make sure environment variable DOCKER_HOST is configured correctly."],
         {},
     )
 
-    TargetPlatformNotSupported = error.ExaError(
+    TargetPlatformNotSupported = ExaError(
         "E-ITDE-2",
         "The platform ITDE is running on is not supported.",
         ["Make sure you are using one of the following platforms: [linux, darwin]."],
@@ -42,7 +42,7 @@ class Error(Enum):
     )
 
 
-def diagnose_docker_daemon_not_available() -> Iterable[error.ExaError]:
+def diagnose_docker_daemon_not_available() -> Iterable[HealthProblem]:
     """Diagnose reasons why docker deamon is not available"""
 
     def _is_unix_socket_issue(message: str) -> bool:
@@ -54,9 +54,9 @@ def diagnose_docker_daemon_not_available() -> Iterable[error.ExaError]:
     except DockerException as ex:
         msg = f"{ex}"
         if _is_unix_socket_issue(msg):
-            errors.append(Error.UnixSocketNotAvailable)
+            errors.append(HealthProblem.UnixSocketNotAvailable)
         if len(errors) == 0:
-            errors.append(Error.Unknown)
+            errors.append(HealthProblem.Unknown)
     return errors
 
 
@@ -78,17 +78,17 @@ def is_supported_platform() -> bool:
     return sys.platform in SUPPORTED_PLATFORMS
 
 
-def health_checkup() -> Iterable[error.ExaError]:
+def health_checkup() -> Iterable[HealthProblem]:
     """
     Runs all known examinations
 
     return an iterator of error codes specifying which problems have been identified.
     """
     check_function = Callable[[], bool]
-    diagnosis_function = Callable[[], Iterable[error.ExaError]]
+    diagnosis_function = Callable[[], Iterable[HealthProblem]]
     examinations: List[Tuple[check_function, diagnosis_function]] = [
         (is_docker_daemon_available, diagnose_docker_daemon_not_available),
-        (is_supported_platform, lambda: [Error.TargetPlatformNotSupported]),
+        (is_supported_platform, lambda: [HealthProblem.TargetPlatformNotSupported]),
     ]
     for is_fine, diagnosis in examinations:
         if not is_fine():

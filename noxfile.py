@@ -138,7 +138,7 @@ def copy_docker_db_config_templates(session: nox.Session):
 
 
 @nox.session(name="test:unit", python=False)
-def unit_tests(session: nox.Session) -> None:
+def itde_unit_tests(session: nox.Session) -> None:
     """Runs all unit tests"""
     from exasol.toolbox.nox._shared import _context
     from exasol.toolbox.nox._test import _unit_tests
