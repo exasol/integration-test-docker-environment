@@ -3,7 +3,7 @@ name = "exasol-integration-test-docker-environment"
 packages = [
     { include = "exasol_integration_test_docker_environment" },
 ]
-version = "4.0.0"
+version = "4.0.1"
 description = "Integration Test Docker Environment for Exasol"
 
 license = "MIT"
