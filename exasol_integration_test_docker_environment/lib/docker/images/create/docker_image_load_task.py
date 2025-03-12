@@ -11,7 +11,7 @@ from exasol_integration_test_docker_environment.lib.models.config.build_config i
 class DockerLoadImageTask(DockerImageCreatorBaseTask):
 
     def run_task(self) -> None:
-        cache_directory = build_config.cache_directory or ""
+        cache_directory = build_config().cache_directory or ""
         image_archive_path = Path(cache_directory).joinpath(
             self.image_info.get_source_complete_name() + ".tar"
         )
