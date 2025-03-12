@@ -1,6 +1,6 @@
 # 4.0.0 - 2025-03-12
 
-Code name: Refactored API.
+Code name: Improved API.
 
 ## Refactorings
 
