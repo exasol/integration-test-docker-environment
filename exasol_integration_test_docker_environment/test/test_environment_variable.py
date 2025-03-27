@@ -1,11 +1,12 @@
 import unittest
-
 from sys import stderr
 from typing import List
 
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.testing import utils
-from exasol_integration_test_docker_environment.testing.exaslct_test_environment import ExaslctTestEnvironment
+from exasol_integration_test_docker_environment.testing.exaslct_test_environment import (
+    ExaslctTestEnvironment,
+)
 
 
 class TestEnvironmentVariable(unittest.TestCase):
@@ -23,7 +24,9 @@ class TestEnvironmentVariable(unittest.TestCase):
     def tearDownClass(cls):
         utils.close_environments(cls.test_environment)
 
-    def assert_env_variable(self, env_variables: List[str], docker_environment_name:str):
+    def assert_env_variable(
+        self, env_variables: List[str], docker_environment_name: str
+    ):
         with ContextDockerClient() as docker_client:
             containers = [
                 c.name
@@ -31,15 +34,12 @@ class TestEnvironmentVariable(unittest.TestCase):
                 if docker_environment_name in c.name
             ]
             db_container = [c for c in containers if "db_container" in c]
-            exit_result = docker_client.containers.get(db_container[0]).exec_run(
-                "env"
-            )
+            exit_result = docker_client.containers.get(db_container[0]).exec_run("env")
             output = exit_result[1].decode("UTF-8")
             return_code = exit_result[0]
             self.assertEqual(return_code, 0)
             for env_variable in env_variables:
                 self.assertIn(env_variable, output)
-
 
     def test_env_variable(self):
         docker_environment_name = "test_env_variable"
@@ -53,9 +53,15 @@ class TestEnvironmentVariable(unittest.TestCase):
         docker_environment_name = "test_env_variable"
         env_variables = ["ABC=123", "DEF=456"]
         with self.test_environment.spawn_docker_test_environments(
-            docker_environment_name, [p for env_variable in env_variables for p in ("--docker-environment-variable", env_variable)]
+            docker_environment_name,
+            [
+                p
+                for env_variable in env_variables
+                for p in ("--docker-environment-variable", env_variable)
+            ],
         ):
             self.assert_env_variable(env_variables, docker_environment_name)
+
 
 if __name__ == "__main__":
     unittest.main()

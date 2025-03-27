@@ -68,7 +68,7 @@ docker_db_options = [
         multiple=True,
         default=[],
         help="An enviroronment variable which will be added to the docker-db. You can repeat this option to add further environment variables.",
-    )
+    ),
 ]
 
 external_db_options = [
