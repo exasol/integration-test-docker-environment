@@ -1,5 +1,12 @@
 on:
   workflow_call:
+    inputs:
+      only_gpu:
+          description: 'Filter for versions which support GPU'
+          default: false
+          required: false
+          type: bool
+
     outputs:
       matrix:
         description: "The list of known db versions"
@@ -21,7 +28,10 @@ jobs:
 
       - id: set-matrix
         run: |
-          ALL_DB_VERSIONS=`poetry run -- nox --non-interactive -s 'get-all-db-versions'` 
+          [[ "${ONLY_GPU}" == "true" ]] && AdditionalArgs='--only-gpu' || AdditionalArgs=""
+          ALL_DB_VERSIONS=`poetry run -- nox --non-interactive -s 'get-all-db-versions' -- "$AdditionalArgs"` 
           echo "matrix=$ALL_DB_VERSIONS" >> "$GITHUB_OUTPUT"
+        env:
+          ONLY_GPU: ${{ inputs.only_gpu }}
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}

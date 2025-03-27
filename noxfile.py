@@ -1,11 +1,17 @@
+import argparse
 import json
 import shutil
+from argparse import ArgumentParser
 from pathlib import Path
 from typing import List
 
+from packaging.version import Version
+
 import nox
 import toml
+from mypy.dmypy.client import action
 
+from exasol_integration_test_docker_environment.lib.test_environment import db_version
 from noxconfig import PROJECT_CONFIG
 
 ROOT = Path(__file__).parent
@@ -16,6 +22,14 @@ from exasol.toolbox.nox.tasks import *  # type: ignore
 # default actions to be run if nothing is explicitly specified with the -s option
 nox.options.sessions = ["project:fix"]
 
+def get_db_versions_only_gpu() -> List[str]:
+    template_path = ROOT / "docker_db_config_template"
+    db_versions = [str(path.name) for path in template_path.iterdir() if path.is_dir()]
+
+    # Filter for versions later than 8.34.0
+    db_versions = [db_version for db_version in db_versions if Version(db_version) >= Version("8.34.0")]
+
+    return db_versions
 
 def get_db_versions() -> List[str]:
     template_path = ROOT / "docker_db_config_template"
@@ -46,7 +60,7 @@ def run_all_tests(session: nox.Session, db_version: str):
     """
     env = {"EXASOL_VERSION": db_version}
     session.run("pytest", "./test/unit")
-    session.run("pytest", "./test/integration", env=env)
+    session.run("pytest", "--ignore", "./test/integration/gpu", "./test/integration", env=env)
     with session.chdir(ROOT):
         session.run(
             "python",
@@ -86,7 +100,7 @@ def run_minimal_tests(session: nox.Session, db_version: str):
     for test in minimal_tests["new-itest"]:
         session.run(
             "pytest",
-            f"./test/integration/{test}",
+            f"./test/integration/normal/{test}",
             env=env,
         )
     with session.chdir(ROOT):
@@ -99,10 +113,35 @@ def run_minimal_tests(session: nox.Session, db_version: str):
             )
 
 
+@nox.session(name="run-gpu-tests", python=False)
+@nox.parametrize("db_version", get_db_versions_only_gpu())
+def run_gpu_tests(session: nox.Session, db_version: str):
+    """
+    This nox task runs gpu tests using the specified version of Exasol database
+    or all versions currently supported by the ITDE which have GPU support.
+    """
+    env = {"EXASOL_VERSION": db_version}
+    session.run("pytest", "--ignore", "./test/integration/normal", "./test/integration", env=env)
+
+
 @nox.session(name="get-all-db-versions", python=False)
 def get_all_db_versions(session: nox.Session):
     """Returns all, known, db-versions as JSON string"""
-    print(json.dumps(get_db_versions()))
+    def parser() -> ArgumentParser:
+        p = ArgumentParser(
+            usage="nox -s get-all-db-versions -- [--only-gpu]",
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        )
+        p.add_argument(
+            "--only-gpu",
+            action='store_true'
+        )
+        return p
+    args = parser().parse_args(session.posargs)
+    if args.only_gpu:
+        print(json.dumps(get_db_versions_only_gpu()))
+    else:
+        print(json.dumps(get_db_versions()))
 
 
 @nox.session(name="release", python=False)
