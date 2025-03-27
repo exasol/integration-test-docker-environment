@@ -1,0 +1,31 @@
+name: Test Docker GPU
+
+on:
+  workflow_call:
+
+jobs:
+  test-docker-gpu:
+    runs-on: ubuntu-24.04
+    get_exasol_versions_with_gpu:
+      uses: ./.github/workflows/get-exasol-versions.yml
+      with:
+        only_gpu: true
+    strategy:
+      fail-fast: false
+      matrix:
+        exasol_version: ${{fromJson(needs.get_exasol_versions.outputs.matrix)}}
+    steps:
+      - name: SCM Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python & Poetry Environment
+        uses: exasol/python-toolbox/.github/actions/python-environment@0.20.0
+        with:
+          python-version: "3.10"
+          poetry-version: '1.8.2'
+
+      - name: Allow unprivileged user namespaces
+        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+
+      - name: Run GPU Tests
+        run: poetry run nox -s "run-gpu-tests(db_version='${{ matrix.exasol_version }}')"
