@@ -110,6 +110,7 @@ class SpawnTestEnvironmentWithDockerDB(
             ip_address_index_in_subnet=0,
             attempt=attempt,
             additional_db_parameter=self.additional_db_parameter,
+            docker_environment_variables=self.docker_environment_variables
         )
 
     def create_wait_for_database_task(

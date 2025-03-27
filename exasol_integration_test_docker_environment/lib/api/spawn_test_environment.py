@@ -3,7 +3,7 @@ from typing import (
     Any,
     Callable,
     Optional,
-    Tuple,
+    Tuple, Dict,
 )
 
 import humanfriendly
@@ -80,6 +80,7 @@ def spawn_test_environment(
     db_os_access: Optional[str] = "DOCKER_EXEC",
     create_certificates: bool = False,
     additional_db_parameter: Tuple[str, ...] = tuple(),
+    docker_environment_variable: Tuple[str, ...] = tuple(),
     source_docker_repository_name: str = DEFAULT_DOCKER_REPOSITORY_NAME,
     source_docker_tag_prefix: str = "",
     source_docker_username: Optional[str] = None,
@@ -164,6 +165,7 @@ def spawn_test_environment(
         create_certificates=create_certificates,
         test_container_content=None,
         additional_db_parameter=additional_db_parameter,
+        docker_environment_variables=docker_environment_variable,
     )
     environment_info = run_task(
         task_creator,

@@ -1,6 +1,7 @@
 from typing import (
     Optional,
     Tuple,
+    Dict,
 )
 
 import luigi
@@ -18,4 +19,5 @@ class GeneralSpawnTestEnvironmentParameter(OptionalTestContainerParameter):
     max_start_attempts: int = luigi.IntParameter(2, significant=False)  # type: ignore
     docker_runtime: Optional[str] = luigi.OptionalParameter(None, significant=False)  # type: ignore
     create_certificates: bool = luigi.BoolParameter()  # type: ignore
-    additional_db_parameter: Tuple[str] = luigi.ListParameter()  # type: ignore
+    additional_db_parameter: Tuple[str, ...] = luigi.ListParameter()  # type: ignore
+    docker_environment_variables: Tuple[str, ...] = luigi.ListParameter()   # type: ignore
