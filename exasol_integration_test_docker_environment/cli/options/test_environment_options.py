@@ -67,7 +67,10 @@ docker_db_options = [
         type=str,
         multiple=True,
         default=[],
-        help="An enviroronment variable which will be added to the docker-db. You can repeat this option to add further environment variables.",
+        help="""An environment variable which will be added to the docker-db.
+                The variable needs to have format "key=value".
+                For example "HTTPS_PROXY=192.168.1.5".
+                You can repeat this option to add further environment variables.""",
     ),
 ]
 

@@ -142,9 +142,12 @@ The following options are available to customize the test environment.
                                       injected to EXAConf. Value should have
                                       format '-param=value'.
       --docker-environment-variable TEXT
-                                      An enviroronment variable which will be
-                                      added to the docker-db. You can repeat this
-                                      option to add further environment variables.
+                                      An environment variable which will be added
+                                      to the docker-db. The variable needs to have
+                                      format "key=value". For example
+                                      "HTTPS_PROXY=192.168.1.5". You can repeat
+                                      this option to add further environment
+                                      variables.
       --source-docker-repository-name TEXT
                                       Name of the docker repository for pulling
                                       cached stages. The repository name may
