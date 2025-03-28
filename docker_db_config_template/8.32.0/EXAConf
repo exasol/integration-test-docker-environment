@@ -4,10 +4,15 @@
     ClusterName = cl4
     Platform = Docker
     LicenseFile = /exa/etc/license.exasol_license
-    CoredPort = 325
+    CoredPort = 3250
     SSHPort = {{ ssh_port }}
-    IssueTracker = Jira
+    IssueTracker = Salesforce
     XMLRPCPort = 443
+    RESTAPIPort = 8000
+    RESTAPIEnabled = False
+    RESTAPIPathPrefix = /api/v1
+    RESTAPIAuthPubKey =
+
     WebUIBackendPort = 4444
     WebUIDomain = exacluster.local
     EnableLoadBalancer = False
@@ -16,9 +21,8 @@
     Networks = private
     # Comma-separated list of nameservers for this cluster.
     NameServers = {{ name_servers }}
-    # Path to c4 unix domain socket, used for deployments of new clusters and nodes.
-    C4Socket = /var/run/c4_socket
     Timezone = Europe/Berlin
+    LegacyPlatformManager = True
     LicenseRAWMEMWarnThreshold = 80
     # Nr. of hugepages ('0' = disabled, 'host' = manually configured on the host, 'auto' = set automatically based on DB config)
     Hugepages = 0
@@ -26,17 +30,18 @@
     StorageMaxConnections = 1024
     # The meta package name, which was installed by C4 to run this system.
     MetaPackage = none
-    ConfVersion = 8.50.0
-    OSVersion = 8.50.0
+    ConfVersion = 8.51.0
+    OSVersion = 8.51.0
     DBVersion = {{ db_version }}
     ImageVersion = {{ db_version }}
     # Cored only accepts incomming messages from privileged ports (port number less than 1024).
-    CoredUsePrivilegedPorts = True
+    CoredUsePrivilegedPorts = False
     # Cored only accepts incomming messages from its own subnet.
     CoredAllowOnlySameSubnet = True
     # Which subnets Cored will allow messages from. Each subnet must be sepparated by a comma.
     # A subnet is either an IPv4 or IPv6 address in CIDR notation.
     CoredSubnets =
+    BuiltinScriptLanguageName = slc-8.3.0-c4-6-standard-EXASOL-all/ScriptLanguages-standard-EXASOL-all-slc-v8.3.0-3GA7ME7R
 
 # SSL options
 [SSL]
@@ -104,6 +109,8 @@
     Affinity = 11
     UUID = F0EA64D47F374A00B0530772981C559EE1C59086
     DockerVolume = n11
+    # Ports to be exposed (container : host)
+    ExposedPorts = 8563:8574, 2581:2592
     [[Disk : disk1]]
         Component = exastorage
         Devices = dev.1
@@ -166,9 +173,10 @@
     NumActiveNodes = 1
     # Name of the data volume to be used by this database.
     DataVolume = DataVolume1
+    # Time in seconds after which a volume should be moved to an online database node.
+    # Setting it to 0 turns off this feature.
+    VolumeMoveDelay = 600
     EnableAuditing = True
-    BuiltinScriptLanguageName = slc-6.0.0-c4-5-standard-EXASOL-8.0.0/ScriptLanguages-standard-EXASOL-8.0.0-slc-v6.0.0-PB5EHDLN
-    AutoStart = True
     {% if additional_db_parameters %}
     Params = {{ additional_db_parameters }}
     {% endif %}
