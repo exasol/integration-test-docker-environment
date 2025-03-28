@@ -12,7 +12,6 @@
     RESTAPIEnabled = False
     RESTAPIPathPrefix = /api/v1
     RESTAPIAuthPubKey =
-
     WebUIBackendPort = 4444
     WebUIDomain = exacluster.local
     EnableLoadBalancer = False
