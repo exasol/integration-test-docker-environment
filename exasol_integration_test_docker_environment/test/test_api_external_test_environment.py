@@ -60,7 +60,7 @@ class APISpawnTestExternalEnvironmentTest(unittest.TestCase):
             reuse_test_container=True,
             test_container_content=get_test_container_content(),
             additional_db_parameter=tuple(),
-            docker_environment_variable=tuple(),
+            docker_environment_variables=tuple(),
         )
         cls.ext_environment_info: EnvironmentInfo = run_task(task_creator, 1, None)
 
