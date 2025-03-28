@@ -96,63 +96,110 @@ The following options are available to customize the test environment.
      This command spawn a test environment with a docker-db container.
 
    Options:
-     --environment-name TEXT         Name of the docker environment. This name
-                                     gets used as suffix for the container
-                                     db_container_<name> and
-                                     test_container_<name>  [required]
+      --environment-name TEXT         Name of the docker environment. This name
+                                      gets used as suffix for the container
+                                      db_container_<name> and
+                                      test_container_<name>  [required]
+      --database-port-forward INTEGER
+                                      Host port to which the database port gets
+                                      forwarded
+      --bucketfs-port-forward INTEGER
+                                      Host port to which the BucketFS port gets
+                                      forwarded
+      --ssh-port-forward INTEGER      Host port to which the SSH port gets
+                                      forwarded. If not specified then ITDE
+                                      selects a random free port.
+      --db-mem-size TEXT              The main memory used by the database. Format
+                                      <number> <unit>, e.g. 1 GiB. The minimum
+                                      size is 1 GB, below that the database will
+                                      not start.  [default: 2 GiB]
+      --db-disk-size TEXT             The disk size available for the database.
+                                      Format <number> <unit>, e.g. 1 GiB. The
+                                      minimum size is 100 MiB. However, the setup
+                                      creates volume files with at least 2 GB
+                                      larger size, because the database needs at
+                                      least so much more disk.  [default: 2 GiB]
+      --nameserver TEXT               Add a nameserver to the list of DNS
+                                      nameservers which the docker-db should use
+                                      for resolving domain names. You can repeat
+                                      this option to add further nameservers.
+      --docker-runtime TEXT           The docker runtime used to start all
+                                      containers
+      --docker-db-image-version TEXT  Docker DB Image Version against which the
+                                      tests should run.  [default: 8.31.0]
+      --docker-db-image-name TEXT     Docker DB Image Name against which the tests
+                                      should run.  [default: exasol/docker-db]
+      --db-os-access METHOD           How to access file system and command line
+                                      of the database operating system.
+                                      Experimental option, will show no effect
+                                      until implementation of feature SSH access
+                                      is completed.  [default: DOCKER_EXEC]
+      --create-certificates / --no-create-certificates
+                                      Creates and injects SSL certificates to the
+                                      Docker DB container.
+      -p, --additional-db-parameter TEXT
+                                      Additional database parameter which will be
+                                      injected to EXAConf. Value should have
+                                      format '-param=value'.
+      --docker-environment-variable TEXT
+                                      An environment variable which will be added
+                                      to the docker-db. The variable needs to have
+                                      format "key=value". For example
+                                      "HTTPS_PROXY=192.168.1.5". You can repeat
+                                      this option to add further environment
+                                      variables.
+      --source-docker-repository-name TEXT
+                                      Name of the docker repository for pulling
+                                      cached stages. The repository name may
+                                      contain the URL of the docker registry, the
+                                      username and the actual repository name. A
+                                      common structure is <docker-registry-
+                                      url>/<username>/<repository-name>  [default:
+                                      exasol/script-language-container]
+      --source-docker-tag-prefix TEXT
+                                      Prefix for the tags which are used for
+                                      pulling of cached stages  [default: ""]
+      --source-docker-username TEXT   Username for the docker registry from where
+                                      the system pulls cached stages.
+      --source-docker-password TEXT   Password for the docker registry from where
+                                      the system pulls cached stages. Without
+                                      password option the system prompts for the
+                                      password.
+      --target-docker-repository-name TEXT
+                                      Name of the docker repository for naming and
+                                      pushing images of stages. The repository
+                                      name may contain the URL of the docker
+                                      registry, the username and the actual
+                                      repository name. A common structure is
+                                      <docker-registry-
+                                      url>/<username>/<repository-name>  [default:
+                                      exasol/script-language-container]
+      --target-docker-tag-prefix TEXT
+                                      Prefix for the tags which are used for
+                                      naming and pushing of stages  [default: ""]
+      --target-docker-username TEXT   Username for the docker registry where the
+                                      system pushes images of stages.
+      --target-docker-password TEXT   Password for the docker registry where the
+                                      system pushes images of stages. Without
+                                      password option the system prompts for the
+                                      password.
+      --output-directory DIRECTORY    Output directory where the system stores all
+                                      output and log files.  [default:
+                                      .build_output]
+      --temporary-base-directory DIRECTORY
+                                      Directory where the system creates temporary
+                                      directories.  [default: /tmp]
+      --workers INTEGER               Number of parallel workers  [default: 5]
+      --task-dependencies-dot-file PATH
+                                      Path where to store the Task Dependency
+                                      Graph as dot file
+      --log-level [DEBUG|INFO|WARNING|ERROR|FATAL]
+                                      Log level used for console logging
+      --use-job-specific-log-file BOOLEAN
+                                      Use a job specific log file which write the
+                                      debug log to the job directory in the build
+                                      directory
 
-     --database-port-forward INTEGER
-                                     Host port to which the database port gets
-                                     forwarded
-
-     --bucketfs-port-forward INTEGER
-                                     Host port to which the BucketFS port gets
-                                     forwarded
-
-     --ssh-port-forward INTEGER
-                                     Host port to which the SSH port gets
-                                     forwarded
-
-     --db-mem-size TEXT              The main memory used by the database. Format
-                                     <number> <unit>, e.g. 1 GiB. The minimum
-                                     size is 1 GB, below that the database will
-                                     not start.  [default: 2 GiB]
-
-     --db-disk-size TEXT             The disk size available for the database.
-                                     Format <number> <unit>, e.g. 1 GiB. The
-                                     minimum size is 100 MiB. However, the setup
-                                     creates volume files with at least 2 GB
-                                     larger size, because the database needs at
-                                     least so much more disk.  [default: 2 GiB]
-
-     --nameserver TEXT               Add a nameserver to the list of DNS
-                                     nameservers which the docker-db should use
-                                     for resolving domain names. You can repeat
-                                     this option to add further nameservers.
-
-     --docker-runtime TEXT           The docker runtime used to start all
-                                     containers
-
-     --docker-db-image-version TEXT  Docker DB Image Version against which the
-                                     tests should run.  [default: 8.31.0]
-
-     --docker-db-image-name TEXT     Docker DB Image Name against which the tests
-                                     should run.  [default: exasol/docker-db]
-
-     --db-os-access METHOD           How to access file system and command
-                                     line of the database operating
-                                     system. Experimental option, will show no
-                                     effect until implementation of feature
-                                     SSH access is completed. [default:
-                                     DOCKER_EXEC]
-
-     --output-directory DIRECTORY    Output directory where the system stores all
-                                     output and log files.  [default:
-                                     .build_output]
-
-     --temporary-base-directory DIRECTORY
-                                     Directory where the system creates temporary
-                                     directories.  [default: /tmp]
 
 You can look at them on the commandline with:
 

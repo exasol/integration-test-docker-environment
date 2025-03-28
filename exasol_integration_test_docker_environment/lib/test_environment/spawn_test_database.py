@@ -80,7 +80,8 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
     ip_address_index_in_subnet: int = luigi.IntParameter(significant=False)  # type: ignore
     docker_runtime: Optional[str] = luigi.OptionalParameter(None, significant=False)  # type: ignore
     certificate_volume_name: Optional[str] = luigi.OptionalParameter(None, significant=False)  # type: ignore
-    additional_db_parameter: Tuple[str] = luigi.ListParameter()  # type: ignore
+    additional_db_parameter: Tuple[str, ...] = luigi.ListParameter()  # type: ignore
+    docker_environment_variables: Tuple[str, ...] = luigi.ListParameter()  # type: ignore
     ssh_user: str = luigi.Parameter("root")  # type: ignore
     ssh_key_file: Union[str, Path, None] = luigi.OptionalParameter(None, significant=False)  # type: ignore
 
@@ -225,6 +226,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                 network_mode=None,
                 ports=port_mapping,
                 runtime=self.docker_runtime,
+                environment=list(self.docker_environment_variables),
             )
             enable_ssh_access(db_container, authorized_keys)
             self._connect_docker_network(docker_client, db_container, db_ip_address)
