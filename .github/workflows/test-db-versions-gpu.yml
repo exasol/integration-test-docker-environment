@@ -4,16 +4,18 @@ on:
   workflow_call:
 
 jobs:
+  get_exasol_versions_with_gpu:
+    uses: ./.github/workflows/get-exasol-versions.yml
+    with:
+      only_gpu: true
   test-docker-gpu:
+    name: Run GPU Tests for Exasol  ${{ matrix.exasol_version }}
     runs-on: ubuntu-24.04
-    get_exasol_versions_with_gpu:
-      uses: ./.github/workflows/get-exasol-versions.yml
-      with:
-        only_gpu: true
+    needs: get_exasol_versions_with_gpu
     strategy:
       fail-fast: false
       matrix:
-        exasol_version: ${{fromJson(needs.get_exasol_versions.outputs.matrix)}}
+        exasol_version: ${{fromJson(needs.get_exasol_versions_with_gpu.outputs.matrix)}}
     steps:
       - name: SCM Checkout
         uses: actions/checkout@v4
