@@ -18,11 +18,11 @@ jobs:
           poetry-version: '1.8.5'
 
       - name: Print matrix
-        run: poetry run nox --non-interactive -s "get-all-db-versions"
+        run: poetry run -- nox --non-interactive -s "get-all-db-versions"
 
       - id: set-matrix
         run: |
-          ALL_DB_VERSIONS=`poetry run nox --non-interactive -s 'get-all-db-versions'` 
+          ALL_DB_VERSIONS=`poetry run -- nox --non-interactive -s 'get-all-db-versions'` 
           echo "matrix=$ALL_DB_VERSIONS" >> "$GITHUB_OUTPUT"
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
