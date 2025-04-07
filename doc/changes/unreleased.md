@@ -9,3 +9,9 @@
 
  - #463: Added option to inject environment variables to docker-db 
  - #467: Add Docker-DB 8.32.0
+
+## Refactorings
+
+ - #427: Use GH approval required for slow tests
+ - #469: Updated dependencies
+   - Updated `exasol-toolbox` to 1.0.0
