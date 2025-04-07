@@ -27,7 +27,7 @@ COPY pyproject.toml /integration_test_docker_environment/pyproject.toml
 COPY LICENSE /integration_test_docker_environment/LICENSE
 COPY README.rst /integration_test_docker_environment/README.rst
 
-ENV POETRY_VERSION=1.8.2
+ENV POETRY_VERSION=2.1.2
 RUN curl -sSL https://install.python-poetry.org | python3 -
 
 ENV PATH /root/.local/bin:$PATH
