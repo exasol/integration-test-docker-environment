@@ -11,10 +11,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@0.20.0
+        uses: exasol/python-toolbox/.github/actions/python-environment@1.0.0
 
       - name: Run Update of EXAConf files
-        run: poetry run nox -s copy-docker-db-config-templates
+        run: poetry run -- nox -s copy-docker-db-config-templates
 
       - name: Show changes on working copy
         run: git status --porcelain=v1 -uno
@@ -23,7 +23,7 @@ jobs:
         run: git diff --cached; git diff --cached --summary;
 
       - name: Fail if git working tree is not clean
-        # If this check fails, you need to run `poetry run nox -s copy-docker-db-config-templates` before commiting
+        # If this check fails, you need to run `poetry run -- nox -s copy-docker-db-config-templates` before commiting
         # or alternatively activate the commit hooks (see developer guide).
         run: |
           [ -z "$(git status --porcelain=v1 -uno 2>/dev/null)" ]

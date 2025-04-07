@@ -28,13 +28,12 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@0.20.0
+        uses: exasol/python-toolbox/.github/actions/python-environment@1.0.0
         with:
           python-version: ${{ matrix.python-version }}
-          poetry-version: '1.8.2'
 
       - name: Allow unprivileged user namespaces
         run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
       - name: Run all tests
-        run: poetry run nox -s "run-all-tests(db_version='default')"
+        run: poetry run -- nox -s "run-all-tests(db_version='default')"

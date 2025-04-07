@@ -1,28 +1,28 @@
-[tool.poetry]
+[project]
 name = "exasol-integration-test-docker-environment"
+version = "4.0.1"
+description = "Integration Test Docker Environment for Exasol"
+authors = [
+    {name="Torsten Kilias", email="torsten.kilias@exasol.com"},
+]
+readme = 'README.rst'
+license = "MIT"
+keywords = ['exasol', 'docker', 'testing']
+
+[project.urls]
+homepage = "https://github.com/exasol/integration-test-docker-environment"
+repository = "https://github.com/exasol/integration-test-docker-environment"
+
+[tool.poetry]
 packages = [
     { include = "exasol_integration_test_docker_environment" },
 ]
-version = "4.0.1"
-description = "Integration Test Docker Environment for Exasol"
 
-license = "MIT"
-
-authors = [
-    "Torsten Kilias <torsten.kilias@exasol.com>"
-]
-
-readme = 'README.rst'
-
-repository = "https://github.com/exasol/integration-test-docker-environment"
-homepage = "https://github.com/exasol/integration-test-docker-environment"
-
-keywords = ['exasol', 'docker', 'testing']
 include = ["docker_db_config", "ext"]
 exclude = ["exasol_integration_test_docker_environment/test"]
 
 [tool.poetry.dependencies]
-python = ">=3.9,<4"
+python = ">=3.9.2,<4"
 click = ">=7.0"
 # The `sys_platform` marker makes sure the docker dependency is only installed on
 # non windows platforms.
@@ -50,10 +50,16 @@ toml = ">=0.10.2"
 nox = "^2022.1.7"
 mypy = "^1.1.1"
 pyexasol = "^0.25.2"
-exasol-toolbox = ">=0.20.0"
+exasol-toolbox = "^1.0.0"
 joblib = "^1.4.2"
 
-[tool.poetry.scripts]
+[build-system]
+requires = [
+    "poetry>=2.0.0",
+    "poetry-core"
+]
+
+[tool.poetry.plugins."console_scripts"]
 itde = 'exasol_integration_test_docker_environment.main:main'
 
 

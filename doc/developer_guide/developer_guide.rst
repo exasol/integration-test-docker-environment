@@ -13,7 +13,7 @@ Install dependencies:
 
 Install the Git commit hooks:
 
-``poetry run pre-commit install``
+``poetry run -- pre-commit install``
 
 .. toctree::
    :maxdepth: 1
@@ -97,7 +97,7 @@ You can execute all tests in a single file with the following command:
 
 .. code-block:: shell
 
-  poetry run python exasol_integration_test_docker_environment/test/test_cli_test_environment_db_mem_size.py
+  poetry run -- python exasol_integration_test_docker_environment/test/test_cli_test_environment_db_mem_size.py
 
 Some tests will use prebuilt Docker Containers.
 After changing the implementation you might need to rebuild the container in order to make

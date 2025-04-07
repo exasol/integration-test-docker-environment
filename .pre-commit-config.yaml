@@ -7,7 +7,7 @@ repos:
         name: update-starter-script-checksums
         pass_filenames: false
         language: system
-        entry: poetry run nox -s starter-scripts-checksums
+        entry: poetry run -- nox -s starter-scripts-checksums
 
   - repo: local
     hooks:
@@ -15,7 +15,7 @@ repos:
         name: copy-docker-db-config-templates
         pass_filenames: false
         language: system
-        entry: poetry run nox -s copy-docker-db-config-templates
+        entry: poetry run -- nox -s copy-docker-db-config-templates
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0
