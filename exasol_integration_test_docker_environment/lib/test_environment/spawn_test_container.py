@@ -49,10 +49,18 @@ class SpawnTestContainer(DockerBaseTask, TestContainerParameter):
     ip_address_index_in_subnet: int = luigi.IntParameter(significant=False)
     attempt: int = luigi.IntParameter(default=1)
     reuse_test_container: bool = luigi.BoolParameter(default=False, significant=False)
-    no_test_container_cleanup_after_success: bool = luigi.BoolParameter(default=False, significant=False)
-    no_test_container_cleanup_after_failure: bool = luigi.BoolParameter(default=False, significant=False)
-    docker_runtime: Optional[str] = luigi.OptionalParameter(default=None, significant=False)
-    certificate_volume_name: Optional[str] = luigi.OptionalParameter(default=None, significant=False)
+    no_test_container_cleanup_after_success: bool = luigi.BoolParameter(
+        default=False, significant=False
+    )
+    no_test_container_cleanup_after_failure: bool = luigi.BoolParameter(
+        default=False, significant=False
+    )
+    docker_runtime: Optional[str] = luigi.OptionalParameter(
+        default=None, significant=False
+    )
+    certificate_volume_name: Optional[str] = luigi.OptionalParameter(
+        default=None, significant=False
+    )
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)

@@ -35,11 +35,25 @@ class DockerDBTestEnvironmentParameter(Config):
     db_os_access = luigi.EnumParameter(
         default=DbOsAccess.DOCKER_EXEC, enum=DbOsAccess, significant=False
     )
-    no_database_cleanup_after_success: bool = luigi.BoolParameter(default=False, significant=False)
-    no_database_cleanup_after_failure: bool = luigi.BoolParameter(default=False, significant=False)
-    database_port_forward: Optional[str] = luigi.OptionalParameter(default=None, significant=False)
-    bucketfs_port_forward: Optional[str] = luigi.OptionalParameter(default=None, significant=False)
-    ssh_port_forward: Optional[str] = luigi.OptionalParameter(default=None, significant=False)
-    mem_size: Optional[str] = luigi.OptionalParameter(default="2 GiB", significant=False)
-    disk_size: Optional[str] = luigi.OptionalParameter(default="2 GiB", significant=False)
+    no_database_cleanup_after_success: bool = luigi.BoolParameter(
+        default=False, significant=False
+    )
+    no_database_cleanup_after_failure: bool = luigi.BoolParameter(
+        default=False, significant=False
+    )
+    database_port_forward: Optional[str] = luigi.OptionalParameter(
+        default=None, significant=False
+    )
+    bucketfs_port_forward: Optional[str] = luigi.OptionalParameter(
+        default=None, significant=False
+    )
+    ssh_port_forward: Optional[str] = luigi.OptionalParameter(
+        default=None, significant=False
+    )
+    mem_size: Optional[str] = luigi.OptionalParameter(
+        default="2 GiB", significant=False
+    )
+    disk_size: Optional[str] = luigi.OptionalParameter(
+        default="2 GiB", significant=False
+    )
     nameservers: List[str] = luigi.ListParameter(default=[], significant=False)

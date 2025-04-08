@@ -15,10 +15,16 @@ class PrepareDockerNetworkForTestEnvironment(DockerBaseTask):
     environment_name: str = luigi.Parameter()
     network_name: str = luigi.Parameter()
     test_container_name: str = luigi.Parameter(significant=False)
-    db_container_name: Optional[str] = luigi.OptionalParameter(default=None, significant=False)
+    db_container_name: Optional[str] = luigi.OptionalParameter(
+        default=None, significant=False
+    )
     reuse: bool = luigi.BoolParameter(default=False, significant=False)
-    no_cleanup_after_success: bool = luigi.BoolParameter(default=False, significant=False)
-    no_cleanup_after_failure: bool = luigi.BoolParameter(default=False, significant=False)
+    no_cleanup_after_success: bool = luigi.BoolParameter(
+        default=False, significant=False
+    )
+    no_cleanup_after_failure: bool = luigi.BoolParameter(
+        default=False, significant=False
+    )
     attempt: int = luigi.IntParameter(default=-1)
 
     def run_task(self) -> None:

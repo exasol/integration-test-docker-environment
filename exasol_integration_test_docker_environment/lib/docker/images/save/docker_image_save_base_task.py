@@ -28,7 +28,9 @@ class DockerSaveImageBaseTask(DockerBaseTask):
     force_save: bool = luigi.BoolParameter(
         default=False, visibility=luigi.parameter.ParameterVisibility.HIDDEN
     )
-    save_path: str = luigi.Parameter(visibility=luigi.parameter.ParameterVisibility.HIDDEN)
+    save_path: str = luigi.Parameter(
+        visibility=luigi.parameter.ParameterVisibility.HIDDEN
+    )
 
     def register_required(self):
         task = self.get_docker_image_task()

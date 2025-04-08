@@ -78,12 +78,18 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
     attempt: int = luigi.IntParameter(default=1)
     network_info: DockerNetworkInfo = JsonPickleParameter(DockerNetworkInfo, significant=False)  # type: ignore
     ip_address_index_in_subnet: int = luigi.IntParameter(significant=False)
-    docker_runtime: Optional[str] = luigi.OptionalParameter(default=None, significant=False)
-    certificate_volume_name: Optional[str] = luigi.OptionalParameter(default=None, significant=False)
+    docker_runtime: Optional[str] = luigi.OptionalParameter(
+        default=None, significant=False
+    )
+    certificate_volume_name: Optional[str] = luigi.OptionalParameter(
+        default=None, significant=False
+    )
     additional_db_parameter: Tuple[str, ...] = luigi.ListParameter()
     docker_environment_variables: Tuple[str, ...] = luigi.ListParameter()
     ssh_user: str = luigi.Parameter(default="root")
-    ssh_key_file: Union[str, Path, None] = luigi.OptionalParameter(default=None, significant=False)
+    ssh_key_file: Union[str, Path, None] = luigi.OptionalParameter(
+        default=None, significant=False
+    )
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)

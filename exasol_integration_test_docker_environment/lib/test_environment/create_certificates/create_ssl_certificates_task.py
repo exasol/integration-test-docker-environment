@@ -36,12 +36,18 @@ CERTIFICATES_MOUNT_PATH = "/certificates"
 
 class CreateSSLCertificatesTask(DockerBaseTask):
     environment_name: str = luigi.Parameter()
-    docker_runtime: Optional[str] = luigi.OptionalParameter(default=None, significant=False)
+    docker_runtime: Optional[str] = luigi.OptionalParameter(
+        default=None, significant=False
+    )
     db_container_name: str = luigi.Parameter(significant=False)
     network_name: str = luigi.Parameter()
     reuse: bool = luigi.BoolParameter(default=False, significant=False)
-    no_cleanup_after_success: bool = luigi.BoolParameter(default=False, significant=False)
-    no_cleanup_after_failure: bool = luigi.BoolParameter(default=False, significant=False)
+    no_cleanup_after_success: bool = luigi.BoolParameter(
+        default=False, significant=False
+    )
+    no_cleanup_after_failure: bool = luigi.BoolParameter(
+        default=False, significant=False
+    )
     volume_name: str = luigi.Parameter()
 
     def __init__(self, *args, **kwargs) -> None:
