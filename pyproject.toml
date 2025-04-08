@@ -63,6 +63,10 @@ requires = [
 itde = 'exasol_integration_test_docker_environment.main:main'
 
 
+[tool.mypy]
+plugins = ["luigi.mypy"]
+
+
 [[tool.mypy.overrides]]
 module = [ "luigi.*", "docker.*", "humanfriendly", "configobj", "toml", "netaddr", "joblib.testing", "networkx",
             "fabric", "requests", "pyexasol", "paramiko.ssh_exception", "six", "jsonpickle",

@@ -41,18 +41,18 @@ from exasol_integration_test_docker_environment.lib.test_environment.parameter.t
 
 
 class SpawnTestContainer(DockerBaseTask, TestContainerParameter):
-    environment_name: str = luigi.Parameter()  # type: ignore
-    test_container_name: str = luigi.Parameter()  # type: ignore
+    environment_name: str = luigi.Parameter()
+    test_container_name: str = luigi.Parameter()
     network_info: DockerNetworkInfo = JsonPickleParameter(
         DockerNetworkInfo, significant=False
     )  # type: ignore
-    ip_address_index_in_subnet: int = luigi.IntParameter(significant=False)  # type: ignore
-    attempt: int = luigi.IntParameter(1)  # type: ignore
-    reuse_test_container: bool = luigi.BoolParameter(False, significant=False)  # type: ignore
-    no_test_container_cleanup_after_success: bool = luigi.BoolParameter(False, significant=False)  # type: ignore
-    no_test_container_cleanup_after_failure: bool = luigi.BoolParameter(False, significant=False)  # type: ignore
-    docker_runtime: Optional[str] = luigi.OptionalParameter(None, significant=False)  # type: ignore
-    certificate_volume_name: Optional[str] = luigi.OptionalParameter(None, significant=False)  # type: ignore
+    ip_address_index_in_subnet: int = luigi.IntParameter(significant=False)
+    attempt: int = luigi.IntParameter(default=1)
+    reuse_test_container: bool = luigi.BoolParameter(default=False, significant=False)
+    no_test_container_cleanup_after_success: bool = luigi.BoolParameter(default=False, significant=False)
+    no_test_container_cleanup_after_failure: bool = luigi.BoolParameter(default=False, significant=False)
+    docker_runtime: Optional[str] = luigi.OptionalParameter(default=None, significant=False)
+    certificate_volume_name: Optional[str] = luigi.OptionalParameter(default=None, significant=False)
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)

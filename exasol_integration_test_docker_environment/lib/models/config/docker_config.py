@@ -14,35 +14,35 @@ from exasol_integration_test_docker_environment.cli.options.docker_repository_op
 
 
 class source_docker_repository_config(luigi.Config):
-    repository_name: str = luigi.Parameter(DEFAULT_DOCKER_REPOSITORY_NAME)  # type: ignore
-    tag_prefix: str = luigi.Parameter("")  # type: ignore
+    repository_name: str = luigi.Parameter(default=DEFAULT_DOCKER_REPOSITORY_NAME)
+    tag_prefix: str = luigi.Parameter(default="")
     username: Optional[str] = luigi.OptionalParameter(
-        None, significant=False, visibility=ParameterVisibility.PRIVATE
-    )  # type: ignore
+        default=None, significant=False, visibility=ParameterVisibility.PRIVATE
+    )
     password: Optional[str] = luigi.OptionalParameter(
-        None, significant=False, visibility=ParameterVisibility.PRIVATE
-    )  # type: ignore
+        default=None, significant=False, visibility=ParameterVisibility.PRIVATE
+    )
 
 
 class target_docker_repository_config(luigi.Config):
-    repository_name: str = luigi.Parameter(DEFAULT_DOCKER_REPOSITORY_NAME)  # type: ignore
-    tag_prefix: str = luigi.Parameter("")  # type: ignore
+    repository_name: str = luigi.Parameter(default=DEFAULT_DOCKER_REPOSITORY_NAME)
+    tag_prefix: str = luigi.Parameter(default="")
     username: Optional[str] = luigi.OptionalParameter(
-        None, significant=False, visibility=ParameterVisibility.PRIVATE
-    )  # type: ignore
+        default=None, significant=False, visibility=ParameterVisibility.PRIVATE
+    )
     password: Optional[str] = luigi.OptionalParameter(
-        None, significant=False, visibility=ParameterVisibility.PRIVATE
-    )  # type: ignore
+        default=None, significant=False, visibility=ParameterVisibility.PRIVATE
+    )
 
 
 class docker_build_arguments(luigi.Config):
-    transparent: Dict[str, str] = luigi.DictParameter(dict())  # type: ignore
-    image_changing: Dict[str, str] = luigi.DictParameter(dict())  # type: ignore
+    transparent: Dict[str, str] = luigi.DictParameter(default=dict())
+    image_changing: Dict[str, str] = luigi.DictParameter(default=dict())
     secret: Dict[str, str] = luigi.DictParameter(
-        dict(),
+        default=dict(),
         description="Will not be saved somewhere, but are also assumed to be transparent",
         visibility=ParameterVisibility.PRIVATE,
-    )  # type: ignore
+    )
 
 
 def set_docker_repository_config(

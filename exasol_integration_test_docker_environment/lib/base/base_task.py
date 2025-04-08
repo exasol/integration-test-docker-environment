@@ -119,8 +119,8 @@ BaseTaskType = TypeVar("BaseTaskType", bound="BaseTask")
 
 
 class BaseTask(Task):
-    caller_output_path: Tuple[str] = luigi.ListParameter([], significant=False, visibility=ParameterVisibility.HIDDEN)  # type: ignore
-    job_id: str = luigi.Parameter()  # type: ignore
+    caller_output_path: Tuple[str] = luigi.ListParameter(default=[], significant=False, visibility=ParameterVisibility.HIDDEN)
+    job_id: str = luigi.Parameter()
 
     def __init__(self, *args, **kwargs) -> None:
         self._registered_tasks: List["BaseTask"] = []

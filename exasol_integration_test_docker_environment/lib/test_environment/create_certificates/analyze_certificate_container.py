@@ -31,7 +31,7 @@ TAG_SUFFIX = "certificate_resources"
 
 
 class AnalyzeCertificateContainer(DockerAnalyzeImageTask):
-    certificate_container_root_directory: str = luigi.Parameter()  # type: ignore
+    certificate_container_root_directory: str = luigi.Parameter()
 
     def get_target_repository_name(self) -> str:
         return f"""{target_docker_repository_config().repository_name}"""
@@ -65,7 +65,7 @@ class AnalyzeCertificateContainer(DockerAnalyzeImageTask):
 
 class DockerCertificateBuildBase(DockerBuildBase):
     GOAL = "certificate-container"
-    certificate_container_root_directory: str = luigi.Parameter()  # type: ignore
+    certificate_container_root_directory: str = luigi.Parameter()
 
     def get_goal_class_map(self) -> Dict[str, DockerAnalyzeImageTask]:
         goal_class_map: Dict[str, DockerAnalyzeImageTask] = {

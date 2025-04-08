@@ -3,5 +3,5 @@ from luigi import Config
 
 
 class DockerPushParameter(Config):
-    force_push: bool = luigi.BoolParameter(False)  # type: ignore
-    push_all: bool = luigi.BoolParameter(False)  # type: ignore
+    force_push: bool = luigi.BoolParameter(default=False)
+    push_all: bool = luigi.BoolParameter(default=False)

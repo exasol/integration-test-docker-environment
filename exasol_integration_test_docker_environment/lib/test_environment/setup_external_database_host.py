@@ -33,9 +33,9 @@ class SetupExternalDatabaseHost(
     ExternalDatabaseHostParameter,
     DatabaseCredentialsParameter,
 ):
-    environment_name: str = luigi.Parameter()  # type: ignore
+    environment_name: str = luigi.Parameter()
     network_info: DockerNetworkInfo = JsonPickleParameter(DockerNetworkInfo, significant=False)  # type: ignore
-    attempt: int = luigi.IntParameter(1)  # type: ignore
+    attempt: int = luigi.IntParameter(default=1)
 
     def run_task(self) -> None:
         database_host = self.external_exasol_db_host

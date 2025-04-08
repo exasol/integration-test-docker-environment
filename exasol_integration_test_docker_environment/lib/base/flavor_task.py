@@ -18,7 +18,7 @@ from exasol_integration_test_docker_environment.lib.base.docker_base_task import
 
 
 class FlavorsBaseTask(DependencyLoggerBaseTask):
-    flavor_paths: Tuple[str] = luigi.ListParameter()  # type: ignore
+    flavor_paths: Tuple[str] = luigi.ListParameter()
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
@@ -43,7 +43,7 @@ class FlavorsBaseTask(DependencyLoggerBaseTask):
 
 
 class FlavorBaseTask(DockerBaseTask):
-    flavor_path: str = luigi.Parameter()  # type: ignore
+    flavor_path: str = luigi.Parameter()
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)

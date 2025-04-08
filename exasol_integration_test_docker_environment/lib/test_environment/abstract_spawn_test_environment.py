@@ -73,7 +73,7 @@ TEST_CONTAINER = "test_container"
 class AbstractSpawnTestEnvironment(
     DockerBaseTask, GeneralSpawnTestEnvironmentParameter, DatabaseCredentialsParameter
 ):
-    environment_name: str = luigi.Parameter()  # type: ignore
+    environment_name: str = luigi.Parameter()
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
@@ -224,7 +224,7 @@ class AbstractSpawnTestEnvironment(
         ssl_volume_info_future = yield from self.run_dependencies(
             self.create_ssl_certificates()
         )
-        ssl_volume_info: Optional[DockerVolumeInfo] = self.get_values_from_future(ssl_volume_info_future)  # type: ignore
+        ssl_volume_info: Optional[DockerVolumeInfo] = self.get_values_from_future(ssl_volume_info_future)
         return ssl_volume_info
 
     def create_ssl_certificates(self):
