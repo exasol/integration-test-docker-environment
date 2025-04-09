@@ -22,3 +22,4 @@
  - #427: Use GH approval required for slow tests
  - #469: Updated to poetry 2.1.2
    - Updated `exasol-toolbox` to 1.0.0
+ - #452: Use luigi mypy plugin for luigi parameters
