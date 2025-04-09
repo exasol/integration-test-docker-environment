@@ -15,7 +15,10 @@ from typing import (
 
 import pytest
 
-from exasol_integration_test_docker_environment.testing import utils, luigi_utils
+from exasol_integration_test_docker_environment.testing import (
+    luigi_utils,
+    utils,
+)
 from exasol_integration_test_docker_environment.testing.api_test_environment import (
     ApiTestEnvironment,
 )
@@ -26,6 +29,7 @@ from exasol_integration_test_docker_environment.testing.exaslct_test_environment
     ExaslctTestEnvironment,
     SpawnedTestEnvironments,
 )
+
 
 @contextlib.contextmanager
 def _build_cli_isolation(request) -> Iterator[ExaslctTestEnvironment]:
@@ -39,15 +43,18 @@ def _build_cli_isolation(request) -> Iterator[ExaslctTestEnvironment]:
     yield environment
     utils.close_environments(environment)
 
+
 @pytest.fixture
 def cli_isolation(request) -> Iterator[ExaslctTestEnvironment]:
     with _build_cli_isolation(request) as environment:
         yield environment
 
+
 @pytest.fixture(scope="module")
 def cli_isolation_module(request) -> Iterator[ExaslctTestEnvironment]:
     with _build_cli_isolation(request) as environment:
         yield environment
+
 
 @contextlib.contextmanager
 def _build_api_isolation(request) -> Iterator[ApiTestEnvironment]:
@@ -63,6 +70,7 @@ def api_isolation(request) -> Iterator[ApiTestEnvironment]:
     with _build_api_isolation(request) as environment:
         yield environment
 
+
 @pytest.fixture(scope="module")
 def api_isolation_module(request) -> Iterator[ApiTestEnvironment]:
     with _build_api_isolation(request) as environment:
@@ -74,11 +82,14 @@ CliContextProvider = NewType(  # type: ignore
     Callable[[Optional[str], Optional[List[str]]], Iterator[SpawnedTestEnvironments]],
 )
 
-def _build_cli_context_provider(test_environment: ExaslctTestEnvironment) -> CliContextProvider:
+
+def _build_cli_context_provider(
+    test_environment: ExaslctTestEnvironment,
+) -> CliContextProvider:
     @contextlib.contextmanager
     def create_context(
-            name: Optional[str] = None,
-            additional_parameters: Optional[List[str]] = None,
+        name: Optional[str] = None,
+        additional_parameters: Optional[List[str]] = None,
     ) -> Iterator[SpawnedTestEnvironments]:
         name = name if name else test_environment.name
         spawned = test_environment.spawn_docker_test_environments(
@@ -87,7 +98,9 @@ def _build_cli_context_provider(test_environment: ExaslctTestEnvironment) -> Cli
         )
         yield spawned
         utils.close_environments(spawned)
+
     return create_context
+
 
 @pytest.fixture
 def cli_database(
@@ -124,13 +137,16 @@ def cli_database_module(
     """
     return _build_cli_context_provider(cli_isolation_module)
 
+
 ApiContextProvider = NewType(  # type: ignore
     "ApiContextProvider",
     Callable[[Optional[str], Optional[Dict[str, Any]]], ExaslctDockerTestEnvironment],
 )
 
 
-def _build_api_context_provider(test_environment: ApiTestEnvironment) -> ApiContextProvider:
+def _build_api_context_provider(
+    test_environment: ApiTestEnvironment,
+) -> ApiContextProvider:
     @contextlib.contextmanager
     def create_context(
         name: Optional[str] = None,
@@ -146,9 +162,11 @@ def _build_api_context_provider(test_environment: ApiTestEnvironment) -> ApiCont
 
     return create_context  # type: ignore
 
+
 @pytest.fixture
 def api_database(api_isolation: ApiTestEnvironment) -> ApiContextProvider:
     return _build_api_context_provider(api_isolation)
+
 
 @pytest.fixture(scope="module")
 def api_database_module(api_isolation_module: ApiTestEnvironment) -> ApiContextProvider:

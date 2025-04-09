@@ -21,11 +21,11 @@ from exasol_integration_test_docker_environment.test.get_test_container_content 
     get_test_container_content,
 )
 
+
 @pytest.fixture(scope="module")
-def spawn_test_environment(api_database_module):
+def spawn_test_environment(api_database_module, api_isolation_module):
     with api_database_module() as db:
         ext_environment_name = "APISpawnExternalTestExternalEnvironmentTest"
-
         task_creator = lambda: generate_root_task(
             task_class=SpawnTestEnvironment,
             environment_type=EnvironmentType.external_db,
@@ -48,7 +48,6 @@ def spawn_test_environment(api_database_module):
             test_container_content=get_test_container_content(),
             additional_db_parameter=tuple(),
             docker_environment_variables=tuple(),
-            output_directory=db.output_directory,
         )
         ext_environment_info: EnvironmentInfo = run_task(task_creator, 1, None)
         yield ext_environment_name, ext_environment_info, db.name
@@ -60,6 +59,7 @@ def spawn_test_environment(api_database_module):
                 if ext_environment_name in c.name
             ]
             remove_docker_container(containers)
+
 
 def test_external_db(spawn_test_environment):
     ext_environment_name, _, docker_environment_name = spawn_test_environment
@@ -81,6 +81,7 @@ def test_external_db(spawn_test_environment):
         test_container = [c for c in containers if "test_container" in c]
         assert len(test_container) == 1, f"Found no test container in {containers}."
 
+
 def test_docker_available_in_test_container(spawn_test_environment):
     _, ext_environment_info, _ = spawn_test_environment
     with ContextDockerClient() as docker_client:
@@ -90,4 +91,6 @@ def test_docker_available_in_test_container(spawn_test_environment):
         exit_result = test_container.exec_run("docker ps")
         exit_code = exit_result[0]
         output = exit_result[1]
-        assert exit_code == 0, f"Error while executing 'docker ps' in test container got output\n {output}."
+        assert (
+            exit_code == 0
+        ), f"Error while executing 'docker ps' in test container got output\n {output}."
