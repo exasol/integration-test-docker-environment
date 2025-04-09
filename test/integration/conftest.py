@@ -11,6 +11,7 @@ from typing import (
     List,
     NewType,
     Optional,
+    TypeAlias,
 )
 
 import pytest
@@ -77,10 +78,9 @@ def api_isolation_module(request) -> Iterator[ApiTestEnvironment]:
         yield environment
 
 
-CliContextProvider = NewType(  # type: ignore
-    "CliContextProvider",
-    Callable[[Optional[str], Optional[List[str]]], Iterator[SpawnedTestEnvironments]],
-)
+CliContextProvider: TypeAlias = Callable[
+    [Optional[str], Optional[List[str]]], ContextManager[SpawnedTestEnvironments]
+]
 
 
 def _build_cli_context_provider(
@@ -138,10 +138,10 @@ def cli_database_module(
     return _build_cli_context_provider(cli_isolation_module)
 
 
-ApiContextProvider = NewType(  # type: ignore
-    "ApiContextProvider",
-    Callable[[Optional[str], Optional[Dict[str, Any]]], ExaslctDockerTestEnvironment],
-)
+ApiContextProvider: TypeAlias = Callable[
+    [Optional[str], Optional[Dict[str, Any]]],
+    ContextManager[ExaslctDockerTestEnvironment],
+]
 
 
 def _build_api_context_provider(
