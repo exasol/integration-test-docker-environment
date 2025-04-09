@@ -15,7 +15,7 @@ from typing import (
 
 import pytest
 
-from exasol_integration_test_docker_environment.testing import utils
+from exasol_integration_test_docker_environment.testing import utils, luigi_utils
 from exasol_integration_test_docker_environment.testing.api_test_environment import (
     ApiTestEnvironment,
 )
@@ -47,6 +47,7 @@ def api_isolation(request) -> Iterator[ApiTestEnvironment]:
     environment = ApiTestEnvironment(test_object=None, name=testname)
     yield environment
     utils.close_environments(environment)
+    luigi_utils.clean(environment.docker_repository_name)
 
 
 CliContextProvider = NewType(  # type: ignore
