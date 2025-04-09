@@ -9,10 +9,9 @@ from typing import (
     Generator,
     Iterator,
     List,
-    NewType,
     Optional,
-    TypeAlias,
 )
+from typing_extensions import TypeAlias #Needed for Python3.9
 
 import pytest
 
