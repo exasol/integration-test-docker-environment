@@ -24,11 +24,13 @@ DOCKER_HUB_REGISTRY_URL_REGEX = r"^.*docker.io/"
 
 # TODO align and extract save_path of DockerSaveImageTask and load_path of DockerLoadImageTask
 class DockerSaveImageBaseTask(DockerBaseTask):
-    image_name: str = luigi.Parameter()  # type: ignore
+    image_name: str = luigi.Parameter()
     force_save: bool = luigi.BoolParameter(
-        False, visibility=luigi.parameter.ParameterVisibility.HIDDEN
-    )  # type: ignore
-    save_path: str = luigi.Parameter(visibility=luigi.parameter.ParameterVisibility.HIDDEN)  # type: ignore
+        default=False, visibility=luigi.parameter.ParameterVisibility.HIDDEN
+    )
+    save_path: str = luigi.Parameter(
+        visibility=luigi.parameter.ParameterVisibility.HIDDEN
+    )
 
     def register_required(self):
         task = self.get_docker_image_task()

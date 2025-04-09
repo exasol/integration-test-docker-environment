@@ -73,17 +73,23 @@ def int_or_none(value: Optional[str]) -> Optional[int]:
 
 
 class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
-    environment_name: str = luigi.Parameter()  # type: ignore
-    db_container_name: str = luigi.Parameter()  # type: ignore
-    attempt: int = luigi.IntParameter(1)  # type: ignore
+    environment_name: str = luigi.Parameter()
+    db_container_name: str = luigi.Parameter()
+    attempt: int = luigi.IntParameter(default=1)
     network_info: DockerNetworkInfo = JsonPickleParameter(DockerNetworkInfo, significant=False)  # type: ignore
-    ip_address_index_in_subnet: int = luigi.IntParameter(significant=False)  # type: ignore
-    docker_runtime: Optional[str] = luigi.OptionalParameter(None, significant=False)  # type: ignore
-    certificate_volume_name: Optional[str] = luigi.OptionalParameter(None, significant=False)  # type: ignore
-    additional_db_parameter: Tuple[str, ...] = luigi.ListParameter()  # type: ignore
-    docker_environment_variables: Tuple[str, ...] = luigi.ListParameter()  # type: ignore
-    ssh_user: str = luigi.Parameter("root")  # type: ignore
-    ssh_key_file: Union[str, Path, None] = luigi.OptionalParameter(None, significant=False)  # type: ignore
+    ip_address_index_in_subnet: int = luigi.IntParameter(significant=False)
+    docker_runtime: Optional[str] = luigi.OptionalParameter(
+        default=None, significant=False
+    )
+    certificate_volume_name: Optional[str] = luigi.OptionalParameter(
+        default=None, significant=False
+    )
+    additional_db_parameter: Tuple[str, ...] = luigi.ListParameter()
+    docker_environment_variables: Tuple[str, ...] = luigi.ListParameter()
+    ssh_user: str = luigi.Parameter(default="root")
+    ssh_key_file: Union[str, Path, None] = luigi.OptionalParameter(
+        default=None, significant=False
+    )
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)

@@ -9,6 +9,6 @@ class DockerParameter(Config):
     """
 
     timeout: int = luigi.IntParameter(
-        100000, significant=False, visibility=ParameterVisibility.PRIVATE
-    )  # type: ignore
-    no_cache: bool = luigi.BoolParameter(False)  # type: ignore
+        default=100000, significant=False, visibility=ParameterVisibility.PRIVATE
+    )
+    no_cache: bool = luigi.BoolParameter(default=False)

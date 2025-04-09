@@ -25,7 +25,7 @@ from exasol_integration_test_docker_environment.lib.models.data.environment_info
 
 class PopulateTestDataToDatabase(DockerBaseTask, DatabaseCredentialsParameter):
 
-    environment_name: str = luigi.Parameter()  # type: ignore
+    environment_name: str = luigi.Parameter()
     test_environment_info: EnvironmentInfo = JsonPickleParameter(
         EnvironmentInfo, significant=False
     )  # type: ignore

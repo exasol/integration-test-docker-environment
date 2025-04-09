@@ -59,7 +59,7 @@ class TestDockerBuildBaseTestAnalyzeImage(DockerAnalyzeImageTask):
 
 
 class TestDockerBuildBase(DockerBuildBase):
-    goals: List[str] = luigi.ListParameter([])  # type: ignore
+    goals: List[str] = luigi.ListParameter(default=[])
 
     def get_goal_class_map(self) -> Dict[str, DockerAnalyzeImageTask]:
         goal_class_map: Dict[str, DockerAnalyzeImageTask] = {

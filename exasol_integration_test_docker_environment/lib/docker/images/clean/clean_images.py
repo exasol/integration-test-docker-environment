@@ -15,7 +15,7 @@ from exasol_integration_test_docker_environment.lib.docker.images.utils import (
 
 
 class CleanImageTask(DockerBaseTask):
-    image_id: str = luigi.Parameter()  # type: ignore
+    image_id: str = luigi.Parameter()
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
@@ -64,7 +64,7 @@ class CleanImageTask(DockerBaseTask):
 
 class CleanImagesStartingWith(DockerBaseTask):
 
-    starts_with_pattern: str = luigi.Parameter()  # type: ignore
+    starts_with_pattern: str = luigi.Parameter()
 
     def register_required(self):
         image_ids = [

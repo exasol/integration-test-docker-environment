@@ -12,7 +12,7 @@ from exasol_integration_test_docker_environment.lib.docker.images.image_info imp
 
 
 class DockerImageCreatorBaseTask(DockerBaseTask):
-    image_name: str = luigi.Parameter()  # type: ignore
+    image_name: str = luigi.Parameter()
     # ParameterVisibility needs to be hidden instead of private, because otherwise a MissingParameter gets thrown
     image_info: ImageInfo = JsonPickleParameter(
         ImageInfo,

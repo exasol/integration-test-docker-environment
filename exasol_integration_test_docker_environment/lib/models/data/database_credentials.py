@@ -12,13 +12,13 @@ class DatabaseCredentials:
 
 
 class DatabaseCredentialsParameter(Config):
-    db_user: str = luigi.Parameter()  # type: ignore
+    db_user: str = luigi.Parameter()
     db_password: str = luigi.Parameter(
         significant=False, visibility=luigi.parameter.ParameterVisibility.HIDDEN
-    )  # type: ignore
+    )
     bucketfs_write_password: str = luigi.Parameter(
         significant=False, visibility=luigi.parameter.ParameterVisibility.HIDDEN
-    )  # type: ignore
+    )
 
     def get_database_credentials(self):
         return DatabaseCredentials(
