@@ -23,3 +23,4 @@
  - #469: Updated to poetry 2.1.2
    - Updated `exasol-toolbox` to 1.0.0
  - #452: Use luigi mypy plugin for luigi parameters
+  -#472: Convert integration API test to pytest - part I
