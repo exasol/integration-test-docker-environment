@@ -154,7 +154,7 @@ def test_luigi_log_level_info_and_basic_logging_error(
     capfd, custom_logging, luigi_output
 ):
     """
-    This test checks if setting luigi log level to level INFO and global log level to ERROR
+    This test checks if setting luigi log level to INFO and global log level to ERROR
     prints error/info messages to stderr.
     Flag `use_job_specific_log_file` is set to False, which means the default luigi log configuration will be used.
     Note: This test does not work with `pytest -s ...`
@@ -184,7 +184,7 @@ def test_luigi_log_level_error_and_basic_logging_info(
     capfd, custom_logging, luigi_output
 ):
     """
-    This test checks if setting luigi log level to level ERROR and global log level to INFO
+    This test checks if setting luigi log level to ERROR and global log level to INFO
     prints only error messages to stderr, but no INFO messages to stderr.
     Flag `use_job_specific_log_file` is set to False, which means the default luigi log configuration will be used.
     Note: This test does not work with `pytest -s ...`
@@ -207,7 +207,7 @@ def test_luigi_log_level_error_multiple_calls_and_basic_logging_info(
     capfd, custom_logging, luigi_output
 ):
     """
-    This test checks if setting luigi log level to level ERROR and global log level to INFO
+    This test checks if setting luigi log level to ERROR and global log level to INFO
     prints only error messages to stderr, but no INFO messages; even when running a task multiple times.
     Flag `use_job_specific_log_file` is set to False, which means the default luigi log configuration will be used.
     Note: This test does not work with `pytest -s ...`
