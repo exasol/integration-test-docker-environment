@@ -1,7 +1,6 @@
 import contextlib
 import logging
 import re
-import sys
 import warnings
 from typing import (
     Any,
@@ -157,6 +156,7 @@ def test_luigi_log_level_info_and_basic_logging_error(
     """
     This test checks if setting luigi log level to level INFO and global log level to ERROR
     prints error/info messages to stderr.
+    Flag `use_job_specific_log_file` is set to False, which means the default luigi log configuration will be used.
     Note: This test does not work with `pytest -s ...`
     """
 
@@ -186,6 +186,7 @@ def test_luigi_log_level_error_and_basic_logging_info(
     """
     This test checks if setting luigi log level to level ERROR and global log level to INFO
     prints only error messages to stderr, but no INFO messages to stderr.
+    Flag `use_job_specific_log_file` is set to False, which means the default luigi log configuration will be used.
     Note: This test does not work with `pytest -s ...`
     """
     with custom_logging(log_level=logging.INFO) as error_log:
@@ -208,12 +209,12 @@ def test_luigi_log_level_error_multiple_calls_and_basic_logging_info(
     """
     This test checks if setting luigi log level to level ERROR and global log level to INFO
     prints only error messages to stderr, but no INFO messages; even when running a task multiple times.
+    Flag `use_job_specific_log_file` is set to False, which means the default luigi log configuration will be used.
     Note: This test does not work with `pytest -s ...`
     """
     with custom_logging(log_level=logging.INFO) as error_log:
 
         logger_infos_before = create_logger_infos()
-        result = dummy_api_command(log_level="ERROR", use_job_specific_log_file=False)
         result = dummy_api_command(log_level="ERROR", use_job_specific_log_file=False)
         logger_infos_after = create_logger_infos()
         assert_loggers_are_equal(logger_infos_after, logger_infos_before)
@@ -231,9 +232,10 @@ def test_luigi_use_job_specific_log_file_and_basic_logging_error(
     capfd, custom_logging, luigi_output
 ):
     """
-    This test checks if setting luigi log level to None and global log level to ERROR, and using flag
-    `use_job_specific_log_file`
-    prints no error messages to stderr/stdout, but writes the log messages to `main.log`.
+    This test sets luigi log level to None and global log level to ERROR.
+    Flag `use_job_specific_log_file` is set to True, which means the template luigi_log.conf will be used
+    for configuration of logging: The logs of the task must be printed to stdout and the Job specific log file
+    according to the format defined in `luigi_log.conf`.
     Note: This test does not work with `pytest -s ...`
     """
 
@@ -245,20 +247,14 @@ def test_luigi_use_job_specific_log_file_and_basic_logging_error(
         assert_loggers_are_equal(logger_infos_after, logger_infos_before)
         stdout_output, stderr_output = capfd.readouterr()
 
-        # Python3.12 (and later?) prints a deprecation warning.
-        if sys.version_info[1] < 12:
-            assert stderr_output == ""
-        else:
-            stderr_output_lines = stderr_output.split("\n")
-            assert len(stderr_output_lines) == 3
-            assert (
-                " is multi-threaded, use of fork() may lead to deadlocks in the child"
-                in stderr_output_lines[0]
-            )
-            assert stderr_output_lines[1] == "  self.pid = os.fork()"
-            assert stderr_output_lines[2] == ""
+        assert stderr_output == ""
+        regex = re.compile("ERROR - DummyTask_.*: DUMMY LOGGER ERROR")
+        assert regex.search(stdout_output) is not None
         main_log_glob = list(luigi_output.glob("**/main.log"))
-        assert len(main_log_glob) > 0
+        assert len(main_log_glob) == 1
+        main_log_file = list(main_log_glob)[0]
+        log_file_content = main_log_file.read_text()
+        assert regex.search(log_file_content) is not None
 
 
 def test_luigi_no_log_config_and_basic_logging_info(
@@ -267,6 +263,7 @@ def test_luigi_no_log_config_and_basic_logging_info(
     """
     This test checks if setting luigi log level to None and global log level to INFO
     prints error/info messages to stderr.
+    Flag `use_job_specific_log_file` is set to False, which means the default luigi log configuration will be used.
     Note: This test does not work with `pytest -s ...`
     """
     with custom_logging(log_level=logging.INFO) as error_log:
@@ -294,6 +291,7 @@ def test_luigi_no_log_config_and_basic_logging_error(
     """
     This test checks if setting luigi log level to None and global log level to ERROR
     prints error messages to stderr, but no INFO messages.
+    Flag `use_job_specific_log_file` is set to False, which means the default luigi log configuration will be used.
     Note: This test does not work with `pytest -s ...`
     """
     with custom_logging(log_level=logging.ERROR) as error_log:
