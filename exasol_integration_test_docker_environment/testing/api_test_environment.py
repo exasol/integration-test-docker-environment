@@ -81,6 +81,7 @@ class ApiTestEnvironment:
                 ssh_port_forward=ports.ssh,
                 docker_db_image_version=docker_db_image_version,
                 test_container_content=test_container_content,
+                output_directory=self.output_dir,
                 **additional_parameter,
             )
         )
@@ -101,6 +102,7 @@ class ApiTestEnvironment:
             bucketfs_port_forward=on_host.ports.bucketfs,
             ssh_port_forward=on_host.ports.ssh,
             docker_db_image_version=on_host.docker_db_image_version,
+            output_directory=self.output_dir,
             **additional_parameter,
         )
         return on_host

@@ -9,13 +9,16 @@ from typing import (
     Generator,
     Iterator,
     List,
-    NewType,
     Optional,
 )
 
 import pytest
+from typing_extensions import TypeAlias  # Needed for Python3.9
 
-from exasol_integration_test_docker_environment.testing import utils
+from exasol_integration_test_docker_environment.testing import (
+    luigi_utils,
+    utils,
+)
 from exasol_integration_test_docker_environment.testing.api_test_environment import (
     ApiTestEnvironment,
 )
@@ -28,8 +31,8 @@ from exasol_integration_test_docker_environment.testing.exaslct_test_environment
 )
 
 
-@pytest.fixture
-def cli_isolation(request) -> Iterator[ExaslctTestEnvironment]:
+@contextlib.contextmanager
+def _build_cli_isolation(request) -> Iterator[ExaslctTestEnvironment]:
     testname = normalize_request_name(request.node.name)
     environment = ExaslctTestEnvironment(
         test_object=None,
@@ -42,44 +45,53 @@ def cli_isolation(request) -> Iterator[ExaslctTestEnvironment]:
 
 
 @pytest.fixture
-def api_isolation(request) -> Iterator[ApiTestEnvironment]:
+def cli_isolation(request) -> Iterator[ExaslctTestEnvironment]:
+    with _build_cli_isolation(request) as environment:
+        yield environment
+
+
+@pytest.fixture(scope="module")
+def cli_isolation_module(request) -> Iterator[ExaslctTestEnvironment]:
+    with _build_cli_isolation(request) as environment:
+        yield environment
+
+
+@contextlib.contextmanager
+def _build_api_isolation(request) -> Iterator[ApiTestEnvironment]:
     testname = normalize_request_name(request.node.name)
     environment = ApiTestEnvironment(test_object=None, name=testname)
     yield environment
     utils.close_environments(environment)
-
-
-CliContextProvider = NewType(  # type: ignore
-    "CliContextProvider",
-    Callable[[Optional[str], Optional[List[str]]], SpawnedTestEnvironments],
-)
+    luigi_utils.clean(environment.docker_repository_name)
 
 
 @pytest.fixture
-def cli_database(
-    cli_isolation,
-) -> Callable[
-    [Optional[str], Optional[list[str]]], ContextManager[SpawnedTestEnvironments]
-]:
-    """
-    Returns a method that test case implementations can use to create a
-    context with a database.
+def api_isolation(request) -> Iterator[ApiTestEnvironment]:
+    with _build_api_isolation(request) as environment:
+        yield environment
 
-    The test case optionally can pass a name and additional parameters for
-    spawning the database:
 
-    def test_case(database):
-        with database(additional_parameters = ["--option"]):
-            ...
-    """
+@pytest.fixture(scope="module")
+def api_isolation_module(request) -> Iterator[ApiTestEnvironment]:
+    with _build_api_isolation(request) as environment:
+        yield environment
 
+
+CliContextProvider: TypeAlias = Callable[
+    [Optional[str], Optional[List[str]]], ContextManager[SpawnedTestEnvironments]
+]
+
+
+def _build_cli_context_provider(
+    test_environment: ExaslctTestEnvironment,
+) -> CliContextProvider:
     @contextlib.contextmanager
     def create_context(
         name: Optional[str] = None,
         additional_parameters: Optional[List[str]] = None,
     ) -> Iterator[SpawnedTestEnvironments]:
-        name = name if name else cli_isolation.name
-        spawned = cli_isolation.spawn_docker_test_environments(
+        name = name if name else test_environment.name
+        spawned = test_environment.spawn_docker_test_environments(
             name=name,
             additional_parameter=additional_parameters,
         )
@@ -89,21 +101,64 @@ def cli_database(
     return create_context
 
 
-ApiContextProvider = NewType(  # type: ignore
-    "ApiContextProvider",
-    Callable[[Optional[str], Optional[Dict[str, Any]]], ExaslctDockerTestEnvironment],
-)
-
-
 @pytest.fixture
-def api_database(api_isolation: ApiTestEnvironment) -> ApiContextProvider:
+def cli_database(
+    cli_isolation,
+) -> CliContextProvider:
+    """
+    Returns a method that test case implementations can use to create a
+    context with a database.
+
+    This fixture should be used on function level, in cases where one
+    database is required per test.
+
+    The test case optionally can pass a name and additional parameters for
+    spawning the database:
+
+    def test_case(cli_database):
+        with cli_database(additional_parameters = ["--option"]):
+            ...
+    """
+    return _build_cli_context_provider(cli_isolation)
+
+
+@pytest.fixture(scope="module")
+def cli_database_module(
+    cli_isolation_module,
+) -> CliContextProvider:
+    """
+    Returns a method that test case implementations can use to create a
+    context with a database.
+
+    This fixture should be used on module level, in cases where one
+    database is required for all tests in the module.
+
+    The test case optionally can pass a name and additional parameters for
+    spawning the database:
+
+    def test_case(cli_database_module):
+        with cli_database_module(additional_parameters = ["--option"]):
+            ...
+    """
+    return _build_cli_context_provider(cli_isolation_module)
+
+
+ApiContextProvider: TypeAlias = Callable[
+    [Optional[str], Optional[Dict[str, Any]]],
+    ContextManager[ExaslctDockerTestEnvironment],
+]
+
+
+def _build_api_context_provider(
+    test_environment: ApiTestEnvironment,
+) -> ApiContextProvider:
     @contextlib.contextmanager
     def create_context(
         name: Optional[str] = None,
         additional_parameters: Optional[Dict[str, Any]] = None,
     ) -> Generator[ExaslctDockerTestEnvironment, None, None]:
-        name = name if name else api_isolation.name
-        spawned = api_isolation.spawn_docker_test_environment(
+        name = name if name else test_environment.name
+        spawned = test_environment.spawn_docker_test_environment(
             name=name,
             additional_parameter=additional_parameters,
         )
@@ -111,6 +166,43 @@ def api_database(api_isolation: ApiTestEnvironment) -> ApiContextProvider:
         utils.close_environments(spawned)
 
     return create_context  # type: ignore
+
+
+@pytest.fixture
+def api_database(api_isolation: ApiTestEnvironment) -> ApiContextProvider:
+    """
+    Returns a method that test case implementations can use to create a
+    context with a database.
+
+    This fixture should be used on function level, in cases where one
+    database is required per test.
+
+    The test case optionally can pass a name and additional parameters for
+    spawning the database:
+
+    def test_case(api_database):
+        with api_database(additional_parameters = ["--option"]):
+            ...
+    """
+    return _build_api_context_provider(api_isolation)
+
+
+@pytest.fixture(scope="module")
+def api_database_module(api_isolation_module: ApiTestEnvironment) -> ApiContextProvider:
+    """
+    Returns a method that test case implementations can use to create a
+    context with a database.
+    This fixture should be used on module level, in cases where one
+    database is required for all tests in the module.
+
+    The test case optionally can pass a name and additional parameters for
+    spawning the database:
+
+    def test_case(api_database_module):
+        with api_database_module(additional_parameters = ["--option"]):
+            ...
+    """
+    return _build_api_context_provider(api_isolation_module)
 
 
 @pytest.fixture
