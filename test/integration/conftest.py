@@ -1,7 +1,5 @@
 import contextlib
 import io
-
-from exasol_integration_test_docker_environment.lib.models.config.build_config import set_build_config
 from test.integration.helpers import normalize_request_name
 from typing import (
     Any,
@@ -17,6 +15,9 @@ from typing import (
 import pytest
 from typing_extensions import TypeAlias  # Needed for Python3.9
 
+from exasol_integration_test_docker_environment.lib.models.config.build_config import (
+    set_build_config,
+)
 from exasol_integration_test_docker_environment.testing import (
     luigi_utils,
     utils,
@@ -216,6 +217,7 @@ def fabric_stdin(monkeypatch):
     See https://github.com/fabric/fabric/issues/2005
     """
     monkeypatch.setattr("sys.stdin", io.StringIO(""))
+
 
 @pytest.fixture
 def luigi_output(tmp_path):

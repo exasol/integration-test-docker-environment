@@ -21,9 +21,7 @@ from exasol_integration_test_docker_environment.lib.utils.resource_directory imp
 
 def assert_image_exists(prefix):
     with ContextDockerClient() as docker_client:
-        image_list = find_images_by_tag(
-            docker_client, lambda x: x.startswith(prefix)
-        )
+        image_list = find_images_by_tag(docker_client, lambda x: x.startswith(prefix))
         assert len(image_list) == 1, f"Image with prefix {prefix} not found"
 
 
@@ -52,4 +50,3 @@ def test_build(luigi_output, api_isolation_module, tmpdir):
         )
     finally:
         task.cleanup(success)
-
