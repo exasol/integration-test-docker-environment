@@ -126,23 +126,22 @@ def _run_it(different_grandchild, use_dynamic_dependency, expected_result):
             shutil.rmtree(str(task._get_tmp_path_for_job()))
     assert global_counter == expected_result, "number of Cleanups not matching"
 
+
 def test_cleanup_of_grandchildren_called_only_once():
     """
     Test that creating the same grandchild task by two different parent tasks, will invoke cleanup of grandchild
     task only once! Luigi takes care of invoking run only once, we take care to invoke cleanup() only once.
     """
-    _run_it(
-        different_grandchild=False, use_dynamic_dependency=False, expected_result=1
-    )
+    _run_it(different_grandchild=False, use_dynamic_dependency=False, expected_result=1)
+
 
 def test_cleanup_of_grandchildren_called_twice():
     """
     Test that creating grandchild task with different parameters by two different parent tasks,
     will invoke cleanup of grandchild twice.
     """
-    _run_it(
-        different_grandchild=True, use_dynamic_dependency=False, expected_result=2
-    )
+    _run_it(different_grandchild=True, use_dynamic_dependency=False, expected_result=2)
+
 
 def test_cleanup_of_grandchildren_called_only_once_dynamic():
     """
@@ -150,9 +149,8 @@ def test_cleanup_of_grandchildren_called_only_once_dynamic():
     task only once! Luigi takes care of invoking run only once, we take care to invoke cleanup() only once.
     In this test all child tasks are created dynamically.
     """
-    _run_it(
-        different_grandchild=False, use_dynamic_dependency=True, expected_result=1
-    )
+    _run_it(different_grandchild=False, use_dynamic_dependency=True, expected_result=1)
+
 
 def test_cleanup_of_grandchildren_called_twice_dynamic():
     """
@@ -160,7 +158,4 @@ def test_cleanup_of_grandchildren_called_twice_dynamic():
     will invoke cleanup of grandchild twice.
     In this test all child tasks are created dynamically.
     """
-    _run_it(
-        different_grandchild=True, use_dynamic_dependency=True, expected_result=2
-    )
-
+    _run_it(different_grandchild=True, use_dynamic_dependency=True, expected_result=2)
