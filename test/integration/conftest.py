@@ -199,7 +199,7 @@ def api_default_database_module(
     Provides a default database environment.
     """
     provider = _build_api_context_provider(api_isolation_module)
-    with provider() as db:
+    with provider(None, None) as db:
         yield db
 
 
@@ -255,7 +255,7 @@ def api_default_database_with_test_conainer_module(
     """
 
     provider = _build_api_context_provider_with_test_container(api_isolation_module)
-    with provider() as db:
+    with provider(None, None) as db:
         yield db
 
 
