@@ -1,3 +1,5 @@
+from typing import List
+
 import pytest
 
 from exasol_integration_test_docker_environment.lib.base.run_task import (
@@ -21,11 +23,19 @@ from exasol_integration_test_docker_environment.test.get_test_container_content 
     get_test_container_content,
 )
 
+def find_docker_containers(search_pattern: str) -> List[str]:
+    with ContextDockerClient() as docker_client:
+        containers = [
+            c.name
+            for c in docker_client.containers.list()
+            if search_pattern in c.name
+        ]
+        return containers
 
 @pytest.fixture(scope="module")
-def spawn_test_environment(api_database_module, api_isolation_module):
+def spawn_test_environment(request, api_database_module, api_isolation_module):
     with api_database_module() as db:
-        ext_environment_name = "APISpawnExternalTestExternalEnvironmentTest"
+        ext_environment_name = request.module.__name__
         task_creator = lambda: generate_root_task(
             task_class=SpawnTestEnvironment,
             environment_type=EnvironmentType.external_db,
@@ -52,34 +62,20 @@ def spawn_test_environment(api_database_module, api_isolation_module):
         ext_environment_info: EnvironmentInfo = run_task(task_creator, 1, None)
         yield ext_environment_name, ext_environment_info, db.name
 
-        with ContextDockerClient() as docker_client:
-            containers = [
-                c.name
-                for c in docker_client.containers.list()
-                if ext_environment_name in c.name
-            ]
-            remove_docker_container(containers)
+        containers = find_docker_containers(ext_environment_name)
+        remove_docker_container(containers)
 
 
 def test_external_db(spawn_test_environment):
     ext_environment_name, _, docker_environment_name = spawn_test_environment
-    with ContextDockerClient() as docker_client:
-        containers = [
-            c.name
-            for c in docker_client.containers.list()
-            if docker_environment_name in c.name
-        ]
-        assert len(containers) == 1, f"Not exactly 1 containers in {containers}."
-        db_container = [c for c in containers if "db_container" in c]
-        assert len(db_container) == 1, f"Found no db container in {containers}."
-        containers = [
-            c.name
-            for c in docker_client.containers.list()
-            if ext_environment_name in c.name
-        ]
-        assert len(containers) == 1, f"Not exactly 1 containers in {containers}."
-        test_container = [c for c in containers if "test_container" in c]
-        assert len(test_container) == 1, f"Found no test container in {containers}."
+    db_containers = find_docker_containers(docker_environment_name)
+    test_containers = find_docker_containers(ext_environment_name)
+    assert len(db_containers) == 1, f"Not exactly 1 containers in {db_containers}."
+    db_container = [c for c in db_containers if "db_container" in c]
+    assert len(db_container) == 1, f"Found no db container in {db_containers}."
+    assert len(test_containers) == 1, f"Not exactly 1 containers in {test_containers}."
+    test_container = [c for c in test_containers if "test_container" in c]
+    assert len(test_container) == 1, f"Found no test container in {test_containers}."
 
 
 def test_docker_available_in_test_container(spawn_test_environment):
