@@ -25,9 +25,13 @@ def test_build_test_container(api_isolation):
         try:
             image = docker_client.images.get(image_info.get_target_complete_name())
         except docker.errors.ImageNotFound as e:
-            available_images = [" ".join(img.tags) for img in docker_client.images.list()]
+            available_images = [
+                " ".join(img.tags) for img in docker_client.images.list()
+            ]
             available_images_str = "\n".join(available_images)
-            pytest.fail(f"Failed to find image '{image_info.get_target_complete_name()}'. Available images: \n{available_images_str}")
+            pytest.fail(
+                f"Failed to find image '{image_info.get_target_complete_name()}'. Available images: \n{available_images_str}"
+            )
         assert len(image.tags) == 1
         assert image.tags[0] == image_info.get_target_complete_name()
         assert image_info.image_state == ImageState.WAS_BUILD.name
