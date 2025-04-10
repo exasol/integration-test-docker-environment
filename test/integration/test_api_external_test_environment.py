@@ -33,43 +33,43 @@ def find_docker_containers(search_pattern: str) -> List[str]:
 
 
 @pytest.fixture(scope="module")
-def spawn_test_environment(request, api_database_module, api_isolation_module):
+def spawn_test_environment(request, api_default_database_module):
     """
     Spawn a test environment with an external database.
     There is no API function available to do that (decision was made that this is not useful for clients other than exaslct).
     So the raw `SpawnTestEnvironment` needs to be launched here.
 
     """
-    with api_database_module() as db:
-        ext_environment_name = request.module.__name__
-        task_creator = lambda: generate_root_task(
-            task_class=SpawnTestEnvironment,
-            environment_type=EnvironmentType.external_db,
-            environment_name=ext_environment_name,
-            external_exasol_db_host=db.database_host,
-            external_exasol_db_port=db.ports.database,
-            external_exasol_bucketfs_port=db.ports.bucketfs,
-            external_exasol_ssh_port=db.ports.ssh,
-            external_exasol_db_user=db.db_username,
-            external_exasol_db_password=db.db_password,
-            external_exasol_bucketfs_write_password=db.bucketfs_password,
-            external_exasol_xmlrpc_host=None,
-            external_exasol_xmlrpc_port=443,
-            external_exasol_xmlrpc_user="admin",
-            external_exasol_xmlrpc_password=None,
-            external_exasol_xmlrpc_cluster_name="cluster1",
-            no_test_container_cleanup_after_success=True,
-            no_test_container_cleanup_after_failure=False,
-            reuse_test_container=True,
-            test_container_content=get_test_container_content(),
-            additional_db_parameter=tuple(),
-            docker_environment_variables=tuple(),
-        )
-        ext_environment_info: EnvironmentInfo = run_task(task_creator, 1, None)
-        yield ext_environment_name, ext_environment_info, db.name
+    db = api_default_database_module
+    ext_environment_name = request.module.__name__
+    task_creator = lambda: generate_root_task(
+        task_class=SpawnTestEnvironment,
+        environment_type=EnvironmentType.external_db,
+        environment_name=ext_environment_name,
+        external_exasol_db_host=db.database_host,
+        external_exasol_db_port=db.ports.database,
+        external_exasol_bucketfs_port=db.ports.bucketfs,
+        external_exasol_ssh_port=db.ports.ssh,
+        external_exasol_db_user=db.db_username,
+        external_exasol_db_password=db.db_password,
+        external_exasol_bucketfs_write_password=db.bucketfs_password,
+        external_exasol_xmlrpc_host=None,
+        external_exasol_xmlrpc_port=443,
+        external_exasol_xmlrpc_user="admin",
+        external_exasol_xmlrpc_password=None,
+        external_exasol_xmlrpc_cluster_name="cluster1",
+        no_test_container_cleanup_after_success=True,
+        no_test_container_cleanup_after_failure=False,
+        reuse_test_container=True,
+        test_container_content=get_test_container_content(),
+        additional_db_parameter=tuple(),
+        docker_environment_variables=tuple(),
+    )
+    ext_environment_info: EnvironmentInfo = run_task(task_creator, 1, None)
+    yield ext_environment_name, ext_environment_info, db.name
 
-        containers = find_docker_containers(ext_environment_name)
-        remove_docker_container(containers)
+    containers = find_docker_containers(ext_environment_name)
+    remove_docker_container(containers)
 
 
 def test_external_db(spawn_test_environment):
