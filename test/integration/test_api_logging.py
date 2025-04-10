@@ -2,6 +2,7 @@ import contextlib
 import logging
 import re
 import warnings
+from test.matchers import regex_matcher
 from typing import (
     Any,
     Dict,
@@ -17,7 +18,6 @@ from exasol_integration_test_docker_environment.lib.base.run_task import (
 from exasol_integration_test_docker_environment.lib.models.config.build_config import (
     set_build_config,
 )
-from test.matchers import regex_matcher
 
 LOGGER_STR = "logger_str"
 
@@ -169,9 +169,15 @@ def test_luigi_log_level_info_and_basic_logging_error(
         stdout_output, stderr_output = capfd.readouterr()
         assert stdout_output == ""
         assert stderr_output != ""
-        assert stderr_output == regex_matcher(create_test_regex(logging.ERROR), re.DOTALL)
-        assert stderr_output == regex_matcher(create_test_regex(logging.INFO), re.DOTALL)
-        assert stderr_output == regex_matcher(".*===== Luigi Execution Summary =====.*", re.DOTALL)
+        assert stderr_output == regex_matcher(
+            create_test_regex(logging.ERROR), re.DOTALL
+        )
+        assert stderr_output == regex_matcher(
+            create_test_regex(logging.INFO), re.DOTALL
+        )
+        assert stderr_output == regex_matcher(
+            ".*===== Luigi Execution Summary =====.*", re.DOTALL
+        )
 
         main_log_glob = list(luigi_output.glob("**/main.log"))
         assert main_log_glob == []
@@ -194,8 +200,12 @@ def test_luigi_log_level_error_and_basic_logging_info(
         stdout_output, stderr_output = capfd.readouterr()
         assert stdout_output == ""
         assert stderr_output != ""
-        assert stderr_output == regex_matcher(create_test_regex(logging.ERROR), re.DOTALL)
-        assert stderr_output != regex_matcher(create_test_regex(logging.INFO), re.DOTALL)
+        assert stderr_output == regex_matcher(
+            create_test_regex(logging.ERROR), re.DOTALL
+        )
+        assert stderr_output != regex_matcher(
+            create_test_regex(logging.INFO), re.DOTALL
+        )
         main_log_glob = list(luigi_output.glob("**/main.log"))
         assert main_log_glob == []
 
@@ -219,8 +229,12 @@ def test_luigi_log_level_error_multiple_calls_and_basic_logging_info(
         stdout_output, stderr_output = capfd.readouterr()
         assert stdout_output == ""
         assert stderr_output != ""
-        assert stderr_output == regex_matcher(create_test_regex(logging.ERROR), re.DOTALL)
-        assert stderr_output != regex_matcher(create_test_regex(logging.INFO), re.DOTALL)
+        assert stderr_output == regex_matcher(
+            create_test_regex(logging.ERROR), re.DOTALL
+        )
+        assert stderr_output != regex_matcher(
+            create_test_regex(logging.INFO), re.DOTALL
+        )
         assert 2 == stderr_output.count("DUMMY LOGGER ERROR")
         main_log_glob = list(luigi_output.glob("**/main.log"))
         assert main_log_glob == []
@@ -246,13 +260,13 @@ def test_luigi_use_job_specific_log_file_and_basic_logging_error(
         stdout_output, stderr_output = capfd.readouterr()
 
         assert stderr_output == ""
-        regex_error = (".*ERROR - DummyTask_.*: DUMMY LOGGER ERROR.*")
+        regex_error = ".*ERROR - DummyTask_.*: DUMMY LOGGER ERROR.*"
         assert stdout_output == regex_matcher(regex_error, re.DOTALL)
         main_log_glob = list(luigi_output.glob("**/main.log"))
         assert len(main_log_glob) == 1
         main_log_file = list(main_log_glob)[0]
         log_file_content = main_log_file.read_text()
-        regex_info = (".*INFO - DummyTask_.*: DUMMY LOGGER INFO.*")
+        regex_info = ".*INFO - DummyTask_.*: DUMMY LOGGER INFO.*"
         assert log_file_content == regex_matcher(regex_error, re.DOTALL)
         assert log_file_content == regex_matcher(regex_info, re.DOTALL)
 
@@ -275,9 +289,15 @@ def test_luigi_no_log_config_and_basic_logging_info(
         assert stdout_output == ""
         assert stderr_output != ""
 
-        assert stderr_output == regex_matcher(create_test_regex(logging.ERROR), re.DOTALL)
-        assert stderr_output == regex_matcher(create_test_regex(logging.INFO), re.DOTALL)
-        assert stderr_output == regex_matcher(".*===== Luigi Execution Summary =====.*", re.DOTALL)
+        assert stderr_output == regex_matcher(
+            create_test_regex(logging.ERROR), re.DOTALL
+        )
+        assert stderr_output == regex_matcher(
+            create_test_regex(logging.INFO), re.DOTALL
+        )
+        assert stderr_output == regex_matcher(
+            ".*===== Luigi Execution Summary =====.*", re.DOTALL
+        )
         main_log_glob = list(luigi_output.glob("**/main.log"))
         assert main_log_glob == []
 
@@ -300,8 +320,12 @@ def test_luigi_no_log_config_and_basic_logging_error(
         assert stdout_output == ""
         assert stderr_output != ""
 
-        assert stderr_output == regex_matcher(create_test_regex(logging.ERROR), re.DOTALL)
-        assert stderr_output != regex_matcher(create_test_regex(logging.INFO), re.DOTALL)
+        assert stderr_output == regex_matcher(
+            create_test_regex(logging.ERROR), re.DOTALL
+        )
+        assert stderr_output != regex_matcher(
+            create_test_regex(logging.INFO), re.DOTALL
+        )
         main_log_glob = list(luigi_output.glob("**/main.log"))
         assert main_log_glob == []
 

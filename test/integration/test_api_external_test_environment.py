@@ -23,17 +23,23 @@ from exasol_integration_test_docker_environment.test.get_test_container_content 
     get_test_container_content,
 )
 
+
 def find_docker_containers(search_pattern: str) -> List[str]:
     with ContextDockerClient() as docker_client:
         containers = [
-            c.name
-            for c in docker_client.containers.list()
-            if search_pattern in c.name
+            c.name for c in docker_client.containers.list() if search_pattern in c.name
         ]
         return containers
 
+
 @pytest.fixture(scope="module")
 def spawn_test_environment(request, api_database_module, api_isolation_module):
+    """
+    Spawn a test environment with an external database.
+    There is no API function available to do that (decision was made that this is not useful for clients other than exaslct).
+    So the raw `SpawnTestEnvironment` needs to be laumched here.
+
+    """
     with api_database_module() as db:
         ext_environment_name = request.module.__name__
         task_creator = lambda: generate_root_task(
