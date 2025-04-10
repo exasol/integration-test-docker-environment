@@ -37,7 +37,7 @@ def spawn_test_environment(request, api_database_module, api_isolation_module):
     """
     Spawn a test environment with an external database.
     There is no API function available to do that (decision was made that this is not useful for clients other than exaslct).
-    So the raw `SpawnTestEnvironment` needs to be laumched here.
+    So the raw `SpawnTestEnvironment` needs to be launched here.
 
     """
     with api_database_module() as db:
