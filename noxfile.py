@@ -78,6 +78,7 @@ def run_minimal_tests(session: nox.Session, db_version: str):
             "test_cli_environment.py",
             "test_db_container_log_thread.py",
             "test_api_logging.py",
+            "test_base_task.py"
         ],
         "unit": ["./test/unit"],
     }
