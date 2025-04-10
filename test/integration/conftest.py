@@ -1,7 +1,5 @@
 import contextlib
 import io
-
-from exasol_integration_test_docker_environment.test.get_test_container_content import get_test_container_content
 from test.integration.helpers import normalize_request_name
 from typing import (
     Any,
@@ -17,6 +15,9 @@ from typing import (
 import pytest
 from typing_extensions import TypeAlias  # Needed for Python3.9
 
+from exasol_integration_test_docker_environment.test.get_test_container_content import (
+    get_test_container_content,
+)
 from exasol_integration_test_docker_environment.testing import (
     luigi_utils,
     utils,
@@ -191,7 +192,9 @@ def api_database(api_isolation: ApiTestEnvironment) -> ApiContextProvider:
 
 
 @pytest.fixture(scope="module")
-def api_default_database_module(api_isolation_module: ApiTestEnvironment) -> Iterator[ExaslctDockerTestEnvironment]:
+def api_default_database_module(
+    api_isolation_module: ApiTestEnvironment,
+) -> Iterator[ExaslctDockerTestEnvironment]:
     """
     Provides a default database environment.
     """
@@ -201,13 +204,13 @@ def api_default_database_module(api_isolation_module: ApiTestEnvironment) -> Ite
 
 
 def _build_api_context_provider_with_test_container(
-        test_environment: ApiTestEnvironment,
+    test_environment: ApiTestEnvironment,
 ) -> ApiContextProvider:
     @contextlib.contextmanager
     def create_context(
-            name: Optional[str] = None,
-            additional_parameters: Optional[Dict[str, Any]] = None,
-            test_container_content = get_test_container_content()
+        name: Optional[str] = None,
+        additional_parameters: Optional[Dict[str, Any]] = None,
+        test_container_content=get_test_container_content(),
     ) -> Generator[ExaslctDockerTestEnvironment, None, None]:
         name = name if name else test_environment.name
         spawned = test_environment.spawn_docker_test_environment_with_test_container(
@@ -221,9 +224,10 @@ def _build_api_context_provider_with_test_container(
     return create_context  # type: ignore
 
 
-
 @pytest.fixture
-def api_database_with_test_container(api_isolation: ApiTestEnvironment) -> ApiContextProvider:
+def api_database_with_test_container(
+    api_isolation: ApiTestEnvironment,
+) -> ApiContextProvider:
     """
     Returns a method that test case implementations can use to create a
     context with a database + test container.
@@ -241,8 +245,11 @@ def api_database_with_test_container(api_isolation: ApiTestEnvironment) -> ApiCo
     """
     return _build_api_context_provider_with_test_container(api_isolation)
 
+
 @pytest.fixture(scope="module")
-def api_default_database_with_test_conainer_module(api_isolation_module: ApiTestEnvironment) -> Iterator[ExaslctDockerTestEnvironment]:
+def api_default_database_with_test_conainer_module(
+    api_isolation_module: ApiTestEnvironment,
+) -> Iterator[ExaslctDockerTestEnvironment]:
     """
     Provides a default database + test container environment.
     """
