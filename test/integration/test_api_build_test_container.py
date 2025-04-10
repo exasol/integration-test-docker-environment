@@ -1,3 +1,6 @@
+import docker
+import pytest
+
 from exasol_integration_test_docker_environment.lib import api
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.lib.docker.images.image_info import (
@@ -19,7 +22,12 @@ def test_build_test_container(api_isolation):
         output_directory=api_isolation.output_dir,
     )
     with ContextDockerClient() as docker_client:
-        image = docker_client.images.get(image_info.get_target_complete_name())
+        try:
+            image = docker_client.images.get(image_info.get_target_complete_name())
+        except docker.errors.ImageNotFound as e:
+            available_images = [" ".join(img.tags) for img in docker_client.images.list()]
+            available_images_str = "\n".join(available_images)
+            pytest.fail(f"Failed to find image '{image_info.get_target_complete_name()}'. Available images: \n{available_images_str}")
         assert len(image.tags) == 1
         assert image.tags[0] == image_info.get_target_complete_name()
         assert image_info.image_state == ImageState.WAS_BUILD.name
