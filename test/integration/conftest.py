@@ -109,11 +109,14 @@ def cli_database(
     Returns a method that test case implementations can use to create a
     context with a database.
 
+    This fixture should be used on function level, in cases where one
+    database is required per test.
+
     The test case optionally can pass a name and additional parameters for
     spawning the database:
 
-    def test_case(database):
-        with database(additional_parameters = ["--option"]):
+    def test_case(cli_database):
+        with cli_database(additional_parameters = ["--option"]):
             ...
     """
     return _build_cli_context_provider(cli_isolation)
@@ -127,11 +130,14 @@ def cli_database_module(
     Returns a method that test case implementations can use to create a
     context with a database.
 
+    This fixture should be used on module level, in cases where one
+    database is required for all tests in the module.
+
     The test case optionally can pass a name and additional parameters for
     spawning the database:
 
-    def test_case(database):
-        with database(additional_parameters = ["--option"]):
+    def test_case(cli_database_module):
+        with cli_database_module(additional_parameters = ["--option"]):
             ...
     """
     return _build_cli_context_provider(cli_isolation_module)
@@ -164,11 +170,38 @@ def _build_api_context_provider(
 
 @pytest.fixture
 def api_database(api_isolation: ApiTestEnvironment) -> ApiContextProvider:
+    """
+    Returns a method that test case implementations can use to create a
+    context with a database.
+
+    This fixture should be used on function level, in cases where one
+    database is required per test.
+
+    The test case optionally can pass a name and additional parameters for
+    spawning the database:
+
+    def test_case(api_database):
+        with api_database(additional_parameters = ["--option"]):
+            ...
+    """
     return _build_api_context_provider(api_isolation)
 
 
 @pytest.fixture(scope="module")
 def api_database_module(api_isolation_module: ApiTestEnvironment) -> ApiContextProvider:
+    """
+    Returns a method that test case implementations can use to create a
+    context with a database.
+    This fixture should be used on module level, in cases where one
+    database is required for all tests in the module.
+
+    The test case optionally can pass a name and additional parameters for
+    spawning the database:
+
+    def test_case(api_database_module):
+        with api_database_module(additional_parameters = ["--option"]):
+            ...
+    """
     return _build_api_context_provider(api_isolation_module)
 
 
