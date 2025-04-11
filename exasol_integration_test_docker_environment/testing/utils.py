@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import unittest
 from typing import (
     Callable,
@@ -51,3 +52,8 @@ def find_docker_container_names(container_name_substr: str) -> List[str]:
             if container_name_substr in c.name
         ]
         return containers
+
+
+def normalize_request_name(name: str):
+    name = re.sub(r"[\[\]._]+", "_", name)
+    return re.sub(r"^_+|_+$", "", name)
