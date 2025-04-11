@@ -32,7 +32,8 @@ def environment_with_certificate(
         api_isolation_module, get_test_container_content()
     )
     with provider(
-        additional_parameters=additional_parameter,
+        None,
+        additional_parameter,
     ) as db:
         yield db
 
