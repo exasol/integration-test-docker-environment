@@ -39,7 +39,7 @@ def _assert_deployment_not_shared(environment_info: EnvironmentInfo, temp_path: 
         assert local_path.exists()
 
         local_path = temp_path / "test_new.txt"
-        assert local_path.exists() == False
+        assert not local_path.exists()
 
 
 @pytest.fixture

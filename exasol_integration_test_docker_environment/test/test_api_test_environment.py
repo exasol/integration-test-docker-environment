@@ -18,6 +18,7 @@ from exasol_integration_test_docker_environment.testing import utils
 from exasol_integration_test_docker_environment.testing.api_test_environment import (
     ApiTestEnvironment,
 )
+from exasol_integration_test_docker_environment.testing.utils import find_docker_container_names
 
 
 class APISpawnTestEnvironmentTest(unittest.TestCase):
@@ -39,23 +40,18 @@ class APISpawnTestEnvironmentTest(unittest.TestCase):
         utils.close_environments(cls.environment, cls.test_environment)
 
     def test_all_containers_started(self):
-        with ContextDockerClient() as docker_client:
-            containers = [
-                c.name
-                for c in docker_client.containers.list()
-                if self.docker_environment_name in c.name
-            ]
-            self.assertEqual(
-                len(containers), 2, f"Not exactly 2 containers in {containers}."
-            )
-            db_container = [c for c in containers if "db_container" in c]
-            self.assertEqual(
-                len(db_container), 1, f"Found no db container in {containers}."
-            )
-            test_container = [c for c in containers if "test_container" in c]
-            self.assertEqual(
-                len(test_container), 1, f"Found no test container in {containers}."
-            )
+        containers = find_docker_container_names(self.docker_environment_name)
+        self.assertEqual(
+            len(containers), 2, f"Not exactly 2 containers in {containers}."
+        )
+        db_container = [c for c in containers if "db_container" in c]
+        self.assertEqual(
+            len(db_container), 1, f"Found no db container in {containers}."
+        )
+        test_container = [c for c in containers if "test_container" in c]
+        self.assertEqual(
+            len(test_container), 1, f"Found no test container in {containers}."
+        )
 
     def test_docker_available_in_test_container(self):
         environment_info = self.environment.environment_info

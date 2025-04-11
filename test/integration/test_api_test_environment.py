@@ -1,4 +1,5 @@
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
+from exasol_integration_test_docker_environment.testing.utils import find_docker_container_names
 
 
 def test_environment_info_set(api_default_database_with_test_conainer_module):
@@ -7,17 +8,12 @@ def test_environment_info_set(api_default_database_with_test_conainer_module):
 
 def test_all_containers_started(api_default_database_with_test_conainer_module):
     test_environment = api_default_database_with_test_conainer_module
-    with ContextDockerClient() as docker_client:
-        containers = [
-            c.name
-            for c in docker_client.containers.list()
-            if test_environment.name in c.name
-        ]
-        assert len(containers) == 2, f"Not exactly 2 containers in {containers}."
-        db_container = [c for c in containers if "db_container" in c]
-        assert len(db_container) == 1, f"Found no db container in {containers}."
-        test_container = [c for c in containers if "test_container" in c]
-        assert len(test_container) == 1, f"Found no test container in {containers}."
+    containers = find_docker_container_names(test_environment.name)
+    assert len(containers) == 2, f"Not exactly 2 containers in {containers}."
+    db_container = [c for c in containers if "db_container" in c]
+    assert len(db_container) == 1, f"Found no db container in {containers}."
+    test_container = [c for c in containers if "test_container" in c]
+    assert len(test_container) == 1, f"Found no test container in {containers}."
 
 
 def test_docker_available_in_test_container(

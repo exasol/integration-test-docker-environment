@@ -22,14 +22,7 @@ from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_
 from exasol_integration_test_docker_environment.test.get_test_container_content import (
     get_test_container_content,
 )
-
-
-def find_docker_containers(search_pattern: str) -> List[str]:
-    with ContextDockerClient() as docker_client:
-        containers = [
-            c.name for c in docker_client.containers.list() if search_pattern in c.name
-        ]
-        return containers
+from exasol_integration_test_docker_environment.testing.utils import find_docker_container_names
 
 
 @pytest.fixture(scope="module")
@@ -68,14 +61,14 @@ def spawn_test_environment(request, api_default_database_module):
     ext_environment_info: EnvironmentInfo = run_task(task_creator, 1, None)
     yield ext_environment_name, ext_environment_info, db.name
 
-    containers = find_docker_containers(ext_environment_name)
+    containers = find_docker_container_names(ext_environment_name)
     remove_docker_container(containers)
 
 
 def test_external_db(spawn_test_environment):
     ext_environment_name, _, docker_environment_name = spawn_test_environment
-    db_containers = find_docker_containers(docker_environment_name)
-    test_containers = find_docker_containers(ext_environment_name)
+    db_containers = find_docker_container_names(docker_environment_name)
+    test_containers = find_docker_container_names(ext_environment_name)
     assert len(db_containers) == 1, f"Not exactly 1 containers in {db_containers}."
     db_container = [c for c in db_containers if "db_container" in c]
     assert len(db_container) == 1, f"Found no db container in {db_containers}."
