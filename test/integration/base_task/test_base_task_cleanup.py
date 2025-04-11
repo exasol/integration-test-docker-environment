@@ -1,20 +1,13 @@
-import shutil
-import unittest
-
 import luigi
 from luigi import (
     BoolParameter,
     IntParameter,
 )
 
-from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import (
-    DependencyLoggerBaseTask,
-)
 from exasol_integration_test_docker_environment.lib.base.run_task import (
     generate_root_task,
 )
-
-TestBaseTask = DependencyLoggerBaseTask
+from test.integration.base_task.base_task import TestBaseTask
 
 
 class TestTaskBase(TestBaseTask):
@@ -118,16 +111,12 @@ def _run_it(different_grandchild, use_dynamic_dependency, expected_result):
         different_grandchild=different_grandchild,
         use_dynamic_dependency=use_dynamic_dependency,
     )
-    try:
-        luigi.build([task], workers=3, local_scheduler=True, log_level="INFO")
-        task.cleanup(success=True)
-    finally:
-        if task._get_tmp_path_for_job().exists():
-            shutil.rmtree(str(task._get_tmp_path_for_job()))
+    luigi.build([task], workers=3, local_scheduler=True, log_level="INFO")
+    task.cleanup(success=True)
     assert global_counter == expected_result, "number of Cleanups not matching"
 
 
-def test_cleanup_of_grandchildren_called_only_once():
+def test_cleanup_of_grandchildren_called_only_once(luigi_output):
     """
     Test that creating the same grandchild task by two different parent tasks, will invoke cleanup of grandchild
     task only once! Luigi takes care of invoking run only once, we take care to invoke cleanup() only once.
@@ -135,7 +124,7 @@ def test_cleanup_of_grandchildren_called_only_once():
     _run_it(different_grandchild=False, use_dynamic_dependency=False, expected_result=1)
 
 
-def test_cleanup_of_grandchildren_called_twice():
+def test_cleanup_of_grandchildren_called_twice(luigi_output):
     """
     Test that creating grandchild task with different parameters by two different parent tasks,
     will invoke cleanup of grandchild twice.
@@ -143,7 +132,7 @@ def test_cleanup_of_grandchildren_called_twice():
     _run_it(different_grandchild=True, use_dynamic_dependency=False, expected_result=2)
 
 
-def test_cleanup_of_grandchildren_called_only_once_dynamic():
+def test_cleanup_of_grandchildren_called_only_once_dynamic(luigi_output):
     """
     Test that creating the same grandchild task by two different parent tasks, will invoke cleanup of grandchild
     task only once! Luigi takes care of invoking run only once, we take care to invoke cleanup() only once.
@@ -152,7 +141,7 @@ def test_cleanup_of_grandchildren_called_only_once_dynamic():
     _run_it(different_grandchild=False, use_dynamic_dependency=True, expected_result=1)
 
 
-def test_cleanup_of_grandchildren_called_twice_dynamic():
+def test_cleanup_of_grandchildren_called_twice_dynamic(luigi_output):
     """
     Test that creating grandchild task with different parameters by two different parent tasks,
     will invoke cleanup of grandchild twice.
