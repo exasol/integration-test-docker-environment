@@ -1,9 +1,11 @@
+from test.integration.base_task.base_task import TestBaseTask
 
 import luigi
 from luigi import Parameter
 
-from exasol_integration_test_docker_environment.lib.base.run_task import generate_root_task
-from test.integration.base_task.base_task import TestBaseTask
+from exasol_integration_test_docker_environment.lib.base.run_task import (
+    generate_root_task,
+)
 
 
 class RootTestTask(TestBaseTask):

@@ -1,14 +1,20 @@
 import time
+from test.integration.base_task.base_task import TestBaseTask
 
 import luigi
 import pytest
 
-from exasol_integration_test_docker_environment.lib.base.json_pickle_parameter import JsonPickleParameter
-from exasol_integration_test_docker_environment.lib.base.run_task import generate_root_task
-from test.integration.base_task.base_task import TestBaseTask
+from exasol_integration_test_docker_environment.lib.base.json_pickle_parameter import (
+    JsonPickleParameter,
+)
+from exasol_integration_test_docker_environment.lib.base.run_task import (
+    generate_root_task,
+)
+
 
 class Data1:
     pass
+
 
 class Data:
     def __init__(self, a1: int, a2: str):
@@ -18,6 +24,7 @@ class Data:
     def __repr__(self):
         return str(self.__dict__)
 
+
 class RootTestTaskSuccess(TestBaseTask):
 
     def __init__(self, *args, **kwargs):
@@ -26,14 +33,18 @@ class RootTestTaskSuccess(TestBaseTask):
     def register_required(self):
         inputs = [Data(i, f"{i}") for i in range(2)]
         tasks = [
-            self.create_child_task(task_class=ChildTaskWithJsonPickleInput, parameter_1=input)
+            self.create_child_task(
+                task_class=ChildTaskWithJsonPickleInput, parameter_1=input
+            )
             for input in inputs
         ]
         self.register_dependencies(tasks)
 
     def run_task(self):
         yield from self.run_dependencies(
-            self.create_child_task(task_class=ChildTaskWithJsonPickleInput, parameter_1=Data(3, "3"))
+            self.create_child_task(
+                task_class=ChildTaskWithJsonPickleInput, parameter_1=Data(3, "3")
+            )
         )
 
 
@@ -55,7 +66,9 @@ class RootTestTaskFail(TestBaseTask):
 
     def run_task(self):
         yield from self.run_dependencies(
-            self.create_child_task(task_class=ChildTaskWithJsonPickleInput, parameter_1=Data1())
+            self.create_child_task(
+                task_class=ChildTaskWithJsonPickleInput, parameter_1=Data1()
+            )
         )
 
 
@@ -69,4 +82,3 @@ def test_json_pickle_parameter_fail(luigi_output):
     task = generate_root_task(task_class=RootTestTaskFail)
     with pytest.raises(Exception):
         luigi.build([task], workers=3, local_scheduler=True, log_level="INFO")
-
