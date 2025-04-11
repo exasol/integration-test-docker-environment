@@ -12,6 +12,8 @@ exasol\_integration\_test\_docker\_environment.testing
 
    api_consistency_utils
    api_test_environment
+   api_test_environment_context_provider
+   cli_test_environment_context_provider
    docker_registry
    exaslct_docker_test_environment
    exaslct_test_environment
