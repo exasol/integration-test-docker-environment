@@ -43,23 +43,23 @@ class DynamiChildTask(TestBaseTask):
 
 
 def test_dependency_creation(luigi_output):
-"""
-Test the creation and execution of task dependencies in a Luigi-based workflow.
+    """
+    Test the creation and execution of task dependencies in a Luigi-based workflow.
 
-This test verifies the correct creation, registration, and execution of task dependencies
-using a root task (`RootTestTask`) and its child tasks (`StaticChildTask` and `DynamiChildTask`).
+    This test verifies the correct creation, registration, and execution of task dependencies
+    using a root task (`RootTestTask`) and its child tasks (`StaticChildTask` and `DynamiChildTask`).
 
-Classes:
-    RootTestTask: A test task that registers and runs child tasks. Includes both static and dynamic dependencies.
-    StaticChildTask: A static child task that returns a predefined list of objects.
-    DynamiChildTask: A dynamic child task that takes an input parameter and returns an object including the parameter.
+    Classes:
+        RootTestTask: A test task that registers and runs child tasks. Includes both static and dynamic dependencies.
+        StaticChildTask: A static child task that returns a predefined list of objects.
+        DynamiChildTask: A dynamic child task that takes an input parameter and returns an object including the parameter.
 
-Args:
-    luigi_output: A fixture or parameter to capture Luigi's output during the test.
+    Args:
+        luigi_output: A fixture or parameter to capture Luigi's output during the test.
 
-Assertions:
-    - Ensures that the Luigi build process executes successfully.
-"""
+    Assertions:
+        - Ensures that the Luigi build process executes successfully.
+    """
     task = generate_root_task(task_class=RootTestTask)
     result = luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
     assert result

@@ -38,8 +38,8 @@ def test_common_parameter(luigi_output):
     """
     Test the usage of common parameters in a Luigi-based task hierarchy.
 
-    This test verifies that a root task (`RootTestTask`) can successfully create a child task 
-    (`ChildTaskWithParameter`) using shared configuration parameters defined in the `TestParameter` class. 
+    This test verifies that a root task (`RootTestTask`) can successfully create a child task
+    (`ChildTaskWithParameter`) using shared configuration parameters defined in the `TestParameter` class.
     It ensures that:
     1. Shared parameters are correctly passed down the task hierarchy.
     2. A root task can register and manage dependencies for its child tasks.

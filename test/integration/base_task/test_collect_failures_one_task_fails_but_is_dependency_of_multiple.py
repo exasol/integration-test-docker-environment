@@ -53,7 +53,7 @@ def test_collect_failures_one_task_fails_but_is_dependency_of_multiple(luigi_out
     Args:
         luigi_output: Mocked Luigi output used for logging or capturing task outputs.
     """
-    
+
     task = generate_root_task(task_class=RootTestTask)
     result = luigi.build([task], workers=3, local_scheduler=True, log_level="INFO")
     assert not result
