@@ -37,10 +37,10 @@ def test_build(luigi_output, api_isolation_module, tmpdir):
 
         with ResourceDirectory(
             exasol_integration_test_docker_environment.certificate_resources.container
-        ) as d:
+        ) as directory:
             task = generate_root_task(
                 task_class=DockerCertificateContainerBuild,
-                certificate_container_root_directory=d,
+                certificate_container_root_directory=directory,
             )
             success = luigi.build(
                 [task], workers=1, local_scheduler=True, log_level="INFO"
