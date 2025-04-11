@@ -104,21 +104,6 @@ def custom_logging():
     return logging_context_creator
 
 
-@pytest.fixture
-def luigi_output(tmp_path):
-    set_build_config(
-        False,
-        tuple(),
-        False,
-        False,
-        str(tmp_path),
-        str(tmp_path.parent),
-        "",
-        "test",
-    )
-    return tmp_path
-
-
 @ignore_resource_warning()
 def dummy_api_command(log_level: Optional[str], use_job_specific_log_file: bool):
     task_creator = lambda: generate_root_task(task_class=DummyTask)
