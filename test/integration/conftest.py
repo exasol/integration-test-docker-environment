@@ -3,6 +3,9 @@ from typing import Iterator
 
 import pytest
 
+from exasol_integration_test_docker_environment.lib.models.config.build_config import (
+    set_build_config,
+)
 from exasol_integration_test_docker_environment.test.get_test_container_content import (
     get_test_container_content,
 )
@@ -147,3 +150,18 @@ def fabric_stdin(monkeypatch):
     See https://github.com/fabric/fabric/issues/2005
     """
     monkeypatch.setattr("sys.stdin", io.StringIO(""))
+
+
+@pytest.fixture
+def luigi_output(tmp_path):
+    set_build_config(
+        False,
+        tuple(),
+        False,
+        False,
+        str(tmp_path),
+        str(tmp_path.parent),
+        "",
+        "test",
+    )
+    return tmp_path
