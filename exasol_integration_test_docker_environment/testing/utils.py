@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import unittest
 from typing import (
     Callable,
@@ -41,3 +42,18 @@ def multiassert(assert_list: List[Callable], unit_test: unittest.TestCase):
     if len(failure_log) != 0:
         res_failure_log = "\n".join(failure_log)
         unit_test.fail(f"{len(failure_log)} failures within test.\n {res_failure_log}")
+
+
+def find_docker_container_names(container_name_substr: str) -> List[str]:
+    with ContextDockerClient() as docker_client:
+        containers = [
+            c.name
+            for c in docker_client.containers.list()
+            if container_name_substr in c.name
+        ]
+        return containers
+
+
+def normalize_request_name(name: str):
+    name = re.sub(r"[\[\]._]+", "_", name)
+    return re.sub(r"^_+|_+$", "", name)

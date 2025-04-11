@@ -2,7 +2,6 @@ import contextlib
 from test.integration.helpers import (
     container_named,
     get_executor_factory,
-    normalize_request_name,
 )
 
 import docker
@@ -27,6 +26,9 @@ from exasol_integration_test_docker_environment.lib.test_environment.parameter.d
 from exasol_integration_test_docker_environment.lib.test_environment.ports import (
     Ports,
     find_free_ports,
+)
+from exasol_integration_test_docker_environment.testing.utils import (
+    normalize_request_name,
 )
 
 

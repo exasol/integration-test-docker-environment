@@ -1,5 +1,4 @@
 import contextlib
-import re
 from typing import (
     Any,
     cast,
@@ -19,11 +18,6 @@ from exasol_integration_test_docker_environment.lib.models.data.database_info im
 from exasol_integration_test_docker_environment.lib.test_environment.parameter.docker_db_test_environment_parameter import (
     DbOsAccess,
 )
-
-
-def normalize_request_name(name: str):
-    name = re.sub(r"[\[\]._]+", "_", name)
-    return re.sub(r"^_+|_+$", "", name)
 
 
 def exact_matcher(names):

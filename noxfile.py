@@ -69,12 +69,12 @@ def run_minimal_tests(session: nox.Session, db_version: str):
     env = {"EXASOL_VERSION": db_version}
     minimal_tests = {
         "old-itest": [
-            "test_api_test_environment.py",
             # "test_cli_test_environment.py",
             "test_doctor.py",
             "test_termination_handler.py",
         ],
         "new-itest": [
+            "test_api_test_environment.py",
             "test_cli_environment.py",
             "test_db_container_log_thread.py",
             "test_api_logging.py",
