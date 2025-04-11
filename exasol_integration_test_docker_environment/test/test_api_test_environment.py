@@ -18,7 +18,9 @@ from exasol_integration_test_docker_environment.testing import utils
 from exasol_integration_test_docker_environment.testing.api_test_environment import (
     ApiTestEnvironment,
 )
-from exasol_integration_test_docker_environment.testing.utils import find_docker_container_names
+from exasol_integration_test_docker_environment.testing.utils import (
+    find_docker_container_names,
+)
 
 
 class APISpawnTestEnvironmentTest(unittest.TestCase):

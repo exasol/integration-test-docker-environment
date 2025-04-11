@@ -1,5 +1,7 @@
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
-from exasol_integration_test_docker_environment.testing.utils import find_docker_container_names
+from exasol_integration_test_docker_environment.testing.utils import (
+    find_docker_container_names,
+)
 
 
 def test_environment_info_set(api_default_database_with_test_conainer_module):
