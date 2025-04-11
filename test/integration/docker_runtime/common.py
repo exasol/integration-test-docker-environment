@@ -8,7 +8,10 @@ def assert_container_runtime(container_name, expected_runtime):
         container = docker_client.containers.get(container_name)
         container.reload()
         actual_runtime = container.attrs["HostConfig"]["Runtime"]
-        assert actual_runtime == expected_runtime,f"{container_name} has the wrong runtime expected {expected_runtime} got {actual_runtime}."
+        assert (
+            actual_runtime == expected_runtime
+        ), f"{container_name} has the wrong runtime expected {expected_runtime} got {actual_runtime}."
+
 
 @pytest.fixture(scope="module")
 def default_docker_runtime():
@@ -20,4 +23,3 @@ def default_docker_runtime():
         finally:
             tmp_container.remove(force=True)
         return default_docker_runtime
-
