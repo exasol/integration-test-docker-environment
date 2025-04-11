@@ -12,14 +12,16 @@ class RootTestTask(TestBaseTask):
 
     def run_task(self):
         tasks = [
-            self.create_child_task(task_class=ChildTestTask, p=f"{i}")
+            self.create_child_task(
+                task_class=ChildTestTaskWithParameterAndException, p=f"{i}"
+            )
             for i in range(10)
         ]
         self.logger.info(tasks)
         yield from self.run_dependencies(tasks)
 
 
-class ChildTestTask(TestBaseTask):
+class ChildTestTaskWithParameterAndException(TestBaseTask):
     p = Parameter()
 
     def run_task(self):
@@ -31,14 +33,14 @@ class ChildTestTask(TestBaseTask):
         raise Exception("%s" % self.task_id)
 
 
-def test_collect_failures_diffrent_task_fail(luigi_output):
+def test_collect_failures_different_task_fail(luigi_output):
     """
     Test the collection of failures when multiple child tasks fail.
 
     This test verifies that when multiple child tasks fail in a parallel execution,
     the root task correctly collects and reports all failures. It uses a custom
-    `RootTestTask` that spawns multiple `ChildTestTask` instances, each of which
-    intentionally fails after a delay. The test asserts that:
+    `RootTestTask` that spawns multiple `ChildTestTaskWithParameterAndException` instances,
+    each of which intentionally fails after a delay. The test asserts that:
     1. The Luigi build process reports a failure.
     2. The root task collects multiple failures as expected.
     """
