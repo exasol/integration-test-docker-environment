@@ -127,7 +127,7 @@ def api_database_with_test_container(
 
 
 @pytest.fixture(scope="module")
-def api_default_database_with_test_conainer_module(
+def api_default_database_with_test_container_module(
     api_isolation_module: ApiTestEnvironment,
 ) -> Iterator[ExaslctDockerTestEnvironment]:
     """
