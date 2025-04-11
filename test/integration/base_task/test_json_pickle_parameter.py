@@ -73,12 +73,24 @@ class RootTestTaskFail(TestBaseTask):
 
 
 def test_json_pickle_parameter_success(luigi_output):
+    """
+    Test the successful execution of tasks using JsonPickleParameter.
+
+    This test ensures that valid Data objects are correctly serialized
+    and deserialized when passed as parameters to child tasks.
+    """
     task = generate_root_task(task_class=RootTestTaskSuccess)
     result = luigi.build([task], workers=3, local_scheduler=True, log_level="INFO")
     assert result
 
 
 def test_json_pickle_parameter_fail(luigi_output):
+    """
+    Test the failure scenario when using JsonPickleParameter with invalid input.
+
+    This test ensures that an exception is raised when an unsupported input
+    type is used with JsonPickleParameter.
+    """
     task = generate_root_task(task_class=RootTestTaskFail)
     with pytest.raises(Exception):
         luigi.build([task], workers=3, local_scheduler=True, log_level="INFO")

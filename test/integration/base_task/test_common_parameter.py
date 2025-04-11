@@ -35,6 +35,23 @@ class ChildTaskWithParameter(TestBaseTask, TestParameter):
 
 
 def test_common_parameter(luigi_output):
+    """
+    Test the usage of common parameters in a Luigi-based task hierarchy.
+
+    This test verifies that a root task (`RootTestTask`) can successfully create a child task 
+    (`ChildTaskWithParameter`) using shared configuration parameters defined in the `TestParameter` class. 
+    It ensures that:
+    1. Shared parameters are correctly passed down the task hierarchy.
+    2. A root task can register and manage dependencies for its child tasks.
+    3. The task execution completes successfully without errors when using common parameters.
+
+    Args:
+        luigi_output: A fixture or mock object used to capture Luigi's output for validation purposes.
+
+    Assertions:
+        - The `luigi.build()` function returns `True`, indicating that all tasks were executed successfully.
+    """
+
     task = generate_root_task(task_class=RootTestTask, test_parameter="input")
     result = luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
     assert result
