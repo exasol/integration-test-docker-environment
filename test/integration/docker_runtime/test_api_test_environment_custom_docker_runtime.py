@@ -30,7 +30,9 @@ def environment_with_specific_docker_runtime(
     additional_parameters = {
         "docker_runtime": default_docker_runtime,
     }
-    with api_context_provider(name=None, additional_parameters=additional_parameters) as db:
+    with api_context_provider(
+        name=None, additional_parameters=additional_parameters
+    ) as db:
         yield db
 
 
