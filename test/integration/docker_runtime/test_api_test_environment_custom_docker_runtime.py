@@ -37,16 +37,16 @@ def environment_with_specific_docker_runtime(
 
 
 def test_test_container_runtime(
-    environment_with_custom_docker_runtime, default_docker_runtime
+    environment_with_specific_docker_runtime, default_docker_runtime
 ):
-    env = environment_with_custom_docker_runtime.environment_info
+    env = environment_with_specific_docker_runtime.environment_info
     container_name = env.test_container_info.container_name
     assert_container_runtime(container_name, default_docker_runtime)
 
 
 def test_database_container_runtime(
-    environment_with_custom_docker_runtime, default_docker_runtime
+    environment_with_specific_docker_runtime, default_docker_runtime
 ):
-    env = environment_with_custom_docker_runtime.environment_info
+    env = environment_with_specific_docker_runtime.environment_info
     container_name = env.database_info.container_info.container_name
     assert_container_runtime(container_name, default_docker_runtime)
