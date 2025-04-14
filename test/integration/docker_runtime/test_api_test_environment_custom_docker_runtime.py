@@ -17,32 +17,34 @@ from exasol_integration_test_docker_environment.testing.api_test_environment_con
 
 
 @pytest.fixture(scope="module")
-def environment_with_custom_docker_runtime(
+def environment_with_specific_docker_runtime(
     api_isolation_module: ApiTestEnvironment, default_docker_runtime
 ):
-    provider = build_api_context_provider_with_test_container(
+    """
+    Start the test environment with a specific docker runtime.
+    See the user guide for details.
+    """
+    api_context_provider = build_api_context_provider_with_test_container(
         api_isolation_module, get_test_container_content()
     )
-    additional_parameter = {
+    additional_parameters = {
         "docker_runtime": default_docker_runtime,
     }
-    with provider(None, additional_parameter) as db:
+    with api_context_provider(name=None, additional_parameters=additional_parameters) as db:
         yield db
 
 
 def test_test_container_runtime(
     environment_with_custom_docker_runtime, default_docker_runtime
 ):
-    environment_info = environment_with_custom_docker_runtime.environment_info
-    test_container_name = environment_info.test_container_info.container_name
-    assert_container_runtime(test_container_name, default_docker_runtime)
+    env = environment_with_custom_docker_runtime.environment_info
+    container_name = env.test_container_info.container_name
+    assert_container_runtime(container_name, default_docker_runtime)
 
 
 def test_database_container_runtime(
     environment_with_custom_docker_runtime, default_docker_runtime
 ):
-    environment_info = environment_with_custom_docker_runtime.environment_info
-    database_container_name = (
-        environment_info.database_info.container_info.container_name
-    )
-    assert_container_runtime(database_container_name, default_docker_runtime)
+    env = environment_with_custom_docker_runtime.environment_info
+    container_name = env.database_info.container_info.container_name
+    assert_container_runtime(container_name, default_docker_runtime)

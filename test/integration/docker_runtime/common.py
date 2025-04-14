@@ -14,9 +14,9 @@ def assert_container_runtime(container_name, expected_runtime):
 
 
 @pytest.fixture(scope="module")
-def default_docker_runtime():
+def default_docker_runtime(default_ubuntu_version):
     with ContextDockerClient() as docker_client:
-        tmp_container = docker_client.containers.create("ubuntu:22.04", "echo")
+        tmp_container = docker_client.containers.create(default_ubuntu_version, "echo")
         try:
             tmp_container.reload()
             default_docker_runtime = tmp_container.attrs["HostConfig"]["Runtime"]

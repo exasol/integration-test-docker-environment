@@ -57,4 +57,4 @@ def find_docker_container_names(container_name_substr: str) -> List[str]:
 def normalize_request_name(name: str):
     name = name.split("/")[-1]
     name = re.sub(r"[\[\]._]+", "_", name)
-    return re.sub(r"^_+|_+$", "", name)
+    return name.strip("_")
