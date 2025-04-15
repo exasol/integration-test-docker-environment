@@ -219,6 +219,7 @@ data-aria-dark="Switch to auto color mode">
 <li><a class="reference internal" href="#ssh-access">SSH Access</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#docker-runtimes">Docker Runtimes</a></li>
 <li><a class="reference internal" href="#tested-docker-runtimes">Tested Docker Runtimes</a></li>
 </ul>
 </li>
@@ -573,6 +574,16 @@ your host machine to which ITDE forwards the SSH port of the Docker Container
 running the Exasol database. If you do not specify a port then ITDE will
 select a random free port.</p>
 </section>
+</section>
+<section id="docker-runtimes">
+<h3>Docker Runtimes<a class="headerlink" href="#docker-runtimes" title="Link to this heading">¶</a></h3>
+<p>ITDE supports launching of the test environment with an alternate
+docker runtime, via option <code class="docutils literal notranslate"><span class="pre">--docker-runtime</span></code>.
+The docker runtime is the software enabling containers to function within a
+host environment.  It handles tasks ranging from retrieving container images
+from a registry and managing their lifecycle to executing the containers on
+your system.  See <a class="reference external" href="https://docs.docker.com/engine/daemon/alternative-runtimes/">https://docs.docker.com/engine/daemon/alternative-runtimes/</a>
+for details.</p>
 </section>
 <section id="tested-docker-runtimes">
 <h3>Tested Docker Runtimes<a class="headerlink" href="#tested-docker-runtimes" title="Link to this heading">¶</a></h3>
