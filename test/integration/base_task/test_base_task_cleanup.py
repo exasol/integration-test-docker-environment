@@ -16,30 +16,30 @@ class RootTestTask(BaseTestTask):
     use_dynamic_dependency = BoolParameter()
 
     def _build_child_task(self, use_dynamic_dependency):
-        index_for_grandchild = 0
-        child_a = self.create_child_task(
-            task_class=ChildATestTask,
-            index_for_grandchild=index_for_grandchild,
-            use_dynamic_dependency=use_dynamic_dependency,
-        )
-        if self.different_grandchild:
-            index_for_grandchild = 1
-        child_b = self.create_child_task(
-            task_class=ChildBTestTask,
-            index_for_grandchild=index_for_grandchild,
-            use_dynamic_dependency=use_dynamic_dependency,
-        )
-        return child_a, child_b
+        index1 = 0
+        index2 = 1 if self.different_grandchild else 0
+        return [
+            self.create_child_task(
+                task_class=ChildATestTask,
+                index_for_grandchild=index1,
+                use_dynamic_dependency=use_dynamic_dependency,
+            ),
+            self.create_child_task(
+                task_class=ChildBTestTask,
+                index_for_grandchild=index2,
+                use_dynamic_dependency=use_dynamic_dependency,
+            ),
+        ]
 
     def register_required(self):
         if not self.use_dynamic_dependency:
-            child_a, child_b = self._build_child_task(False)
-            self.child_tasks = self.register_dependencies([child_a, child_b])
+            children = self._build_child_task(False)
+            self.child_tasks = self.register_dependencies(children)
 
     def run_task(self):
         if self.use_dynamic_dependency:
-            child_a, child_b = self._build_child_task(True)
-            yield from self.run_dependencies([child_a, child_b])
+            children = self._build_child_task(True)
+            yield from self.run_dependencies(children)
 
 
 class ChildATestTask(BaseTestTask):
