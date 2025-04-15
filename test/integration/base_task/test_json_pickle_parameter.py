@@ -1,5 +1,5 @@
 import time
-from test.integration.base_task.base_task import TestBaseTask
+from test.integration.base_task.base_task import BaseTestTask
 
 import luigi
 import pytest
@@ -25,7 +25,7 @@ class Data:
         return str(self.__dict__)
 
 
-class RootTestTaskSuccess(TestBaseTask):
+class RootTestTaskSuccess(BaseTestTask):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -48,7 +48,7 @@ class RootTestTaskSuccess(TestBaseTask):
         )
 
 
-class ChildTaskWithJsonPickleInput(TestBaseTask):
+class ChildTaskWithJsonPickleInput(BaseTestTask):
     parameter_1 = JsonPickleParameter(Data)
 
     def run_task(self):
@@ -56,7 +56,7 @@ class ChildTaskWithJsonPickleInput(TestBaseTask):
         print(self.parameter_1)
 
 
-class RootTestTaskFail(TestBaseTask):
+class RootTestTaskFail(BaseTestTask):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

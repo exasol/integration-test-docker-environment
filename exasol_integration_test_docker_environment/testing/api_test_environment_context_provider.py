@@ -1,15 +1,13 @@
 import contextlib
 from typing import (
     Any,
-    Callable,
     ContextManager,
     Dict,
     Generator,
     Iterator,
     Optional,
+    Protocol,
 )
-
-from typing_extensions import TypeAlias  # Needed for Python3.9
 
 from exasol_integration_test_docker_environment.lib.models.data.test_container_content_description import (
     TestContainerContentDescription,
@@ -39,10 +37,12 @@ def build_api_isolation(request) -> Iterator[ApiTestEnvironment]:
     luigi_utils.clean(environment.docker_repository_name)
 
 
-ApiContextProvider: TypeAlias = Callable[
-    [Optional[str], Optional[Dict[str, Any]]],
-    ContextManager[ExaslctDockerTestEnvironment],
-]
+class ApiContextProvider(Protocol):
+    def __call__(
+        self,
+        name: Optional[str],
+        additional_parameters: Optional[Dict[str, Any]] = None,
+    ) -> ContextManager[ExaslctDockerTestEnvironment]: ...
 
 
 def build_api_context_provider(
@@ -66,13 +66,22 @@ def build_api_context_provider(
         yield spawned
         utils.close_environments(spawned)
 
-    return create_context  # type: ignore
+    return create_context
+
+
+class ApiContextProviderWithTestContainer(Protocol):
+    def __call__(
+        self,
+        name: Optional[str],
+        additional_parameters: Optional[Dict[str, Any]] = None,
+        test_container_content: Optional[TestContainerContentDescription] = None,
+    ) -> ContextManager[ExaslctDockerTestEnvironment]: ...
 
 
 def build_api_context_provider_with_test_container(
     test_environment: ApiTestEnvironment,
     default_test_container_content: TestContainerContentDescription,
-) -> ApiContextProvider:
+) -> ApiContextProviderWithTestContainer:
     """
     Returns a context provider function which can be used to spawn a Docker DB + Test container
     with custom name, custom additional db parameters and custom test container content.
@@ -94,4 +103,4 @@ def build_api_context_provider_with_test_container(
         yield spawned
         utils.close_environments(spawned)
 
-    return create_context  # type: ignore
+    return create_context

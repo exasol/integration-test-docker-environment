@@ -346,6 +346,18 @@ running the Exasol database. If you do not specify a port then ITDE will
 select a random free port.
 
 
+Docker Runtimes
+~~~~~~~~~~~~~~~
+
+ITDE supports launching of the test environment with an alternate
+docker runtime, via option ``--docker-runtime``.
+The docker runtime is the software enabling containers to function within a
+host environment.  It handles tasks ranging from retrieving container images
+from a registry and managing their lifecycle to executing the containers on
+your system.  See https://docs.docker.com/engine/daemon/alternative-runtimes/
+for details.
+
+
 Tested Docker Runtimes
 ~~~~~~~~~~~~~~~~~~~~~~
 

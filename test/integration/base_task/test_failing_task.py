@@ -1,4 +1,4 @@
-from test.integration.base_task.base_task import TestBaseTask
+from test.integration.base_task.base_task import BaseTestTask
 
 import luigi
 
@@ -7,7 +7,7 @@ from exasol_integration_test_docker_environment.lib.base.run_task import (
 )
 
 
-class RootTestTask(TestBaseTask):
+class RootTestTask(BaseTestTask):
 
     def run_task(self):
         yield from self.run_dependencies(
@@ -15,13 +15,13 @@ class RootTestTask(TestBaseTask):
         )
 
 
-class ChildTestTaskWithException(TestBaseTask):
+class ChildTestTaskWithException(BaseTestTask):
 
     def run_task(self):
         raise Exception()
 
 
-class OtherChildTestTask(TestBaseTask):
+class OtherChildTestTask(BaseTestTask):
 
     def run_task(self):
         pass

@@ -165,3 +165,8 @@ def luigi_output(tmp_path):
         "test",
     )
     return tmp_path
+
+
+@pytest.fixture(scope="module")
+def default_ubuntu_version():
+    return "ubuntu:22.04"
