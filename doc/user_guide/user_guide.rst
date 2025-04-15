@@ -347,7 +347,7 @@ select a random free port.
 
 
 Docker Runtimes
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
 
 ITDE supports launching of the test environment with an alternate
 docker runtime, via option ``--docker-runtime``.
