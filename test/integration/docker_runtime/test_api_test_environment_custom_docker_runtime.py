@@ -21,19 +21,23 @@ def environment_with_specific_docker_runtime(
     api_isolation_module: ApiTestEnvironment, default_docker_runtime
 ):
     """
-    Start the test environment with a specific docker runtime.
-    See the user guide for details.
+    Start the test environment incl. specifying a custom docker runtime in
+    additional_parameters.  Section "Docker Runtimes" in the ITDE User Guide
+    gives an introduction on Docker Runtimes.  As currently there is no other
+    runtime, the default_docker_runtime is used but, however, specified
+    explicitly.
     """
     api_context_provider = build_api_context_provider_with_test_container(
         api_isolation_module, get_test_container_content()
     )
-    additional_parameters = {
-        "docker_runtime": default_docker_runtime,
-    }
+    custom_runtime = default_docker_runtime
     with api_context_provider(
-        name=None, additional_parameters=additional_parameters
-    ) as db:
-        yield db
+        name=None,
+        additional_parameters={
+            "docker_runtime": custom_runtime,
+        },
+    ) as api_context:
+        yield api_context
 
 
 def test_test_container_runtime(
