@@ -76,8 +76,8 @@ def smoke_test_sql(exaplus_path: str, env: ExaslctDockerTestEnvironment) -> str:
     return f'bash -c "{command_str}" '
 
 
-def test_db_container_started(cli_database):
-    with cli_database() as db:
+def test_db_container_started(cli_context):
+    with cli_context() as db:
         with ContextDockerClient() as docker_client:
             name = db.on_host_docker_environment.name
             containers = [
@@ -92,9 +92,9 @@ def test_db_container_started(cli_database):
 
 
 @pytest.mark.parametrize("db_os_access", [DbOsAccess.DOCKER_EXEC, DbOsAccess.SSH])
-def test_db_available(cli_database, fabric_stdin, db_os_access):
+def test_db_available(cli_context, fabric_stdin, db_os_access):
     params = ["--db-os-access", db_os_access.name]
-    with cli_database(additional_parameters=params) as db:
+    with cli_context(additional_parameters=params) as db:
         with ContextDockerClient() as docker_client:
             dbinfo = db.on_host_docker_environment.environment_info.database_info
             db_container_name = dbinfo.container_info.container_name

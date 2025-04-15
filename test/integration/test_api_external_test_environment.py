@@ -28,14 +28,14 @@ from exasol_integration_test_docker_environment.testing.utils import (
 
 
 @pytest.fixture(scope="module")
-def spawn_test_environment(request, api_default_database_module):
+def spawn_test_environment(request, api_default_env):
     """
     Spawn a test environment with an external database.
     There is no API function available to do that (decision was made that this is not useful for clients other than exaslct).
     So the raw `SpawnTestEnvironment` needs to be launched here.
 
     """
-    db = api_default_database_module
+    db = api_default_env
     ext_environment_name = request.module.__name__
     task_creator = lambda: generate_root_task(
         task_class=SpawnTestEnvironment,
