@@ -1,4 +1,4 @@
-from test.integration.base_task.base_task import TestBaseTask
+from test.integration.base_task.base_task import BaseTestTask
 
 import luigi
 from luigi import (
@@ -11,11 +11,11 @@ from exasol_integration_test_docker_environment.lib.base.run_task import (
 )
 
 
-class TestParameter(Config):
+class ParameterUnderTest(Config):
     test_parameter = Parameter()
 
 
-class RootTestTask(TestBaseTask, TestParameter):
+class RootTestTask(BaseTestTask, ParameterUnderTest):
 
     def register_required(self):
         task8 = self.create_child_task_with_common_params(
@@ -27,7 +27,7 @@ class RootTestTask(TestBaseTask, TestParameter):
         pass
 
 
-class ChildTaskWithParameter(TestBaseTask, TestParameter):
+class ChildTaskWithParameter(BaseTestTask, ParameterUnderTest):
     new_parameter = Parameter()
 
     def run_task(self):
