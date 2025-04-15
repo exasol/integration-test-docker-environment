@@ -65,9 +65,7 @@ def test_runtime_mapping_without_deployment(
         _assert_deployment_available(test_environment.environment_info)
 
 
-def test_runtime_mapping_deployment(
-    api_context_with_test_container, make_test_mapping
-):
+def test_runtime_mapping_deployment(api_context_with_test_container, make_test_mapping):
     mapping = make_test_mapping(deployment_target="/test_target")
     with api_context_with_test_container(
         test_container_content=get_test_container_content(runtime_mapping=(mapping,))
