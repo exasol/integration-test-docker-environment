@@ -97,8 +97,8 @@ def api_default_env(
     Provides a default database environment.
     """
     env_context = build_api_context_provider(api_isolation_module)
-    with env_context(name=None, additional_parameters=None) as db:
-        yield db
+    with env_context(name=None, additional_parameters=None) as env:
+        yield env
 
 
 @pytest.fixture
@@ -138,8 +138,8 @@ def api_default_env_with_test_container(
         test_environment=api_isolation_module,
         default_test_container_content=get_test_container_content(),
     )
-    with env_context(name=None, additional_parameters=None) as db:
-        yield db
+    with env_context(name=None, additional_parameters=None) as env:
+        yield env
 
 
 @pytest.fixture
