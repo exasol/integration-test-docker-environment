@@ -135,7 +135,8 @@ def api_default_env_with_test_container_module(
     """
 
     env_context = build_api_context_provider_with_test_container(
-        test_environment=api_isolation_module, default_test_container_content=get_test_container_content()
+        test_environment=api_isolation_module,
+        default_test_container_content=get_test_container_content(),
     )
     with env_context(None, None) as db:
         yield db
