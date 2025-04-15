@@ -127,17 +127,17 @@ def api_database_with_test_container(
 
 
 @pytest.fixture(scope="module")
-def api_default_database_with_test_container_module(
+def api_default_env_with_test_container_module(
     api_isolation_module: ApiTestEnvironment,
 ) -> Iterator[ExaslctDockerTestEnvironment]:
     """
     Provides a default database + test container environment.
     """
 
-    provider = build_api_context_provider_with_test_container(
-        api_isolation_module, get_test_container_content()
+    env_context = build_api_context_provider_with_test_container(
+        test_environment=api_isolation_module, default_test_container_content=get_test_container_content()
     )
-    with provider(None, None) as db:
+    with env_context(None, None) as db:
         yield db
 
 

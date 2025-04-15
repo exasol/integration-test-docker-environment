@@ -4,12 +4,12 @@ from exasol_integration_test_docker_environment.testing.utils import (
 )
 
 
-def test_environment_info_set(api_default_database_with_test_container_module):
-    assert api_default_database_with_test_container_module.environment_info is not None
+def test_environment_info_set(api_default_env_with_test_container_module):
+    assert api_default_env_with_test_container_module.environment_info is not None
 
 
-def test_all_containers_started(api_default_database_with_test_container_module):
-    test_environment = api_default_database_with_test_container_module
+def test_all_containers_started(api_default_env_with_test_container_module):
+    test_environment = api_default_env_with_test_container_module
     containers = find_docker_container_names(test_environment.name)
     assert len(containers) == 2, f"Not exactly 2 containers in {containers}."
     db_container = [c for c in containers if "db_container" in c]
@@ -19,9 +19,9 @@ def test_all_containers_started(api_default_database_with_test_container_module)
 
 
 def test_docker_available_in_test_container(
-    api_default_database_with_test_container_module,
+    api_default_env_with_test_container_module,
 ):
-    environment_info = api_default_database_with_test_container_module.environment_info
+    environment_info = api_default_env_with_test_container_module.environment_info
     with ContextDockerClient() as docker_client:
         test_container = docker_client.containers.get(
             environment_info.test_container_info.container_name
@@ -34,8 +34,8 @@ def test_docker_available_in_test_container(
         ), f"Error while executing 'docker ps' in test container got output\n {output}."
 
 
-def test_db_container_available(api_default_database_with_test_container_module):
-    environment_info = api_default_database_with_test_container_module.environment_info
+def test_db_container_available(api_default_env_with_test_container_module):
+    environment_info = api_default_env_with_test_container_module.environment_info
     with ContextDockerClient() as docker_client:
         db_container = docker_client.containers.get(
             environment_info.database_info.container_info.container_name
@@ -48,8 +48,8 @@ def test_db_container_available(api_default_database_with_test_container_module)
         ), f"Error while executing 'ls /exa' in db container got output\n {output}."
 
 
-def test_db_available(api_default_database_with_test_container_module):
-    test_environment = api_default_database_with_test_container_module
+def test_db_available(api_default_env_with_test_container_module):
+    test_environment = api_default_env_with_test_container_module
     environment_info = test_environment.environment_info
     with ContextDockerClient() as docker_client:
         test_container = docker_client.containers.get(
@@ -76,8 +76,8 @@ def create_db_connection_command(test_environment):
     return bash_cmd
 
 
-def test_build_mapping(api_default_database_with_test_container_module):
-    environment_info = api_default_database_with_test_container_module.environment_info
+def test_build_mapping(api_default_env_with_test_container_module):
+    environment_info = api_default_env_with_test_container_module.environment_info
     with ContextDockerClient() as docker_client:
         test_container = docker_client.containers.get(
             environment_info.test_container_info.container_name

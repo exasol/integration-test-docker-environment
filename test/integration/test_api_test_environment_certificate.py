@@ -22,9 +22,8 @@ from exasol_integration_test_docker_environment.testing.utils import (
 def environment_with_certificate(
     api_isolation_module: ApiTestEnvironment,
 ):
-    # Important: The default test environment name will be long for the certificate,
-    #            because host name length is limited to 63 characters.
-    #            Hence, we override the environment name here, we a shorter name.
+    # Abbreviate environment name to meet limitation of max. 63 characters for
+    # certificate host name.
     api_isolation_module.name = "cert_test"
     additional_parameter = {"create_certificates": True}
 
@@ -40,7 +39,7 @@ def environment_with_certificate(
 
 @pytest.mark.skipif(
     not db_version_supports_custom_certificates(check_db_version_from_env()),
-    reason="Database not supported",
+    reason="Database version does not support custom certificates.",
 )
 def test_certificate(environment_with_certificate):
     with ContextDockerClient() as docker_client:
