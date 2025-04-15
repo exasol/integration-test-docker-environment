@@ -55,21 +55,19 @@ def make_test_mapping(tmp_path):
 
 
 def test_runtime_mapping_without_deployment(
-    api_database_with_test_container, make_test_mapping
+    api_context_with_test_container, make_test_mapping
 ):
     mapping = make_test_mapping()
-    with api_database_with_test_container(
+    with api_context_with_test_container(
         test_container_content=get_test_container_content(runtime_mapping=(mapping,))
     ) as test_environment:
         assert test_environment.environment_info is not None
         _assert_deployment_available(test_environment.environment_info)
 
 
-def test_runtime_mapping_deployment(
-    api_database_with_test_container, make_test_mapping
-):
+def test_runtime_mapping_deployment(api_context_with_test_container, make_test_mapping):
     mapping = make_test_mapping(deployment_target="/test_target")
-    with api_database_with_test_container(
+    with api_context_with_test_container(
         test_container_content=get_test_container_content(runtime_mapping=(mapping,))
     ) as test_environment:
         assert test_environment.environment_info is not None

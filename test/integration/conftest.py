@@ -50,7 +50,7 @@ def api_isolation_module(request) -> Iterator[ApiTestEnvironment]:
 
 
 @pytest.fixture
-def cli_database(
+def cli_context(
     cli_isolation,
 ) -> CliContextProvider:
     """
@@ -63,15 +63,15 @@ def cli_database(
     The test case optionally can pass a name and additional parameters for
     spawning the database:
 
-    def test_case(cli_database):
-        with cli_database(additional_parameters = ["--option"]):
+    def test_case(cli_context):
+        with cli_context(additional_parameters = ["--option"]):
             ...
     """
     return build_cli_context_provider(cli_isolation)
 
 
 @pytest.fixture
-def api_database(api_isolation: ApiTestEnvironment) -> ApiContextProvider:
+def api_context(api_isolation: ApiTestEnvironment) -> ApiContextProvider:
     """
     Returns a method that test case implementations can use to create a
     context with a database.
@@ -82,27 +82,27 @@ def api_database(api_isolation: ApiTestEnvironment) -> ApiContextProvider:
     The test case optionally can pass a name and additional parameters for
     spawning the database:
 
-    def test_case(api_database):
-        with api_database(additional_parameters = ["--option"]):
+    def test_case(api_context):
+        with api_context(additional_parameters = ["--option"]):
             ...
     """
     return build_api_context_provider(api_isolation)
 
 
 @pytest.fixture(scope="module")
-def api_default_database_module(
+def api_default_env(
     api_isolation_module: ApiTestEnvironment,
 ) -> Iterator[ExaslctDockerTestEnvironment]:
     """
     Provides a default database environment.
     """
-    provider = build_api_context_provider(api_isolation_module)
-    with provider(None, None) as db:
-        yield db
+    env_context = build_api_context_provider(api_isolation_module)
+    with env_context(name=None, additional_parameters=None) as env:
+        yield env
 
 
 @pytest.fixture
-def api_database_with_test_container(
+def api_context_with_test_container(
     api_isolation: ApiTestEnvironment,
 ) -> ApiContextProvider:
     """
@@ -115,8 +115,8 @@ def api_database_with_test_container(
     The test case optionally can pass a name and additional parameters for
     spawning the database:
 
-    def test_case(api_database_with_test_container):
-        with api_database_with_test_container(additional_parameters = ["--option"],
+    def test_case(api_context_with_test_container):
+        with api_context_with_test_container(additional_parameters = ["--option"],
                                               test_container_content = get_test_container_content(runtime_mapping-...)):
             ...
     """
@@ -127,18 +127,19 @@ def api_database_with_test_container(
 
 
 @pytest.fixture(scope="module")
-def api_default_database_with_test_conainer_module(
+def api_default_env_with_test_container(
     api_isolation_module: ApiTestEnvironment,
 ) -> Iterator[ExaslctDockerTestEnvironment]:
     """
     Provides a default database + test container environment.
     """
 
-    provider = build_api_context_provider_with_test_container(
-        api_isolation_module, get_test_container_content()
+    env_context = build_api_context_provider_with_test_container(
+        test_environment=api_isolation_module,
+        default_test_container_content=get_test_container_content(),
     )
-    with provider(None, None) as db:
-        yield db
+    with env_context(name=None, additional_parameters=None) as env:
+        yield env
 
 
 @pytest.fixture
