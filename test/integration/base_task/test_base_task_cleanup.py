@@ -1,4 +1,4 @@
-from test.integration.base_task.base_task import TestBaseTask
+from test.integration.base_task.base_task import BaseTestTask
 
 import luigi
 from luigi import (
@@ -11,21 +11,21 @@ from exasol_integration_test_docker_environment.lib.base.run_task import (
 )
 
 
-class TestTaskBase(TestBaseTask):
+class RootTestTask(BaseTestTask):
     different_grandchild = BoolParameter()
     use_dynamic_dependency = BoolParameter()
 
     def _build_child_task(self, use_dynamic_dependency):
         index_for_grandchild = 0
         child_a = self.create_child_task(
-            task_class=TestTaskChildA,
+            task_class=ChildATestTask,
             index_for_grandchild=index_for_grandchild,
             use_dynamic_dependency=use_dynamic_dependency,
         )
         if self.different_grandchild:
             index_for_grandchild = 1
         child_b = self.create_child_task(
-            task_class=TestTaskChildB,
+            task_class=ChildBTestTask,
             index_for_grandchild=index_for_grandchild,
             use_dynamic_dependency=use_dynamic_dependency,
         )
@@ -42,14 +42,14 @@ class TestTaskBase(TestBaseTask):
             yield from self.run_dependencies([child_a, child_b])
 
 
-class TestTaskChildA(TestBaseTask):
+class ChildATestTask(BaseTestTask):
     index_for_grandchild = IntParameter()
     use_dynamic_dependency = BoolParameter()
 
     def register_required(self):
         if not self.use_dynamic_dependency:
             grandchild = self.create_child_task(
-                task_class=TestTaskGrandchild,
+                task_class=GrandchildTestTask,
                 index_for_grandchild=self.index_for_grandchild,
             )
             self.register_dependency(grandchild)
@@ -57,7 +57,7 @@ class TestTaskChildA(TestBaseTask):
     def run_task(self):
         if self.use_dynamic_dependency:
             grandchild = self.create_child_task(
-                task_class=TestTaskGrandchild,
+                task_class=GrandchildTestTask,
                 index_for_grandchild=self.index_for_grandchild,
             )
             yield from self.run_dependencies(grandchild)
@@ -66,14 +66,14 @@ class TestTaskChildA(TestBaseTask):
         pass
 
 
-class TestTaskChildB(TestBaseTask):
+class ChildBTestTask(BaseTestTask):
     index_for_grandchild = IntParameter()
     use_dynamic_dependency = BoolParameter()
 
     def register_required(self):
         if not self.use_dynamic_dependency:
             grandchild = self.create_child_task(
-                task_class=TestTaskGrandchild,
+                task_class=GrandchildTestTask,
                 index_for_grandchild=self.index_for_grandchild,
             )
             self.register_dependency(grandchild)
@@ -81,7 +81,7 @@ class TestTaskChildB(TestBaseTask):
     def run_task(self):
         if self.use_dynamic_dependency:
             grandchild = self.create_child_task(
-                task_class=TestTaskGrandchild,
+                task_class=GrandchildTestTask,
                 index_for_grandchild=self.index_for_grandchild,
             )
             yield from self.run_dependencies(grandchild)
@@ -90,31 +90,31 @@ class TestTaskChildB(TestBaseTask):
         pass
 
 
-global_counter = 0
+global_cleanup_counter = 0
 
 
-class TestTaskGrandchild(TestBaseTask):
+class GrandchildTestTask(BaseTestTask):
     index_for_grandchild = IntParameter()
 
     def run_task(self):
         pass
 
     def cleanup_task(self, success: bool):
-        global global_counter
-        global_counter = global_counter + 1
+        global global_cleanup_counter
+        global_cleanup_counter = global_cleanup_counter + 1
 
 
-def _run_it(different_grandchild, use_dynamic_dependency, expected_result):
-    global global_counter
-    global_counter = 0
+def _run_root_task(different_grandchild, use_dynamic_dependency):
+    global global_cleanup_counter
+    global_cleanup_counter = 0
     task = generate_root_task(
-        task_class=TestTaskBase,
+        task_class=RootTestTask,
         different_grandchild=different_grandchild,
         use_dynamic_dependency=use_dynamic_dependency,
     )
     luigi.build([task], workers=3, local_scheduler=True, log_level="INFO")
     task.cleanup(success=True)
-    assert global_counter == expected_result, "number of Cleanups not matching"
+    return global_cleanup_counter
 
 
 def test_cleanup_of_grandchildren_called_only_once(luigi_output):
@@ -122,7 +122,8 @@ def test_cleanup_of_grandchildren_called_only_once(luigi_output):
     Test that creating the same grandchild task by two different parent tasks, will invoke cleanup of grandchild
     task only once! Luigi takes care of invoking run only once, we take care to invoke cleanup() only once.
     """
-    _run_it(different_grandchild=False, use_dynamic_dependency=False, expected_result=1)
+    counter = _run_root_task(different_grandchild=False, use_dynamic_dependency=False)
+    assert counter == 1, "number of Cleanups not matching"
 
 
 def test_cleanup_of_grandchildren_called_twice(luigi_output):
@@ -130,7 +131,8 @@ def test_cleanup_of_grandchildren_called_twice(luigi_output):
     Test that creating grandchild task with different parameters by two different parent tasks,
     will invoke cleanup of grandchild twice.
     """
-    _run_it(different_grandchild=True, use_dynamic_dependency=False, expected_result=2)
+    counter = _run_root_task(different_grandchild=True, use_dynamic_dependency=False)
+    assert counter == 2, "number of Cleanups not matching"
 
 
 def test_cleanup_of_grandchildren_called_only_once_dynamic(luigi_output):
@@ -139,7 +141,8 @@ def test_cleanup_of_grandchildren_called_only_once_dynamic(luigi_output):
     task only once! Luigi takes care of invoking run only once, we take care to invoke cleanup() only once.
     In this test all child tasks are created dynamically.
     """
-    _run_it(different_grandchild=False, use_dynamic_dependency=True, expected_result=1)
+    counter = _run_root_task(different_grandchild=False, use_dynamic_dependency=True)
+    assert counter == 1, "number of Cleanups not matching"
 
 
 def test_cleanup_of_grandchildren_called_twice_dynamic(luigi_output):
@@ -148,4 +151,5 @@ def test_cleanup_of_grandchildren_called_twice_dynamic(luigi_output):
     will invoke cleanup of grandchild twice.
     In this test all child tasks are created dynamically.
     """
-    _run_it(different_grandchild=True, use_dynamic_dependency=True, expected_result=2)
+    counter = _run_root_task(different_grandchild=True, use_dynamic_dependency=True)
+    assert counter == 2, "number of Cleanups not matching"

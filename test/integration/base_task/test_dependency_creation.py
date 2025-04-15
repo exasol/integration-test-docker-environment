@@ -1,4 +1,4 @@
-from test.integration.base_task.base_task import TestBaseTask
+from test.integration.base_task.base_task import BaseTestTask
 
 import luigi
 from luigi import Parameter
@@ -8,7 +8,7 @@ from exasol_integration_test_docker_environment.lib.base.run_task import (
 )
 
 
-class RootTestTask(TestBaseTask):
+class RootTestTask(BaseTestTask):
     def register_required(self):
         self.task2 = self.register_dependency(
             self.create_child_task(task_class=StaticChildTask)
@@ -27,14 +27,14 @@ class RootTestTask(TestBaseTask):
         self.logger.info(f"""task3_2 {tasks_3["2"].get_output()}""")
 
 
-class StaticChildTask(TestBaseTask):
+class StaticChildTask(BaseTestTask):
 
     def run_task(self):
         self.logger.info("RUN")
         self.return_object([1, 2, 3, 4])
 
 
-class DynamiChildTask(TestBaseTask):
+class DynamiChildTask(BaseTestTask):
     input_param = Parameter()
 
     def run_task(self):

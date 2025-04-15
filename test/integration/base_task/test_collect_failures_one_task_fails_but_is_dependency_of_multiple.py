@@ -1,4 +1,4 @@
-from test.integration.base_task.base_task import TestBaseTask
+from test.integration.base_task.base_task import BaseTestTask
 
 import luigi
 from luigi import Parameter
@@ -8,7 +8,7 @@ from exasol_integration_test_docker_environment.lib.base.run_task import (
 )
 
 
-class RootTestTask(TestBaseTask):
+class RootTestTask(BaseTestTask):
 
     def register_required(self):
         tasks = [
@@ -21,7 +21,7 @@ class RootTestTask(TestBaseTask):
         pass
 
 
-class ChildTestTask(TestBaseTask):
+class ChildTestTask(BaseTestTask):
     p = Parameter()
 
     def register_required(self):
@@ -31,7 +31,7 @@ class ChildTestTask(TestBaseTask):
         pass
 
 
-class GrandChildTestTask(TestBaseTask):
+class GrandChildTestTask(BaseTestTask):
     def run_task(self):
         raise Exception("%s" % self.task_id)
 
