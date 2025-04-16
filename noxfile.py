@@ -65,9 +65,7 @@ def run_all_tests(session: nox.Session, db_version: str):
     """
     env = {"EXASOL_VERSION": db_version}
     session.run("pytest", "./test/unit")
-    session.run(
-        "pytest", "-m", "not gpu", "./test/integration", env=env
-    )
+    session.run("pytest", "-m", "not gpu", "./test/integration", env=env)
     with session.chdir(ROOT):
         session.run(
             "python",
@@ -107,7 +105,9 @@ def run_minimal_tests(session: nox.Session, db_version: str):
     session.run("pytest", *minimal_tests["unit"])
     for test in minimal_tests["new-itest"]:
         session.run(
-            "pytest", "-m", "not gpu",
+            "pytest",
+            "-m",
+            "not gpu",
             f"./test/integration/{test}",
             env=env,
         )
@@ -130,9 +130,7 @@ def run_gpu_tests(session: nox.Session, db_version: str):
     This test requires the appropriate NVIDIA GPU and drivers to be installed.
     """
     env = {"EXASOL_VERSION": db_version}
-    session.run(
-        "pytest", "-m", "gpu", "./test/integration", env=env
-    )
+    session.run("pytest", "-m", "gpu", "./test/integration", env=env)
 
 
 @nox.session(name="get-all-db-versions", python=False)
