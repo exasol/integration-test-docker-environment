@@ -1,8 +1,10 @@
 from inspect import cleandoc
 
 import pyexasol
+import pytest
 
 
+@pytest.mark.gpu
 def test_gpu(cli_database):
 
     query_accelerator_parameters = cleandoc(

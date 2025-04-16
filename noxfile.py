@@ -60,13 +60,13 @@ def run_all_tests(session: nox.Session, db_version: str):
     Run all tests using the specified version of Exasol database or all versions currently supported by the ITDE.
     This nox tasks runs 3 different groups of tests for the ITDE:
     1. new unit tests (using pytest framework)
-    2. new integration tests (also using pytest)
+    2. new integration tests (also using pytest), excluding the GPU specific tests.
     3. old tests (mainly integration tests) using python module "unitest"
     """
     env = {"EXASOL_VERSION": db_version}
     session.run("pytest", "./test/unit")
     session.run(
-        "pytest", "--ignore", "./test/integration/gpu", "./test/integration", env=env
+        "pytest", "-m", "not gpu", "./test/integration", env=env
     )
     with session.chdir(ROOT):
         session.run(
@@ -86,6 +86,7 @@ def run_minimal_tests(session: nox.Session, db_version: str):
     """
     This nox task runs selected tests from new unit tests and selected old and new integration tests using the
     specified version of Exasol database or all versions currently supported by the ITDE.
+    It does not run the GPU specific tests.
     """
     env = {"EXASOL_VERSION": db_version}
     minimal_tests = {
@@ -106,8 +107,8 @@ def run_minimal_tests(session: nox.Session, db_version: str):
     session.run("pytest", *minimal_tests["unit"])
     for test in minimal_tests["new-itest"]:
         session.run(
-            "pytest",
-            f"./test/integration/normal/{test}",
+            "pytest", "-m", "not gpu",
+            f"./test/integration/{test}",
             env=env,
         )
     with session.chdir(ROOT):
@@ -126,10 +127,11 @@ def run_gpu_tests(session: nox.Session, db_version: str):
     """
     This nox task runs gpu tests using the specified version of Exasol database
     or all versions currently supported by the ITDE which have GPU support.
+    This test requires the appropriate NVIDIA GPU and drivers to be installed.
     """
     env = {"EXASOL_VERSION": db_version}
     session.run(
-        "pytest", "--ignore", "./test/integration/normal", "./test/integration", env=env
+        "pytest", "-m", "gpu", "./test/integration", env=env
     )
 
 
