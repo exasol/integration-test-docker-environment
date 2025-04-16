@@ -1,5 +1,5 @@
 [Global]
-    Revision = 17
+    Revision = 16
     Checksum = COMMIT
     ClusterName = cl4
     Platform = Docker
@@ -29,8 +29,8 @@
     StorageMaxConnections = 1024
     # The meta package name, which was installed by C4 to run this system.
     MetaPackage = none
-    ConfVersion = 8.54.0
-    OSVersion = 8.54.0
+    ConfVersion = 8.56.0
+    OSVersion = 8.56.0
     DBVersion = 8.34.0
     ImageVersion = 8.34.0
     # Cored only accepts incomming messages from privileged ports (port number less than 1024).
@@ -40,7 +40,7 @@
     # Which subnets Cored will allow messages from. Each subnet must be sepparated by a comma.
     # A subnet is either an IPv4 or IPv6 address in CIDR notation.
     CoredSubnets =
-    BuiltinScriptLanguageName = slc-9.2.0_c4_7_standard_EXASOL_all/ScriptLanguages_standard_EXASOL_all_slc_v9.2.0_IJ7V37CU
+    BuiltinScriptLanguageNames = slc-9.2.0_c4_7_standard_EXASOL_all/ScriptLanguages_standard_EXASOL_all_slc_v9.2.0_IJ7V37CU
 
 # SSL options
 [SSL]
