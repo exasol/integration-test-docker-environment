@@ -5,7 +5,7 @@ import pytest
 
 
 @pytest.mark.gpu
-def test_gpu(cli_database):
+def test_gpu(cli_context):
 
     query_accelerator_parameters = cleandoc(
         f"""
@@ -22,7 +22,7 @@ def test_gpu(cli_database):
         "--additional-db-parameter",
         "-enableAcceleratorDeviceDetection=1",
     ]
-    with cli_database(name="test_gpu", additional_parameters=additional_param) as db:
+    with cli_context(name="test_gpu", additional_parameters=additional_param) as db:
         host_name = db.on_host_docker_environment.database_host
         port = db.on_host_docker_environment.ports.database
         dsn = f"{host_name}:{port}"

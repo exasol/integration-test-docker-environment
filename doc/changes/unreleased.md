@@ -5,7 +5,7 @@
 ### Supported Exasol Versions
 
 * **7.1**: up to 7.1.29
-* **8**: from 8.17.0 up to 8.32.0
+* **8**: from 8.17.0 up to 8.34.0
 
 ## Features
 
