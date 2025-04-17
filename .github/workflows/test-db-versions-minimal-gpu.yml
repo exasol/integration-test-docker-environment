@@ -9,7 +9,7 @@ jobs:
     with:
       only_gpu: true
   test-docker-gpu:
-    name: Run GPU Tests for Exasol  ${{ matrix.exasol_version }}
+    name: Run GPU Minimal Tests for Exasol  ${{ matrix.exasol_version }}
     runs-on:
       labels: int-linux-x64-4core-gpu-t4-ubuntu24.04-1
     needs: get_exasol_versions_with_gpu
