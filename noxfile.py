@@ -40,7 +40,7 @@ def parse_test_arguments(session: nox.Session):
     )
     args = parser.parse_args(session.posargs)
     db_version = args.db_version
-    if args.test_set == TestSet.DEFAULT.value:
+    if args.test_set == TestSet.GPU_ONLY.value:
         if db_version not in get_db_versions_gpu_only():
             parser.error(f"db-version must be one of {get_db_versions_gpu_only()}")
     else:
