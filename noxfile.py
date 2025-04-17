@@ -21,8 +21,13 @@ from exasol.toolbox.nox.tasks import *  # type: ignore
 # default actions to be run if nothing is explicitly specified with the -s option
 nox.options.sessions = ["project:fix"]
 
+def test_arg_parser():
+    parser = ArgumentParser()
+    parser.add_argument("db-version")
+    parser.add_argument("test-set", choices=["gpu-only", "normal"], required=True, help="Test set name")
+    return parser
 
-def get_db_versions_only_gpu() -> List[str]:
+def get_db_versions_gpu_only() -> List[str]:
     template_path = ROOT / "docker_db_config_template"
     db_versions = [str(path.name) for path in template_path.iterdir() if path.is_dir()]
 
@@ -54,84 +59,92 @@ def get_db_versions() -> List[str]:
 
 
 @nox.session(name="run-all-tests", python=False)
-@nox.parametrize("db_version", get_db_versions())
-def run_all_tests(session: nox.Session, db_version: str):
+def run_all_tests(session: nox.Session):
     """
-    Run all tests using the specified version of Exasol database or all versions currently supported by the ITDE.
-    This nox tasks runs 3 different groups of tests for the ITDE:
-    1. new unit tests (using pytest framework)
-    2. new integration tests (also using pytest), excluding the GPU specific tests.
-    3. old tests (mainly integration tests) using python module "unitest"
+    Run all tests using the specified version of Exasol database.
+    If test-set is set to "normal":
+        This nox tasks runs 3 different groups of tests for the ITDE:
+        1. new unit tests (using pytest framework)
+        2. new integration tests (also using pytest), excluding GPU Tests.
+        3. old tests (mainly integration tests) using python module "unitest"
+    If test-set is set to "gpu-only":
+        This nox tasks runs only the GPU specific integration tests using pytest.
     """
-    env = {"EXASOL_VERSION": db_version}
-    session.run("pytest", "./test/unit")
-    session.run("pytest", "-m", "not gpu", "./test/integration", env=env)
-    with session.chdir(ROOT):
-        session.run(
-            "python",
-            "-u",
-            "-m",
-            "unittest",
-            "discover",
-            "./exasol_integration_test_docker_environment/test",
-            env=env,
-        )
+    parser = test_arg_parser()
+    args = parser.parse_args(session.posargs)
+    env = {"EXASOL_VERSION": args.db_version}
+    if args.test_set == "gpu-only":
+        if args.db_version not in get_db_versions_gpu_only():
+            raise ValueError(f"Version {args.db_version} not supported.")
+        session.run("pytest", "-m", "gpu", "./test/integration", env=env)
+    else:
+        if args.db_version not in get_db_versions():
+            raise ValueError(f"Version {args.db_version} not supported.")
+        session.run("pytest", "./test/unit")
+        session.run("pytest", "-m", "not gpu", "./test/integration", env=env)
+        with session.chdir(ROOT):
+            session.run(
+                "python",
+                "-u",
+                "-m",
+                "unittest",
+                "discover",
+                "./exasol_integration_test_docker_environment/test",
+                env=env,
+            )
 
 
 @nox.session(name="run-minimal-tests", python=False)
-@nox.parametrize("db_version", get_db_versions())
 def run_minimal_tests(session: nox.Session, db_version: str):
     """
     This nox task runs selected tests from new unit tests and selected old and new integration tests using the
     specified version of Exasol database or all versions currently supported by the ITDE.
     It does not run the GPU specific tests.
     """
-    env = {"EXASOL_VERSION": db_version}
-    minimal_tests = {
-        "old-itest": [
-            # "test_cli_test_environment.py",
-            "test_doctor.py",
-            "test_termination_handler.py",
-        ],
-        "new-itest": [
-            "test_api_test_environment.py",
-            "test_cli_environment.py",
-            "test_db_container_log_thread.py",
-            "test_api_logging.py",
-            "base_task",
-        ],
-        "unit": ["./test/unit"],
-    }
-    session.run("pytest", *minimal_tests["unit"])
-    for test in minimal_tests["new-itest"]:
-        session.run(
-            "pytest",
-            "-m",
-            "not gpu",
-            f"./test/integration/{test}",
-            env=env,
-        )
-    with session.chdir(ROOT):
-        for test in minimal_tests["old-itest"]:
+    parser = test_arg_parser()
+    args = parser.parse_args(session.posargs)
+    env = {"EXASOL_VERSION": args.db_version}
+    if args.test_set == "gpu-only":
+        if args.db_version not in get_db_versions_gpu_only():
+            raise ValueError(f"Version {args.db_version} not supported.")
+
+        session.run("pytest", "-m", "gpu", "./test/integration", env=env)
+    else:
+        if args.db_version not in get_db_versions():
+            raise ValueError(f"Version {args.db_version} not supported.")
+
+        minimal_tests = {
+            "old-itest": [
+                # "test_cli_test_environment.py",
+                "test_doctor.py",
+                "test_termination_handler.py",
+            ],
+            "new-itest": [
+                "test_api_test_environment.py",
+                "test_cli_environment.py",
+                "test_db_container_log_thread.py",
+                "test_api_logging.py",
+                "base_task",
+            ],
+            "unit": ["./test/unit"],
+        }
+        session.run("pytest", *minimal_tests["unit"])
+        for test in minimal_tests["new-itest"]:
             session.run(
-                "python",
-                "-u",
-                f"./exasol_integration_test_docker_environment/test/{test}",
+                "pytest",
+                "-m",
+                "not gpu",
+                f"./test/integration/{test}",
                 env=env,
             )
-
-
-@nox.session(name="run-gpu-tests", python=False)
-@nox.parametrize("db_version", get_db_versions_only_gpu())
-def run_gpu_tests(session: nox.Session, db_version: str):
-    """
-    This nox task runs gpu tests using the specified version of Exasol database
-    or all versions currently supported by the ITDE which have GPU support.
-    This test requires the appropriate NVIDIA GPU and drivers to be installed.
-    """
-    env = {"EXASOL_VERSION": db_version}
-    session.run("pytest", "-m", "gpu", "./test/integration", env=env)
-
+        with session.chdir(ROOT):
+            for test in minimal_tests["old-itest"]:
+                session.run(
+                    "python",
+                    "-u",
+                    f"./exasol_integration_test_docker_environment/test/{test}",
+                    env=env,
+                )
 
 @nox.session(name="get-all-db-versions", python=False)
 def get_all_db_versions(session: nox.Session):
@@ -139,15 +152,15 @@ def get_all_db_versions(session: nox.Session):
 
     def parser() -> ArgumentParser:
         p = ArgumentParser(
-            usage="nox -s get-all-db-versions -- [--only-gpu]",
+            usage="nox -s get-all-db-versions -- [--gpu-only]",
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         )
-        p.add_argument("--only-gpu", action="store_true")
+        p.add_argument("--gpu-only", action="store_true")
         return p
 
     args = parser().parse_args(session.posargs)
-    if args.only_gpu:
-        print(json.dumps(get_db_versions_only_gpu()))
+    if args.gpu_only:
+        print(json.dumps(get_db_versions_gpu_only()))
     else:
         print(json.dumps(get_db_versions()))
 

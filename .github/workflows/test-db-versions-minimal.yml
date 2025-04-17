@@ -36,4 +36,4 @@ jobs:
         run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
       - name: Run Minimal Tests
-        run: poetry run -- nox -s "run-minimal-tests(db_version='${{ matrix.exasol_version }}')"
+        run: poetry run -- nox -s run-minimal-tests -- --db_version=''${{ matrix.exasol_version }}') --test-set=normal

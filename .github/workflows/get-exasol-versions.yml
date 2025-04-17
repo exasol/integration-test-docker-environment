@@ -28,7 +28,7 @@ jobs:
 
       - id: set-matrix
         run: |
-          [[ "${ONLY_GPU}" == "true" ]] && AdditionalArgs='--only-gpu' || AdditionalArgs=""
+          [[ "${ONLY_GPU}" == "true" ]] && AdditionalArgs='--gpu-only' || AdditionalArgs=""
           ALL_DB_VERSIONS=`poetry run -- nox --non-interactive -s 'get-all-db-versions' -- $AdditionalArgs` 
           echo "matrix=$ALL_DB_VERSIONS" >> "$GITHUB_OUTPUT"
         env:
