@@ -8,10 +8,8 @@ from typing import List
 
 import nox
 import toml
-from mypy.dmypy.client import action
 from packaging.version import Version
 
-from exasol_integration_test_docker_environment.lib.test_environment import db_version
 from noxconfig import PROJECT_CONFIG
 
 ROOT = Path(__file__).parent
@@ -22,15 +20,17 @@ from exasol.toolbox.nox.tasks import *  # type: ignore
 # default actions to be run if nothing is explicitly specified with the -s option
 nox.options.sessions = ["project:fix"]
 
+
 class TestSet(Enum):
     GPU_ONLY = "gpu-only"
     DEFAULT = "default"
 
 
-
 def parse_test_arguments(session: nox.Session):
     test_set_values = [ts.value for ts in TestSet]
-    parser = ArgumentParser(usage=f"nox -s {session.name} -- [--db-version DB_VERSION] --test-set {{{','.join(test_set_values)}}}")
+    parser = ArgumentParser(
+        usage=f"nox -s {session.name} -- [--db-version DB_VERSION] --test-set {{{','.join(test_set_values)}}}"
+    )
     parser.add_argument("--db-version", default="default")
     parser.add_argument(
         "--test-set",
@@ -39,11 +39,12 @@ def parse_test_arguments(session: nox.Session):
         help="Test set name",
     )
     args = parser.parse_args(session.posargs)
+    db_version = args.db_version
     if args.test_set == TestSet.DEFAULT.value:
-        if db_version not in get_db_versions_gpu_only() and db_version != "default":
+        if db_version not in get_db_versions_gpu_only():
             parser.error(f"db-version must be one of {get_db_versions_gpu_only()}")
     else:
-        if db_version not in get_db_versions() and db_version != "default":
+        if db_version not in get_db_versions():
             parser.error(f"db-version must be one of {get_db_versions()}")
     return db_version, args.test_set
 
@@ -58,7 +59,7 @@ def get_db_versions_gpu_only() -> List[str]:
         for db_version in db_versions
         if Version(db_version) >= Version("8.34.0")
     ]
-
+    db_versions.append("default")
     return db_versions
 
 
@@ -91,7 +92,7 @@ def run_all_tests(session: nox.Session):
     If test-set is set to "gpu-only":
         This nox tasks runs only the GPU specific integration tests using pytest.
     """
-    db_version, test_set  = parse_test_arguments(session)
+    db_version, test_set = parse_test_arguments(session)
     env = {"EXASOL_VERSION": db_version}
     if test_set == TestSet.GPU_ONLY.value:
         session.run("pytest", "-m", "gpu", "./test/integration", env=env)
