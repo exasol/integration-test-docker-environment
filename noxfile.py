@@ -21,11 +21,18 @@ from exasol.toolbox.nox.tasks import *  # type: ignore
 # default actions to be run if nothing is explicitly specified with the -s option
 nox.options.sessions = ["project:fix"]
 
+
 def test_arg_parser():
     parser = ArgumentParser()
     parser.add_argument("--db-version")
-    parser.add_argument("--test-set", choices=["gpu-only", "normal"], required=True, help="Test set name")
+    parser.add_argument(
+        "--test-set",
+        choices=["gpu-only", "normal"],
+        required=True,
+        help="Test set name",
+    )
     return parser
+
 
 def get_db_versions_gpu_only() -> List[str]:
     template_path = ROOT / "docker_db_config_template"
@@ -74,7 +81,10 @@ def run_all_tests(session: nox.Session):
     args = parser.parse_args(session.posargs)
     env = {"EXASOL_VERSION": args.db_version}
     if args.test_set == "gpu-only":
-        if args.db_version not in get_db_versions_gpu_only() and args.db_version != "default":
+        if (
+            args.db_version not in get_db_versions_gpu_only()
+            and args.db_version != "default"
+        ):
             raise ValueError(f"Version {args.db_version} not supported.")
         session.run("pytest", "-m", "gpu", "./test/integration", env=env)
     else:
@@ -105,7 +115,10 @@ def run_minimal_tests(session: nox.Session):
     args = parser.parse_args(session.posargs)
     env = {"EXASOL_VERSION": args.db_version}
     if args.test_set == "gpu-only":
-        if args.db_version not in get_db_versions_gpu_only() and args.db_version != "default":
+        if (
+            args.db_version not in get_db_versions_gpu_only()
+            and args.db_version != "default"
+        ):
             raise ValueError(f"Version {args.db_version} not supported.")
 
         session.run("pytest", "-m", "gpu", "./test/integration", env=env)
@@ -145,6 +158,7 @@ def run_minimal_tests(session: nox.Session):
                     f"./exasol_integration_test_docker_environment/test/{test}",
                     env=env,
                 )
+
 
 @nox.session(name="get-all-db-versions", python=False)
 def get_all_db_versions(session: nox.Session):

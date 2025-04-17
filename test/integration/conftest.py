@@ -174,7 +174,7 @@ def default_ubuntu_version():
 
 
 def pytest_collection_modifyitems(items, config):
-    markexpr = config.getoption("markexpr", 'False')
+    markexpr = config.getoption("markexpr", "False")
     if not markexpr:
         config.option.markexpr = f"not gpu"
     elif "gpu" not in markexpr:
