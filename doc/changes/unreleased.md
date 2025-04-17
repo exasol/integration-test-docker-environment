@@ -11,6 +11,7 @@
 
  - #463: Added option to inject environment variables to docker-db 
  - #467: Add Docker-DB 8.32.0
+ - #465: Added a CI test for a GPU setup and added DB 8.34.0
 
 ## Security:
 
