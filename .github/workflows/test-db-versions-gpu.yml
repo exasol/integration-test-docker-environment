@@ -21,6 +21,12 @@ jobs:
       - name: SCM Checkout
         uses: actions/checkout@v4
 
+      - name: Install pipx
+        run: |
+          sudo apt update && sudo apt install -y python3 python3-pip
+          sudo pip install pipx
+          
+
       - name: Setup Python & Poetry Environment
         uses: exasol/python-toolbox/.github/actions/python-environment@1.0.1
         with:
