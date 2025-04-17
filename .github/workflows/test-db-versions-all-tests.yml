@@ -37,4 +37,4 @@ jobs:
         run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
       - name: Run all tests
-        run: poetry run -- nox -s run-all-tests -- -db-version='${{ matrix.exasol_version }}' --test-set=normal
+        run: poetry run -- nox -s run-all-tests -- --db-version='${{ matrix.exasol_version }}' --test-set=normal
