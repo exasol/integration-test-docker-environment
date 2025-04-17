@@ -2,6 +2,7 @@ import argparse
 import json
 import shutil
 from argparse import ArgumentParser
+from enum import Enum
 from pathlib import Path
 from typing import List
 
@@ -21,17 +22,30 @@ from exasol.toolbox.nox.tasks import *  # type: ignore
 # default actions to be run if nothing is explicitly specified with the -s option
 nox.options.sessions = ["project:fix"]
 
+class TestSet(Enum):
+    GPU_ONLY = "gpu-only"
+    DEFAULT = "default"
 
-def test_arg_parser():
-    parser = ArgumentParser()
-    parser.add_argument("--db-version")
+
+
+def parse_test_arguments(session: nox.Session):
+    test_set_values = [ts.value for ts in TestSet]
+    parser = ArgumentParser(usage=f"nox -s {session.name} -- [--db-version DB_VERSION] --test-set {{{','.join(test_set_values)}}}")
+    parser.add_argument("--db-version", default="default")
     parser.add_argument(
         "--test-set",
-        choices=["gpu-only", "normal"],
+        choices=test_set_values,
         required=True,
         help="Test set name",
     )
-    return parser
+    args = parser.parse_args(session.posargs)
+    if args.test_set == TestSet.DEFAULT.value:
+        if db_version not in get_db_versions_gpu_only() and db_version != "default":
+            parser.error(f"db-version must be one of {get_db_versions_gpu_only()}")
+    else:
+        if db_version not in get_db_versions() and db_version != "default":
+            parser.error(f"db-version must be one of {get_db_versions()}")
+    return db_version, args.test_set
 
 
 def get_db_versions_gpu_only() -> List[str]:
@@ -77,19 +91,11 @@ def run_all_tests(session: nox.Session):
     If test-set is set to "gpu-only":
         This nox tasks runs only the GPU specific integration tests using pytest.
     """
-    parser = test_arg_parser()
-    args = parser.parse_args(session.posargs)
-    env = {"EXASOL_VERSION": args.db_version}
-    if args.test_set == "gpu-only":
-        if (
-            args.db_version not in get_db_versions_gpu_only()
-            and args.db_version != "default"
-        ):
-            raise ValueError(f"Version {args.db_version} not supported.")
+    db_version, test_set  = parse_test_arguments(session)
+    env = {"EXASOL_VERSION": db_version}
+    if test_set == TestSet.GPU_ONLY.value:
         session.run("pytest", "-m", "gpu", "./test/integration", env=env)
     else:
-        if args.db_version not in get_db_versions() and args.db_version != "default":
-            raise ValueError(f"Version {args.db_version} not supported.")
         session.run("pytest", "./test/unit")
         session.run("pytest", "-m", "not gpu", "./test/integration", env=env)
         with session.chdir(ROOT):
@@ -111,21 +117,11 @@ def run_minimal_tests(session: nox.Session):
     specified version of Exasol database or all versions currently supported by the ITDE.
     It does not run the GPU specific tests.
     """
-    parser = test_arg_parser()
-    args = parser.parse_args(session.posargs)
-    env = {"EXASOL_VERSION": args.db_version}
-    if args.test_set == "gpu-only":
-        if (
-            args.db_version not in get_db_versions_gpu_only()
-            and args.db_version != "default"
-        ):
-            raise ValueError(f"Version {args.db_version} not supported.")
-
+    db_version, test_set = parse_test_arguments(session)
+    env = {"EXASOL_VERSION": db_version}
+    if test_set == TestSet.GPU_ONLY.value:
         session.run("pytest", "-m", "gpu", "./test/integration", env=env)
     else:
-        if args.db_version not in get_db_versions() and args.db_version != "default":
-            raise ValueError(f"Version {args.db_version} not supported.")
-
         minimal_tests = {
             "old-itest": [
                 # "test_cli_test_environment.py",
