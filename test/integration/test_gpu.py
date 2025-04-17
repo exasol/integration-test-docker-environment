@@ -28,4 +28,4 @@ def test_gpu(cli_context):
         dsn = f"{host_name}:{port}"
         connection = pyexasol.connect(dsn=dsn, user="sys", password="exasol")
         result = connection.execute(query_accelerator_parameters).fetchall()
-        assert result == [("0",), ("0",)]
+        assert result == [("1",), ("1",)]
