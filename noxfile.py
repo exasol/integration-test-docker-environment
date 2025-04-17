@@ -23,8 +23,8 @@ nox.options.sessions = ["project:fix"]
 
 def test_arg_parser():
     parser = ArgumentParser()
-    parser.add_argument("db-version")
-    parser.add_argument("test-set", choices=["gpu-only", "normal"], required=True, help="Test set name")
+    parser.add_argument("--db-version")
+    parser.add_argument("--test-set", choices=["gpu-only", "normal"], required=True, help="Test set name")
     return parser
 
 def get_db_versions_gpu_only() -> List[str]:
@@ -74,11 +74,11 @@ def run_all_tests(session: nox.Session):
     args = parser.parse_args(session.posargs)
     env = {"EXASOL_VERSION": args.db_version}
     if args.test_set == "gpu-only":
-        if args.db_version not in get_db_versions_gpu_only():
+        if args.db_version not in get_db_versions_gpu_only() and args.db_version != "default":
             raise ValueError(f"Version {args.db_version} not supported.")
         session.run("pytest", "-m", "gpu", "./test/integration", env=env)
     else:
-        if args.db_version not in get_db_versions():
+        if args.db_version not in get_db_versions() and args.db_version != "default":
             raise ValueError(f"Version {args.db_version} not supported.")
         session.run("pytest", "./test/unit")
         session.run("pytest", "-m", "not gpu", "./test/integration", env=env)
@@ -95,7 +95,7 @@ def run_all_tests(session: nox.Session):
 
 
 @nox.session(name="run-minimal-tests", python=False)
-def run_minimal_tests(session: nox.Session, db_version: str):
+def run_minimal_tests(session: nox.Session):
     """
     This nox task runs selected tests from new unit tests and selected old and new integration tests using the
     specified version of Exasol database or all versions currently supported by the ITDE.
@@ -105,12 +105,12 @@ def run_minimal_tests(session: nox.Session, db_version: str):
     args = parser.parse_args(session.posargs)
     env = {"EXASOL_VERSION": args.db_version}
     if args.test_set == "gpu-only":
-        if args.db_version not in get_db_versions_gpu_only():
+        if args.db_version not in get_db_versions_gpu_only() and args.db_version != "default":
             raise ValueError(f"Version {args.db_version} not supported.")
 
         session.run("pytest", "-m", "gpu", "./test/integration", env=env)
     else:
-        if args.db_version not in get_db_versions():
+        if args.db_version not in get_db_versions() and args.db_version != "default":
             raise ValueError(f"Version {args.db_version} not supported.")
 
         minimal_tests = {

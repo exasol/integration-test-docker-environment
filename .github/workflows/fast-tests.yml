@@ -44,8 +44,8 @@ jobs:
     name: Run Db Versions Minimal Tests
     uses: ./.github/workflows/test-db-versions-minimal.yml
 
-  db-version-gpu-tests:
-    name: Run Db Versions GPU Tests
+  db-version-minimal-gpu-tests:
+    name: Run Db Versions GPU Minimal Tests
     uses: ./.github/workflows/test-db-versions-minimal-gpu.yml
 
   test-docker-starter:
