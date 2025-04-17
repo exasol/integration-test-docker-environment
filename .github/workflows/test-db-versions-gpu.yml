@@ -27,6 +27,11 @@ jobs:
           curl -sSL https://install.python-poetry.org | POETRY_VERSION=2.1.2 python3 -
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
+      - name: Setup Poetry
+        run: |
+          poetry env use python3
+          poetry install
+
       - name: Allow unprivileged user namespaces
         run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
