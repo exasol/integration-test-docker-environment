@@ -30,11 +30,16 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Setup pipx and poetry
+      - name: Install pipx and poetry
         run: |
           pip install pipx
           pipx install poetry=="2.1.2"
           echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Setup Poetry
+        run: |
+          poetry env use python3
+          poetry install
 
       - name: Run GPU Tests
         run: poetry run -- nox -s run-all-tests -- --db-version='${{ matrix.exasol_version }}' --test-set=gpu-only
