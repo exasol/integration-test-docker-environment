@@ -25,7 +25,7 @@ jobs:
       #because pipx is not installed on int-linux-x64-4core-gpu-t4-ubuntu24.04-1
       - name: Install Poetry
         run: |
-          sudo apt update && sudo apt install -y python3 python3-pip
+          sudo apt update && sudo apt install -y python3
           curl -sSL https://install.python-poetry.org | POETRY_VERSION=2.1.2 python3 -
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
@@ -35,4 +35,4 @@ jobs:
           poetry install
 
       - name: Run GPU Tests
-        run: poetry run -- nox -s run-minimal-tests -- --db-version='${{ matrix.exasol_version }}' --test-set=gpu-only
+        run: poetry run -- nox -s run-all-tests -- --db-version='${{ matrix.exasol_version }}' --test-set=gpu-only

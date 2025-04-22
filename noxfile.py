@@ -34,13 +34,13 @@ def parse_test_arguments(session: nox.Session):
     parser.add_argument("--db-version", default="default")
     parser.add_argument(
         "--test-set",
-        choices=test_set_values,
+        type=TestSet,
         required=True,
         help="Test set name",
     )
     args = parser.parse_args(session.posargs)
     db_version = args.db_version
-    if args.test_set == TestSet.GPU_ONLY.value:
+    if args.test_set == TestSet.GPU_ONLY:
         if db_version not in get_db_versions_gpu_only():
             parser.error(f"db-version must be one of {get_db_versions_gpu_only()}")
     else:
@@ -84,7 +84,7 @@ def get_db_versions() -> List[str]:
 def run_all_tests(session: nox.Session):
     """
     Run all tests using the specified version of Exasol database.
-    If test-set is set to "normal":
+    If test-set is set to "default":
         This nox tasks runs 3 different groups of tests for the ITDE:
         1. new unit tests (using pytest framework)
         2. new integration tests (also using pytest), excluding GPU Tests.
@@ -94,7 +94,7 @@ def run_all_tests(session: nox.Session):
     """
     db_version, test_set = parse_test_arguments(session)
     env = {"EXASOL_VERSION": db_version}
-    if test_set == TestSet.GPU_ONLY.value:
+    if test_set == TestSet.GPU_ONLY:
         session.run("pytest", "-m", "gpu", "./test/integration", env=env)
     else:
         session.run("pytest", "./test/unit")
@@ -114,13 +114,17 @@ def run_all_tests(session: nox.Session):
 @nox.session(name="run-minimal-tests", python=False)
 def run_minimal_tests(session: nox.Session):
     """
-    This nox task runs selected tests from new unit tests and selected old and new integration tests using the
-    specified version of Exasol database or all versions currently supported by the ITDE.
-    It does not run the GPU specific tests.
+    This nox task runs selected tests.
+    There are two options: `--db-version` and `--test-set`.
+    It `test-set` is set to `gpu-only`,
+    then only the minimal GPU tests will be executed, using the
+    specified version of Exasol database.
+    Otherwise, it executes  new unit tests and selected old and new integration tests using the
+    specified version of Exasol database.
     """
     db_version, test_set = parse_test_arguments(session)
     env = {"EXASOL_VERSION": db_version}
-    if test_set == TestSet.GPU_ONLY.value:
+    if test_set == TestSet.GPU_ONLY:
         session.run("pytest", "-m", "gpu", "./test/integration", env=env)
     else:
         minimal_tests = {
