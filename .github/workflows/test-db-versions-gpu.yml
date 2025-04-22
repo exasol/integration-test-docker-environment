@@ -28,6 +28,9 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
+      - name: Setup pipx
+        run: pip install pipx
+
       - name: Setup Python & Poetry Environment
         uses: exasol/python-toolbox/.github/actions/python-environment@1.0.0
         with:
