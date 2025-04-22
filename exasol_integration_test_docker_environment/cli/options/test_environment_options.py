@@ -22,7 +22,7 @@ test_environment_options = [
     ),
 ]
 
-LATEST_DB_VERSION = """8.32.0"""
+LATEST_DB_VERSION = """8.34.0"""
 
 docker_db_options = [
     click.option(

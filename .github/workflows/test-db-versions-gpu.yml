@@ -1,0 +1,45 @@
+name: Test Docker GPU
+
+on:
+  workflow_call:
+
+jobs:
+  get_exasol_versions_with_gpu:
+    uses: ./.github/workflows/get-exasol-versions.yml
+    with:
+      only_gpu: true
+  test-docker-gpu:
+    name: Run GPU Tests for Exasol  ${{ matrix.exasol_version }}
+    runs-on:
+      labels: int-linux-x64-4core-gpu-t4-ubuntu24.04-1
+    needs: get_exasol_versions_with_gpu
+    env:
+      PYTHON_VERSION: "3.10"
+    strategy:
+      fail-fast: false
+      matrix:
+        exasol_version: ${{fromJson(needs.get_exasol_versions_with_gpu.outputs.matrix)}}
+    steps:
+      - name: SCM Checkout
+        uses: actions/checkout@v4
+
+        #Cannot use exasol/python-toolbox/.github/actions/python-environment here
+        #because pipx is not installed on int-linux-x64-4core-gpu-t4-ubuntu24.04-1
+      - name: Setup Python (${{ env.PYTHON_VERSION }})
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install pipx and poetry
+        run: |
+          pip install pipx
+          pipx install poetry=="2.1.2"
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Setup Poetry
+        run: |
+          poetry env use python3
+          poetry install
+
+      - name: Run GPU Tests
+        run: poetry run -- nox -s run-all-tests -- --db-version='${{ matrix.exasol_version }}' --test-set=gpu-only

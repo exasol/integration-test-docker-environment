@@ -171,3 +171,11 @@ def luigi_output(tmp_path):
 @pytest.fixture(scope="module")
 def default_ubuntu_version():
     return "ubuntu:22.04"
+
+
+def pytest_collection_modifyitems(items, config):
+    markexpr = config.getoption("markexpr", "False")
+    if not markexpr:
+        config.option.markexpr = f"not gpu"
+    elif "gpu" not in markexpr:
+        config.option.markexpr = f"not gpu or ({markexpr})"

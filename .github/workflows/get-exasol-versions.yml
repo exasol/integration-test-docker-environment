@@ -1,11 +1,19 @@
 on:
   workflow_call:
+    inputs:
+      only_gpu:
+          description: 'Filter for versions which support GPU'
+          default: false
+          required: false
+          type: boolean
+
     outputs:
       matrix:
         description: "The list of known db versions"
         value: ${{ jobs.get_exasol_versions.outputs.matrix }}
 jobs:
   get_exasol_versions:
+    name: "get_exasol_versions with_gpu=${{inputs.only_gpu}}"
     runs-on: ubuntu-24.04
     steps:
       - name: SCM Checkout
@@ -16,12 +24,16 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Print matrix
-        run: poetry run -- nox --non-interactive -s "get-all-db-versions"
-
       - id: set-matrix
         run: |
-          ALL_DB_VERSIONS=`poetry run -- nox --non-interactive -s 'get-all-db-versions'` 
+          [[ "${ONLY_GPU}" == "true" ]] && AdditionalArgs='--gpu-only' || AdditionalArgs=""
+          ALL_DB_VERSIONS=`poetry run -- nox --non-interactive -s 'get-all-db-versions' -- $AdditionalArgs` 
           echo "matrix=$ALL_DB_VERSIONS" >> "$GITHUB_OUTPUT"
+        env:
+          ONLY_GPU: ${{ inputs.only_gpu }}
+
+      - name: Print matrix
+        run: echo ${{ steps.set-matrix.outputs.matrix }}
+
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}

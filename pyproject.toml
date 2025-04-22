@@ -90,3 +90,8 @@ force_grid_wrap = 2
 [tool.pylint.format]
 max-line-length = 88
 max-module-lines = 800
+
+[tool.pytest.ini_options]
+markers = [
+    "gpu: tests which require a GPU (deselect with '-m \"not gpu\"')",
+]
