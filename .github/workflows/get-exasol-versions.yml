@@ -23,9 +23,6 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Print matrix
-        run: poetry run -- nox --non-interactive -s "get-all-db-versions"
-
       - id: set-matrix
         run: |
           [[ "${ONLY_GPU}" == "true" ]] && AdditionalArgs='--gpu-only' || AdditionalArgs=""
@@ -33,5 +30,9 @@ jobs:
           echo "matrix=$ALL_DB_VERSIONS" >> "$GITHUB_OUTPUT"
         env:
           ONLY_GPU: ${{ inputs.only_gpu }}
+
+      - name: Print matrix
+        run: echo "$GITHUB_OUTPUT"
+
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
