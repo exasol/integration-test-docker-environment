@@ -31,8 +31,8 @@
     MetaPackage = none
     ConfVersion = 8.56.0
     OSVersion = 8.56.0
-    DBVersion = 8.34.0
-    ImageVersion = 8.34.0
+    DBVersion = {{ db_version }}
+    ImageVersion = {{ db_version }}
     # Cored only accepts incomming messages from privileged ports (port number less than 1024).
     CoredUsePrivilegedPorts = False
     # Cored only accepts incomming messages from its own subnet.
@@ -161,7 +161,7 @@
     # Unique id of this database.
     ID = aCbUZhU3R8eEc0UIDS7wQw
     # Version nr. of this database.
-    Version = 8.34.0
+    Version = {{ db_version }}
     # Memory size over all nodes (e. g. '1 TiB').
     MemSize = {{ mem_size }}
     Port = {{ db_port }}
