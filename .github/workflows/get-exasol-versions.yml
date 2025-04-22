@@ -32,7 +32,7 @@ jobs:
           ONLY_GPU: ${{ inputs.only_gpu }}
 
       - name: Print matrix
-        run: echo "$GITHUB_OUTPUT"
+        run: echo ${{ steps.set-matrix.outputs.matrix }}
 
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
