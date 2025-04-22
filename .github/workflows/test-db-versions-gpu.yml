@@ -23,19 +23,17 @@ jobs:
       - name: SCM Checkout
         uses: actions/checkout@v4
 
+        #Cannot use exasol/python-toolbox/.github/actions/python-environment here
+        #because pipx is not installed on int-linux-x64-4core-gpu-t4-ubuntu24.04-1
       - name: Setup Python (${{ env.PYTHON_VERSION }})
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Setup pipx
-        run: pip install pipx
-
-      - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@1.0.0
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-          poetry-version: "2.1.2"
+      - name: Setup pipx and poetry
+        run: |
+          pip install pipx
+          pipx install poetry=="2.1.2"
 
       - name: Run GPU Tests
         run: poetry run -- nox -s run-all-tests -- --db-version='${{ matrix.exasol_version }}' --test-set=gpu-only
