@@ -34,6 +34,7 @@ jobs:
         run: |
           pip install pipx
           pipx install poetry=="2.1.2"
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Run GPU Tests
         run: poetry run -- nox -s run-all-tests -- --db-version='${{ matrix.exasol_version }}' --test-set=gpu-only
