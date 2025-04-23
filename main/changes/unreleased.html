@@ -2,7 +2,7 @@
 <html lang="en" data-accent-color="grass" data-content_root="../">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Unreleased - Toolbox</title><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="4.0.1 - 2025-03-12" href="changes_4.0.1.html" /><link rel="prev" title="Integration-Test-Docker-Environment 0.1.0, released 25.06.2020" href="changes_0.1.0.html" /><script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Unreleased - Toolbox</title><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="4.1.0 - 2025-04-23" href="changes_4.1.0.html" /><link rel="prev" title="Integration-Test-Docker-Environment 0.1.0, released 25.06.2020" href="changes_0.1.0.html" /><script>
     function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
     setColorMode(localStorage._theme||"auto");
   </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=397bb51e" />
@@ -186,6 +186,7 @@ data-aria-dark="Switch to auto color mode">
 <li class="toctree-l2"><a class="reference internal" href="changes_0.2.0.html">Integration-Test-Docker-Environment 0.2.0, released 2020-11-17</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changes_0.1.0.html">Integration-Test-Docker-Environment 0.1.0, released 25.06.2020</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Unreleased</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changes_4.1.0.html">4.1.0 - 2025-04-23</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changes_4.0.1.html">4.0.1 - 2025-03-12</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changes_4.0.0.html">4.0.0 - 2025-03-12</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changes_3.4.0.html">3.4.0 - 2025-01-21</a></li>
@@ -203,14 +204,7 @@ data-aria-dark="Switch to auto color mode">
     <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
       <i class="i-lucide close"></i>
     </button>
-    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
-<li><a class="reference internal" href="#summary">Summary</a></li>
-<li><a class="reference internal" href="#supported-exasol-versions">Supported Exasol Versions</a></li>
-<li><a class="reference internal" href="#features">Features</a></li>
-<li><a class="reference internal" href="#security">Security:</a></li>
-<li><a class="reference internal" href="#refactorings">Refactorings</a></li>
-</ul>
-</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
   </aside>
   <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
   <main class="sy-main w-full max-sm:max-w-full print:pt-6"><div class="sy-breadcrumbs" role="navigation">
@@ -244,47 +238,6 @@ data-aria-dark="Switch to auto color mode">
         <article class="yue" role="main">
           <section id="unreleased">
 <h1>Unreleased<a class="headerlink" href="#unreleased" title="Link to this heading">¶</a></h1>
-<section id="summary">
-<h2>Summary<a class="headerlink" href="#summary" title="Link to this heading">¶</a></h2>
-</section>
-<section id="supported-exasol-versions">
-<h2>Supported Exasol Versions<a class="headerlink" href="#supported-exasol-versions" title="Link to this heading">¶</a></h2>
-<ul class="simple">
-<li><p><strong>7.1</strong>: up to 7.1.29</p></li>
-<li><p><strong>8</strong>: from 8.17.0 up to 8.34.0</p></li>
-</ul>
-</section>
-<section id="features">
-<h2>Features<a class="headerlink" href="#features" title="Link to this heading">¶</a></h2>
-<ul class="simple">
-<li><p>#463: Added option to inject environment variables to docker-db</p></li>
-<li><p>#467: Add Docker-DB 8.32.0</p></li>
-<li><p>#465: Added a CI test for a GPU setup and added DB 8.34.0</p></li>
-</ul>
-</section>
-<section id="security">
-<h2>Security:<a class="headerlink" href="#security" title="Link to this heading">¶</a></h2>
-<ul class="simple">
-<li><p>#469 Resolved CVE-2024-12797 in transitive dependency <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> via fabric &amp; pyexasol by updating <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> to version 44.0.2</p>
-<ul>
-<li><p>Due to changes in cryptography’s Python support (!=3.9.0 and 3.9.1), we updated our support to Python ^3.9.2.</p></li>
-</ul>
-</li>
-</ul>
-</section>
-<section id="refactorings">
-<h2>Refactorings<a class="headerlink" href="#refactorings" title="Link to this heading">¶</a></h2>
-<ul class="simple">
-<li><p>#427: Use GH approval required for slow tests</p></li>
-<li><p>#469: Updated to poetry 2.1.2</p>
-<ul>
-<li><p>Updated <code class="docutils literal notranslate"><span class="pre">exasol-toolbox</span></code> to 1.0.0</p></li>
-</ul>
-</li>
-<li><p>#452: Use luigi mypy plugin for luigi parameters
--#472: Convert integration API test to pytest - part I</p></li>
-</ul>
-</section>
 </section>
 
         </article><button class="back-to-top" type="button">
@@ -299,10 +252,10 @@ data-aria-dark="Switch to auto color mode">
         <span>Previous</span><div class="title">Integration-Test-Docker-Environment 0.1.0, released 25.06.2020</div></div>
     </a>
   </div><div class="navigation-next">
-    <a href="changes_4.0.1.html">
+    <a href="changes_4.1.0.html">
       <div class="page-info">
         <span>Next</span>
-        <div class="title">4.0.1 - 2025-03-12</div>
+        <div class="title">4.1.0 - 2025-04-23</div>
       </div>
       <i class="i-lucide chevron-right"></i>
     </a>
