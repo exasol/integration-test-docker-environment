@@ -16,11 +16,11 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@1.0.0
+        uses: exasol/python-toolbox/.github/actions/python-environment@1.2.0
 
       - name: Check Version(s)
         run: |
-          poetry run version-check `poetry run -- python -c "from noxconfig import PROJECT_CONFIG; print(PROJECT_CONFIG.version_file)"`
+          poetry run -- nox -s version:check -- exasol_integration_test_docker_environment/version.py
 
   Documentation:
     name: Docs
@@ -32,7 +32,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@1.0.0
+        uses: exasol/python-toolbox/.github/actions/python-environment@1.2.0
 
       - name: Build Documentation
         run: |
@@ -55,7 +55,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@1.0.0
+        uses: exasol/python-toolbox/.github/actions/python-environment@1.2.0
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -84,7 +84,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@1.0.0
+        uses: exasol/python-toolbox/.github/actions/python-environment@1.2.0
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -104,7 +104,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@1.0.0
+        uses: exasol/python-toolbox/.github/actions/python-environment@1.2.0
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -127,7 +127,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@1.0.0
+        uses: exasol/python-toolbox/.github/actions/python-environment@1.2.0
         with:
           python-version: "3.9"
 
