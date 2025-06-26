@@ -6,6 +6,8 @@ on:
 jobs:
   test-docker-starter:
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     steps:
       - name: SCM Checkout
         uses: actions/checkout@v4

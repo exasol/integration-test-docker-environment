@@ -15,12 +15,14 @@ jobs:
   get_exasol_versions:
     name: "get_exasol_versions with_gpu=${{inputs.only_gpu}}"
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     steps:
       - name: SCM Checkout
         uses: actions/checkout@v4
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@1.2.0
+        uses: exasol/python-toolbox/.github/actions/python-environment@1.5.0
         with:
           python-version: "3.10"
 

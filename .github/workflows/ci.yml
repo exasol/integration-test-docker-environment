@@ -2,20 +2,27 @@ name: CI
 
 on:
   pull_request:
+      types: [opened, synchronize, reopened]
 
 jobs:
 
   checks:
     name: Checks
     uses: ./.github/workflows/checks.yml
+    permissions:
+      contents: read
 
   fast-tests:
     name: Fast Tests
     uses: ./.github/workflows/fast-tests.yml
+    permissions:
+      contents: read
 
   slow-tests-approval:
     name: Approve Slow Tests
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
 
     # Even though the environment "manual-approval" will be created automatically,
     # it still needs to be configured to require interactive review.
@@ -34,18 +41,25 @@ jobs:
   slow-tests:
     name: Slow Tests
     needs: slow-tests-approval
+    permissions:
+      contents: read
     uses: ./.github/workflows/slow-tests.yml
     #Do not inherit secrets because ITDE Slow Tests does not need it
 
   metrics:
     name: Report Metrics
     needs: [ checks, fast-tests ]
+    secrets: inherit
+    permissions:
+      contents: read
     uses: ./.github/workflows/report.yml
 
   # This job ensures inputs have been executed successfully.
   approve-merge:
     name: Allow Merge
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     # If you need additional jobs to be part of the merge gate, add them below
     needs: [ checks, fast-tests, slow-tests ]
 
@@ -53,4 +67,3 @@ jobs:
     steps:
       - name: Approve
         run: echo "Merge Approved"
-

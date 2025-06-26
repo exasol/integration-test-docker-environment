@@ -6,12 +6,16 @@ on:
 jobs:
   get_exasol_versions_with_gpu:
     uses: ./.github/workflows/get-exasol-versions.yml
+    permissions:
+      contents: read
     with:
       only_gpu: true
   test-docker-gpu:
     name: Run GPU Tests for Exasol  ${{ matrix.exasol_version }}
     runs-on:
       labels: int-linux-x64-4core-gpu-t4-ubuntu24.04-1
+    permissions:
+      contents: read
     needs: get_exasol_versions_with_gpu
     env:
       PYTHON_VERSION: "3.10"
