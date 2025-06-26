@@ -11,12 +11,14 @@ from nox import Session
 class Config:
     root: Path = Path(__file__).parent
     doc: Path = Path(__file__).parent / "doc"
+    source: Path = Path("exasol_integration_test_docker_environment")
     version_file: Path = (
         Path(__file__).parent
         / "exasol_integration_test_docker_environment"
         / "version.py"
     )
     path_filters: Iterable[str] = ("dist", ".eggs", "venv", "resources")
+    python_versions = ["3.9", "3.10", "3.11", "3.12", "3.13"]
 
 
 PROJECT_CONFIG = Config()
