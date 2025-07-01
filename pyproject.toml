@@ -1,6 +1,6 @@
 [project]
 name = "exasol-integration-test-docker-environment"
-version = "4.1.0"
+version = "4.2.0"
 description = "Integration Test Docker Environment for Exasol"
 authors = [
     {name="Torsten Kilias", email="torsten.kilias@exasol.com"},
