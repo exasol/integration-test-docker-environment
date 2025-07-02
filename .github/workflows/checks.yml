@@ -4,11 +4,11 @@ on:
   workflow_call:
 
 jobs:
-
   Version-Check:
     name: Version
     runs-on: ubuntu-24.04
-
+    permissions:
+      contents: read
     steps:
       - name: SCM Checkout
         uses: actions/checkout@v4
@@ -16,46 +16,65 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@1.2.0
+        uses: exasol/python-toolbox/.github/actions/python-environment@1.5.0
 
       - name: Check Version(s)
-        run: |
-          poetry run -- nox -s version:check -- exasol_integration_test_docker_environment/version.py
+        run: poetry run -- nox -s version:check
 
   Documentation:
     name: Docs
     needs: [ Version-Check ]
     runs-on: ubuntu-24.04
-
+    permissions:
+      contents: read
     steps:
       - name: SCM Checkout
         uses: actions/checkout@v4
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@1.2.0
+        uses: exasol/python-toolbox/.github/actions/python-environment@1.5.0
 
       - name: Build Documentation
         run: |
-          poetry run -- python -m nox -s docs:build
+          poetry run -- nox -s docs:build
 
   build-matrix:
     name: Generate Build Matrix
     uses: ./.github/workflows/matrix-python.yml
+    permissions:
+      contents: read
+
+  Changelog:
+    name: Changelog Update Check
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    if: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/master' }}
+    steps:
+      - name: SCM Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python & Poetry Environment
+        uses: exasol/python-toolbox/.github/actions/python-environment@1.5.0
+
+      - name: Run changelog update check
+        run: poetry run -- nox -s changelog:updated
 
   Lint:
     name: Linting (Python-${{ matrix.python-version }})
     needs: [ Version-Check, build-matrix ]
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
-
     steps:
       - name: SCM Checkout
         uses: actions/checkout@v4
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@1.2.0
+        uses: exasol/python-toolbox/.github/actions/python-environment@1.5.0
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -63,7 +82,7 @@ jobs:
         run: poetry run -- nox -s lint:code
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4.6.0
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: lint-python${{ matrix.python-version }}
           path: |
@@ -75,6 +94,8 @@ jobs:
     name: Type Checking (Python-${{ matrix.python-version }})
     needs: [ Version-Check, build-matrix ]
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
@@ -84,7 +105,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@1.2.0
+        uses: exasol/python-toolbox/.github/actions/python-environment@1.5.0
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -95,6 +116,8 @@ jobs:
     name: Security Checks (Python-${{ matrix.python-version }})
     needs: [ Version-Check, build-matrix ]
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
@@ -104,7 +127,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@1.2.0
+        uses: exasol/python-toolbox/.github/actions/python-environment@1.5.0
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -112,7 +135,7 @@ jobs:
         run: poetry run -- nox -s lint:security
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4.4.0
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: security-python${{ matrix.python-version }}
           path: .security.json
@@ -121,19 +144,20 @@ jobs:
   Format:
     name: Format Check
     runs-on: ubuntu-24.04
-
+    permissions:
+      contents: read
     steps:
       - name: SCM Checkout
         uses: actions/checkout@v4
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@1.2.0
-        with:
-          python-version: "3.9"
+        uses: exasol/python-toolbox/.github/actions/python-environment@1.5.0
 
       - name: Run format check
         run: poetry run -- nox -s project:format
 
   EXAConf-files:
     name: Test EXAConf files
+    permissions:
+      contents: read
     uses: ./.github/workflows/test-exaconf-files.yml

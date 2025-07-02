@@ -9,19 +9,28 @@ jobs:
 
   checks:
     name: Checks
+    permissions:
+      contents: read
     uses: ./.github/workflows/checks.yml
 
   fast-tests:
     name: Fast Tests
+    permissions:
+      contents: read
     uses: ./.github/workflows/fast-tests.yml
 
   slow-tests:
     name: Slow Tests
+    permissions:
+      contents: read
     uses: ./.github/workflows/slow-tests.yml
     #Do not inherit secrets because ITDE Slow Tests does not need it
 
   metrics:
     name: Report Metrics
     needs: [ checks, fast-tests ]
+    secrets: inherit
+    permissions:
+      contents: read
     uses: ./.github/workflows/report.yml
 

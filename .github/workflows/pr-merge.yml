@@ -11,26 +11,38 @@ jobs:
   # This job can be removed if certain preconditions are met. See
   # https://exasol.github.io/python-toolbox/user_guide/workflows.html#pr-merge-workflow
 
-  checks:
+  ci-job:
     name: Checks
     uses: ./.github/workflows/checks.yml
+    permissions:
+      contents: read
 
   fast-tests:
     name: Fast Tests
     uses: ./.github/workflows/fast-tests.yml
+    permissions:
+      contents: read
 
   metrics:
     name: Report Metrics
-    needs: [ checks, fast-tests ]
+    needs: [ ci-job, fast-tests ]
     uses: ./.github/workflows/report.yml
+    permissions:
+      contents: read
 
   publish-docs:
     name: Publish Documentation
     uses: ./.github/workflows/gh-pages.yml
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
 
   publish-docker-runner:
     name: Publish Runner Docker Image to Dockerhub
     uses: ./.github/workflows/publish-docker-runner.yml
+    permissions:
+      contents: read
     secrets:
       DOCKER_USER_NAME: ${{ secrets.DOCKER_USER_NAME }}
       DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}

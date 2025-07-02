@@ -7,6 +7,8 @@ jobs:
   build:
     name: Test Shell Scripts
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     steps:
       - name: SCM Checkout
         uses: actions/checkout@v4

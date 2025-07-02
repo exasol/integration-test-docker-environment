@@ -7,12 +7,18 @@ jobs:
 
   test-db-versions-all-tests:
     name: Run all tests with all supported Db Versions
+    permissions:
+      contents: read
     uses: ./.github/workflows/test-db-versions-all-tests.yml
 
   test-python-versions:
     name: Run all tests with all supported Python versions
+    permissions:
+      contents: read
     uses: ./.github/workflows/test-python-versions.yml
 
   db-version-gpu-tests:
     name: Run Db Versions GPU Tests
+    permissions:
+      contents: read
     uses: ./.github/workflows/test-db-versions-gpu.yml
