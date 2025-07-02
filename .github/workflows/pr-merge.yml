@@ -26,6 +26,7 @@ jobs:
   metrics:
     name: Report Metrics
     needs: [ ci-job, fast-tests ]
+    secrets: inherit
     uses: ./.github/workflows/report.yml
     permissions:
       contents: read
