@@ -28,10 +28,10 @@ Comparison to Docker-DB and the Exasol Testcontainers
    Java project use the Exasol Testcontainer, because they are more
    integrated in the Java ecosystem than this project. Testcontainers
    are designed to integrate with popular unit testing frameworks like
-   `JUnit4 <https://www.testcontainers.org/test_framework_integration/junit_4/>`__,
-   `JUnit5 <https://www.testcontainers.org/test_framework_integration/junit_5/>`__
+   `JUnit4 <https://java.testcontainers.org/test_framework_integration/junit_4/>`__,
+   `JUnit5 <https://java.testcontainers.org/test_framework_integration/junit_5/>`__
    and
-   `Spock <https://www.testcontainers.org/test_framework_integration/spock/>`__.
+   `Spock <https://java.testcontainers.org/test_framework_integration/spock/>`__.
    Most notably, lifecycle management of containers controlled by the
    tests lifecycle.
 
@@ -50,7 +50,7 @@ In order to start a Docker-DB Test Environment, you need:
 
    -  Linux
    -  Mac OS X with `Docker Desktop on
-      Mac <https://docs.docker.com/docker-for-mac/install/>`__ and Intel
+      Mac <https://docs.docker.com/desktop/setup/install/mac-install/>`__ and Intel
       processor
    -  Windows is currently **not supported**
 
@@ -384,8 +384,8 @@ What happens under the hood
 Mac OS X with Docker Desktop for Mac uses a lightweight virtual machine
 with linux in which the docker daemon runs and the containers get
 started. This makes
-`networking <https://docs.docker.com/docker-for-mac/networking/>`__ and
-`shared directories <https://docs.docker.com/docker-for-mac/osxfs/>`__
+`networking <https://docs.docker.com/desktop/features/networking/>`__ and
+`shared directories <https://docs.docker.com/desktop/features/synchronized-file-sharing/>`__
 more complicated then on Linux.
 
 We start the python setup script for the test environment in its own
