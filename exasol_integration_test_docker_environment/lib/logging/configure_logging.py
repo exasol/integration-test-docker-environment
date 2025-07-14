@@ -1,9 +1,9 @@
 import contextlib
 import warnings
+from collections.abc import Iterator
 from pathlib import Path
 from typing import (
     Dict,
-    Iterator,
     Optional,
     Tuple,
 )
@@ -20,7 +20,7 @@ from exasol_integration_test_docker_environment.lib.logging.luigi_log_config imp
 @contextlib.contextmanager
 def configure_logging(
     log_file_path: Path, log_level: Optional[str], use_job_specific_log_file: bool
-) -> Iterator[Dict[str, str]]:
+) -> Iterator[dict[str, str]]:
     with get_luigi_log_config(
         log_file_target=log_file_path,
         log_level=log_level,
@@ -50,7 +50,7 @@ def configure_logging(
 
 def _configure_logging_parameter(
     log_level: Optional[str], luigi_config: Path, use_job_specific_log_file: bool
-) -> Tuple[bool, Dict[str, str]]:
+) -> tuple[bool, dict[str, str]]:
     if use_job_specific_log_file:
         no_configure_logging = False
         run_kwargs = {"logging_conf_file": f"{luigi_config}"}

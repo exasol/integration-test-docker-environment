@@ -21,7 +21,7 @@ class CommandLogHandler(AbstractLogHandler):
         timestamp = cur_time.strftime("%H.%M.%S")
         msecs = str(int(cur_time.microsecond / 1000))
         usecs = str(int(cur_time.microsecond % 1000))
-        return timestamp + '.' + msecs + '.' + usecs
+        return timestamp + "." + msecs + "." + usecs
 
     def handle_log_line(self, log_line, error: bool = False):
         log_time = CommandLogHandler.timestamp_for_logging()

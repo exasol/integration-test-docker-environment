@@ -40,7 +40,7 @@ def mock_settings_env_vars():
 
 
 class UsedLogPath:
-    def __init__(self, task: Dict[str, Any]) -> None:
+    def __init__(self, task: dict[str, Any]) -> None:
         self.log_path = Path(task["log_path"])
         self.task_input_parameter = task["in_parameter"]
 

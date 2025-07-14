@@ -38,7 +38,7 @@ from exasol_integration_test_docker_environment.lib.utils.api_function_decorator
 def build_test_container(
     test_container_content: TestContainerContentDescription,
     force_rebuild: bool = False,
-    force_rebuild_from: Tuple[str, ...] = tuple(),
+    force_rebuild_from: tuple[str, ...] = tuple(),
     force_pull: bool = False,
     output_directory: str = DEFAULT_OUTPUT_DIRECTORY,
     temporary_base_directory: str = "/tmp",

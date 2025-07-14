@@ -1,10 +1,12 @@
 import contextlib
+from collections.abc import (
+    Generator,
+    Iterator,
+)
 from typing import (
     Any,
     ContextManager,
     Dict,
-    Generator,
-    Iterator,
     Optional,
     Protocol,
 )
@@ -41,7 +43,7 @@ class ApiContextProvider(Protocol):
     def __call__(
         self,
         name: Optional[str],
-        additional_parameters: Optional[Dict[str, Any]] = None,
+        additional_parameters: Optional[dict[str, Any]] = None,
     ) -> ContextManager[ExaslctDockerTestEnvironment]: ...
 
 
@@ -56,7 +58,7 @@ def build_api_context_provider(
     @contextlib.contextmanager
     def create_context(
         name: Optional[str] = None,
-        additional_parameters: Optional[Dict[str, Any]] = None,
+        additional_parameters: Optional[dict[str, Any]] = None,
     ) -> Generator[ExaslctDockerTestEnvironment, None, None]:
         name = name if name else test_environment.name
         spawned = test_environment.spawn_docker_test_environment(
@@ -73,7 +75,7 @@ class ApiContextProviderWithTestContainer(Protocol):
     def __call__(
         self,
         name: Optional[str],
-        additional_parameters: Optional[Dict[str, Any]] = None,
+        additional_parameters: Optional[dict[str, Any]] = None,
         test_container_content: Optional[TestContainerContentDescription] = None,
     ) -> ContextManager[ExaslctDockerTestEnvironment]: ...
 
@@ -91,7 +93,7 @@ def build_api_context_provider_with_test_container(
     @contextlib.contextmanager
     def create_context(
         name: Optional[str] = None,
-        additional_parameters: Optional[Dict[str, Any]] = None,
+        additional_parameters: Optional[dict[str, Any]] = None,
         test_container_content=default_test_container_content,
     ) -> Generator[ExaslctDockerTestEnvironment, None, None]:
         name = name if name else test_environment.name

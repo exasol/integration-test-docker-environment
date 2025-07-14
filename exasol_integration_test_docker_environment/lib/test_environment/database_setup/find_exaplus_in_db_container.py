@@ -24,7 +24,7 @@ def find_exaplus(
         exit, output = os_executor.exec("find /opt -name 'exaplus' -type f")
     if exit != 0:
         raise RuntimeError(f"Exaplus not found on docker db! Output is {output}")
-    found_paths: List[str] = list(filter(None, output.decode("UTF-8").split("\n")))
+    found_paths: list[str] = list(filter(None, output.decode("UTF-8").split("\n")))
     if len(found_paths) != 1:
         raise RuntimeError(f"Error determining exaplus path! Output is {output}")
     exaplus_path = PurePath(found_paths[0])

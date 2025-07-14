@@ -25,7 +25,7 @@ class TestEnvironmentVariable(unittest.TestCase):
         utils.close_environments(cls.test_environment)
 
     def assert_env_variable(
-        self, env_variables: List[str], docker_environment_name: str
+        self, env_variables: list[str], docker_environment_name: str
     ):
         with ContextDockerClient() as docker_client:
             containers = [
