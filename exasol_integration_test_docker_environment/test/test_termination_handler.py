@@ -41,7 +41,7 @@ def run_with_unknown_error(queue: Queue) -> None:
         raise RuntimeError("unknown error")
 
 
-def get_queue_content(q: Queue) -> list[str]:
+def get_queue_content(q: Queue) -> List[str]:
     result = list()
     while not q.empty():
         result.append(q.get(block=False))

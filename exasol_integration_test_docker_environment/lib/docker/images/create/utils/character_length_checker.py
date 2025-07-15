@@ -23,7 +23,7 @@ class CharacterLengthChecker:
         self._count_directory_names = count_directory_names
         self._count_file_names = count_file_names
 
-    def add_and_check(self, directories: list[str], files: list[str]) -> None:
+    def add_and_check(self, directories: List[str], files: List[str]) -> None:
         """
         Adds number of characters of the names of all directories and files to the internal counter
         and applies the check if the internal counter becomes greater than the given limit.

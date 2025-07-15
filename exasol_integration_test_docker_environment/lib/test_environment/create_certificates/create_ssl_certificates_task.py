@@ -1,9 +1,7 @@
-from collections.abc import (
-    Generator,
-    Iterator,
-)
 from typing import (
     Dict,
+    Generator,
+    Iterator,
     Optional,
     Set,
 )
@@ -88,13 +86,13 @@ class CreateSSLCertificatesTask(DockerBaseTask):
 
     def build_image(
         self,
-    ) -> Generator[DockerCertificateContainerBuild, None, dict[str, ImageInfo]]:
+    ) -> Generator[DockerCertificateContainerBuild, None, Dict[str, ImageInfo]]:
         task = self.create_child_task(
             task_class=DockerCertificateContainerBuild,
             certificate_container_root_directory=self._temp_resource_directory.tmp_directory,
         )
         image_infos_future = yield from self.run_dependencies(task)
-        image_infos: dict[str, ImageInfo] = self.get_values_from_future(image_infos_future)  # type: ignore
+        image_infos: Dict[str, ImageInfo] = self.get_values_from_future(image_infos_future)  # type: ignore
         return image_infos
 
     def get_volume_info(self, reused: bool) -> DockerVolumeInfo:
@@ -147,7 +145,7 @@ class CreateSSLCertificatesTask(DockerBaseTask):
         return f"{self.db_container_name}.{self.network_name}"
 
     def create_certificate(
-        self, image_infos: dict[str, ImageInfo], volume_info: DockerVolumeInfo
+        self, image_infos: Dict[str, ImageInfo], volume_info: DockerVolumeInfo
     ) -> None:
         certificate_container_image_info = image_infos[DockerCertificateBuildBase.GOAL]
         volumes = {

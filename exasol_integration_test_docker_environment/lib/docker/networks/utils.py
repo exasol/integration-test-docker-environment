@@ -1,5 +1,5 @@
 import logging
-from collections.abc import Iterable
+from typing import Iterable
 
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 

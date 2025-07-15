@@ -15,7 +15,7 @@ MOCK_TEST_CONTAINER_PATH = TEST_CONTAINER_ROOT_PATH / "mock"
 
 def get_test_container_content(
     test_container_path: Path = FULL_TEST_CONTAINER_PATH,
-    runtime_mapping: tuple[TestContainerRuntimeMapping, ...] = tuple(),
+    runtime_mapping: Tuple[TestContainerRuntimeMapping, ...] = tuple(),
 ) -> TestContainerContentDescription:
     return TestContainerContentDescription(
         docker_file=str(test_container_path / "Dockerfile"),

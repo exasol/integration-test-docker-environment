@@ -4,7 +4,7 @@ from typing import (
 )
 
 
-def find_images_by_tag(docker_client, condition: Callable[[str], bool]) -> list:
+def find_images_by_tag(docker_client, condition: Callable[[str], bool]) -> List:
     images = docker_client.images.list()
     filter_images = [
         image

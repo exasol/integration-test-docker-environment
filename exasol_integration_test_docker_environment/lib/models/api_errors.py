@@ -1,5 +1,5 @@
-from collections.abc import Iterable
 from typing import (
+    Iterable,
     List,
     Optional,
 )
@@ -16,7 +16,7 @@ class HealthProblem(RuntimeError):
 class TaskFailures(Exception):
     """Represents a potential cause of a TaskRuntimeError"""
 
-    def __init__(self, inner: Optional[list[str]] = None):
+    def __init__(self, inner: Optional[List[str]] = None):
         super().__init__(self._construct_exception_message(inner))
         self.inner = inner
 
@@ -31,7 +31,7 @@ class TaskFailures(Exception):
 class TaskRuntimeError(RuntimeError):
     """Represents an error which occurred during execution of a luigi task"""
 
-    def __init__(self, msg: str, inner: Optional[list[str]] = None):
+    def __init__(self, msg: str, inner: Optional[List[str]] = None):
         """
         Creates a TaskRuntimeError
         Args:

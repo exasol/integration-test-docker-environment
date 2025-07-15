@@ -36,7 +36,7 @@ def is_click_command(obj: Any) -> bool:
 
 def defaults_of_click_call(
     click_call: click.Command,
-) -> list[tuple[Optional[str], Any]]:
+) -> List[Tuple[Optional[str], Any]]:
     """
     Returns the default values of all None-required parameters of a click-command.
     """
@@ -47,7 +47,7 @@ def defaults_of_click_call(
     ]
 
 
-def param_names_of_click_call(click_call: click.Command) -> list[Optional[str]]:
+def param_names_of_click_call(click_call: click.Command) -> List[Optional[str]]:
     """
     Returns names of all parameters of a click call
     """
@@ -56,7 +56,7 @@ def param_names_of_click_call(click_call: click.Command) -> list[Optional[str]]:
 
 def get_click_and_api_functions(
     click_module, api_module
-) -> tuple[list[Any], list[Any]]:
+) -> Tuple[List[Any], List[Any]]:
     # Get all click commands in module 'click_module'
     click_commands = [c[1] for c in inspect.getmembers(click_module, is_click_command)]
     # Get all functions in module 'api_module'
@@ -70,7 +70,7 @@ def get_click_and_api_functions(
 
 def get_click_and_api_function_names(
     click_module, api_module
-) -> tuple[list[Any], list[Any]]:
+) -> Tuple[List[Any], List[Any]]:
     # Get all click command names in module 'click_module'
     click_command_names = [
         c[0] for c in inspect.getmembers(click_module, is_click_command)

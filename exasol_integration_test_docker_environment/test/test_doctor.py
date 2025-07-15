@@ -1,7 +1,7 @@
 import os
 import unittest
-from collections.abc import Generator
 from contextlib import contextmanager
+from typing import Generator
 from unittest.mock import patch
 
 from exasol_integration_test_docker_environment.doctor import (

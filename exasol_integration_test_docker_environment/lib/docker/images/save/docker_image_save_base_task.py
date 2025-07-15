@@ -1,7 +1,7 @@
 import os
 import pathlib
 import re
-from collections.abc import Generator
+from typing import Generator
 
 import luigi
 

@@ -293,7 +293,7 @@ class APIClientLoggingTest(unittest.TestCase):
             loggerDict[key].disabled = True
             del loggerDict[key]
 
-    def create_logger_infos(self) -> dict[str, dict[str, Any]]:
+    def create_logger_infos(self) -> Dict[str, Dict[str, Any]]:
         logger_infos = {
             ROOT_LOGGER: self.get_logger_info(logging.root),
             API_CLIENT_LOGGING_TEST_LOGGER: self.get_logger_info(
@@ -306,8 +306,8 @@ class APIClientLoggingTest(unittest.TestCase):
         }
         return logger_infos
 
-    def get_logger_info(self, logger: logging.Logger) -> dict[str, Any]:
-        logger_info: dict[str, Any] = dict()
+    def get_logger_info(self, logger: logging.Logger) -> Dict[str, Any]:
+        logger_info: Dict[str, Any] = dict()
         logger_info[LOGGER_STR] = str(logger)
         logger_info[LEVEL] = logger.level
         logger_info[LEVEL_NAME] = logging.getLevelName(logger.level)

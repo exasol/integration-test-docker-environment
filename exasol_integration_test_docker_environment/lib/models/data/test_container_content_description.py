@@ -44,8 +44,8 @@ class TestContainerContentDescription(Info):
     def __init__(
         self,
         docker_file: Optional[str],
-        build_files_and_directories: list[TestContainerBuildMapping],
-        runtime_mappings: list[TestContainerRuntimeMapping],
+        build_files_and_directories: List[TestContainerBuildMapping],
+        runtime_mappings: List[TestContainerRuntimeMapping],
     ) -> None:
         self.docker_file = docker_file
         self.build_files_and_directories = build_files_and_directories

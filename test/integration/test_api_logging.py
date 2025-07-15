@@ -315,7 +315,7 @@ def test_luigi_no_log_config_and_basic_logging_error(
         assert main_log_glob == []
 
 
-def create_logger_infos() -> dict[str, dict[str, Any]]:
+def create_logger_infos() -> Dict[str, Dict[str, Any]]:
     logger_infos = {
         ROOT_LOGGER: get_logger_info(logging.root),
         API_CLIENT_LOGGING_TEST_LOGGER: get_logger_info(
@@ -327,8 +327,8 @@ def create_logger_infos() -> dict[str, dict[str, Any]]:
     return logger_infos
 
 
-def get_logger_info(logger: logging.Logger) -> dict[str, Any]:
-    logger_info: dict[str, Any] = dict()
+def get_logger_info(logger: logging.Logger) -> Dict[str, Any]:
+    logger_info: Dict[str, Any] = dict()
     logger_info[LOGGER_STR] = str(logger)
     logger_info[LEVEL] = logger.level
     logger_info[LEVEL_NAME] = logging.getLevelName(logger.level)

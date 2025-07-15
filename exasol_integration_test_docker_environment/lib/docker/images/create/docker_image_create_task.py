@@ -1,10 +1,8 @@
 import copy
 import importlib
-from collections.abc import (
+from typing import (
     Generator,
     Iterator,
-)
-from typing import (
     Union,
 )
 

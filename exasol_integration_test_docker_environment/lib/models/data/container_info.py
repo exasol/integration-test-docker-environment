@@ -15,7 +15,7 @@ class ContainerInfo(Info):
         self,
         container_name: str,
         ip_address: str,
-        network_aliases: list[str],
+        network_aliases: List[str],
         network_info: DockerNetworkInfo,
         volume_name: Optional[str] = None,
     ) -> None:

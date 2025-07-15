@@ -84,8 +84,8 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
     certificate_volume_name: Optional[str] = luigi.OptionalParameter(
         default=None, significant=False
     )
-    additional_db_parameter: tuple[str, ...] = luigi.ListParameter()
-    docker_environment_variables: tuple[str, ...] = luigi.ListParameter()
+    additional_db_parameter: Tuple[str, ...] = luigi.ListParameter()
+    docker_environment_variables: Tuple[str, ...] = luigi.ListParameter()
     ssh_user: str = luigi.Parameter(default="root")
     ssh_key_file: Union[str, Path, None] = luigi.OptionalParameter(
         default=None, significant=False
@@ -155,7 +155,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                 still_running_logger.log()
                 log_handler.handle_log_lines(log_line)
 
-    def _get_network_aliases(self) -> list[str]:
+    def _get_network_aliases(self) -> List[str]:
         network_aliases = [
             "exasol_test_database",
             "exasol-test-database",
@@ -175,7 +175,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
 
     def _port_mapping(
         self, internal_ports, forwarded_ports
-    ) -> dict[str, tuple[str, str]]:
+    ) -> Dict[str, Tuple[str, str]]:
         result = {}
         for name, internal in internal_ports.__dict__.items():
             forward = forwarded_ports.__getattribute__(name)
@@ -344,7 +344,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         volume_name,
         container_name,
         remove_old_instances: bool = False,
-    ) -> tuple[Volume, Container]:
+    ) -> Tuple[Volume, Container]:
         """
         Create an intermediate Docker Container containing a volume that
         can be mounted into another Docker Container.

@@ -27,11 +27,11 @@ from exasol_integration_test_docker_environment.testing.spawned_test_environment
 
 
 class NumberCheck:
-    def __init__(self, db: SpawnedTestEnvironments, all: list[str]) -> None:
+    def __init__(self, db: SpawnedTestEnvironments, all: List[str]) -> None:
         self.db = db
         self.all = all
 
-    def count(self, selected: Optional[list[str]] = None):
+    def count(self, selected: Optional[List[str]] = None):
         return len(selected if selected is not None else self.all)
 
     @property
@@ -57,7 +57,7 @@ def smoke_test_sql(exaplus_path: str, env: ExaslctDockerTestEnvironment) -> str:
 
     assert env.environment_info
     db_info = env.environment_info.database_info
-    command: list[str] = [
+    command: List[str] = [
         str(exaplus_path),
         "-c",
         quote(f"{db_info.host}:{db_info.ports.database}"),

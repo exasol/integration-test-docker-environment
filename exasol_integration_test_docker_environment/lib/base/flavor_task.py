@@ -18,7 +18,7 @@ from exasol_integration_test_docker_environment.lib.base.docker_base_task import
 
 
 class FlavorsBaseTask(DependencyLoggerBaseTask):
-    flavor_paths: tuple[str] = luigi.ListParameter()
+    flavor_paths: Tuple[str] = luigi.ListParameter()
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
@@ -28,14 +28,14 @@ class FlavorsBaseTask(DependencyLoggerBaseTask):
 
     def create_tasks_for_flavors_with_common_params(
         self, cls, **kwargs
-    ) -> dict[str, Any]:
+    ) -> Dict[str, Any]:
         return {
             flavor_path: self._create_task_with_common_params(cls, flavor_path, kwargs)
             for flavor_path in self.flavor_paths
         }
 
     def _create_task_with_common_params(
-        self, cls: type[BaseTaskType], flavor_path, kwargs
+        self, cls: Type[BaseTaskType], flavor_path, kwargs
     ) -> BaseTaskType:
         params = {**kwargs, "flavor_path": flavor_path}
         task = self.create_child_task_with_common_params(cls, **params)

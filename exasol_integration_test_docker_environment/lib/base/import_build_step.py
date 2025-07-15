@@ -6,7 +6,7 @@ from exasol_integration_test_docker_environment.lib import (
 )
 
 
-def import_build_steps(flavor_path: tuple[str, ...]) -> None:
+def import_build_steps(flavor_path: Tuple[str, ...]) -> None:
     # TODO Move to script-languages-container-tools: https://github.com/exasol/script-languages-container-tool/issues/268
     # We need to load the build steps of a flavor in the commandline processor,
     # because the imported classes need to be available in all processes spawned by luigi.

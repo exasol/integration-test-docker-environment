@@ -67,7 +67,7 @@ class WaitForTestDockerDatabase(DockerBaseTask, DatabaseCredentialsParameter):
 
     def start_wait_threads(
         self, db_container: Container
-    ) -> tuple[DBContainerLogThread, IsDatabaseReadyThread]:
+    ) -> Tuple[DBContainerLogThread, IsDatabaseReadyThread]:
         startup_log_file = self.get_log_path().joinpath("startup.log")
         container_log_thread = DBContainerLogThread(
             db_container,

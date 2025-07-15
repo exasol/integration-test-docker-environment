@@ -4,7 +4,7 @@ from typing import List
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 
 
-def remove_docker_volumes(volumes: list[str]):
+def remove_docker_volumes(volumes: List[str]):
     """
     Removes the given volumes using docker API.
     """

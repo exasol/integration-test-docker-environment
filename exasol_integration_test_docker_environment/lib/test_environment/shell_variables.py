@@ -13,7 +13,7 @@ class ShellVariables:
     Represents a collection of unix shell environment variables.
     """
 
-    def __init__(self, env: dict[str, str]) -> None:
+    def __init__(self, env: Dict[str, str]) -> None:
         self.env = env
 
     @classmethod
@@ -29,7 +29,7 @@ class ShellVariables:
         info = test_environment_info
         assert info.database_info.ports.database is not None
         assert info.database_info.ports.bucketfs is not None
-        env: dict[str, str] = {
+        env: Dict[str, str] = {
             "NAME": info.name,
             "TYPE": info.type if isinstance(info.type, str) else info.type.name,
             "DATABASE_HOST": info.database_info.host,

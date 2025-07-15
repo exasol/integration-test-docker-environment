@@ -49,7 +49,7 @@ def parse_test_arguments(session: nox.Session):
     return db_version, args.test_set
 
 
-def get_db_versions_gpu_only() -> list[str]:
+def get_db_versions_gpu_only() -> List[str]:
     template_path = ROOT / "docker_db_config_template"
     db_versions = [str(path.name) for path in template_path.iterdir() if path.is_dir()]
 
@@ -63,7 +63,7 @@ def get_db_versions_gpu_only() -> list[str]:
     return db_versions
 
 
-def get_db_versions() -> list[str]:
+def get_db_versions() -> List[str]:
     template_path = ROOT / "docker_db_config_template"
     db_versions = [str(path.name) for path in template_path.iterdir() if path.is_dir()]
     db_versions.append("default")

@@ -15,7 +15,7 @@ from exasol_integration_test_docker_environment.lib.test_environment.database_wa
 )
 
 
-def _build_docker_command(logs: list[str]):
+def _build_docker_command(logs: List[str]):
     """
     Builds a bash while loop command which can be used to print logs.
     Args:
@@ -30,7 +30,7 @@ def _build_docker_command(logs: list[str]):
     return ["bash", "-c", bash_command]
 
 
-def _run_container_log_thread(logger, logs: list[str]) -> Optional[str]:
+def _run_container_log_thread(logger, logs: List[str]) -> Optional[str]:
     """
     Starts a dummy docker container which prints logs in an endless loop, and calls DBContainerLogThread on that container.
 

@@ -59,10 +59,10 @@ class TestDockerBuildBaseTestAnalyzeImage(DockerAnalyzeImageTask):
 
 
 class TestDockerBuildBase(DockerBuildBase):
-    goals: list[str] = luigi.ListParameter(default=[])
+    goals: List[str] = luigi.ListParameter(default=[])
 
-    def get_goal_class_map(self) -> dict[str, DockerAnalyzeImageTask]:
-        goal_class_map: dict[str, DockerAnalyzeImageTask] = {
+    def get_goal_class_map(self) -> Dict[str, DockerAnalyzeImageTask]:
+        goal_class_map: Dict[str, DockerAnalyzeImageTask] = {
             "test-analyze-image-1": self.create_child_task(
                 task_class=TestDockerBuildBaseTestAnalyzeImage,
                 task_name="test-analyze-image-1",
@@ -73,7 +73,7 @@ class TestDockerBuildBase(DockerBuildBase):
         }
         return goal_class_map
 
-    def get_default_goals(self) -> set[str]:
+    def get_default_goals(self) -> Set[str]:
         goals = {"test-analyze-image-1"}
         return goals
 

@@ -1,13 +1,13 @@
 import socket
-from collections.abc import Generator
 from contextlib import ExitStack
 from typing import (
+    Generator,
     List,
     Optional,
 )
 
 
-def find_free_ports(num_ports: int) -> list[int]:
+def find_free_ports(num_ports: int) -> List[int]:
     def new_socket():
         return socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 

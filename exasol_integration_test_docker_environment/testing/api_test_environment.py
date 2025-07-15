@@ -66,7 +66,7 @@ class ApiTestEnvironment:
         self,
         name: str,
         test_container_content: TestContainerContentDescription,
-        additional_parameter: Optional[dict[str, Any]] = None,
+        additional_parameter: Optional[Dict[str, Any]] = None,
     ) -> ExaslctDockerTestEnvironment:
         if additional_parameter is None:
             additional_parameter = dict()
@@ -90,7 +90,7 @@ class ApiTestEnvironment:
     def spawn_docker_test_environment(
         self,
         name: str,
-        additional_parameter: Optional[dict[str, Any]] = None,
+        additional_parameter: Optional[Dict[str, Any]] = None,
     ) -> ExaslctDockerTestEnvironment:
         if additional_parameter is None:
             additional_parameter = dict()

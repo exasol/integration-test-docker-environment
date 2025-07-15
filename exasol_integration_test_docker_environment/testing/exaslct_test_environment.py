@@ -165,7 +165,7 @@ class ExaslctTestEnvironment:
             print(e, file=stderr)
 
     def spawn_docker_test_environments(
-        self, name: str, additional_parameter: Optional[list[str]] = None
+        self, name: str, additional_parameter: Optional[List[str]] = None
     ) -> SpawnedTestEnvironments:
         ports = Ports.random_free()
         on_host_parameter = ExaslctDockerTestEnvironment(
@@ -178,7 +178,7 @@ class ExaslctTestEnvironment:
             ports=ports,
         )
 
-        arguments: list[str] = [
+        arguments: List[str] = [
             f"--environment-name {on_host_parameter.name}",
             f"--database-port-forward {on_host_parameter.ports.database}",
             f"--bucketfs-port-forward {on_host_parameter.ports.bucketfs}",
