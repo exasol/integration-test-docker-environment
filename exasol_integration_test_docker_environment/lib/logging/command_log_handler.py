@@ -1,5 +1,8 @@
 import pathlib
-from datetime import datetime
+from datetime import (
+    datetime,
+    timezone,
+)
 
 from exasol_integration_test_docker_environment.lib.logging.abstract_log_handler import (
     AbstractLogHandler,
@@ -15,16 +18,9 @@ class CommandLogHandler(AbstractLogHandler):
         super().__init__(log_file_path, logger)
         self._description = description
 
-    @staticmethod
-    def timestamp_for_logging() -> str:
-        cur_time = datetime.utcnow()
-        timestamp = cur_time.strftime("%H.%M.%S")
-        msecs = str(int(cur_time.microsecond / 1000))
-        usecs = str(int(cur_time.microsecond % 1000))
-        return timestamp + "." + msecs + "." + usecs
-
     def handle_log_line(self, log_line, error: bool = False):
-        log_time = CommandLogHandler.timestamp_for_logging()
+        cur_time = datetime.now(timezone.utc)
+        log_time = cur_time.strftime("%H.%M.%S.%f")
         self._log_file.write(f"{log_time}: {log_line}\n")
         self._log_file.flush()
         self._complete_log.append(f"{log_time}: {log_line}\n")
