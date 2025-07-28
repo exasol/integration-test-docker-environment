@@ -3,17 +3,16 @@ from exasol_integration_test_docker_environment.lib.docker import ContextDockerC
 ADDITIONAL_DB_PARAMS = ["-disableIndexIteratorScan=1", "-disableIndexIteratorScan=1"]
 
 
-def test_additional_params_are_used(cli_context):
-    additional_db_parameters = [
-        f"--additional-db-parameter {add_param}" for add_param in ADDITIONAL_DB_PARAMS
-    ]
-    with cli_context(
-        name="additional_params_are_used",
+def test_additional_params_are_used(api_context):
+    additional_db_parameters = {
+        "additional_db_parameter": tuple(add_db_param for add_db_param in ADDITIONAL_DB_PARAMS)
+    }
+    with api_context(
         additional_parameters=additional_db_parameters,
     ) as db:
         with ContextDockerClient() as docker_client:
             db_container = docker_client.containers.get(
-                db.on_host_docker_environment.environment_info.database_info.container_info.container_name
+                db.environment_info.database_info.container_info.container_name
             )
             exit_code, output = db_container.exec_run("dwad_client print-params DB1")
             assert exit_code == 0, (
