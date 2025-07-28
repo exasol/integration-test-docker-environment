@@ -5,7 +5,9 @@ ADDITIONAL_DB_PARAMS = ["-disableIndexIteratorScan=1", "-disableIndexIteratorSca
 
 def test_additional_params_are_used(api_context):
     additional_db_parameters = {
-        "additional_db_parameter": tuple(add_db_param for add_db_param in ADDITIONAL_DB_PARAMS)
+        "additional_db_parameter": tuple(
+            add_db_param for add_db_param in ADDITIONAL_DB_PARAMS
+        )
     }
     with api_context(
         additional_parameters=additional_db_parameters,
