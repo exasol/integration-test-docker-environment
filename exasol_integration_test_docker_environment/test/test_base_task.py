@@ -20,6 +20,8 @@ from exasol_integration_test_docker_environment.lib.base.run_task import (
 
 TestBaseTask = DependencyLoggerBaseTask
 
+# Deprecated. Replaced by "./test/integration/base_task/*"
+
 
 class TestTask1(TestBaseTask):
     def register_required(self):
