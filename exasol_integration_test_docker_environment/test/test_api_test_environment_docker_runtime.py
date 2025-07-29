@@ -36,6 +36,9 @@ def get_default_docker_runtime():
 
 
 class DockerTestEnvironmentDockerRuntimeNoRuntimeGivenTest(unittest.TestCase):
+    """
+    Deprecated. Replaced by "./test/integration/docker_runtime/test_api_test_environment_default_docker_runtime.py"
+    """
 
     @classmethod
     def setUpClass(cls):
@@ -70,6 +73,9 @@ class DockerTestEnvironmentDockerRuntimeNoRuntimeGivenTest(unittest.TestCase):
 
 
 class DockerTestEnvironmentDockerRuntimeDefaultRuntimeGivenTest(unittest.TestCase):
+    """
+    Deprecated. Replaced by "./test/integration/docker_runtime/test_api_test_environment_custom_docker_runtime.py"
+    """
 
     @classmethod
     def setUpClass(cls):
@@ -107,6 +113,9 @@ class DockerTestEnvironmentDockerRuntimeDefaultRuntimeGivenTest(unittest.TestCas
 
 
 class DockerTestEnvironmentDockerRuntimeInvalidRuntimeGivenTest(unittest.TestCase):
+    """
+    Deprecated. Replaced by "./test/integration/docker_runtime/test_api_test_environment_invalid_docker_runtime.py"
+    """
 
     @classmethod
     def setUpClass(cls):

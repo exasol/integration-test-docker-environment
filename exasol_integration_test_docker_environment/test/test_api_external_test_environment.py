@@ -28,6 +28,9 @@ from exasol_integration_test_docker_environment.testing.api_test_environment imp
 
 
 class APISpawnTestExternalEnvironmentTest(unittest.TestCase):
+    """
+    Deprecated. Replaced by "./test/integration/test_api_external_test_environment.py"
+    """
 
     @classmethod
     def setUpClass(cls):

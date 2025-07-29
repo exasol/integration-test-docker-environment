@@ -25,6 +25,9 @@ from exasol_integration_test_docker_environment.lib.utils.resource_directory imp
 
 
 class DockerCertificateBuildTest(unittest.TestCase):
+    """
+    Deprecated. Replaced by "./test/integration/test_certificate_docker_build.py"
+    """
 
     def clean(self):
         task = generate_root_task(

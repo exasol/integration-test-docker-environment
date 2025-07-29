@@ -16,6 +16,8 @@ from exasol_integration_test_docker_environment.lib.base.run_task import (
 
 TestBaseTask = DependencyLoggerBaseTask
 
+# Deprecated. Replaced by "./test/integration/base_task/*"
+
 
 class TestTaskBase(TestBaseTask):
     different_grandchild = BoolParameter()

@@ -10,6 +10,9 @@ ADDITIONAL_DB_PARAMS = ["-disableIndexIteratorScan=1", "-disableIndexIteratorSca
 
 
 class DockerTestEnvironmentAdditionParamsTest(unittest.TestCase):
+    """
+    Deprecated. Replaced by "./test/integration/test_api_test_environment_additional_params.py"
+    """
 
     @classmethod
     def setUpClass(cls):
