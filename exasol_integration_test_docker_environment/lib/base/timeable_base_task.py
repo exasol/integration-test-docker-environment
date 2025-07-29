@@ -1,6 +1,5 @@
 from datetime import datetime
 from pathlib import Path
-from typing import List
 
 from exasol_integration_test_docker_environment.lib.base.base_task import BaseTask
 

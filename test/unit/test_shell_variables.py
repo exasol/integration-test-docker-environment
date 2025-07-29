@@ -1,8 +1,5 @@
-import contextlib
 from inspect import cleandoc
 from unittest.mock import Mock
-
-import pytest
 
 from exasol_integration_test_docker_environment.lib.test_environment.ports import Ports
 from exasol_integration_test_docker_environment.lib.test_environment.shell_variables import (

@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Tuple
 
 from exasol_integration_test_docker_environment.lib import (
     extract_modulename_for_build_steps,

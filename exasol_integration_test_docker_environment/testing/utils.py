@@ -1,14 +1,10 @@
-import json
 import os
 import re
 import unittest
 from typing import (
     Callable,
-    List,
     Optional,
 )
-
-import requests
 
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 

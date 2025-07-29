@@ -5,7 +5,6 @@ from collections.abc import (
 from pathlib import Path
 from typing import (
     Optional,
-    Tuple,
     Union,
 )
 

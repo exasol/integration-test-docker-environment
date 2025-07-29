@@ -4,7 +4,6 @@ from pathlib import Path
 from threading import Thread
 from typing import (
     Callable,
-    List,
     Optional,
 )
 

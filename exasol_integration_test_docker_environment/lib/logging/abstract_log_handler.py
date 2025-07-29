@@ -1,10 +1,4 @@
-from abc import abstractmethod
 from pathlib import Path
-from typing import (
-    List,
-    Optional,
-)
-
 from exasol_integration_test_docker_environment.lib.base.task_logger_wrapper import (
     TaskLoggerWrapper,
 )

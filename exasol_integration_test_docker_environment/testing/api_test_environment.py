@@ -3,7 +3,6 @@ import tempfile
 from sys import stderr
 from typing import (
     Any,
-    Dict,
     Optional,
 )
 

@@ -2,7 +2,6 @@ import socket
 from collections.abc import Generator
 from contextlib import ExitStack
 from typing import (
-    List,
     Optional,
 )
 

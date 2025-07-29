@@ -1,12 +1,7 @@
 from collections.abc import Iterator
-from typing import (
-    Dict,
-    Set,
-)
 
 import luigi
 
-from exasol_integration_test_docker_environment.lib.base.base_task import BaseTaskType
 from exasol_integration_test_docker_environment.lib.docker.images.create.docker_build_base import (
     DockerBuildBase,
 )

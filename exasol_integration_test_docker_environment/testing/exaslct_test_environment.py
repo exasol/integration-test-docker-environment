@@ -8,7 +8,6 @@ import tempfile
 from pathlib import Path
 from sys import stderr
 from typing import (
-    List,
     Optional,
 )
 

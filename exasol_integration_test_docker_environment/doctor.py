@@ -9,10 +9,6 @@ from collections.abc import (
     Iterable,
 )
 from enum import Enum
-from typing import (
-    List,
-    Tuple,
-)
 
 import docker
 from docker.errors import DockerException

@@ -1,6 +1,4 @@
 from enum import Enum
-from sys import stderr
-
 import jsonpickle
 
 

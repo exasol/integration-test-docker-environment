@@ -3,7 +3,6 @@ from enum import (
     auto,
 )
 from typing import (
-    List,
     Optional,
 )
 

@@ -1,5 +1,3 @@
-from typing import List
-
 from exasol_integration_test_docker_environment.lib.logging.abstract_log_handler import (
     AbstractLogHandler,
 )

@@ -3,19 +3,13 @@ from collections.abc import (
     Iterator,
 )
 from typing import (
-    Dict,
     Optional,
-    Set,
 )
 
 import docker
 import luigi
 
 import exasol_integration_test_docker_environment.certificate_resources.container
-from exasol_integration_test_docker_environment.lib.base.base_task import (
-    BaseTask,
-    BaseTaskType,
-)
 from exasol_integration_test_docker_environment.lib.base.docker_base_task import (
     DockerBaseTask,
 )

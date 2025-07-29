@@ -3,7 +3,6 @@ from typing import (
     Any,
     Callable,
     Optional,
-    Tuple,
 )
 
 import humanfriendly

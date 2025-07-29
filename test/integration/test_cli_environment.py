@@ -1,16 +1,9 @@
 from inspect import cleandoc
 from test.integration.helpers import get_executor_factory
 from typing import (
-    List,
     Optional,
 )
-
-import docker
 import pytest
-
-from exasol_integration_test_docker_environment.lib.base.db_os_executor import (
-    DbOsExecFactory,
-)
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.lib.test_environment.database_setup.find_exaplus_in_db_container import (
     find_exaplus,

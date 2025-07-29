@@ -9,7 +9,6 @@ from pathlib import (
 )
 from typing import (
     Callable,
-    List,
 )
 
 import humanfriendly

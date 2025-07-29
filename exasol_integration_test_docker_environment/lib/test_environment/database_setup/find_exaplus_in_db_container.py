@@ -1,5 +1,4 @@
 from pathlib import PurePath
-from typing import List
 
 import docker
 

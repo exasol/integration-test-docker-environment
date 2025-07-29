@@ -5,7 +5,6 @@ import warnings
 from test.matchers import regex_matcher
 from typing import (
     Any,
-    Dict,
     Optional,
 )
 
@@ -14,9 +13,6 @@ import pytest
 from exasol_integration_test_docker_environment.lib.base.run_task import (
     generate_root_task,
     run_task,
-)
-from exasol_integration_test_docker_environment.lib.models.config.build_config import (
-    set_build_config,
 )
 
 LOGGER_STR = "logger_str"

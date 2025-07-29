@@ -1,10 +1,6 @@
 import traceback
 from collections import OrderedDict
 from pathlib import Path
-from typing import (
-    Dict,
-    List,
-)
 
 from exasol_integration_test_docker_environment.lib.base.timeable_base_task import (
     TimeableBaseTask,

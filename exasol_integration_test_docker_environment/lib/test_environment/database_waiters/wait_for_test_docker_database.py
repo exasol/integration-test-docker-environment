@@ -5,7 +5,6 @@ from datetime import (
     datetime,
     timedelta,
 )
-from typing import Tuple
 
 import luigi
 from docker.models.containers import Container

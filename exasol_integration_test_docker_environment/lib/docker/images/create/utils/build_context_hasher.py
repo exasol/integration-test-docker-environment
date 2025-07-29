@@ -4,7 +4,6 @@ from pathlib import (
     Path,
     PurePath,
 )
-from typing import Dict
 
 # TODO add hash config to the hash
 from exasol_integration_test_docker_environment.lib.docker.images.create.utils.file_directory_list_hasher import (

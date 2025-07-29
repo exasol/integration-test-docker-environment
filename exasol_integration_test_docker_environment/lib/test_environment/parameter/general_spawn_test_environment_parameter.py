@@ -1,6 +1,5 @@
 from typing import (
     Optional,
-    Tuple,
 )
 
 import luigi

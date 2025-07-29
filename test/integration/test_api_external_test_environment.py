@@ -1,5 +1,3 @@
-from typing import List
-
 import pytest
 
 from exasol_integration_test_docker_environment.lib.base.run_task import (

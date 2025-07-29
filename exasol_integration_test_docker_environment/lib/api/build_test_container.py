@@ -1,6 +1,5 @@
 from typing import (
     Optional,
-    Tuple,
 )
 
 from exasol_integration_test_docker_environment.cli.options.docker_repository_options import (

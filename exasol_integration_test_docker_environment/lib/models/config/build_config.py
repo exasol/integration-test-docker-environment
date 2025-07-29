@@ -1,8 +1,6 @@
 import json
 from typing import (
-    List,
     Optional,
-    Tuple,
 )
 
 import luigi

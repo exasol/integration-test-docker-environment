@@ -6,7 +6,6 @@ from typing import (
     Any,
     Callable,
     Optional,
-    Set,
 )
 
 import luigi
