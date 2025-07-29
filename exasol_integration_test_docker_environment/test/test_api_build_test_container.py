@@ -19,6 +19,9 @@ TEST_CONTAINER_CONTENT = get_test_container_content(MOCK_TEST_CONTAINER_PATH)
 
 
 class APIBuildTestContainerTest(unittest.TestCase):
+    """
+    Deprecated. Replaced by "./test/integration/test_api_build_test_container.py"
+    """
 
     def setUp(self):
         print(f"SetUp {self.__class__.__name__}", file=stderr)

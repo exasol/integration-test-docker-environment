@@ -15,6 +15,9 @@ from exasol_integration_test_docker_environment.testing.docker_registry import (
 
 
 class APIPushTestContainerTest(unittest.TestCase):
+    """
+    Deprecated. Replaced by "./test/integration/test_api_push_test_container.py"
+    """
 
     def setUp(self):
         print(f"SetUp {self.__class__.__name__}", file=stderr)

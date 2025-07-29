@@ -17,6 +17,9 @@ from exasol_integration_test_docker_environment.testing.utils import (
 
 
 class CertificateTest(unittest.TestCase):
+    """
+    Deprecated. Replaced by "./test/integration/test_api_test_environment_certificate.py"
+    """
 
     @classmethod
     def setUpClass(cls):
