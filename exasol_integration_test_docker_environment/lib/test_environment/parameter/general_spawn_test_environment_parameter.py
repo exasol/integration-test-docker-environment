@@ -22,5 +22,5 @@ class GeneralSpawnTestEnvironmentParameter(OptionalTestContainerParameter):
     max_start_attempts: int = luigi.IntParameter(2, significant=False)
     docker_runtime: Optional[str] = luigi.OptionalParameter(None, significant=False)
     create_certificates: bool = luigi.BoolParameter()
-    additional_db_parameter: Tuple[str, ...] = luigi.ListParameter()
-    docker_environment_variables: Tuple[str, ...] = luigi.ListParameter()
+    additional_db_parameter: tuple[str, ...] = luigi.ListParameter()
+    docker_environment_variables: tuple[str, ...] = luigi.ListParameter()

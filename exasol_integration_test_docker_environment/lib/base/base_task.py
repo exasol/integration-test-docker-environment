@@ -2,11 +2,11 @@ import hashlib
 import json
 import logging
 import shutil
+from collections.abc import Generator
 from pathlib import Path
 from typing import (
     Any,
     Dict,
-    Generator,
     List,
     Set,
     Tuple,
@@ -119,14 +119,14 @@ BaseTaskType = TypeVar("BaseTaskType", bound="BaseTask")
 
 
 class BaseTask(Task):
-    caller_output_path: Tuple[str] = luigi.ListParameter(
+    caller_output_path: tuple[str] = luigi.ListParameter(
         default=[], significant=False, visibility=ParameterVisibility.HIDDEN
     )
     job_id: str = luigi.Parameter()
 
     def __init__(self, *args, **kwargs) -> None:
-        self._registered_tasks: List["BaseTask"] = []
-        self._run_dependencies_tasks: List["BaseTask"] = []
+        self._registered_tasks: list["BaseTask"] = []
+        self._run_dependencies_tasks: list["BaseTask"] = []
         self._task_state = TaskState.INIT
         super().__init__(*args, **kwargs)
         self.task_id = self.task_id_str(
@@ -159,7 +159,7 @@ class BaseTask(Task):
         self.__dict__ = new_dict
         self._init_non_pickle_attributes()
 
-    def task_id_str(self, task_family: str, params: Dict[str, str]) -> str:
+    def task_id_str(self, task_family: str, params: dict[str, str]) -> str:
         """
         Returns a canonical string used to identify a particular task
 
@@ -174,7 +174,7 @@ class BaseTask(Task):
         param_hash = hashlib.sha3_256(hash_input.encode("utf-8")).hexdigest()
         return f"{task_family}_{param_hash[:TASK_ID_TRUNCATE_HASH]}"
 
-    def get_parameter_as_string_dict(self) -> Dict[str, str]:
+    def get_parameter_as_string_dict(self) -> dict[str, str]:
         """
         Convert all parameters to a str->str hash.
         """
@@ -197,14 +197,14 @@ class BaseTask(Task):
     def _get_output_path_for_job(self) -> Path:
         return Path(build_config().output_directory, "jobs", self.job_id)
 
-    def _extend_output_path(self) -> Union[Tuple[str, ...], str]:
+    def _extend_output_path(self) -> Union[tuple[str, ...], str]:
         extension = self.extend_output_path()
         if extension is None or extension == tuple():
             return self.task_id
         else:
             return extension
 
-    def extend_output_path(self) -> Tuple[str, ...]:
+    def extend_output_path(self) -> tuple[str, ...]:
         return tuple(self.caller_output_path) + (self.task_id,)
 
     def _get_tmp_path_for_job(self) -> Path:
@@ -326,7 +326,7 @@ class BaseTask(Task):
 
     def _generate_run_task_futures(
         self, completion_targets: Union[Any]
-    ) -> Union[List[Any], Dict[Any, Any], RunTaskFuture, Any]:
+    ) -> Union[list[Any], dict[Any, Any], RunTaskFuture, Any]:
         if isinstance(completion_targets, dict):
             return {
                 key: self._generate_run_task_futures(task)
@@ -389,7 +389,7 @@ class BaseTask(Task):
         return task_str
 
     def create_child_task_with_common_params(
-        self, task_class: Type[BaseTaskType], **kwargs
+        self, task_class: type[BaseTaskType], **kwargs
     ) -> BaseTaskType:
         params = util.common_params(self, task_class)
         params["caller_output_path"] = self._extend_output_path()
@@ -398,9 +398,9 @@ class BaseTask(Task):
         return task_class(**params)
 
     def create_child_task(
-        self, task_class: Type[BaseTaskType], **kwargs
+        self, task_class: type[BaseTaskType], **kwargs
     ) -> BaseTaskType:
-        params: Dict[str, Any] = {}
+        params: dict[str, Any] = {}
         params["caller_output_path"] = self._extend_output_path()
         params["job_id"] = self.job_id
         params.update(kwargs)
@@ -409,7 +409,7 @@ class BaseTask(Task):
     def cleanup(self, success: bool) -> None:
         self.cleanup_internal(success, set())
 
-    def cleanup_internal(self, success: bool, cleanup_checklist: Set[str]) -> None:
+    def cleanup_internal(self, success: bool, cleanup_checklist: set[str]) -> None:
         self.logger.debug("Cleaning up")
         if str(self) not in cleanup_checklist:
             cleanup_checklist.add(str(self))
@@ -433,7 +433,7 @@ class BaseTask(Task):
         else:
             self.logger.debug("Cleanup skipped")
 
-    def cleanup_child_task(self, success: bool, cleanup_checklist: Set[str]) -> None:
+    def cleanup_child_task(self, success: bool, cleanup_checklist: set[str]) -> None:
         if self._run_dependencies_target.exists():
             _run_dependencies_tasks_from_target = self._run_dependencies_target.read()
         else:

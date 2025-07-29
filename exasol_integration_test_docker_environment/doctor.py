@@ -4,10 +4,12 @@ package and also provide help to find potential fixes.
 """
 
 import sys
-from collections.abc import Callable
+from collections.abc import (
+    Callable,
+    Iterable,
+)
 from enum import Enum
 from typing import (
-    Iterable,
     List,
     Tuple,
 )
@@ -86,7 +88,7 @@ def health_checkup() -> Iterable[HealthProblem]:
     """
     check_function = Callable[[], bool]
     diagnosis_function = Callable[[], Iterable[HealthProblem]]
-    examinations: List[Tuple[check_function, diagnosis_function]] = [
+    examinations: list[tuple[check_function, diagnosis_function]] = [
         (is_docker_daemon_available, diagnose_docker_daemon_not_available),
         (is_supported_platform, lambda: [HealthProblem.TargetPlatformNotSupported]),
     ]

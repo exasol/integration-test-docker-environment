@@ -20,8 +20,8 @@ from exasol_integration_test_docker_environment.lib.docker.images.required_task_
 class TaskCreatorFromBuildTasks:
 
     def create_tasks_for_build_tasks(
-        self, build_tasks: Dict[str, DockerCreateImageTask]
-    ) -> List[BaseTask]:
+        self, build_tasks: dict[str, DockerCreateImageTask]
+    ) -> list[BaseTask]:
         tasks_per_goal = [
             self._create_tasks_for_build_task(build_task)
             for goal, build_task in build_tasks.items()
@@ -30,7 +30,7 @@ class TaskCreatorFromBuildTasks:
 
     def _create_tasks_for_build_task(
         self, build_task: DockerCreateImageTask
-    ) -> List[DockerCreateImageTaskWithDeps]:
+    ) -> list[DockerCreateImageTaskWithDeps]:
         if isinstance(build_task, DockerCreateImageTaskWithDeps):
             tasks = self.create_tasks_for_build_tasks(build_task.required_tasks)
             task = self._create_task(build_task)

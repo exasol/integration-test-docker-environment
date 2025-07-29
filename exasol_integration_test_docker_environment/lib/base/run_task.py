@@ -137,8 +137,8 @@ def generate_graph_from_task_dependencies(
         networkx.nx_pydot.write_dot(g, task_dependencies_dot_file)
 
 
-def collect_dependencies(task: DependencyLoggerBaseTask) -> Set[TaskDependency]:
-    dependencies: Set[TaskDependency] = set()
+def collect_dependencies(task: DependencyLoggerBaseTask) -> set[TaskDependency]:
+    dependencies: set[TaskDependency] = set()
     for root, directories, files in os.walk(task._get_dependencies_path_for_job()):
         for file in files:
             file_path = Path(root).joinpath(file)

@@ -18,7 +18,7 @@ class ContainerLogHandler(AbstractLogHandler):
         self._log_file.write(log_line + "\n")
         self._complete_log.append(log_line)
 
-    def get_complete_log(self) -> List[str]:
+    def get_complete_log(self) -> list[str]:
         return self._complete_log
 
     def finish(self) -> None:

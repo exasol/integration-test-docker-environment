@@ -23,7 +23,7 @@ class BuildContextHasher:
         self.image_description = image_description
         self.logger = logger
 
-    def generate_image_hash(self, image_info_of_dependencies: Dict[str, ImageInfo]):
+    def generate_image_hash(self, image_info_of_dependencies: dict[str, ImageInfo]):
         hash_of_build_context = self._generate_build_context_hash()
         final_hash = self._generate_final_hash(
             hash_of_build_context, image_info_of_dependencies
@@ -60,7 +60,7 @@ class BuildContextHasher:
     def _generate_final_hash(
         self,
         hash_of_build_context: bytes,
-        image_info_of_dependencies: Dict[str, ImageInfo],
+        image_info_of_dependencies: dict[str, ImageInfo],
     ):
         hasher = hashlib.sha256()
         self.add_image_changing_build_arguments(hasher)
@@ -70,7 +70,7 @@ class BuildContextHasher:
         return final_hash
 
     def add_dependencies(
-        self, hasher, image_info_of_dependencies: Dict[str, ImageInfo]
+        self, hasher, image_info_of_dependencies: dict[str, ImageInfo]
     ):
         hashes_of_dependencies = [
             (key, image_info.hash)

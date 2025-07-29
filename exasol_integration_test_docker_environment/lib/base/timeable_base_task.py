@@ -105,7 +105,7 @@ class TimeableBaseTask(BaseTask):
                 f.write(str(total_runtime))
                 f.write("\n")
 
-    def calculate_total_runtime(self, lines: List[str]) -> float:
+    def calculate_total_runtime(self, lines: list[str]) -> float:
         total_runtime: float = 0.0
         for line in lines:
             seconds_of_run = float(line)

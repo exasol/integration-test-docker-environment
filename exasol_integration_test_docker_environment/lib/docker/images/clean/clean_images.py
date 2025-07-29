@@ -1,5 +1,5 @@
+from collections.abc import Iterator
 from typing import (
-    Iterator,
     List,
 )
 
@@ -39,7 +39,7 @@ class CleanImageTask(DockerBaseTask):
                     )
                 )
 
-    def get_clean_image_tasks_for_dependent_images(self) -> List["CleanImageTask"]:
+    def get_clean_image_tasks_for_dependent_images(self) -> list["CleanImageTask"]:
         with self._get_docker_client() as docker_client:
             image_ids = [
                 str(possible_child).replace("sha256:", "")

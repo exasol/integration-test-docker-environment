@@ -67,8 +67,8 @@ class DirectoryMappingResult:
     Contains all entries found by traversing all mapping directory paths.
     """
 
-    sources: List[Path]
-    paths_for_hashing: List[DestinationMapping]
+    sources: list[Path]
+    paths_for_hashing: list[DestinationMapping]
 
 
 class FileDirectoryListHasher:
@@ -113,8 +113,8 @@ class FileDirectoryListHasher:
         self.path_hasher = PathHasher(hashfunc, hash_permissions=hash_permissions)
         self.file_content_hasher = FileContentHasher(hashfunc, blocksize)
 
-    def hash(self, files_and_directories: List[PathMapping]) -> bytes:
-        if not isinstance(files_and_directories, List):
+    def hash(self, files_and_directories: list[PathMapping]) -> bytes:
+        if not isinstance(files_and_directories, list):
             raise Exception(
                 "List with paths expected and not '%s' with type %s"
                 % (files_and_directories, type(files_and_directories))
@@ -127,7 +127,7 @@ class FileDirectoryListHasher:
         return self._reduce_hash(hashes)
 
     @staticmethod
-    def check_no_duplicate_destinations(mappings: List[DestinationMapping]) -> None:
+    def check_no_duplicate_destinations(mappings: list[DestinationMapping]) -> None:
         """
         Verify that there are no duplicate mappings to same destination.
         This can happen, if the destination of two mappings are equal and the two sources contains the same sub-path
@@ -141,7 +141,7 @@ class FileDirectoryListHasher:
             )
 
     def collect_dest_path_and_src_files(
-        self, files_and_directories: List[PathMapping]
+        self, files_and_directories: list[PathMapping]
     ) -> DirectoryMappingResult:
         """
         Traverse the source paths of all mappings and assemble two lists:
@@ -153,7 +153,7 @@ class FileDirectoryListHasher:
          - for both: excluded_directory/excluded_extensions/excluded_file
          - for 1): hash_file_names/hash_directory_names
         """
-        collected_dest_paths: List[DestinationMapping] = list()
+        collected_dest_paths: list[DestinationMapping] = list()
 
         def replace_src_by_dest_path(
             src: PurePath, dest: PurePath, target: str
@@ -169,7 +169,7 @@ class FileDirectoryListHasher:
             source = file_or_directory.source
             destination = file_or_directory.destination
 
-            def handle_directory(directories: List[str]) -> None:
+            def handle_directory(directories: list[str]) -> None:
                 new_dest_paths_mappings = [
                     DestinationMapping(
                         destination_path=replace_src_by_dest_path(
@@ -181,7 +181,7 @@ class FileDirectoryListHasher:
                 ]
                 collected_dest_paths.extend(new_dest_paths_mappings)
 
-            def handle_files(files: List[str]) -> None:
+            def handle_files(files: list[str]) -> None:
                 collected_dest_paths.extend(
                     [
                         DestinationMapping(
@@ -223,7 +223,7 @@ class FileDirectoryListHasher:
 
     def compute_hashes(
         self, directory_mapping_result: DirectoryMappingResult
-    ) -> List[bytes]:
+    ) -> list[bytes]:
         paths_for_hashing = directory_mapping_result.paths_for_hashing
         collected_src_files = directory_mapping_result.sources
         pool = Pool(processes=self.workers)
@@ -251,8 +251,8 @@ class FileDirectoryListHasher:
     def traverse_directory(
         self,
         directory: PurePath,
-        directory_handler: Callable[[List[str]], None],
-        file_handler: Callable[[List[str]], None],
+        directory_handler: Callable[[list[str]], None],
+        file_handler: Callable[[list[str]], None],
     ) -> None:
 
         symlink_loop_checker = SymlinkLoopChecker()

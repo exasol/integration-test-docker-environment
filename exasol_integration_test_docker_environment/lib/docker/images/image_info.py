@@ -32,9 +32,9 @@ class ImageDescription:
     def __init__(
         self,
         dockerfile: str,
-        image_changing_build_arguments: Dict[str, Any],
-        transparent_build_arguments: Dict[str, Any],
-        mapping_of_build_files_and_directories: Dict[str, str],
+        image_changing_build_arguments: dict[str, Any],
+        transparent_build_arguments: dict[str, Any],
+        mapping_of_build_files_and_directories: dict[str, str],
     ) -> None:
         self.transparent_build_arguments = transparent_build_arguments
         self.image_changing_build_arguments = image_changing_build_arguments
@@ -63,7 +63,7 @@ class ImageInfo(Info):
         build_name: str = "",
         build_date_time: datetime = datetime.utcnow(),
         image_state: Optional[ImageState] = ImageState.NOT_EXISTING,
-        depends_on_images: Optional[Dict[str, "ImageInfo"]] = None,
+        depends_on_images: Optional[dict[str, "ImageInfo"]] = None,
     ) -> None:
         self.build_name = build_name
         self.date_time = str(build_date_time)

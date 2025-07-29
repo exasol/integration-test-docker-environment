@@ -37,13 +37,13 @@ class DockerBuildBase(DependencyLoggerBaseTask):
     def _get_build_steps_to_rebuild(self):
         return set(build_config().force_rebuild_from)
 
-    def get_goals(self) -> Set[str]:
+    def get_goals(self) -> set[str]:
         raise AbstractMethodException()
 
-    def get_default_goals(self) -> Set[str]:
+    def get_default_goals(self) -> set[str]:
         raise AbstractMethodException()
 
-    def get_goal_class_map(self) -> Dict[str, DockerAnalyzeImageTask]:
+    def get_goal_class_map(self) -> dict[str, DockerAnalyzeImageTask]:
         raise AbstractMethodException()
 
     def register_required(self):
@@ -51,7 +51,7 @@ class DockerBuildBase(DependencyLoggerBaseTask):
             self.create_analyze_tasks()
         )
 
-    def create_analyze_tasks(self) -> Dict[str, DockerAnalyzeImageTask]:
+    def create_analyze_tasks(self) -> dict[str, DockerAnalyzeImageTask]:
         goals = set(self.get_goals())
         self.goal_class_map = self.get_goal_class_map()
         self.available_goals = set(self.goal_class_map.keys())
@@ -80,7 +80,7 @@ class DockerBuildBase(DependencyLoggerBaseTask):
 
     def create_build_tasks(
         self, shortcut_build: bool = True
-    ) -> Dict[str, DockerCreateImageTask]:
+    ) -> dict[str, DockerCreateImageTask]:
         image_infos = {
             goal: analyze_task_future.get_output()
             for goal, analyze_task_future in self.analyze_tasks_futures.items()
@@ -89,7 +89,7 @@ class DockerBuildBase(DependencyLoggerBaseTask):
         return tasks
 
     def _create_build_tasks_for_image_infos(
-        self, image_infos: Dict[str, ImageInfo], shortcut_build: bool
+        self, image_infos: dict[str, ImageInfo], shortcut_build: bool
     ):
         result = {
             goal: self._create_build_task_for_image_info(image_info, shortcut_build)
@@ -143,7 +143,7 @@ class DockerBuildBase(DependencyLoggerBaseTask):
         return task_for_image_info
 
     def _create_required_task_infos(
-        self, required_tasks: Dict[str, DockerCreateImageTask]
+        self, required_tasks: dict[str, DockerCreateImageTask]
     ) -> RequiredTaskInfoDict:
         result = {
             key: self._create_required_task_info(required_task)

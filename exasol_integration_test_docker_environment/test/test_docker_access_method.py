@@ -21,7 +21,7 @@ class Testee(DependencyLoggerBaseTask, DockerDBTestEnvironmentParameter):
 
     @classmethod
     def make(cls, method: str) -> "Testee":
-        kwargs: Dict[str, Any] = {"task_class": Testee}
+        kwargs: dict[str, Any] = {"task_class": Testee}
         if method:
             kwargs["db_os_access"] = method
         task: Testee = generate_root_task(**kwargs)  # type: ignore
