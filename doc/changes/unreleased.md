@@ -6,6 +6,7 @@
  - #501: Converted integration API test to pytest - part III
    - test_cli_test_environment_additional_params
    - test_cli_test_environment_db_disk_size
+   - test_cli_test_environment_db_mem_size
  
 
  ## Security
