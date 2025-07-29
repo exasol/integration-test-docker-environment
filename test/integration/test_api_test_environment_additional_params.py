@@ -2,6 +2,7 @@ import pytest
 
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 
+
 def _get_db_parameter_line_from_dwad_client(container_name: str) -> str:
     """
     Run `dwad_client` in the DB container to get the db parameter line
@@ -29,8 +30,13 @@ def _get_db_parameter_line_from_dwad_client(container_name: str) -> str:
         return params_lines[0]
 
 
-@pytest.mark.parametrize("additional_db_parameters", (("-disableIndexIteratorScan=1", "-disableViewOptimization=1"),
-                                                      ("-disableIndexIteratorScan=1", "-disableIndexIteratorScan=1")))
+@pytest.mark.parametrize(
+    "additional_db_parameters",
+    (
+        ("-disableIndexIteratorScan=1", "-disableViewOptimization=1"),
+        ("-disableIndexIteratorScan=1", "-disableIndexIteratorScan=1"),
+    ),
+)
 def test_additional_params_are_used(api_context, additional_db_parameters):
     """
     This test checks that running "spawn_test_environment" works as expected with parameter "additional_db_parameter".
@@ -42,10 +48,12 @@ def test_additional_params_are_used(api_context, additional_db_parameters):
     Returns:
 
     """
-    additional_parameters = { "additional_db_parameter": additional_db_parameters }
+    additional_parameters = {"additional_db_parameter": additional_db_parameters}
     with api_context(
         additional_parameters=additional_parameters,
     ) as db:
-        parameter_line = _get_db_parameter_line_from_dwad_client(db.environment_info.database_info.container_info.container_name)
+        parameter_line = _get_db_parameter_line_from_dwad_client(
+            db.environment_info.database_info.container_info.container_name
+        )
         for add_db_param in additional_db_parameters:
             assert add_db_param in parameter_line
