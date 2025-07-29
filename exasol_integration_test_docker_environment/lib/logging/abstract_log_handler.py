@@ -1,4 +1,5 @@
 from pathlib import Path
+
 from exasol_integration_test_docker_environment.lib.base.task_logger_wrapper import (
     TaskLoggerWrapper,
 )
