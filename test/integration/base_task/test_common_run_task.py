@@ -16,17 +16,12 @@ class TestTaskWithReturn(DependencyLoggerBaseTask):
         self.return_object(f"{self.x}-123")
 
 
-
 def test_return_value(self) -> None:
     """
     Integration test which verifies that the return value processing in run_task works as expected.
     """
 
-    task_creator = lambda: generate_root_task(
-        task_class=TestTaskWithReturn, x="Test"
-    )
+    task_creator = lambda: generate_root_task(task_class=TestTaskWithReturn, x="Test")
 
-    return_value = run_task(
-        task_creator, workers=5, task_dependencies_dot_file=None
-    )
+    return_value = run_task(task_creator, workers=5, task_dependencies_dot_file=None)
     assert return_value == "Test-123"
