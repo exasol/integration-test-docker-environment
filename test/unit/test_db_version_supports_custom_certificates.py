@@ -20,6 +20,6 @@ def test_db_version_supports_custom_certificates(version, expected):
     assert db_version_supports_custom_certificates(version) == expected
 
 
-def test_throw_error():
+def test_fails_with_invalid_version():
     with pytest.raises(ValueError):
         db_version_supports_custom_certificates("7abc")
