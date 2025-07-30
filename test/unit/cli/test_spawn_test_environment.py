@@ -1,10 +1,4 @@
 import itertools
-
-from exasol_integration_test_docker_environment.testing.api_consistency_utils import (
-    defaults_of_click_call,
-)
-from exasol_integration_test_docker_environment.lib.test_environment.parameter.docker_db_test_environment_parameter import \
-    DbOsAccess
 from test.unit.cli.cli_runner import CliRunner
 from unittest.mock import (
     MagicMock,
@@ -17,6 +11,12 @@ from _pytest.monkeypatch import MonkeyPatch
 import exasol_integration_test_docker_environment.lib.api as api
 from exasol_integration_test_docker_environment.cli.commands.spawn_test_environment import (
     spawn_test_environment as spawn_test_environment_command,
+)
+from exasol_integration_test_docker_environment.lib.test_environment.parameter.docker_db_test_environment_parameter import (
+    DbOsAccess,
+)
+from exasol_integration_test_docker_environment.testing.api_consistency_utils import (
+    defaults_of_click_call,
 )
 
 
@@ -33,27 +33,28 @@ def mock_api_spawn_test_environment(monkeypatch: MonkeyPatch) -> MagicMock:
 
 
 def _build_cli_args(cli_arguments: dict[str, str]) -> list[str]:
-    gen = (
-        k
-        for pair in cli_arguments.items()
-        for k in (f"--{pair[0]}", pair[1][0])
-    )
+    gen = (k for pair in cli_arguments.items() for k in (f"--{pair[0]}", pair[1][0]))
     return [k for k in gen if k is not None]
 
+
 def _gen_db_os_exec_values() -> list[tuple[str, DbOsAccess]]:
-    return [ (i.name,i.name) for i in DbOsAccess]
+    return [(i.name, i.name) for i in DbOsAccess]
+
 
 def _gen_log_level_values() -> list[tuple[str, str]]:
-    return [(i,i) for i in ["DEBUG", "INFO", "WARNING", "ERROR", "FATAL"]]
+    return [(i, i) for i in ["DEBUG", "INFO", "WARNING", "ERROR", "FATAL"]]
+
 
 def _gen_str_values(v: str) -> list[tuple[str, str]]:
-    return [(v,v)]
+    return [(v, v)]
+
 
 def _gen_int_values(v: int) -> list[tuple[str, int]]:
-    return [(str(v),v)]
+    return [(str(v), v)]
+
 
 def _gen_tuple_values(v: str) -> list[tuple[str, tuple[str]]]:
-    return [(v,(v,))]
+    return [(v, (v,))]
 
 
 ARGUMENTS_VALUES = {
@@ -71,15 +72,27 @@ ARGUMENTS_VALUES = {
     "create-certificates": [(None, True)],
     "no-create-certificates": [(None, False)],
     "additional-db-parameter": _gen_tuple_values("test-db-additional-parameter"),
-    "docker-environment-variable": _gen_tuple_values("test-docker-environment-variable"),
-    "source-docker-repository-name": _gen_str_values("test-docker-repository-name",),
+    "docker-environment-variable": _gen_tuple_values(
+        "test-docker-environment-variable"
+    ),
+    "source-docker-repository-name": _gen_str_values(
+        "test-docker-repository-name",
+    ),
     "source-docker-tag-prefix": _gen_str_values("test-docker-tag-prefix"),
-    "source-docker-username": _gen_str_values("test-docker-username",),
-    "source-docker-password": _gen_str_values("<PASSWORD>",),
+    "source-docker-username": _gen_str_values(
+        "test-docker-username",
+    ),
+    "source-docker-password": _gen_str_values(
+        "<PASSWORD>",
+    ),
     "target-docker-repository-name": _gen_str_values("test-docker-repository-name"),
     "target-docker-tag-prefix": _gen_str_values("test-docker-tag-prefix"),
-    "target-docker-username": _gen_str_values("test-docker-username",),
-    "target-docker-password": _gen_str_values("<TARGET-DOCKER-PASSWORD>",),
+    "target-docker-username": _gen_str_values(
+        "test-docker-username",
+    ),
+    "target-docker-password": _gen_str_values(
+        "<TARGET-DOCKER-PASSWORD>",
+    ),
     "output-directory": _gen_str_values("test-output-directory"),
     "temporary-base-directory": _gen_str_values("test-temporary-base-directory"),
     "workers": _gen_int_values(9),
@@ -88,9 +101,7 @@ ARGUMENTS_VALUES = {
     "use-job-specific-log-file": [("True", True), ("False", False)],
 }
 
-REQUIRED_ARGS = (
-    "environment-name",
-)
+REQUIRED_ARGS = ("environment-name",)
 
 SOURCE_DOCKER_ARGS = (
     "source-docker-repository-name",
@@ -129,25 +140,50 @@ DB_ARGS = (
 CREATE_CERTIFICATES_ARGS = ("create-certificates",)
 NO_CREATE_CERTIFICATE_ARGS = ("no-create-certificates",)
 
-DOCKER_ARGS = ("docker-runtime", "docker-db-image-version", "docker-db-image-name", "docker-environment-variable")
+DOCKER_ARGS = (
+    "docker-runtime",
+    "docker-db-image-version",
+    "docker-db-image-name",
+    "docker-environment-variable",
+)
 
 COMBINATIONS_OF_KEYS = [
-    REQUIRED_ARGS + DB_ARGS + UTILITY_ARGS +SOURCE_DOCKER_ARGS + TARGET_DOCKER_ARGS + DOCKER_ARGS + CREATE_CERTIFICATES_ARGS,
-    REQUIRED_ARGS + DB_ARGS + UTILITY_ARGS +SOURCE_DOCKER_ARGS + TARGET_DOCKER_ARGS + DOCKER_ARGS + NO_CREATE_CERTIFICATE_ARGS,
+    REQUIRED_ARGS
+    + DB_ARGS
+    + UTILITY_ARGS
+    + SOURCE_DOCKER_ARGS
+    + TARGET_DOCKER_ARGS
+    + DOCKER_ARGS
+    + CREATE_CERTIFICATES_ARGS,
+    REQUIRED_ARGS
+    + DB_ARGS
+    + UTILITY_ARGS
+    + SOURCE_DOCKER_ARGS
+    + TARGET_DOCKER_ARGS
+    + DOCKER_ARGS
+    + NO_CREATE_CERTIFICATE_ARGS,
     REQUIRED_ARGS,
 ]
+
 
 def _build_combinations() -> tuple[dict[str, tuple[str, ...]]]:
     ret_val = ()
     for keys in COMBINATIONS_OF_KEYS:
-        values_product = list(itertools.product(*(ARGUMENTS_VALUES[key] for key in keys)))
+        values_product = list(
+            itertools.product(*(ARGUMENTS_VALUES[key] for key in keys))
+        )
         ret_val += tuple(
             {key: value for key, value in zip(keys, combination)}
             for combination in values_product
         )
     return ret_val
 
-CLICK_DEFAULT_VALUES = { key: default for key, default in defaults_of_click_call(spawn_test_environment_command) }
+
+CLICK_DEFAULT_VALUES = {
+    key: default
+    for key, default in defaults_of_click_call(spawn_test_environment_command)
+}
+
 
 def _build_expected_call(cli_arguments) -> call:
     def _get_optional_value(cli_arguments, key):
@@ -167,24 +203,52 @@ def _build_expected_call(cli_arguments) -> call:
     docker_db_image_version_value = _get_optional_value(
         cli_arguments, "docker-db-image-version"
     )
-    docker_db_image_name_value = _get_optional_value(cli_arguments, "docker-db-image-name")
+    docker_db_image_name_value = _get_optional_value(
+        cli_arguments, "docker-db-image-name"
+    )
     db_os_access_value = _get_optional_value(cli_arguments, "db-os-access")
-    additional_db_parameter_value = _get_optional_value(cli_arguments, "additional-db-parameter")
-    docker_environment_variable_value = _get_optional_value(cli_arguments, "docker-environment-variable")
-    source_docker_repository_name_value = _get_optional_value(cli_arguments, "source-docker-repository-name")
-    source_docker_tag_prefix_value = _get_optional_value(cli_arguments, "source-docker-tag-prefix")
-    source_docker_username_value = _get_optional_value(cli_arguments, "source-docker-username")
-    source_docker_password = _get_optional_value(cli_arguments, "source-docker-password")
-    target_docker_repository_name_value = _get_optional_value(cli_arguments, "target-docker-repository-name")
-    target_docker_tag_prefix_value = _get_optional_value(cli_arguments, "target-docker-tag-prefix")
-    target_docker_username_value = _get_optional_value(cli_arguments, "target-docker-username")
-    target_docker_password_value = _get_optional_value(cli_arguments, "target-docker-password")
+    additional_db_parameter_value = _get_optional_value(
+        cli_arguments, "additional-db-parameter"
+    )
+    docker_environment_variable_value = _get_optional_value(
+        cli_arguments, "docker-environment-variable"
+    )
+    source_docker_repository_name_value = _get_optional_value(
+        cli_arguments, "source-docker-repository-name"
+    )
+    source_docker_tag_prefix_value = _get_optional_value(
+        cli_arguments, "source-docker-tag-prefix"
+    )
+    source_docker_username_value = _get_optional_value(
+        cli_arguments, "source-docker-username"
+    )
+    source_docker_password = _get_optional_value(
+        cli_arguments, "source-docker-password"
+    )
+    target_docker_repository_name_value = _get_optional_value(
+        cli_arguments, "target-docker-repository-name"
+    )
+    target_docker_tag_prefix_value = _get_optional_value(
+        cli_arguments, "target-docker-tag-prefix"
+    )
+    target_docker_username_value = _get_optional_value(
+        cli_arguments, "target-docker-username"
+    )
+    target_docker_password_value = _get_optional_value(
+        cli_arguments, "target-docker-password"
+    )
     output_directory_value = _get_optional_value(cli_arguments, "output-directory")
-    temporary_base_directory_value = _get_optional_value(cli_arguments, "temporary-base-directory")
+    temporary_base_directory_value = _get_optional_value(
+        cli_arguments, "temporary-base-directory"
+    )
     workers_value = _get_optional_value(cli_arguments, "workers")
-    task_dependencies_dot_file_value = _get_optional_value(cli_arguments, "task-dependencies-dot-file")
+    task_dependencies_dot_file_value = _get_optional_value(
+        cli_arguments, "task-dependencies-dot-file"
+    )
     log_level_value = _get_optional_value(cli_arguments, "log-level")
-    use_job_specific_log_file_value = _get_optional_value(cli_arguments, "use-job-specific-log-file")
+    use_job_specific_log_file_value = _get_optional_value(
+        cli_arguments, "use-job-specific-log-file"
+    )
 
     if "create-certificates" in cli_arguments:
         create_certificates_value = cli_arguments["create-certificates"][1]
@@ -238,8 +302,4 @@ def test_spawn_test_environment(cli, mock_api_spawn_test_environment, cli_argume
 
 
 def test_no_environment(cli):
-    assert (
-        cli.run().failed
-        and "Missing option '--environment-name'" in cli.output
-    )
-
+    assert cli.run().failed and "Missing option '--environment-name'" in cli.output
