@@ -1,12 +1,6 @@
-import unittest
-
 import pytest
 
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
-from exasol_integration_test_docker_environment.testing import utils
-from exasol_integration_test_docker_environment.testing.exaslct_test_environment import (
-    ExaslctTestEnvironment,
-)
 
 
 def _assert_disk_size(env_name: str, size: str) -> None:

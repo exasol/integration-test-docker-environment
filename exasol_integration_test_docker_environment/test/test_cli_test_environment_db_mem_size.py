@@ -8,6 +8,9 @@ from exasol_integration_test_docker_environment.testing.exaslct_test_environment
 
 
 class DockerTestEnvironmentDBMemSizeTest(unittest.TestCase):
+    """
+    Deprecated. Replaced by "./test/integration/test_api_test_environment_db_mem_size.py
+    """
 
     @classmethod
     def setUpClass(cls):
