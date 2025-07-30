@@ -42,7 +42,7 @@ def run_with_unknown_error(queue: Queue) -> None:
 
 
 def get_queue_content(q: Queue) -> list[str]:
-    result = list()
+    result = []
     while not q.empty():
         result.append(q.get(block=False))
     return result

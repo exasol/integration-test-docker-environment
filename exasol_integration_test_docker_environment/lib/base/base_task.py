@@ -194,7 +194,7 @@ class BaseTask(Task):
 
     def _extend_output_path(self) -> Union[tuple[str, ...], str]:
         extension = self.extend_output_path()
-        if extension is None or extension == tuple():
+        if extension is None or extension == ():
             return self.task_id
         else:
             return extension

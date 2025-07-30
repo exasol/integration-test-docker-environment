@@ -165,7 +165,7 @@ class SpawnTestContainer(DockerBaseTask, TestContainerParameter):
             self.test_container_image_future
         )["test-container"]
 
-        volumes: dict[Union[str, Path], dict[str, str]] = dict()
+        volumes: dict[Union[str, Path], dict[str, str]] = {}
         for runtime_mapping in self.test_container_content.runtime_mappings:
             volumes[runtime_mapping.source.absolute()] = {
                 "bind": runtime_mapping.target,

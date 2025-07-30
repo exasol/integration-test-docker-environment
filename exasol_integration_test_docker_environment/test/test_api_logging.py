@@ -110,7 +110,7 @@ class APIClientLoggingTest(unittest.TestCase):
     ):
         set_build_config(
             False,
-            tuple(),
+            (),
             False,
             False,
             self._build_output_temp_dir.name,
@@ -310,7 +310,7 @@ class APIClientLoggingTest(unittest.TestCase):
         return logger_infos
 
     def get_logger_info(self, logger: logging.Logger) -> dict[str, Any]:
-        logger_info: dict[str, Any] = dict()
+        logger_info: dict[str, Any] = {}
         logger_info[LOGGER_STR] = str(logger)
         logger_info[LEVEL] = logger.level
         logger_info[LEVEL_NAME] = logging.getLevelName(logger.level)

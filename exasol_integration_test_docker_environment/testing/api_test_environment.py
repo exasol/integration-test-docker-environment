@@ -68,7 +68,7 @@ class ApiTestEnvironment:
         additional_parameter: Optional[dict[str, Any]] = None,
     ) -> ExaslctDockerTestEnvironment:
         if additional_parameter is None:
-            additional_parameter = dict()
+            additional_parameter = {}
         ports = Ports.random_free()
         on_host_parameter = self._get_default_test_environment(name, ports)
         docker_db_image_version = on_host_parameter.docker_db_image_version
@@ -92,7 +92,7 @@ class ApiTestEnvironment:
         additional_parameter: Optional[dict[str, Any]] = None,
     ) -> ExaslctDockerTestEnvironment:
         if additional_parameter is None:
-            additional_parameter = dict()
+            additional_parameter = {}
         ports = Ports.random_free()
         on_host = self._get_default_test_environment(name, ports)
         on_host.environment_info, on_host.clean_up = spawn_test_environment(

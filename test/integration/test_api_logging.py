@@ -324,7 +324,7 @@ def create_logger_infos() -> dict[str, dict[str, Any]]:
 
 
 def get_logger_info(logger: logging.Logger) -> dict[str, Any]:
-    logger_info: dict[str, Any] = dict()
+    logger_info: dict[str, Any] = {}
     logger_info[LOGGER_STR] = str(logger)
     logger_info[LEVEL] = logger.level
     logger_info[LEVEL_NAME] = logging.getLevelName(logger.level)

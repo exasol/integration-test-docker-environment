@@ -60,7 +60,7 @@ class ClickApiConsistencyTest(unittest.TestCase):
 
         # Now iterate over the list and compare consistency
         for cli_call, api_call in zip(click_commands, api_functions):
-            api_spec_defaults = inspect.getfullargspec(api_call).defaults or tuple()
+            api_spec_defaults = inspect.getfullargspec(api_call).defaults or ()
             cli_defaults = defaults_of_click_call(cli_call)
 
             self.assertEqual(len(cli_defaults), len(api_spec_defaults))

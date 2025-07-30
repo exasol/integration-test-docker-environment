@@ -116,7 +116,7 @@ class DockerAnalyzeImageTask(DockerBaseTask):
         Sub classes need to implement this method.
         :return: Dictionary of build arguments, where the keys are the argument name
         """
-        return dict()
+        return {}
 
     def get_transparent_build_arguments(self) -> dict[str, str]:
         """
@@ -127,7 +127,7 @@ class DockerAnalyzeImageTask(DockerBaseTask):
         Sub classes need to implement this method.
         :return: Dictionary of build arguments, where the keys are the argument name
         """
-        return dict()
+        return {}
 
     @abc.abstractmethod
     def is_rebuild_requested(self) -> bool:
@@ -161,14 +161,14 @@ class DockerAnalyzeImageTask(DockerBaseTask):
         )
 
     def requires_tasks(self) -> dict[str, type["DockerAnalyzeImageTask"]]:
-        return dict()
+        return {}
 
     def run_task(self) -> None:
         image_info_of_dependencies = self.get_values_from_futures(
             self.dependencies_futures
         )
         if image_info_of_dependencies is None:
-            image_info_of_dependencies = dict()
+            image_info_of_dependencies = {}
         _build_context_hasher = BuildContextHasher(self.logger, self.image_description)
         image_hash = _build_context_hasher.generate_image_hash(
             image_info_of_dependencies

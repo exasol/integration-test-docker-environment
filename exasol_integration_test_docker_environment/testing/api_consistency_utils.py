@@ -21,7 +21,7 @@ def adjust_default_value_for_multiple(x: Any):
         if type(def_value) == list:
             return tuple(def_value)
         elif def_value is None:
-            return tuple()
+            return ()
     return def_value
 
 

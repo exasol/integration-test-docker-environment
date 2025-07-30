@@ -38,7 +38,7 @@ class docker_build_arguments(luigi.Config):
     transparent: dict[str, str] = luigi.DictParameter(default=dict())
     image_changing: dict[str, str] = luigi.DictParameter(default=dict())
     secret: dict[str, str] = luigi.DictParameter(
-        default=dict(),
+        default={},
         description="Will not be saved somewhere, but are also assumed to be transparent",
         visibility=ParameterVisibility.PRIVATE,
     )

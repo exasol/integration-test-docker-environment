@@ -90,8 +90,8 @@ class TestContainerReuseTest(unittest.TestCase):
             docker_db_image_version=self.docker_db_version_parameter,
             docker_db_image_name="exasol/docker-db",
             test_container_content=get_test_container_content(),
-            additional_db_parameter=tuple(),
-            docker_environment_variables=tuple(),
+            additional_db_parameter=(),
+            docker_environment_variables=(),
         )
         try:
             success = luigi.build(

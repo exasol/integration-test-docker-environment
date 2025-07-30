@@ -152,7 +152,7 @@ class FileDirectoryListHasher:
          - for both: excluded_directory/excluded_extensions/excluded_file
          - for 1): hash_file_names/hash_directory_names
         """
-        collected_dest_paths: list[DestinationMapping] = list()
+        collected_dest_paths: list[DestinationMapping] = []
 
         def replace_src_by_dest_path(
             src: PurePath, dest: PurePath, target: str

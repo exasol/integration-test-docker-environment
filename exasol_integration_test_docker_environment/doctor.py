@@ -46,7 +46,7 @@ def diagnose_docker_daemon_not_available() -> Iterable[HealthProblem]:
     def _is_unix_socket_issue(message: str) -> bool:
         return "FileNotFoundError(2, 'No such file or directory')" in message
 
-    errors = list()
+    errors = []
     try:
         _docker = docker.from_env()
     except DockerException as ex:
