@@ -1,9 +1,5 @@
-import os
-import platform
 from pathlib import Path
 from test.matchers import regex_matcher
-
-import pytest
 
 from exasol_integration_test_docker_environment.lib.logging.command_log_handler import (
     CommandLogHandler,

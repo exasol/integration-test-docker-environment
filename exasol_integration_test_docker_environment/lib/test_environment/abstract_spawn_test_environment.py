@@ -1,9 +1,10 @@
-from pathlib import Path
-from typing import (
+from collections.abc import (
     Generator,
     Iterator,
+)
+from pathlib import Path
+from typing import (
     Optional,
-    Tuple,
     Union,
 )
 
@@ -204,7 +205,7 @@ class AbstractSpawnTestEnvironment(
             WaitForTestExternalDatabase,
         ],
         None,
-        Tuple[DockerNetworkInfo, DatabaseInfo, bool, Optional[ContainerInfo]],
+        tuple[DockerNetworkInfo, DatabaseInfo, bool, Optional[ContainerInfo]],
     ]:
         network_info = yield from self._create_network(attempt)
         ssl_volume_info = None
@@ -251,7 +252,7 @@ class AbstractSpawnTestEnvironment(
         network_info: DockerNetworkInfo,
         certificate_volume_info: Optional[DockerVolumeInfo],
         attempt: int,
-    ) -> Generator[BaseTaskType, None, Tuple[DatabaseInfo, Optional[ContainerInfo]]]:
+    ) -> Generator[BaseTaskType, None, tuple[DatabaseInfo, Optional[ContainerInfo]]]:
         def volume_name(info):
             return None if info is None else info.volume_name
 

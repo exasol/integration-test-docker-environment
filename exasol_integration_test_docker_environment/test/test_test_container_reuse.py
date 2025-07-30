@@ -104,15 +104,15 @@ class TestContainerReuseTest(unittest.TestCase):
     def get_test_container_content(self) -> TestContainerContentDescription:
         return TestContainerContentDescription(
             docker_file=str(self.dockerfile),
-            build_files_and_directories=list(),
-            runtime_mappings=list(),
+            build_files_and_directories=[],
+            runtime_mappings=[],
         )
 
     def setup_luigi_config(self):
         set_build_config(
             force_rebuild=False,
             force_pull=False,
-            force_rebuild_from=tuple(),
+            force_rebuild_from=(),
             log_build_context_content=False,
             output_directory=self.temp_directory,
             cache_directory="",

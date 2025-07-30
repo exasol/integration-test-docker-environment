@@ -1,7 +1,5 @@
 from pathlib import Path
 from typing import (
-    Dict,
-    List,
     Optional,
     Union,
 )
@@ -167,7 +165,7 @@ class SpawnTestContainer(DockerBaseTask, TestContainerParameter):
             self.test_container_image_future
         )["test-container"]
 
-        volumes: Dict[Union[str, Path], Dict[str, str]] = dict()
+        volumes: dict[Union[str, Path], dict[str, str]] = {}
         for runtime_mapping in self.test_container_content.runtime_mappings:
             volumes[runtime_mapping.source.absolute()] = {
                 "bind": runtime_mapping.target,
@@ -216,14 +214,14 @@ class SpawnTestContainer(DockerBaseTask, TestContainerParameter):
             )
             return container_info
 
-    def _get_network_aliases(self) -> List[str]:
+    def _get_network_aliases(self) -> list[str]:
         network_aliases = ["test_container", self.test_container_name]
         return network_aliases
 
     def create_container_info(
         self,
         ip_address: str,
-        network_aliases: List[str],
+        network_aliases: list[str],
         network_info: DockerNetworkInfo,
     ) -> ContainerInfo:
         with self._get_docker_client() as docker_client:

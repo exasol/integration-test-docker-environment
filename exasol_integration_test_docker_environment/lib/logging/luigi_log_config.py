@@ -2,13 +2,12 @@ import contextlib
 import logging
 import os
 import tempfile
+from collections.abc import Generator
 from dataclasses import dataclass
 from pathlib import Path
 from typing import (
     Any,
     Callable,
-    Generator,
-    List,
     Optional,
 )
 
@@ -54,8 +53,8 @@ def get_log_path(job_id: str) -> Path:
 @dataclass
 class LogInfoStorage:
     level: int
-    handlers: List[logging.Handler]
-    filters: List[Any]
+    handlers: list[logging.Handler]
+    filters: list[Any]
     propagate: bool
 
 

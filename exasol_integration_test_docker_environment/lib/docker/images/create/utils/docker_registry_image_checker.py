@@ -2,9 +2,6 @@ import json
 import multiprocessing as mp
 
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
-from exasol_integration_test_docker_environment.lib.logging.abstract_log_handler import (
-    AbstractLogHandler,
-)
 
 
 class DockerRegistryImageCheckerPullLogHandler:

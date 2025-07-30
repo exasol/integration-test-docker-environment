@@ -1,5 +1,4 @@
 import os
-from typing import Set
 
 
 class SymlinkLoopChecker:
@@ -9,7 +8,7 @@ class SymlinkLoopChecker:
     """
 
     def __init__(self) -> None:
-        self._inodes: Set[int] = set()
+        self._inodes: set[int] = set()
 
     def check_and_add(self, directory: str) -> None:
         """

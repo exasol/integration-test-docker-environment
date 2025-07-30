@@ -1,12 +1,11 @@
 import logging
-from typing import List
 
 from docker.models.containers import Container
 
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 
 
-def remove_docker_container(containers: List[str]):
+def remove_docker_container(containers: list[str]):
     """
     Removes the given container using docker API.
     """

@@ -1,9 +1,7 @@
 import inspect
 from typing import (
     Any,
-    List,
     Optional,
-    Tuple,
 )
 
 import click
@@ -23,7 +21,7 @@ def adjust_default_value_for_multiple(x: Any):
         if type(def_value) == list:
             return tuple(def_value)
         elif def_value is None:
-            return tuple()
+            return ()
     return def_value
 
 
@@ -36,7 +34,7 @@ def is_click_command(obj: Any) -> bool:
 
 def defaults_of_click_call(
     click_call: click.Command,
-) -> List[Tuple[Optional[str], Any]]:
+) -> list[tuple[Optional[str], Any]]:
     """
     Returns the default values of all None-required parameters of a click-command.
     """
@@ -47,7 +45,7 @@ def defaults_of_click_call(
     ]
 
 
-def param_names_of_click_call(click_call: click.Command) -> List[Optional[str]]:
+def param_names_of_click_call(click_call: click.Command) -> list[Optional[str]]:
     """
     Returns names of all parameters of a click call
     """
@@ -56,7 +54,7 @@ def param_names_of_click_call(click_call: click.Command) -> List[Optional[str]]:
 
 def get_click_and_api_functions(
     click_module, api_module
-) -> Tuple[List[Any], List[Any]]:
+) -> tuple[list[Any], list[Any]]:
     # Get all click commands in module 'click_module'
     click_commands = [c[1] for c in inspect.getmembers(click_module, is_click_command)]
     # Get all functions in module 'api_module'
@@ -70,7 +68,7 @@ def get_click_and_api_functions(
 
 def get_click_and_api_function_names(
     click_module, api_module
-) -> Tuple[List[Any], List[Any]]:
+) -> tuple[list[Any], list[Any]]:
     # Get all click command names in module 'click_module'
     click_command_names = [
         c[0] for c in inspect.getmembers(click_module, is_click_command)

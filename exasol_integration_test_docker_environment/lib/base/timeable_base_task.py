@@ -1,6 +1,5 @@
 from datetime import datetime
 from pathlib import Path
-from typing import List
 
 from exasol_integration_test_docker_environment.lib.base.base_task import BaseTask
 
@@ -105,7 +104,7 @@ class TimeableBaseTask(BaseTask):
                 f.write(str(total_runtime))
                 f.write("\n")
 
-    def calculate_total_runtime(self, lines: List[str]) -> float:
+    def calculate_total_runtime(self, lines: list[str]) -> float:
         total_runtime: float = 0.0
         for line in lines:
             seconds_of_run = float(line)

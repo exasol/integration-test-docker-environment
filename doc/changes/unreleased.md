@@ -8,7 +8,7 @@
    - test_cli_test_environment_db_disk_size
    - test_cli_test_environment_nameservers
    - test_cli_test_environment_db_mem_size
- 
+ - #506: Updated formatting
 
  ## Security
 

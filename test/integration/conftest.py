@@ -1,5 +1,5 @@
 import io
-from typing import Iterator
+from collections.abc import Iterator
 
 import pytest
 
@@ -157,7 +157,7 @@ def fabric_stdin(monkeypatch):
 def luigi_output(tmp_path):
     set_build_config(
         False,
-        tuple(),
+        (),
         False,
         False,
         str(tmp_path),

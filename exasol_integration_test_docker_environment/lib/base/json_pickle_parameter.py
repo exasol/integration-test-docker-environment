@@ -1,5 +1,3 @@
-from typing import Any
-
 import jsonpickle
 from luigi.parameter import (
     Parameter,

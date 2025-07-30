@@ -5,7 +5,6 @@ from datetime import (
     datetime,
     timedelta,
 )
-from typing import Tuple
 
 import luigi
 from docker.models.containers import Container
@@ -67,7 +66,7 @@ class WaitForTestDockerDatabase(DockerBaseTask, DatabaseCredentialsParameter):
 
     def start_wait_threads(
         self, db_container: Container
-    ) -> Tuple[DBContainerLogThread, IsDatabaseReadyThread]:
+    ) -> tuple[DBContainerLogThread, IsDatabaseReadyThread]:
         startup_log_file = self.get_log_path().joinpath("startup.log")
         container_log_thread = DBContainerLogThread(
             db_container,

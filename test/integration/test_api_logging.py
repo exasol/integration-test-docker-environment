@@ -5,7 +5,6 @@ import warnings
 from test.matchers import regex_matcher
 from typing import (
     Any,
-    Dict,
     Optional,
 )
 
@@ -14,9 +13,6 @@ import pytest
 from exasol_integration_test_docker_environment.lib.base.run_task import (
     generate_root_task,
     run_task,
-)
-from exasol_integration_test_docker_environment.lib.models.config.build_config import (
-    set_build_config,
 )
 
 LOGGER_STR = "logger_str"
@@ -315,7 +311,7 @@ def test_luigi_no_log_config_and_basic_logging_error(
         assert main_log_glob == []
 
 
-def create_logger_infos() -> Dict[str, Dict[str, Any]]:
+def create_logger_infos() -> dict[str, dict[str, Any]]:
     logger_infos = {
         ROOT_LOGGER: get_logger_info(logging.root),
         API_CLIENT_LOGGING_TEST_LOGGER: get_logger_info(
@@ -327,8 +323,8 @@ def create_logger_infos() -> Dict[str, Dict[str, Any]]:
     return logger_infos
 
 
-def get_logger_info(logger: logging.Logger) -> Dict[str, Any]:
-    logger_info: Dict[str, Any] = dict()
+def get_logger_info(logger: logging.Logger) -> dict[str, Any]:
+    logger_info: dict[str, Any] = {}
     logger_info[LOGGER_STR] = str(logger)
     logger_info[LEVEL] = logger.level
     logger_info[LEVEL_NAME] = logging.getLevelName(logger.level)

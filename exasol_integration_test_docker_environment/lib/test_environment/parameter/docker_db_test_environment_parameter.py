@@ -3,7 +3,6 @@ from enum import (
     auto,
 )
 from typing import (
-    List,
     Optional,
 )
 
@@ -56,4 +55,4 @@ class DockerDBTestEnvironmentParameter(Config):
     disk_size: Optional[str] = luigi.OptionalParameter(
         default="2 GiB", significant=False
     )
-    nameservers: List[str] = luigi.ListParameter(default=[], significant=False)
+    nameservers: list[str] = luigi.ListParameter(default=[], significant=False)

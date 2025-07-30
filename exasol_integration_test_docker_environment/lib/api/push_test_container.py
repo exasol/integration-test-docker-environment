@@ -1,6 +1,5 @@
 from typing import (
     Optional,
-    Tuple,
 )
 
 from exasol_integration_test_docker_environment.cli.options.docker_repository_options import (
@@ -40,7 +39,7 @@ def push_test_container(
     force_push: bool = False,
     push_all: bool = False,
     force_rebuild: bool = False,
-    force_rebuild_from: Tuple[str, ...] = tuple(),
+    force_rebuild_from: tuple[str, ...] = (),
     force_pull: bool = False,
     output_directory: str = DEFAULT_OUTPUT_DIRECTORY,
     temporary_base_directory: str = "/tmp",

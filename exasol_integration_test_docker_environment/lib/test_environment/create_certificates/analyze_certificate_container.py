@@ -1,12 +1,7 @@
-from typing import (
-    Dict,
-    Iterator,
-    Set,
-)
+from collections.abc import Iterator
 
 import luigi
 
-from exasol_integration_test_docker_environment.lib.base.base_task import BaseTaskType
 from exasol_integration_test_docker_environment.lib.docker.images.create.docker_build_base import (
     DockerBuildBase,
 )
@@ -67,8 +62,8 @@ class DockerCertificateBuildBase(DockerBuildBase):
     GOAL = "certificate-container"
     certificate_container_root_directory: str = luigi.Parameter()
 
-    def get_goal_class_map(self) -> Dict[str, DockerAnalyzeImageTask]:
-        goal_class_map: Dict[str, DockerAnalyzeImageTask] = {
+    def get_goal_class_map(self) -> dict[str, DockerAnalyzeImageTask]:
+        goal_class_map: dict[str, DockerAnalyzeImageTask] = {
             self.GOAL: self.create_child_task(
                 task_class=AnalyzeCertificateContainer,
                 certificate_container_root_directory=self.certificate_container_root_directory,
@@ -76,7 +71,7 @@ class DockerCertificateBuildBase(DockerBuildBase):
         }
         return goal_class_map
 
-    def get_default_goals(self) -> Set[str]:
+    def get_default_goals(self) -> set[str]:
         goals = {self.GOAL}
         return goals
 

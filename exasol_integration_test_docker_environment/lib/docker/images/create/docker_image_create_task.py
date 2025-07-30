@@ -1,14 +1,15 @@
 import copy
 import importlib
-from typing import (
+from collections.abc import (
     Generator,
     Iterator,
+)
+from typing import (
     Union,
 )
 
 import luigi
 
-from exasol_integration_test_docker_environment.lib.base.base_task import BaseTaskType
 from exasol_integration_test_docker_environment.lib.base.docker_base_task import (
     DockerBaseTask,
 )

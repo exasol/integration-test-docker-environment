@@ -1,8 +1,6 @@
 import json
 from typing import (
-    List,
     Optional,
-    Tuple,
 )
 
 import luigi
@@ -16,7 +14,7 @@ class build_config(luigi.Config):
     force_pull: bool = luigi.BoolParameter(default=False)
     force_load: bool = luigi.BoolParameter(default=False)
     force_rebuild: bool = luigi.BoolParameter(default=False)
-    force_rebuild_from: List[str] = luigi.ListParameter(default=[])
+    force_rebuild_from: list[str] = luigi.ListParameter(default=[])
     log_build_context_content: bool = luigi.BoolParameter(default=False)
     # keep_build_context = luigi.BoolParameter(False)
     temporary_base_directory: Optional[str] = luigi.OptionalParameter(default=None)
@@ -34,7 +32,7 @@ def set_output_directory(output_directory: Optional[str]):
 
 def set_build_config(
     force_rebuild: bool,
-    force_rebuild_from: Tuple[str, ...],
+    force_rebuild_from: tuple[str, ...],
     force_pull: bool,
     log_build_context_content: bool,
     output_directory: Optional[str],

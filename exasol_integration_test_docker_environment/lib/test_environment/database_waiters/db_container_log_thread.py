@@ -4,7 +4,6 @@ from pathlib import Path
 from threading import Thread
 from typing import (
     Callable,
-    List,
     Optional,
 )
 
@@ -30,7 +29,7 @@ class DBContainerLogThread(Thread):
         description: str,
     ) -> None:
         super().__init__()
-        self.complete_log: List[str] = list()
+        self.complete_log: list[str] = []
         self.description = description
         self.logger = logger
         self.log_file = log_file

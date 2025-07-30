@@ -1,6 +1,5 @@
 from typing import (
     Optional,
-    Tuple,
 )
 
 from exasol_integration_test_docker_environment.cli.options.test_environment_options import (
@@ -27,7 +26,7 @@ class DbVersion:
             db_version = "-".join(db_version.split("-")[0:-1])
         if db_version.startswith("prerelease-"):
             db_version = "-".join(db_version.split("-")[1:])
-        version: Tuple[int, ...] = tuple([int(v) for v in db_version.split(".")])
+        version: tuple[int, ...] = tuple(int(v) for v in db_version.split("."))
         if len(version) != 3:
             raise ValueError(f"Invalid db version given: {db_version}")
         return DbVersion(version[0], version[1], version[2])

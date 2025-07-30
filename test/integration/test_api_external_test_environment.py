@@ -1,5 +1,3 @@
-from typing import List
-
 import pytest
 
 from exasol_integration_test_docker_environment.lib.base.run_task import (
@@ -57,8 +55,8 @@ def spawn_test_environment(request, api_default_env):
         no_test_container_cleanup_after_failure=False,
         reuse_test_container=True,
         test_container_content=get_test_container_content(),
-        additional_db_parameter=tuple(),
-        docker_environment_variables=tuple(),
+        additional_db_parameter=(),
+        docker_environment_variables=(),
     )
     ext_environment_info: EnvironmentInfo = run_task(task_creator, 1, None)
     yield ext_environment_name, ext_environment_info, db.name

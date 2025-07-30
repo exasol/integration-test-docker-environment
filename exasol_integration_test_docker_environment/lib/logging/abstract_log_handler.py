@@ -1,9 +1,4 @@
-from abc import abstractmethod
 from pathlib import Path
-from typing import (
-    List,
-    Optional,
-)
 
 from exasol_integration_test_docker_environment.lib.base.task_logger_wrapper import (
     TaskLoggerWrapper,
@@ -18,7 +13,7 @@ class AbstractLogHandler:
     def __init__(self, log_file_path: Path, logger: TaskLoggerWrapper) -> None:
         self._log_file_path = log_file_path
         self._logger = logger
-        self._complete_log: List[str] = []
+        self._complete_log: list[str] = []
         self._error_message = None
         self._log_config = log_config()
 

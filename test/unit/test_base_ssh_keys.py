@@ -1,8 +1,5 @@
 import os
 import platform
-from pathlib import Path
-
-import pytest
 
 from exasol_integration_test_docker_environment.lib.base.ssh_access import (
     SshKey,

@@ -1,5 +1,3 @@
-from sys import stderr
-
 from exasol_integration_test_docker_environment.lib import api
 from exasol_integration_test_docker_environment.test.get_test_container_content import (
     get_test_container_content,

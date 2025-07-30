@@ -77,14 +77,14 @@ def spawn_test_environment_with_test_container(
     ssh_port_forward: Optional[int] = None,
     db_mem_size: str = "2 GiB",
     db_disk_size: str = "2 GiB",
-    nameserver: Tuple[str, ...] = tuple(),
+    nameserver: tuple[str, ...] = (),
     docker_runtime: Optional[str] = None,
     docker_db_image_version: str = LATEST_DB_VERSION,
     docker_db_image_name: str = "exasol/docker-db",
     db_os_access: str = "DOCKER_EXEC",
     create_certificates: bool = False,
-    additional_db_parameter: Tuple[str, ...] = tuple(),
-    docker_environment_variable: Tuple[str, ...] = tuple(),
+    additional_db_parameter: tuple[str, ...] = (),
+    docker_environment_variable: tuple[str, ...] = (),
     source_docker_repository_name: str = DEFAULT_DOCKER_REPOSITORY_NAME,
     source_docker_tag_prefix: str = "",
     source_docker_username: Optional[str] = None,
@@ -99,7 +99,7 @@ def spawn_test_environment_with_test_container(
     task_dependencies_dot_file: Optional[str] = None,
     log_level: Optional[str] = None,
     use_job_specific_log_file: bool = False,
-) -> Tuple[EnvironmentInfo, Callable[[], None]]:
+) -> tuple[EnvironmentInfo, Callable[[], None]]:
     """
     This function spawns a test environment with a docker-db container and a connected test-container.
     The test-container is reachable by the database for output redirects of UDFs.
@@ -120,7 +120,7 @@ def spawn_test_environment_with_test_container(
         raise ArgumentConstraintError("db_disk_size", "needs to be at least 100 MiB")
     set_build_config(
         False,
-        tuple(),
+        (),
         False,
         False,
         output_directory,
