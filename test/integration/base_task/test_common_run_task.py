@@ -16,7 +16,7 @@ class TestTaskWithReturn(DependencyLoggerBaseTask):
         self.return_object(f"{self.x}-123")
 
 
-def test_return_value(self) -> None:
+def test_return_value() -> None:
     """
     Integration test which verifies that the return value processing in run_task works as expected.
     """
