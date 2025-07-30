@@ -9,8 +9,8 @@
    - test_cli_test_environment_nameservers
    - test_cli_test_environment_db_mem_size
    - test_common_run_task
+   - test_click_api_consistency
  - #506: Updated formatting
- 
 
  ## Security
 

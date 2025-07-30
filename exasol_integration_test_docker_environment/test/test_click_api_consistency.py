@@ -13,6 +13,9 @@ from exasol_integration_test_docker_environment.testing.utils import multiassert
 
 
 class ClickApiConsistencyTest(unittest.TestCase):
+    """
+    Deprecated. Replaced by "./test/unit/test_click_api_consistency.py
+    """
 
     def test_api_arguments(self):
         """
