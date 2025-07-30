@@ -13,12 +13,6 @@ def _assert_mem_size(container_name: str, size: str):
             "cat /exa/etc/EXAConf"
         )
         output = exit_result[1].decode("UTF-8")
-        if output == "":
-            exit_result = docker_client.containers.get(db_container[0]).exec_run(
-                "cat /exa/etc/EXAConf"
-            )
-            output = exit_result[1].decode("UTF-8")
-            return_code = exit_result[0]
         return_code = exit_result[0]
         assert return_code == 0
         assert f"MemSize = {size}" in output
