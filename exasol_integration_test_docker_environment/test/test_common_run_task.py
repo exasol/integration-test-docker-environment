@@ -19,6 +19,9 @@ class TestTaskWithReturn(DependencyLoggerBaseTask):
 
 
 class ReturnValueRunTaskTest(unittest.TestCase):
+    """
+    Deprecated. Replaced by "./test/integration/base_task/test_common_run_task.py"
+    """
 
     def test_return_value(self) -> None:
         """
