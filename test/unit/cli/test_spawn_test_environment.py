@@ -1,7 +1,9 @@
 import itertools
 from test.unit.cli.cli_runner import CliRunner
+from typing import Any
 from unittest.mock import (
     MagicMock,
+    _Call,
     call,
 )
 
@@ -37,7 +39,7 @@ def _build_cli_args(cli_arguments: dict[str, str]) -> list[str]:
     return [k for k in gen if k is not None]
 
 
-def _gen_db_os_exec_values() -> list[tuple[str, DbOsAccess]]:
+def _gen_db_os_exec_values() -> list[tuple[str, str]]:
     return [(i.name, i.name) for i in DbOsAccess]
 
 
@@ -57,7 +59,20 @@ def _gen_tuple_values(v: str) -> list[tuple[str, tuple[str]]]:
     return [(v, (v,))]
 
 
-ARGUMENTS_VALUES = {
+ARGUMENT_VALUE_TYPE = (
+    list[tuple[str, str]]
+    | list[tuple[str, int]]
+    | list[tuple[str, tuple[str]]]
+    | list[tuple[None, bool]]
+    | list[tuple[str, bool]]
+)
+
+# Sample data as dictory of all possible argument keys to a list of CLI/API tuple.
+# The CLI value is always of type string, the API value is specific for each argument: One of str, bool, int or tuple.
+# E.g. argument key "database-port-forward" can have [("1234", 1234), ("678", 1234)]
+ARGUMENTS_VALUES: dict[str, ARGUMENT_VALUE_TYPE] = {
+    """
+    """
     "environment-name": _gen_str_values("test-environment"),
     "database-port-forward": _gen_int_values(1234),
     "bucketfs-port-forward": _gen_int_values(3456),
@@ -147,6 +162,8 @@ DOCKER_ARGS = (
     "docker-environment-variable",
 )
 
+# Valid combination of keys used for the test.
+# REQUIRED_ARGS need to be part in all test sets.
 COMBINATIONS_OF_KEYS = [
     REQUIRED_ARGS
     + DB_ARGS
@@ -166,17 +183,24 @@ COMBINATIONS_OF_KEYS = [
 ]
 
 
-def _build_combinations() -> tuple[dict[str, tuple[str, ...]]]:
-    ret_val = ()
+def _build_combinations() -> tuple[dict[str, Any], ...]:
+    """ "
+    Builds the cartesian product of all key : value combinations, by iterating over the COMBINATIONS_OF_KEYS.
+    """
+    ret_val = []
     for keys in COMBINATIONS_OF_KEYS:
+        # No valid type definitions for combinations of argument values (see ARGUMENT_VALUE_TYPE) defined for
+        # itertools.product. So we need to suppress type checker here.
         values_product = list(
-            itertools.product(*(ARGUMENTS_VALUES[key] for key in keys))
+            itertools.product(*(ARGUMENTS_VALUES[key] for key in keys))  # type: ignore
         )
-        ret_val += tuple(
-            {key: value for key, value in zip(keys, combination)}
-            for combination in values_product
+        ret_val.extend(
+            [
+                {key: value for key, value in zip(keys, combination)}
+                for combination in values_product
+            ]
         )
-    return ret_val
+    return tuple(ret_val)
 
 
 CLICK_DEFAULT_VALUES = {
@@ -185,7 +209,7 @@ CLICK_DEFAULT_VALUES = {
 }
 
 
-def _build_expected_call(cli_arguments) -> call:
+def _build_expected_call(cli_arguments) -> _Call:
     def _get_optional_value(cli_arguments, key):
         if key in cli_arguments:
             return cli_arguments[key][1]
