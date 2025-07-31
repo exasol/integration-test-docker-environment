@@ -10,6 +10,7 @@
    - test_cli_test_environment_db_mem_size
    - test_common_run_task
    - test_db_version_supports_custom_certificates
+   - test_click_api_consistency
  - #506: Updated formatting
 
  ## Security
