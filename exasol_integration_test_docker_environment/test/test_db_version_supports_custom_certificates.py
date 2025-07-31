@@ -6,6 +6,9 @@ from exasol_integration_test_docker_environment.lib.test_environment.db_version 
 
 
 class TestDbVersionSupportCustomCertificates(unittest.TestCase):
+    """
+    Deprecated. Replaced by "./test/unit/test_db_version_supports_custom_certificates.py"
+    """
 
     def test_default(self):
         self.assertTrue(db_version_supports_custom_certificates("default"))
