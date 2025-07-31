@@ -1,6 +1,9 @@
 import itertools
 from test.unit.cli.cli_runner import CliRunner
-from typing import Any
+from typing import (
+    Any,
+    Union,
+)
 from unittest.mock import (
     MagicMock,
     _Call,
@@ -59,13 +62,13 @@ def _gen_tuple_values(v: str) -> list[tuple[str, tuple[str]]]:
     return [(v, (v,))]
 
 
-ARGUMENT_VALUE_TYPE = (
-    list[tuple[str, str]]
-    | list[tuple[str, int]]
-    | list[tuple[str, tuple[str]]]
-    | list[tuple[None, bool]]
-    | list[tuple[str, bool]]
-)
+ARGUMENT_VALUE_TYPE = Union[
+    list[tuple[str, str]],
+    list[tuple[str, int]],
+    list[tuple[str, tuple[str]]],
+    list[tuple[None, bool]],
+    list[tuple[str, bool]],
+]
 
 # Sample data as dictory of all possible argument keys to a list of CLI/API tuple.
 # The CLI value is always of type string, the API value is specific for each argument: One of str, bool, int or tuple.
