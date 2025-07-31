@@ -71,8 +71,6 @@ ARGUMENT_VALUE_TYPE = (
 # The CLI value is always of type string, the API value is specific for each argument: One of str, bool, int or tuple.
 # E.g. argument key "database-port-forward" can have [("1234", 1234), ("678", 1234)]
 ARGUMENTS_VALUES: dict[str, ARGUMENT_VALUE_TYPE] = {
-    """
-    """
     "environment-name": _gen_str_values("test-environment"),
     "database-port-forward": _gen_int_values(1234),
     "bucketfs-port-forward": _gen_int_values(3456),
