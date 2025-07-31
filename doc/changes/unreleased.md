@@ -15,3 +15,7 @@
  ## Security
 
  - Updated lock file
+
+## Internal
+
+ - Updated GH workflows from tbx 1.6.0 to 1.7.1
