@@ -2489,6 +2489,25 @@ tomli = {version = ">=1.0.0", markers = "python_version < \"3.11\""}
 testing = ["argcomplete", "attrs (>=19.2.0)", "hypothesis (>=3.56)", "mock", "nose", "pygments (>=2.7.2)", "requests", "setuptools", "xmlschema"]
 
 [[package]]
+name = "pytest-check"
+version = "2.5.3"
+description = "A pytest plugin that allows multiple failures per test."
+optional = false
+python-versions = ">=3.9"
+groups = ["dev"]
+files = [
+    {file = "pytest_check-2.5.3-py3-none-any.whl", hash = "sha256:354685dfa63e714a20aa62b61c4d30d5acfa30891319df9046f59af653c3b9ba"},
+    {file = "pytest_check-2.5.3.tar.gz", hash = "sha256:2357d7df77c395d30c0c4957724fdfce1a75ea8bc9eb2308c0ffe56f62ac70ca"},
+]
+
+[package.dependencies]
+pytest = ">=7.0.0"
+typing-extensions = {version = ">=4.12.2,<5", markers = "python_version < \"3.11\""}
+
+[package.extras]
+dev = ["build", "tox", "tox-uv"]
+
+[[package]]
 name = "pytest-prysk"
 version = "0.2.0"
 description = "Pytest plugin for prysk"
@@ -3544,4 +3563,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.9.2,<4"
-content-hash = "40a9f7ffbac3f80c3a966ef1f2688d0f0525cd79e778a0ac83f5797c63296849"
+content-hash = "0943ba48ff802a77c7bec6e03d01298cd8d51c8564f72824aa0f406879b3943f"

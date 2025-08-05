@@ -52,6 +52,7 @@ mypy = "^1.1.1"
 pyexasol = "^0.25.2"
 exasol-toolbox = "^1.6.0"
 joblib = "^1.4.2"
+pytest-check = "2.5.3"
 
 [build-system]
 requires = [
