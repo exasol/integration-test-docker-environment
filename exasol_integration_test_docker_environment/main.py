@@ -8,6 +8,7 @@ def main():
     from exasol_integration_test_docker_environment.cli.commands import (
         health,
         spawn_test_environment,
+        environment
     )
 
     cli()

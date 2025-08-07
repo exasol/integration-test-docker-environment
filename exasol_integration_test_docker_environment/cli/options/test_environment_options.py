@@ -23,6 +23,8 @@ test_environment_options = [
 ]
 
 LATEST_DB_VERSION = """8.34.0"""
+DEFAULT_MEM_SIZE = """2 GiB"""
+DEFAULT_DISK_SIZE = """2 GiB"""
 
 docker_db_options = [
     click.option(

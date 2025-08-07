@@ -225,3 +225,15 @@ def itde_unit_tests(session: nox.Session) -> None:
 
     context = _context(session, coverage=True)
     _unit_tests(session, PROJECT_CONFIG, context)
+
+'''
+@nox.session(name="update-default-db-version", python=False)
+def update_default_db_version(session: nox.Session):
+    p = ArgumentParser(
+        usage="nox -s update-default-db-version -- --version <version>",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+    p.add_argument("--version")
+    args = p.parse_args(session.posargs)
+    new_version = args.version
+'''
