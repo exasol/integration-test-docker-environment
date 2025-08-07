@@ -1,12 +1,15 @@
 import sys
+
 import click
+
 from exasol_integration_test_docker_environment.cli.cli import cli
-from exasol_integration_test_docker_environment.lib import api
 from exasol_integration_test_docker_environment.cli.options.test_environment_options import (
-    LATEST_DB_VERSION,
-    DEFAULT_MEM_SIZE,
     DEFAULT_DISK_SIZE,
+    DEFAULT_MEM_SIZE,
+    LATEST_DB_VERSION,
 )
+from exasol_integration_test_docker_environment.lib import api
+
 
 @cli.command()
 @click.option(
@@ -28,7 +31,7 @@ def environment(
     show_default_db_version: bool,
     show_default_mem_size: bool,
     show_default_disk_size: bool,
-    ):
+):
     """
     This command displays the default configurations details of the DB.
     """

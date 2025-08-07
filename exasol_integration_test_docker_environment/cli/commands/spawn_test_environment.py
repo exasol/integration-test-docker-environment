@@ -8,10 +8,6 @@ from exasol_integration_test_docker_environment.cli.cli import cli
 from exasol_integration_test_docker_environment.cli.options.docker_repository_options import (
     docker_repository_options,
 )
-from exasol_integration_test_docker_environment.cli.options.test_environment_options import (
-    DEFAULT_MEM_SIZE,
-    DEFAULT_DISK_SIZE,
-)
 from exasol_integration_test_docker_environment.cli.options.system_options import (
     luigi_logging_options,
     output_directory_option,
@@ -19,6 +15,8 @@ from exasol_integration_test_docker_environment.cli.options.system_options impor
     tempory_base_directory_option,
 )
 from exasol_integration_test_docker_environment.cli.options.test_environment_options import (
+    DEFAULT_DISK_SIZE,
+    DEFAULT_MEM_SIZE,
     docker_db_options,
 )
 from exasol_integration_test_docker_environment.cli.termination_handler import (
