@@ -32,7 +32,7 @@ def environment(
     show_default_disk_size: bool,
 ):
     """
-    This command displays the default configurations details of the DB.
+    Displays the default configurations of the DB.
     """
     if show_default_db_version:
         print(f"Default Docker DB Image Version: {LATEST_DB_VERSION}")
