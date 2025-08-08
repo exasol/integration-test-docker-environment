@@ -12,6 +12,7 @@
    - test_db_version_supports_custom_certificates
    - test_click_api_consistency
  - #506: Updated formatting
+ - #515: Update GPU Test Query
 
  ## Security
 
