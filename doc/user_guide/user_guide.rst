@@ -224,6 +224,7 @@ Run ``main.py --help``, to get a list of the available commands:
      --help  Show this message and exit.
 
    Commands:
+     environment             Displays the default configurations of the DB.
      health                  Check the health of the execution environment.
      spawn-test-environment  This command spawn a test environment with a...
 
@@ -243,6 +244,21 @@ To get more details on a specific command run
 
    Options:
      --help  Show this message and exit.
+
+To get the details of default configurations run ``main.py environment --help``
+
+.. code:: console
+
+   Usage: itde environment [OPTIONS]
+
+      Displays the default configurations of the DB.
+
+      --show-default-db-version  Displays the defualt Docker DB Image version
+      --show-default-mem-size    Displays the defualt DB mem size
+      --show-default-disk-size   Displays the defualt DB disk size
+      --help                     Show this message and exit.
+
+   Eg: itde environment --show-default-db-version
 
 The integration-test-docker-environment API
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
