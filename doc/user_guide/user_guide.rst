@@ -245,7 +245,7 @@ To get more details on a specific command run
    Options:
      --help  Show this message and exit.
 
-To get the details of default configuratins run ``main.py environment --help``
+To get the details of default configurations run ``main.py environment --help``
 
 .. code:: console
 
