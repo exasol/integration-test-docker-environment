@@ -1,5 +1,7 @@
 import argparse
 import json
+import os
+import re
 import shutil
 from argparse import ArgumentParser
 from enum import Enum
@@ -78,6 +80,27 @@ def get_db_versions() -> list[str]:
     db_versions.remove("7.1.0")
     db_versions.append("7.1.0-d1")
     return db_versions
+
+
+def get_default_db_version(file_name):
+    with open(file_name) as txt_file:
+        file_content = txt_file.read()
+        pattern = r"\s*LATEST_DB_VERSION\s*=\s*[\"']+([\d\.]+)[\"']+"
+        match = re.search(pattern, file_content)
+        return match.group(1) if match else None
+
+
+def replace_string_in_file(file_name, old_string, str_to_replace):
+    is_ok = file_name and os.path.exists(file_name) and old_string and str_to_replace
+    if not is_ok:
+        return False
+    updated_text = ""
+    with open(file_name) as txt_file:
+        file_content = txt_file.read()
+        updated_text = file_content.replace(old_string, str_to_replace)
+    with open(file_name, "w") as txt_file:
+        txt_file.write(updated_text)
+    return True
 
 
 @nox.session(name="run-all-tests", python=False)
@@ -227,9 +250,9 @@ def itde_unit_tests(session: nox.Session) -> None:
     _unit_tests(session, PROJECT_CONFIG, context)
 
 
-"""
 @nox.session(name="update-default-db-version", python=False)
 def update_default_db_version(session: nox.Session):
+    is_ok = True
     p = ArgumentParser(
         usage="nox -s update-default-db-version -- --version <version>",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -237,4 +260,17 @@ def update_default_db_version(session: nox.Session):
     p.add_argument("--version")
     args = p.parse_args(session.posargs)
     new_version = args.version
-"""
+
+    # Get default db version from python file
+    pwd = os.getcwd()
+    file_name = os.path.join(
+        pwd,
+        "exasol_integration_test_docker_environment/cli/options/test_environment_options.py",
+    )
+    default_db_ver = get_default_db_version(file_name)
+    is_ok = is_ok and default_db_ver
+    is_ok = is_ok and replace_string_in_file(file_name, default_db_ver, new_version)
+
+    file_name = os.path.join(pwd, "doc/user_guide/user_guide.rst")
+    is_ok = is_ok and replace_string_in_file(file_name, default_db_ver, new_version)
+    print("Successfully updated" if is_ok else "Failed updating")

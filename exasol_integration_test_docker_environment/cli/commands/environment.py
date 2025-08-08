@@ -8,7 +8,6 @@ from exasol_integration_test_docker_environment.cli.options.test_environment_opt
     DEFAULT_MEM_SIZE,
     LATEST_DB_VERSION,
 )
-from exasol_integration_test_docker_environment.lib import api
 
 
 @cli.command()
