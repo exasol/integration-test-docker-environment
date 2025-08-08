@@ -254,7 +254,7 @@ def itde_unit_tests(session: nox.Session) -> None:
 def update_default_db_version(session: nox.Session):
     is_ok = True
     p = ArgumentParser(
-        usage="nox -s update-default-db-version -- --version \"major.minor.patch\"",
+        usage='nox -s update-default-db-version -- --version "major.minor.patch"',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     p.add_argument("--version")
