@@ -5,6 +5,6 @@ def cli_function(func):
 
 
 def no_cli_function(func):
-    """Decorator: Register a function as noy having a cli equivalent"""
+    """Decorator: Register a function as not having a cli equivalent"""
     func.__cli_function__ = False
     return func
