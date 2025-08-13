@@ -10,4 +10,4 @@
    * CVE-2024-47081 in productive dependency `requests` by updating `requests` to version `2.32.4`
 
 ## Feature
- - 442: Adding feature to show the default DB version and Adding a nox task to update the default DB version all over the repository at relevant places.
+ - #442: Adding feature to show the default DB version and Adding a nox task to update the default DB version all over the repository at relevant places.
