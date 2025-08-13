@@ -19,5 +19,9 @@ def cli():
             $ itde spawn-test-environment --environment-name test \\
             --database-port-forward 8563 --bucketfs-port-forward 2580 \\
             --docker-db-image-version 7.1.9 --db-mem-size 4GB
+
+        Display the default configurations of the execution environment:
+
+            $ itde environment --show-default-db-version
     """
     pass

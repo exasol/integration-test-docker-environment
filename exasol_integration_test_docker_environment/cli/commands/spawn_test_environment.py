@@ -15,6 +15,8 @@ from exasol_integration_test_docker_environment.cli.options.system_options impor
     tempory_base_directory_option,
 )
 from exasol_integration_test_docker_environment.cli.options.test_environment_options import (
+    DEFAULT_DISK_SIZE,
+    DEFAULT_MEM_SIZE,
     docker_db_options,
 )
 from exasol_integration_test_docker_environment.cli.termination_handler import (
@@ -60,14 +62,14 @@ from exasol_integration_test_docker_environment.lib.utils.cli_function_decorator
 @click.option(
     "--db-mem-size",
     type=str,
-    default="2 GiB",
+    default=DEFAULT_MEM_SIZE,
     show_default=True,
     help="The main memory used by the database. Format <number> <unit>, e.g. 1 GiB. The minimum size is 1 GB, below that the database will not start.",
 )
 @click.option(
     "--db-disk-size",
     type=str,
-    default="2 GiB",
+    default=DEFAULT_DISK_SIZE,
     show_default=True,
     help="The disk size available for the database. Format <number> <unit>, e.g. 1 GiB. The minimum size is 100 MiB. However, the setup creates volume files with at least 2 GB larger size, because the database needs at least so much more disk.",
 )
