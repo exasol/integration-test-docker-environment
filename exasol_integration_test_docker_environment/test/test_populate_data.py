@@ -7,7 +7,9 @@ from sys import stderr
 
 import luigi
 
-from exasol_integration_test_docker_environment.cli.options import test_environment_options
+from exasol_integration_test_docker_environment.cli.options import (
+    test_environment_options,
+)
 from exasol_integration_test_docker_environment.lib.base.run_task import (
     generate_root_task,
 )
@@ -18,7 +20,9 @@ from exasol_integration_test_docker_environment.lib.models.data.test_container_c
 from exasol_integration_test_docker_environment.lib.test_environment.database_setup.populate_data import (
     PopulateTestDataToDatabase,
 )
-from exasol_integration_test_docker_environment.lib.test_environment.db_version import DbVersion
+from exasol_integration_test_docker_environment.lib.test_environment.db_version import (
+    DbVersion,
+)
 from exasol_integration_test_docker_environment.test.get_test_container_content import (
     get_test_container_content,
 )
@@ -26,7 +30,9 @@ from exasol_integration_test_docker_environment.testing import utils
 from exasol_integration_test_docker_environment.testing.api_test_environment import (
     ApiTestEnvironment,
 )
-from exasol_integration_test_docker_environment.testing.utils import check_db_version_from_env
+from exasol_integration_test_docker_environment.testing.utils import (
+    check_db_version_from_env,
+)
 
 
 class TestDataPopulateData(PopulateTestDataToDatabase):
@@ -37,7 +43,7 @@ class TestDataPopulateData(PopulateTestDataToDatabase):
         return PurePath("/test_data")
 
     def get_data_file_within_data_path(self) -> PurePath:
-        if DbVersion.from_db_version_str(self.db_version) >= DbVersion(2025,1,0):
+        if DbVersion.from_db_version_str(self.db_version) >= DbVersion(2025, 1, 0):
             return PurePath("import_ignore_cert.sql")
         else:
             return PurePath("import.sql")
@@ -56,7 +62,7 @@ class TestPopulateData(unittest.TestCase):
         )
 
         cls.docker_db_version_parameter = (
-                check_db_version_from_env() or test_environment_options.LATEST_DB_VERSION
+            check_db_version_from_env() or test_environment_options.LATEST_DB_VERSION
         )
         test_container_content = get_test_container_content(
             runtime_mapping=(test_container_runtime_mapping,)
