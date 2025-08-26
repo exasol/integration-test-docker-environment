@@ -1,4 +1,5 @@
 # 4.3.0 - 2025-08-27
+
 Support for Exasol docker db 2025.1.0 and internal improvements.
 
 ## Features
