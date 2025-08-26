@@ -126,7 +126,7 @@ The following options are available to customize the test environment.
       --docker-runtime TEXT           The docker runtime used to start all
                                       containers
       --docker-db-image-version TEXT  Docker DB Image Version against which the
-                                      tests should run.  [default: 8.34.0]
+                                      tests should run.  [default: 2025.1.0]
       --docker-db-image-name TEXT     Docker DB Image Name against which the tests
                                       should run.  [default: exasol/docker-db]
       --db-os-access METHOD           How to access file system and command line
@@ -330,7 +330,7 @@ Currently supported Exasol Versions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  **7.1**: up to 7.1.29
--  **8**: from 8.17.0 up to 8.34.0
+-  **8**: from 8.17.0 up to 2025.1.0
 
 If you need further versions, please open an issue.
 

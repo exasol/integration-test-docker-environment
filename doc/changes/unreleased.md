@@ -1,5 +1,8 @@
 # Unreleased
 
+## Features
+
+ - #497: Added Docker-DB 2025.1.0
 ## Refactorings
 
  - Updated `exasol-toolbox` to 1.6.0 and fixed broken links
