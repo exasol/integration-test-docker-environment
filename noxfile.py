@@ -12,6 +12,7 @@ from typing import (
 )
 
 import nox
+import PyInstaller.__main__
 import toml
 from packaging.version import Version
 
@@ -277,3 +278,17 @@ def update_default_db_version(session: nox.Session):
     file_name = ROOT / "doc" / "user_guide/user_guide.rst"
     is_ok = is_ok and replace_string_in_file(file_name, default_db_ver, new_version)
     print("Successfully updated" if is_ok else "Failed updating")
+
+
+@nox.session(name="build-standalone-binary", python=False)
+def build_standalone_binary(session: nox.Session):
+    script_path = str(ROOT / "exasol_integration_test_docker_environment" / "main.py")
+
+    options = [
+        script_path,
+        "--onefile",  # As a single exe file
+        "--name=standalone_itde",  # Name of the executable
+    ]
+    PyInstaller.__main__.run(options)
+
+    print("PyInstaller build complete")
