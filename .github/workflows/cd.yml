@@ -23,24 +23,13 @@ jobs:
       PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
 
   standalone-executable:
+    needs: [cd-job]
     name: Create a standalone linux executable
-    runs-on: ubuntu-24.04
+    uses: ./.github/workflows/build-executable.yml
+    with:
+      release-tag: ${{ github.ref_name }}
     permissions:
       contents: write
-    steps:
-      - name: SCM Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@v1
-
-      - name: Build standalone binary
-        run: poetry run -- nox -s build-standalone-binary -- --executable-name "itde_linux_x86-64"
-
-      - name: Upload to release
-        run: gh release upload ${{ github.ref_name }} dist/itde_linux_x86-64
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   publish-docs:
     needs: [ cd-job ]

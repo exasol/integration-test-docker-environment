@@ -292,11 +292,13 @@ def build_standalone_binary(session: nox.Session):
     args = p.parse_args(session.posargs)
     exe_name = getattr(args, "executable_name")
 
-    options = [
-        script_path,
-        "--onefile",  # As a single exe file
-        f"--name={exe_name}",  # Name of the executable
-    ]
-    PyInstaller.__main__.run(options)
-
-    print(f"PyInstaller completed building {exe_name}")
+    if bool(exe_name):
+        options = [
+            script_path,
+            "--onefile",  # As a single exe file
+            f"--name={exe_name}",  # Name of the executable
+        ]
+        PyInstaller.__main__.run(options)
+        print(f"PyInstaller completed building {exe_name}")
+    else:
+        print("PyInstaller needs a valid executable-name")

@@ -49,6 +49,15 @@ jobs:
     uses: ./.github/workflows/slow-tests.yml
     #Do not inherit secrets because ITDE Slow Tests does not need it
 
+  standalone-executable:
+    needs: [fast-tests, slow-tests]
+    name: Create a standalone linux executable
+    uses: ./.github/workflows/build-executable.yml
+    with:
+      release-tag: ''
+    permissions:
+      contents: write
+
   metrics:
     name: Report Metrics
     needs: [ checks, fast-tests ]
