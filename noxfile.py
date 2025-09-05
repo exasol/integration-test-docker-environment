@@ -284,11 +284,19 @@ def update_default_db_version(session: nox.Session):
 def build_standalone_binary(session: nox.Session):
     script_path = str(ROOT / "exasol_integration_test_docker_environment" / "main.py")
 
+    p = ArgumentParser(
+        usage='nox -s build-standalone-binary -- --executable-name "itde_os_x86-64"',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+    p.add_argument("--executable-name")
+    args = p.parse_args(session.posargs)
+    exe_name = getattr(args, 'executable_name')
+
     options = [
         script_path,
         "--onefile",  # As a single exe file
-        "--name=standalone_itde",  # Name of the executable
+        f"--name={exe_name}",  # Name of the executable
     ]
     PyInstaller.__main__.run(options)
 
-    print("PyInstaller build complete")
+    print(f"PyInstaller completed building {exe_name}")
