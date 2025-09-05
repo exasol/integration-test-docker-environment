@@ -290,7 +290,7 @@ def build_standalone_binary(session: nox.Session):
     )
     p.add_argument("--executable-name")
     args = p.parse_args(session.posargs)
-    exe_name = getattr(args, 'executable_name')
+    exe_name = getattr(args, "executable_name")
 
     options = [
         script_path,
