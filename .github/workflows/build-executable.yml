@@ -13,6 +13,7 @@ jobs:
   standalone-executable:
     name: Create a standalone linux executable
     runs-on: ubuntu-24.04
+    if: ${{ inputs.release-tag != ''}}
     permissions:
       contents: write
     steps:
