@@ -26,6 +26,9 @@ jobs:
       - name: Build standalone executable
         run: poetry run -- nox -s build-standalone-binary -- --executable-name "itde_linux_x86-64"
 
+      - name: Execute the executable
+        run: poetry run -- nox -s execute-itde -- --executable-name "dist/itde_linux_x86-64"
+
       - name: Upload to release
         run: gh release upload ${{ inputs.release-tag }} dist/itde_linux_x86-64
         env:
