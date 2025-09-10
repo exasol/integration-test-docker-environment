@@ -5,7 +5,7 @@ Support for Exasol docker db 2025.1.0 and internal improvements.
 ## Features
 
  - #497: Added Docker-DB 2025.1.0
- - #449: Added nox task to build standalone executable
+ - #449: Added nox task to build standalone executable and another one to execute it
 
 ## Refactorings
 
