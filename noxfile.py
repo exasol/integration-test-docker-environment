@@ -316,4 +316,6 @@ def execute_itde(session: nox.Session):
     args = p.parse_args(session.posargs)
     exe_name = getattr(args, "executable_name")
     session.run(f"{exe_name}", "--help")
-    session.run(f"{exe_name}", "spawn-test-environment", "--environment-name", "test_01")
+    session.run(
+        f"{exe_name}", "spawn-test-environment", "--environment-name", "test_01"
+    )
