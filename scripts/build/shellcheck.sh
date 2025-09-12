@@ -2,7 +2,7 @@
 
 set -u
 
-interesting_paths=("starter_scripts" "scripts" "docker_db_config_template" "exasol_integration_test_docker_environment")
+interesting_paths=("scripts" "docker_db_config_template" "exasol_integration_test_docker_environment")
 
 SCRIPT_DIR="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 status=0

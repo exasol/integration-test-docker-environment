@@ -21,6 +21,3 @@ jobs:
 
       - name: Run shunit2 based Shell Tests
         run: shunit2 scripts/health_test.sh
-
-      - name: Run Starter Script Tests
-        run: starter_scripts/test/test_scripts.sh

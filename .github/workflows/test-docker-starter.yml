@@ -11,6 +11,3 @@ jobs:
     steps:
       - name: SCM Checkout
         uses: actions/checkout@v4
-
-      - name: Test ./start-test-env
-        run: ./start-test-env health
