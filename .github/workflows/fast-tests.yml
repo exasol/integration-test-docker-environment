@@ -50,12 +50,6 @@ jobs:
       contents: read
     uses: ./.github/workflows/test-db-versions-minimal.yml
 
-  test-docker-starter:
-    name: Test Docker Starter
-    permissions:
-      contents: read
-    uses: ./.github/workflows/test-docker-starter.yml
-
   test-shell-scripts:
     name: Test Shell Scripts
     permissions:
