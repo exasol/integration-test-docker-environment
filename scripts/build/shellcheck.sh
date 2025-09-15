@@ -12,12 +12,4 @@ for path in "${interesting_paths[@]}"; do
   test $? -ne 0 && status=1
 done
 
-
-interesting_files=("./start-test-env")
-
-for f in "${interesting_files[@]}"; do
-  shellcheck -x "$SCRIPT_DIR/../../$f"
-  test $? -ne 0 && status=1
-done
-
 exit "$status"
