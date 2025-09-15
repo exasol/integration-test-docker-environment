@@ -13,7 +13,6 @@ jobs:
   standalone-executable:
     name: Create a standalone linux executable
     runs-on: ubuntu-22.04
-    if: ${{ inputs.release-tag != ''}}
     permissions:
       contents: write
     steps:
@@ -30,6 +29,7 @@ jobs:
         run: poetry run -- nox -s execute-itde -- --executable-name "dist/itde_linux_x86-64"
 
       - name: Upload to release
+        if: ${{ inputs.release-tag != ''}}
         run: gh release upload ${{ inputs.release-tag }} dist/itde_linux_x86-64
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
