@@ -213,23 +213,6 @@ def release(session: nox.Session):
     session.run("git", "push", "origin", version)
 
 
-@nox.session(name="starter-scripts-checksums", python=False)
-def starter_scripts_checksums(session: nox.Session):
-    start_script_dir = ROOT / "starter_scripts"
-    with session.chdir(start_script_dir):
-        for start_script_entry in start_script_dir.iterdir():
-            if start_script_entry.is_file():
-                sha512: str = session.run("sha512sum", start_script_entry.name, silent=True)  # type: ignore
-                with open(
-                    start_script_dir
-                    / "checksums"
-                    / f"{start_script_entry.name}.sha512sum",
-                    "w",
-                ) as f:
-                    f.write(sha512)
-    session.run("git", "add", "starter_scripts/checksums")
-
-
 @nox.session(name="copy-docker-db-config-templates", python=False)
 def copy_docker_db_config_templates(session: nox.Session):
     target_path = (
