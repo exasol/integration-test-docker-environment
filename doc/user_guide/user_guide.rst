@@ -73,8 +73,7 @@ A standalone executable for linux environment can be created as follows. It will
 
 ::
 
-   poetry run bash
-   nox -s build-standalone-binary -- --executable-name "itde_linux_x86-64"
+   poetry run -- nox -s build-standalone-binary -- --executable-name "itde_linux_x86-64"
 
 
 Starting the test environment:
