@@ -60,18 +60,13 @@ In order to start a Docker-DB Test Environment, you need:
    Docker stores its images and containers. On Linux Docker typically
    stores the images under ``/var/lib/docker``.
 
+
 Getting started
 ---------------
 
-Clone the repository
+Download the standalone executable ``itde_linux_x86-64``, for linux, from `release-page <https://github.com/exasol/integration-test-docker-environment/releases>`_ or install the package in your virtual environment using ``venv or Poetry`` via Pip or Pipx.
 
-::
-
-   git clone https://github.com/exasol/integration-test-docker-environment
-
-or install the package in your virtual environment using ``venv or Poetry``.
-
-or Pip via PyPi
+Pip via PyPi
 
 ::
 
@@ -84,9 +79,25 @@ or Pipx via PyPi
 
    pipx install exasol-integration-test-docker-environment
 
-This way you can use it via ``itde spawn-test-environment --environment-name <NAME>``
+This way you can run it using standalone executable, ``./itde_linux_x86-64 spawn-test-environment --environment-name <NAME>`` or through the package, ``itde spawn-test-environment --environment-name <NAME>``
 
+Starting the test environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Using the standalone executable, ``itde_linux_x86-64`` as follows
+
+::
+
+   ./itde_linux_x86-64 spawn-test-environment --environment-name <NAME>
+
+or if you work on the code of the Test Environment (requires Python
+>=3.9 with `poetry <https://python-poetry.org/>`__):
+
+::
+
+   poetry run itde spawn-test-environment --environment-name <NAME>
+
+Shutdown of the test environment is currently done manual.
 
 Options
 ~~~~~~~

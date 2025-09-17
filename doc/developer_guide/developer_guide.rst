@@ -100,24 +100,6 @@ One of the release steps failed (Partial Release)
 
     **Solution**: Manually push the package to PyPi
 
-Starting the test environment
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The ``itde_linux_x86-64`` is a linux executable that can be downloaded from `release-page <https://github.com/exasol/integration-test-docker-environment/releases>`_.
-
-::
-
-   ./itde_linux_x86-64 spawn-test-environment --environment-name <NAME>
-
-or if you work on the code of the Test Environment (requires Python
->=3.9 with `poetry <https://python-poetry.org/>`__):
-
-::
-
-   poetry run itde spawn-test-environment --environment-name <NAME>
-
-Shutdown of the test environment is currently done manual.
-
 Running Tests
 *************
 
