@@ -69,27 +69,24 @@ Clone the repository
 
    git clone https://github.com/exasol/integration-test-docker-environment
 
-A standalone executable for linux environment can be created as follows. It will be created under ``dist`` folder.
+or install the package in your virtual environment using ``venv or Poetry``.
+
+or Pip via PyPi
 
 ::
 
-   poetry run -- nox -s build-standalone-binary -- --executable-name "itde_linux_x86-64"
+   python3 -m pip install exasol-integration-test-docker-environment
 
 
-Starting the test environment:
-
-::
-
-   ./dist/itde_linux_x86-64 spawn-test-environment --environment-name <NAME>
-
-or if you work on the code of the Test Environment (requires Python
->=3.9 with `poetry <https://python-poetry.org/>`__):
+or Pipx via PyPi
 
 ::
 
-   poetry run itde spawn-test-environment --environment-name <NAME>
+   pipx install exasol-integration-test-docker-environment
 
-Shutdown of the test environment is currently done manual.
+This way you can use it via ``itde spawn-test-environment --environment-name <NAME>``
+
+
 
 Options
 ~~~~~~~
@@ -212,7 +209,9 @@ You can look at them on the commandline with:
 
 ::
 
-   ./dist/itde_linux_x86-64 spawn-test-environment --help
+   ./itde_linux_x86-64 spawn-test-environment --help
+   # or
+   ./itde spawn-test-environment --help
 
 The integration-test-docker-environment command line tool
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
