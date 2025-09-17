@@ -69,18 +69,26 @@ Clone the repository
 
    git clone https://github.com/exasol/integration-test-docker-environment
 
+A standalone executable for linux environment can be created as follows. It will be created under ``dist`` folder.
+
+::
+
+   poetry run bash
+   nox -s build-standalone-binary -- --executable-name "itde_linux_x86-64"
+
+
 Starting the test environment:
 
 ::
 
-   ./start-test-env spawn-test-environment --environment-name <NAME>
+   ./dist/itde_linux_x86-64 spawn-test-environment --environment-name <NAME>
 
 or if you work on the code of the Test Environment (requires Python
 >=3.9 with `poetry <https://python-poetry.org/>`__):
 
 ::
 
-   ./start-test-env-with-poetry spawn-test-environment --environment-name <NAME>
+   poetry run itde spawn-test-environment --environment-name <NAME>
 
 Shutdown of the test environment is currently done manual.
 
@@ -205,7 +213,7 @@ You can look at them on the commandline with:
 
 ::
 
-   ./start-test-env spawn-test-environment --help
+   ./dist/itde_linux_x86-64 spawn-test-environment --help
 
 The integration-test-docker-environment command line tool
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
