@@ -94,7 +94,7 @@ Using the standalone executable, ``itde_linux_x86-64`` as follows
 
 ::
 
-   poetry run itde spawn-test-environment --environment-name <NAME>
+   itde spawn-test-environment --environment-name <NAME>
 
 Shutdown of the test environment is currently done manual.
 
