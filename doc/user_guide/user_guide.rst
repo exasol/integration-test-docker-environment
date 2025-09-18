@@ -64,7 +64,7 @@ In order to start a Docker-DB Test Environment, you need:
 Getting started
 ---------------
 
-Download the standalone executable ``itde_linux_x86-64``, for linux, from `release-page <https://github.com/exasol/integration-test-docker-environment/releases>`_ or install the package in your virtual environment using ``venv or Poetry`` via Pip or Pipx.
+Download the standalone executable ``itde_linux_x86-64``, for linux, from `release-page <https://github.com/exasol/integration-test-docker-environment/releases>`_ or install the package in your virtual environment using virtual environment via Pip or Pipx.
 
 Pip via PyPi
 
