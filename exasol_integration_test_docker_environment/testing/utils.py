@@ -8,7 +8,7 @@ from typing import (
 
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 
-INTEGRATION_TEST_DOCKER_ENVIRONMENT_DEFAULT_BIN = "./start-test-env"
+INTEGRATION_TEST_DOCKER_ENVIRONMENT_DEFAULT_BIN = "itde"
 
 
 def close_environments(*args):

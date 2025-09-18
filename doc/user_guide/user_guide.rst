@@ -60,27 +60,41 @@ In order to start a Docker-DB Test Environment, you need:
    Docker stores its images and containers. On Linux Docker typically
    stores the images under ``/var/lib/docker``.
 
+
 Getting started
 ---------------
 
-Clone the repository
+Download the standalone executable ``itde_linux_x86-64``, for linux, from `release-page <https://github.com/exasol/integration-test-docker-environment/releases>`_ or install the package in your virtual environment using virtual environment via Pip or Pipx.
+
+Pip via PyPi
 
 ::
 
-   git clone https://github.com/exasol/integration-test-docker-environment
+   python3 -m pip install exasol-integration-test-docker-environment
 
-Starting the test environment:
 
-::
-
-   ./start-test-env spawn-test-environment --environment-name <NAME>
-
-or if you work on the code of the Test Environment (requires Python
->=3.9 with `poetry <https://python-poetry.org/>`__):
+or Pipx via PyPi
 
 ::
 
-   ./start-test-env-with-poetry spawn-test-environment --environment-name <NAME>
+   pipx install exasol-integration-test-docker-environment
+
+This way you can run it using standalone executable, ``./itde_linux_x86-64 spawn-test-environment --environment-name <NAME>`` or through the package, ``itde spawn-test-environment --environment-name <NAME>``
+
+Starting the test environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Using the standalone executable, ``itde_linux_x86-64`` as follows
+
+::
+
+   ./itde_linux_x86-64 spawn-test-environment --environment-name <NAME>
+
+or if you installed it via Pip or Pipx
+
+::
+
+   itde spawn-test-environment --environment-name <NAME>
 
 Shutdown of the test environment is currently done manual.
 
@@ -205,7 +219,9 @@ You can look at them on the commandline with:
 
 ::
 
-   ./start-test-env spawn-test-environment --help
+   ./itde_linux_x86-64 spawn-test-environment --help
+   # or
+   itde spawn-test-environment --help
 
 The integration-test-docker-environment command line tool
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -382,42 +398,3 @@ Tested Docker Runtimes
 -  `NVIDIA Container
    Runtime <https://github.com/NVIDIA/nvidia-container-runtime>`__ for
    GPU accelerated UDFs
-
-Mac OS X Support
-----------------
-
-What do I need to do to start the Test Environment with Mac OS X
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The Exasol Docker-DB needs per default a bit more than 2 GB of RAM,
-however the Docker VM on Mac OS X provides often not enough RAM to
-accommodate this. You should increase the RAM of the Docker VM to at
-least 4.25 GB or reduce the DB Mem Size for the Exasol Docker-DB to less
-than 2 GB with ``--db-mem-size 1 GiB``.
-
-What happens under the hood
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Mac OS X with Docker Desktop for Mac uses a lightweight virtual machine
-with linux in which the docker daemon runs and the containers get
-started. This makes
-`networking <https://docs.docker.com/desktop/features/networking/>`__ and
-`shared directories <https://docs.docker.com/desktop/features/synchronized-file-sharing/>`__
-more complicated then on Linux.
-
-We start the python setup script for the test environment in its own
-Docker container, lets call it ``docker runner``, because the library
-`Luigi <https://luigi.readthedocs.io/en/stable/>`__ can have problems
-with Mac OS X and to avoid the installation of further dependencies. To
-support Mac OS X, the ``start-test-env`` script starts the
-``docker runner`` container and mounts the docker socket at
-``/var/run/docker.sock`` and the directory of the test environment from
-the Mac OS X host to the container. Then, it starts
-``start-test-env-without-docker`` which then starts the python script.
-It is important, that the repository gets cloned to the Mac OS X host
-and not to a docker container, because the python scripts tries to start
-further docker container which use host mounts to share the tests
-directory of the test environment with the docker container.
-
-.. toctree::
-   :maxdepth: 1

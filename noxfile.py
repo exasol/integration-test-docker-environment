@@ -12,6 +12,7 @@ from typing import (
 )
 
 import nox
+import PyInstaller.__main__
 import toml
 from packaging.version import Version
 
@@ -212,23 +213,6 @@ def release(session: nox.Session):
     session.run("git", "push", "origin", version)
 
 
-@nox.session(name="starter-scripts-checksums", python=False)
-def starter_scripts_checksums(session: nox.Session):
-    start_script_dir = ROOT / "starter_scripts"
-    with session.chdir(start_script_dir):
-        for start_script_entry in start_script_dir.iterdir():
-            if start_script_entry.is_file():
-                sha512: str = session.run("sha512sum", start_script_entry.name, silent=True)  # type: ignore
-                with open(
-                    start_script_dir
-                    / "checksums"
-                    / f"{start_script_entry.name}.sha512sum",
-                    "w",
-                ) as f:
-                    f.write(sha512)
-    session.run("git", "add", "starter_scripts/checksums")
-
-
 @nox.session(name="copy-docker-db-config-templates", python=False)
 def copy_docker_db_config_templates(session: nox.Session):
     target_path = (
@@ -277,3 +261,44 @@ def update_default_db_version(session: nox.Session):
     file_name = ROOT / "doc" / "user_guide/user_guide.rst"
     is_ok = is_ok and replace_string_in_file(file_name, default_db_ver, new_version)
     print("Successfully updated" if is_ok else "Failed updating")
+
+
+@nox.session(name="build-standalone-binary", python=False)
+def build_standalone_binary(session: nox.Session):
+    script_path = str(ROOT / "exasol_integration_test_docker_environment" / "main.py")
+
+    p = ArgumentParser(
+        usage='nox -s build-standalone-binary -- --executable-name "itde_os_x86-64"',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+    p.add_argument("--executable-name")
+    args = p.parse_args(session.posargs)
+    exe_name = getattr(args, "executable_name")
+
+    if bool(exe_name):
+        options = [
+            script_path,
+            "--onefile",  # As a single exe file
+            f"--name={exe_name}",  # Name of the executable
+            "--collect-datas=exasol_integration_test_docker_environment.templates",
+            "--collect-datas=exasol_integration_test_docker_environment.docker_db_config",
+        ]
+        PyInstaller.__main__.run(options)
+        print(f"PyInstaller completed building {exe_name}")
+    else:
+        print("PyInstaller needs a valid executable-name")
+
+
+@nox.session(name="execute-itde", python=False)
+def execute_itde(session: nox.Session):
+    p = ArgumentParser(
+        usage='nox -s execute-itde -- --executable-name "dist/itde_os_x86-64"',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+    p.add_argument("--executable-name")
+    args = p.parse_args(session.posargs)
+    exe_name = getattr(args, "executable_name")
+    session.run(f"{exe_name}", "--help")
+    session.run(
+        f"{exe_name}", "spawn-test-environment", "--environment-name", "test_01"
+    )

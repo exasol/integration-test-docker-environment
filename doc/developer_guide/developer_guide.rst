@@ -18,6 +18,16 @@ Install the Git commit hooks:
 .. toctree::
    :maxdepth: 1
 
+
+Creating a Standalone Executable
+********************************
+A standalone executable for linux environment can be created as follows. It will be created under ``dist`` folder.
+
+.. code-block:: shell
+
+   poetry run -- nox -s build-standalone-binary -- --executable-name "itde_linux_x86-64"
+
+
 Creating a Release
 *******************
 
@@ -103,11 +113,6 @@ Some tests will use prebuilt Docker Containers.
 After changing the implementation you might need to rebuild the container in order to make
 your changes effective when executing the tests.
 
-Please use the following command to rebuild the Docker Container:
-
-.. code-block:: shell
-
-  starter_scripts/build_docker_runner_image.sh
 
 Configuring Tests
 -----------------
