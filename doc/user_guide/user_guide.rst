@@ -90,7 +90,7 @@ Using the standalone executable, ``itde_linux_x86-64`` as follows
 
    ./itde_linux_x86-64 spawn-test-environment --environment-name <NAME>
 
-or if you work on the code of the Test Environment (requires Python
+ or if you installed it via Pip or Pipx
 >=3.9 with `poetry <https://python-poetry.org/>`__):
 
 ::
