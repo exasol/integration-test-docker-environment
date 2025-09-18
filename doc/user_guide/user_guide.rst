@@ -221,7 +221,7 @@ You can look at them on the commandline with:
 
    ./itde_linux_x86-64 spawn-test-environment --help
    # or
-   ./itde spawn-test-environment --help
+   itde spawn-test-environment --help
 
 The integration-test-docker-environment command line tool
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
