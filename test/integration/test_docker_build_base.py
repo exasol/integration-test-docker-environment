@@ -27,10 +27,10 @@ class TestDockerBuildBaseTestAnalyzeImage(DockerAnalyzeImageTask):
     task_name = Parameter()
 
     def get_target_repository_name(self) -> str:
-        return f"""exasol-test-docker-build-base"""
+        return "exasol-test-docker-build-base"
 
     def get_source_repository_name(self) -> str:
-        return f"""exasol-test-docker-build-base"""
+        return "exasol-test-docker-build-base"
 
     def get_source_image_tag(self):
         return self.task_name
@@ -128,6 +128,6 @@ def test_valid_non_default_goal(clean_images):
 
 def test_non_valid_non_default_goal(clean_images):
     with pytest.raises(Exception, match=r"^Unknown goal\(s\).+"):
-        _ = generate_root_task(
+        generate_root_task(
             task_class=TestDockerBuildBase, goals=["test-analyze-image-3"]
         )
