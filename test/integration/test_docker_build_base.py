@@ -105,7 +105,11 @@ def assert_image_exists(prefix):
 
 
 def _run_docker_build_base_task_and_check(expected_img_name: str, goals: list[str]):
-    task = generate_root_task(task_class=TestDockerBuildBase, goals=goals) if goals else generate_root_task(task_class=TestDockerBuildBase)
+    task = (
+        generate_root_task(task_class=TestDockerBuildBase, goals=goals)
+        if goals
+        else generate_root_task(task_class=TestDockerBuildBase)
+    )
     try:
         luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
         assert_image_exists(expected_img_name)
@@ -115,7 +119,10 @@ def _run_docker_build_base_task_and_check(expected_img_name: str, goals: list[st
 
 
 def test_default_parameter(clean_images):
-    _run_docker_build_base_task_and_check("exasol-test-docker-build-base:test-analyze-image-1", [])
+    _run_docker_build_base_task_and_check(
+        "exasol-test-docker-build-base:test-analyze-image-1", []
+    )
+
 
 def test_valid_non_default_goal(clean_images):
     _run_docker_build_base_task_and_check(
