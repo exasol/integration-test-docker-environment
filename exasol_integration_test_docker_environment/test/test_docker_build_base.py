@@ -92,7 +92,6 @@ class DockerBuildBaseTest(unittest.TestCase):
     Deprecated. Replaced by "./test/integration/test_docker_build_base.py"
     """
 
-
     def clean(self):
         task = generate_root_task(
             task_class=CleanImagesStartingWith,
