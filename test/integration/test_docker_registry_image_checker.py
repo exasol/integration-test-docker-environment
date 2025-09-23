@@ -12,6 +12,7 @@ def test_pull_success():
     exists = checker.check(image=image)
     assert exists, f"Image {image} does not exist"
 
+
 def test_pull_fail_with_DockerException():
     image = "index.docker.io/registry:abc"
     checker = DockerRegistryImageChecker()
