@@ -1,7 +1,7 @@
 import os
 import unittest
 from collections.abc import Generator
-from contextlib import contextmanager
+from contextlib import contextmanager, _GeneratorContextManager
 from typing import Callable
 from unittest.mock import patch
 
@@ -17,7 +17,7 @@ from exasol_integration_test_docker_environment.doctor import (
 
 
 @pytest.fixture
-def temporary_env_factory() -> Callable[[dict], Generator[os._Environ, None, None]]:
+def temporary_env_factory():
     """
     Creates a temporary environment factory that returns a generator that yields a temporary environment.
     """
