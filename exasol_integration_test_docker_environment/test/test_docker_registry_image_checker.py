@@ -8,6 +8,9 @@ from exasol_integration_test_docker_environment.lib.docker.images.create.utils.d
 
 
 class MyTestCase(unittest.TestCase):
+    """
+    Deprecated. Replaced by "./test/integration/test_docker_registry_image_checker.py"
+    """
 
     def test_pull_success(self):
         image = "index.docker.io/registry:latest"
