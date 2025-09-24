@@ -1,3 +1,7 @@
+"""
+Deprecated. Replaced by ./test/unit/test_doctor.py
+"""
+
 import os
 import unittest
 from collections.abc import Generator
