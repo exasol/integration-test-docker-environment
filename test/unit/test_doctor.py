@@ -1,6 +1,7 @@
 import os
 from collections.abc import Generator
 from contextlib import contextmanager
+from unittest import mock
 from unittest.mock import patch
 
 import pytest
@@ -15,13 +16,13 @@ from exasol_integration_test_docker_environment.doctor import (
 
 
 @pytest.fixture
-def temporary_env_factory():
+def temporary_env_factory(monkeypatch):
     """
     Creates a temporary environment factory that returns a generator that yields a temporary environment.
     """
 
     @contextmanager
-    def temporary_env_factory(env_vars: dict) -> Generator[os._Environ, None, None]:
+    def temporary_env_factory(env_vars: dict) -> Generator[None, None, None]:
         """
         Creates a temporary environment, containing the current environment variables.
 
@@ -29,11 +30,10 @@ def temporary_env_factory():
 
         :return: the temporary environment variables in use
         """
-        old_env = dict(os.environ)
-        os.environ.update(env_vars)
-        yield os.environ
-        os.environ.clear()
-        os.environ.update(old_env)
+        with mock.patch.dict(os.environ, clear=True):
+            for k, v in env_vars.items():
+                monkeypatch.setenv(k, v)
+            yield
 
     return temporary_env_factory
 
@@ -55,7 +55,7 @@ def test_docker_connection_attempt_on_non_existing_unix_socket_returns_false(
 
 def test_successful_connection_to_the_daemon():
     """
-    Attention: this test require docker.
+    This test requires a docker service to be available on the machine executing the tests.
     """
     assert is_docker_daemon_available()
 
