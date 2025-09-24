@@ -1,8 +1,6 @@
 import os
-import unittest
 from collections.abc import Generator
-from contextlib import contextmanager, _GeneratorContextManager
-from typing import Callable
+from contextlib import contextmanager
 from unittest.mock import patch
 
 import pytest
