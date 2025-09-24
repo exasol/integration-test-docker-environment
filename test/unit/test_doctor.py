@@ -15,31 +15,8 @@ from exasol_integration_test_docker_environment.doctor import (
 )
 
 
-@pytest.fixture
-def temporary_env_factory(monkeypatch):
-    """
-    Creates a temporary environment factory that returns a generator that yields a temporary environment.
-    """
-
-    @contextmanager
-    def temporary_env_factory(env_vars: dict) -> Generator[None, None, None]:
-        """
-        Creates a temporary environment, containing the current environment variables.
-
-        :param env_vars: to be updated within the temporary environment.
-
-        :return: the temporary environment variables in use
-        """
-        with mock.patch.dict(os.environ, clear=True):
-            for k, v in env_vars.items():
-                monkeypatch.setenv(k, v)
-            yield
-
-    return temporary_env_factory
-
-
 def test_docker_connection_attempt_on_non_existing_unix_socket_returns_false(
-    temporary_env_factory,
+    monkeypatch,
 ):
     """
     Regression:  https://github.com/exasol/integration-test-docker-environment/issues/17
@@ -48,9 +25,8 @@ def test_docker_connection_attempt_on_non_existing_unix_socket_returns_false(
            file of the unix socket is not existent, creating a docker client using
            `docker.from_env()` will fail with an exception.
     """
-    env = {"DOCKER_HOST": "unix:///var/non/existent/path"}
-    with temporary_env_factory(env):
-        assert not is_docker_daemon_available()
+    monkeypatch.setitem(os.environ, "DOCKER_HOST", "unix:///var/non/existent/path")
+    assert not is_docker_daemon_available()
 
 
 def test_successful_connection_to_the_daemon():
@@ -60,18 +36,16 @@ def test_successful_connection_to_the_daemon():
     assert is_docker_daemon_available()
 
 
-def test_non_existing_unix_socket(temporary_env_factory):
+def test_non_existing_unix_socket(monkeypatch):
     expected = [HealthProblem.UnixSocketNotAvailable]
-    env = {"DOCKER_HOST": "unix:///var/non/existent/path"}
-    with temporary_env_factory(env):
-        assert expected == diagnose_docker_daemon_not_available()
+    monkeypatch.setitem(os.environ, "DOCKER_HOST", "unix:///var/non/existent/path")
+    assert expected == diagnose_docker_daemon_not_available()
 
 
-def test_unknown_health_problem(temporary_env_factory):
+def test_unknown_health_problem(monkeypatch):
     expected = [HealthProblem.Unknown]
-    env = {"DOCKER_HOST": "https://foobar"}
-    with temporary_env_factory(env):
-        assert expected == diagnose_docker_daemon_not_available()
+    monkeypatch.setitem(os.environ, "DOCKER_HOST", "https://foobar")
+    assert expected == diagnose_docker_daemon_not_available()
 
 
 @pytest.mark.parametrize("platform", SUPPORTED_PLATFORMS)
