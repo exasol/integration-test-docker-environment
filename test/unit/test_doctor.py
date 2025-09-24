@@ -21,6 +21,7 @@ def temporary_env_factory() -> Callable[[dict], Generator[os._Environ, None, Non
     """
     Creates a temporary environment factory that returns a generator that yields a temporary environment.
     """
+
     @contextmanager
     def temporary_env_factory(env_vars: dict) -> Generator[os._Environ, None, None]:
         """
@@ -35,10 +36,13 @@ def temporary_env_factory() -> Callable[[dict], Generator[os._Environ, None, Non
         yield os.environ
         os.environ.clear()
         os.environ.update(old_env)
+
     return temporary_env_factory
 
 
-def test_docker_connection_attempt_on_non_existing_unix_socket_returns_false(temporary_env_factory):
+def test_docker_connection_attempt_on_non_existing_unix_socket_returns_false(
+    temporary_env_factory,
+):
     """
     Regression:  https://github.com/exasol/integration-test-docker-environment/issues/17
 
@@ -49,6 +53,7 @@ def test_docker_connection_attempt_on_non_existing_unix_socket_returns_false(tem
     env = {"DOCKER_HOST": "unix:///var/non/existent/path"}
     with temporary_env_factory(env):
         assert not is_docker_daemon_available()
+
 
 def test_successful_connection_to_the_daemon():
     """
@@ -63,16 +68,19 @@ def test_non_existing_unix_socket(temporary_env_factory):
     with temporary_env_factory(env):
         assert expected == diagnose_docker_daemon_not_available()
 
+
 def test_unknown_health_problem(temporary_env_factory):
     expected = [HealthProblem.Unknown]
     env = {"DOCKER_HOST": "https://foobar"}
     with temporary_env_factory(env):
         assert expected == diagnose_docker_daemon_not_available()
 
+
 @pytest.mark.parametrize("platform", SUPPORTED_PLATFORMS)
 def test_target_platform_is_supported(platform):
     with patch("sys.platform", platform):
         assert is_supported_platform()
+
 
 def test_target_platform_is_not_supported():
     with patch("sys.platform", "unsupported-platform"):
