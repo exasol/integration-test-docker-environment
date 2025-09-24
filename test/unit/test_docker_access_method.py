@@ -1,5 +1,6 @@
 from typing import (
     Any,
+    Union,
 )
 
 import luigi
@@ -26,7 +27,7 @@ class MockTask(DependencyLoggerBaseTask, DockerDBTestEnvironmentParameter):
 @pytest.fixture()
 def mock_test_task_creator():
 
-    def make(method: DbOsAccess | None | str) -> MockTask:
+    def make(method: Union[DbOsAccess, None, str]) -> MockTask:
         kwargs: dict[str, Any] = {"task_class": MockTask}
         if method:
             kwargs["db_os_access"] = method
