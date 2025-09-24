@@ -1,16 +1,10 @@
 import shutil
-import unittest
 from pathlib import Path
-from typing import (
-    Dict,
-    List,
-    Set,
-)
 
 import luigi
+import pytest
 from luigi import Parameter
 
-from exasol_integration_test_docker_environment.lib.base.base_task import BaseTask
 from exasol_integration_test_docker_environment.lib.base.run_task import (
     generate_root_task,
 )
@@ -33,10 +27,10 @@ class TestDockerBuildBaseTestAnalyzeImage(DockerAnalyzeImageTask):
     task_name = Parameter()
 
     def get_target_repository_name(self) -> str:
-        return f"""exasol-test-docker-build-base"""
+        return "exasol-test-docker-build-base"
 
     def get_source_repository_name(self) -> str:
-        return f"""exasol-test-docker-build-base"""
+        return "exasol-test-docker-build-base"
 
     def get_source_image_tag(self):
         return self.task_name
@@ -87,66 +81,57 @@ class TestDockerBuildBase(DockerBuildBase):
         self.return_object(image_infos)
 
 
-class DockerBuildBaseTest(unittest.TestCase):
-    """
-    Deprecated. Replaced by "./test/integration/test_docker_build_base.py"
-    """
+def clean():
+    task = generate_root_task(
+        task_class=CleanImagesStartingWith,
+        starts_with_pattern="exasol-test-docker-build-base",
+    )
+    luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
+    if task._get_tmp_path_for_job().exists():
+        shutil.rmtree(str(task._get_tmp_path_for_job()))
 
-    def clean(self):
-        task = generate_root_task(
-            task_class=CleanImagesStartingWith,
-            starts_with_pattern="exasol-test-docker-build-base",
-        )
+
+@pytest.fixture
+def clean_images():
+    clean()
+    yield
+    clean()
+
+
+def assert_image_exists(prefix):
+    with ContextDockerClient() as docker_client:
+        image_list = find_images_by_tag(docker_client, lambda x: x.startswith(prefix))
+        assert len(image_list) == 1, f"Image with prefix {prefix} not found"
+
+
+def _run_docker_build_base_task_and_check(expected_img_name: str, goals: list[str]):
+    task = (
+        generate_root_task(task_class=TestDockerBuildBase, goals=goals)
+        if goals
+        else generate_root_task(task_class=TestDockerBuildBase)
+    )
+    try:
         luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
+        assert_image_exists(expected_img_name)
+    finally:
         if task._get_tmp_path_for_job().exists():
             shutil.rmtree(str(task._get_tmp_path_for_job()))
 
-    def setUp(self):
-        self.clean()
 
-    def tearDown(self):
-        self.clean()
+def test_default_parameter(clean_images):
+    _run_docker_build_base_task_and_check(
+        "exasol-test-docker-build-base:test-analyze-image-1", []
+    )
 
-    def assert_image_exists(self, prefix):
-        with ContextDockerClient() as docker_client:
-            image_list = find_images_by_tag(
-                docker_client, lambda x: x.startswith(prefix)
-            )
-            self.assertEqual(
-                len(image_list), 1, f"Image with prefix {prefix} not found"
-            )
 
-    def test_default_parameter(self):
-        task = generate_root_task(task_class=TestDockerBuildBase)
-        try:
-            luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
-            self.assert_image_exists(
-                "exasol-test-docker-build-base:test-analyze-image-1"
-            )
-        finally:
-            if task._get_tmp_path_for_job().exists():
-                shutil.rmtree(str(task._get_tmp_path_for_job()))
+def test_valid_non_default_goal(clean_images):
+    _run_docker_build_base_task_and_check(
+        "exasol-test-docker-build-base:test-analyze-image-2", ["test-analyze-image-2"]
+    )
 
-    def test_valid_non_default_goal(self):
-        task = generate_root_task(
-            task_class=TestDockerBuildBase, goals=["test-analyze-image-2"]
+
+def test_non_valid_non_default_goal(clean_images):
+    with pytest.raises(Exception, match=r"^Unknown goal\(s\).+"):
+        generate_root_task(
+            task_class=TestDockerBuildBase, goals=["test-analyze-image-3"]
         )
-        try:
-            luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
-            self.assert_image_exists(
-                "exasol-test-docker-build-base:test-analyze-image-2"
-            )
-        finally:
-            if task._get_tmp_path_for_job().exists():
-                shutil.rmtree(str(task._get_tmp_path_for_job()))
-
-    def test_non_valid_non_default_goal(self):
-        with self.assertRaises(Exception) as contex:
-            task = generate_root_task(
-                task_class=TestDockerBuildBase, goals=["test-analyze-image-3"]
-            )
-        self.assertIn("Unknown goal(s)", str(contex.exception))
-
-
-if __name__ == "__main__":
-    unittest.main()
