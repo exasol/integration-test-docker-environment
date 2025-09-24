@@ -28,20 +28,14 @@ class TestChildTask(DependencyLoggerBaseTask):
         pass
 
 
-
 def test_generate_dependency_dot_file(tmp_path):
     NUMBER_TASK = 5
     task_id_generator = (x for x in range(NUMBER_TASK))
 
     def create_task():
-        return generate_root_task(
-            task_class=TestTask, x=f"{next(task_id_generator)}"
-        )
+        return generate_root_task(task_class=TestTask, x=f"{next(task_id_generator)}")
 
     for i in range(NUMBER_TASK):
         dot_file = tmp_path / f"dot_file_{i}.dot"
-        run_task(
-            create_task, workers=5, task_dependencies_dot_file=str(dot_file)
-        )
+        run_task(create_task, workers=5, task_dependencies_dot_file=str(dot_file))
         assert dot_file.exists()
-
