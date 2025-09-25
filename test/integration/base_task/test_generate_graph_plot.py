@@ -9,19 +9,19 @@ from exasol_integration_test_docker_environment.lib.base.run_task import (
 )
 
 
-class TestTask(DependencyLoggerBaseTask):
+class RootTestTask(DependencyLoggerBaseTask):
     x = luigi.Parameter()
 
     def register_required(self):
         self.register_dependency(
-            self.create_child_task(task_class=TestChildTask, y=["1", "2", "3"])
+            self.create_child_task(task_class=ChildTestTask, y=["1", "2", "3"])
         )
 
     def run_task(self):
         pass
 
 
-class TestChildTask(DependencyLoggerBaseTask):
+class ChildTestTask(DependencyLoggerBaseTask):
     y = luigi.ListParameter()
 
     def run_task(self):
@@ -33,7 +33,7 @@ def test_generate_dependency_dot_file(tmp_path):
     task_id_generator = (x for x in range(NUMBER_TASK))
 
     def create_task():
-        return generate_root_task(task_class=TestTask, x=f"{next(task_id_generator)}")
+        return generate_root_task(task_class=RootTestTask, x=f"{next(task_id_generator)}")
 
     for i in range(NUMBER_TASK):
         dot_file = tmp_path / f"dot_file_{i}.dot"
