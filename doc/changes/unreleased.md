@@ -6,3 +6,4 @@
  - #522: Converted integration API test to pytest - test_docker_access_method.py
  - #522: Converted integration API test to pytest - test_doctor.py
  - #522: Converted integration API test to pytest - test_environment_variable.py
+ - #522: Converted integration API test to pytest - test_find_free_port.py

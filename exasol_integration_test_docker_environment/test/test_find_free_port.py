@@ -6,6 +6,9 @@ from exasol_integration_test_docker_environment.lib.test_environment.ports impor
 
 
 class FindFreePortTest(unittest.TestCase):
+    """
+    Deprecated. Replaced by ./test/integration/test_find_free_port.py
+    """
 
     def run_it(self, num_ports: int):
         ports = find_free_ports(num_ports)
