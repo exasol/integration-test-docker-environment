@@ -33,7 +33,9 @@ def test_generate_dependency_dot_file(tmp_path):
     task_id_generator = (x for x in range(NUMBER_TASK))
 
     def create_task():
-        return generate_root_task(task_class=RootTestTask, x=f"{next(task_id_generator)}")
+        return generate_root_task(
+            task_class=RootTestTask, x=f"{next(task_id_generator)}"
+        )
 
     for i in range(NUMBER_TASK):
         dot_file = tmp_path / f"dot_file_{i}.dot"
