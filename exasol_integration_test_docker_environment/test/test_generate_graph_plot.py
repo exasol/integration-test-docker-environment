@@ -33,6 +33,9 @@ class TestChildTask(DependencyLoggerBaseTask):
 
 
 class BaseTaskTest(unittest.TestCase):
+    """
+    Deprecated. Replaced by "./test/integration/base_task/test_generate_graph_plot.py
+    """
 
     def test_generate_dependency_dot_file(self):
         NUMBER_TASK = 5
