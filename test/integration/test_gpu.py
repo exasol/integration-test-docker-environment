@@ -27,7 +27,12 @@ def test_gpu(cli_context):
         host_name = db.on_host_docker_environment.database_host
         port = db.on_host_docker_environment.ports.database
         dsn = f"{host_name}:{port}"
-        connection = pyexasol.connect(dsn=dsn, user="sys", password="exasol", websocket_sslopt={"cert_reqs": ssl.CERT_NONE})
+        connection = pyexasol.connect(
+            dsn=dsn,
+            user="sys",
+            password="exasol",
+            websocket_sslopt={"cert_reqs": ssl.CERT_NONE},
+        )
         result = connection.execute(query_accelerator_parameters).fetchall()
         assert result == [
             ("1", "acceleratorDeviceDetected"),
