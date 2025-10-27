@@ -23,14 +23,17 @@ docker_repository_options = [
     click.option(
         "--source-docker-username",
         type=str,
+        default=None,
         help="Username for the docker registry from where the system pulls cached stages.",
         required=False,
     ),
     click.option(
         "--source-docker-password",
         type=str,
+        default=None,
         help="Password for the docker registry from where the system pulls cached stages. "
         "Without password option the system prompts for the password.",
+        required=False,
     ),
     click.option(
         "--target-docker-repository-name",
@@ -52,14 +55,17 @@ docker_repository_options = [
     click.option(
         "--target-docker-username",
         type=str,
+        default=None,
         help="Username for the docker registry where the system pushes images of stages.",
         required=False,
     ),
     click.option(
         "--target-docker-password",
         type=str,
+        default=None,
         help="Password for the docker registry where the system pushes images of stages. "
         "Without password option the system prompts for the password.",
+        required=False,
     ),
 ]
 
