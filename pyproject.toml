@@ -49,12 +49,13 @@ pytest = "^7.2.2"
 toml = ">=0.10.2"
 nox = "^2022.1.7"
 mypy = "^1.1.1"
-pyexasol = "^0.25.2"
+pyexasol = ">=1.1.1, <2.0.0"
 exasol-toolbox = "^1.6.0"
 joblib = "^1.4.2"
 pytest-check = "2.5.3"
 pyinstaller = "^6.15.0"
 types-pyinstaller = "^6.15.0.20250822"
+dill = "^0.4.0"
 
 [build-system]
 requires = [
