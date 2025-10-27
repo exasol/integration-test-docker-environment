@@ -55,6 +55,7 @@ joblib = "^1.4.2"
 pytest-check = "2.5.3"
 pyinstaller = "^6.15.0"
 types-pyinstaller = "^6.15.0.20250822"
+dill = "^0.4.0"
 
 [build-system]
 requires = [
