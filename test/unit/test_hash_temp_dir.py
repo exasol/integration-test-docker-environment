@@ -156,7 +156,7 @@ def test_directory_to_same_destination_equal(temp_dirs):
         (False, False, True, False, False),
         (False, False, True, False, False),
         (False, True, True, False, False),
-    ]
+    ],
 )
 def test_two_directories(
     hash_directory_names_dir1,
