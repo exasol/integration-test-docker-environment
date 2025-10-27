@@ -1,4 +1,5 @@
 import os
+import ssl
 from inspect import cleandoc
 from time import sleep
 
@@ -36,7 +37,7 @@ def test_udf_execution(api_context):
     with api_context() as db:
         dbinfo = db.environment_info.database_info
         dsn = f"{dbinfo.host}:{dbinfo.ports.database}"
-        connection = pyexasol.connect(dsn=dsn, user="sys", password="exasol")
+        connection = pyexasol.connect(dsn=dsn, user="sys", password="exasol", websocket_sslopt={"cert_reqs": ssl.CERT_NONE})
         if DbVersion.from_db_version_str(db.docker_db_image_version).major == 7:
             wait_until_container_is_unpacked()
         connection.execute("CREATE SCHEMA IF NOT EXISTS S")
