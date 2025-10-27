@@ -62,7 +62,7 @@ docker_db_options = [
         "-p",
         type=str,
         multiple=True,
-        default=tuple(),
+        default=(),
         help="""Additional database parameter which will be injected to EXAConf. Value should have format '-param=value'.""",
     ),
     click.option(
