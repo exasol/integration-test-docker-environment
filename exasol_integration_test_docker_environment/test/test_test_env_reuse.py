@@ -33,7 +33,6 @@ class TestContainerReuseTest(unittest.TestCase):
     Deprecated. Replaced by "./test/integration/test_test_env_reuse.py"
     """
 
-
     def env_name(self):
         return self.__class__.__name__.lower()
 

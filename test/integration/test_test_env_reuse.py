@@ -10,7 +10,9 @@ from exasol_integration_test_docker_environment.lib.base.run_task import (
     generate_root_task,
 )
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
-from exasol_integration_test_docker_environment.lib.models.config.build_config import set_build_config
+from exasol_integration_test_docker_environment.lib.models.config.build_config import (
+    set_build_config,
+)
 from exasol_integration_test_docker_environment.lib.models.config.docker_config import (
     set_docker_repository_config,
 )
@@ -31,6 +33,7 @@ from exasol_integration_test_docker_environment.testing.utils import (
 
 ENV_NAME = "test_test_env_reuse"
 
+
 def _setup_luigi_config(output_directory: Path, docker_repository_name: str):
     set_build_config(
         force_rebuild=False,
@@ -50,17 +53,23 @@ def _setup_luigi_config(output_directory: Path, docker_repository_name: str):
         kind="target",
     )
 
+
 @pytest.fixture()
 def docker_repository(tmp_path):
     _docker_repository_name = ENV_NAME
-    _setup_luigi_config(output_directory=tmp_path / "output", docker_repository_name=_docker_repository_name)
+    _setup_luigi_config(
+        output_directory=tmp_path / "output",
+        docker_repository_name=_docker_repository_name,
+    )
     luigi_utils.clean(_docker_repository_name)
     yield _docker_repository_name
     luigi_utils.clean(_docker_repository_name)
 
+
 @pytest.fixture()
 def docker_db_version_parameter():
     return check_db_version_from_env() or test_environment_options.LATEST_DB_VERSION
+
 
 @pytest.fixture()
 def free_ports():
@@ -96,9 +105,7 @@ def run_spawn_test_env(docker_db_version_parameter, ports: Ports, cleanup: bool)
         docker_environment_variables=(),
     )
     try:
-        success = luigi.build(
-            [task], workers=1, local_scheduler=True, log_level="INFO"
-        )
+        success = luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
         if success:
             result = task
         else:
@@ -122,7 +129,10 @@ def get_instance_ids(test_environment_info):
         )
         return test_container.id, db_container.id, network.id
 
-def test_reuse_env_same_instances(docker_repository, docker_db_version_parameter, free_ports):
+
+def test_reuse_env_same_instances(
+    docker_repository, docker_db_version_parameter, free_ports
+):
     """
     This test spawns a new test environment and, with parameters:
     * reuse_database_setup=True,
@@ -130,16 +140,23 @@ def test_reuse_env_same_instances(docker_repository, docker_db_version_parameter
     * reuse_test_container=True
     and verifies if the test data was populated to the docker db.
     """
-    task = run_spawn_test_env(docker_db_version_parameter=docker_db_version_parameter, ports=free_ports, cleanup=False)
+    task = run_spawn_test_env(
+        docker_db_version_parameter=docker_db_version_parameter,
+        ports=free_ports,
+        cleanup=False,
+    )
     test_environment_info = task.get_result()
     old_instance_ids = get_instance_ids(test_environment_info)
     # This clean is supposed to not remove docker instances
     task.cleanup(True)
 
-    task = run_spawn_test_env(docker_db_version_parameter=docker_db_version_parameter, ports=free_ports, cleanup=True)
+    task = run_spawn_test_env(
+        docker_db_version_parameter=docker_db_version_parameter,
+        ports=free_ports,
+        cleanup=True,
+    )
     test_environment_info = task.get_result()
     new_instance_ids = get_instance_ids(test_environment_info)
     assert old_instance_ids == new_instance_ids
 
     task.cleanup(True)
-
