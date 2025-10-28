@@ -153,7 +153,7 @@ def test_directory_to_same_destination_equal(temp_dirs):
         (False, False, False, False, True),
         (True, True, True, True, False),
         (False, False, True, True, False),
-        (False, False, True, False, False),
+        (False, False, False, True, False),
         (False, False, True, False, False),
         (False, True, True, False, False),
     ],
