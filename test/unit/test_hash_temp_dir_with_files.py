@@ -1,6 +1,9 @@
 import base64
 import os
-from pathlib import Path, PurePath
+from pathlib import (
+    Path,
+    PurePath,
+)
 
 import pytest
 
@@ -9,6 +12,7 @@ from exasol_integration_test_docker_environment.lib.docker.images.create.utils.f
     PathMapping,
 )
 
+
 @pytest.fixture
 def temp_dirs(tmp_path):
     test_path1 = tmp_path / "test1"
@@ -16,7 +20,6 @@ def temp_dirs(tmp_path):
     test_path2 = tmp_path / "test2"
     test_path2.mkdir()
     yield test_path1, test_path2
-
 
 
 def test_file_name_with_relative_path(temp_dirs):
@@ -47,7 +50,6 @@ def test_file_name_with_relative_path(temp_dirs):
     ascii_hash1 = base64.b32encode(hash1).decode("ASCII")
     ascii_hash2 = base64.b32encode(hash2).decode("ASCII")
     assert ascii_hash1 == ascii_hash2
-
 
 
 def test_file_name_with_relative_path_in_same_sub_path(temp_dirs):
@@ -83,7 +85,6 @@ def test_file_name_with_relative_path_in_same_sub_path(temp_dirs):
     assert ascii_hash1 == ascii_hash2
 
 
-
 def test_file_name_with_relative_path_in_different_sub_path(temp_dirs):
     """
     Test that hashing of same files in different paths, and different subpaths, gives different result.
@@ -103,22 +104,17 @@ def test_file_name_with_relative_path_in_different_sub_path(temp_dirs):
     p1.mkdir()
     test_file1 = p1 / "test.txt"
     test_file1.write_text("test")
-    hash1 = hasher.hash(
-        [PathMapping(PurePath("level0/test.txt"), test_file1)]
-    )
+    hash1 = hasher.hash([PathMapping(PurePath("level0/test.txt"), test_file1)])
 
     p2 = test_path2 / "level0" / "level1_0"
     p2.mkdir(parents=True)
     test_file2 = p2 / "test.txt"
     test_file2.write_text("test")
-    hash2 = hasher.hash(
-        [PathMapping(PurePath("level0/level1_0/test.txt"), test_file2)]
-    )
+    hash2 = hasher.hash([PathMapping(PurePath("level0/level1_0/test.txt"), test_file2)])
 
     ascii_hash1 = base64.b32encode(hash1).decode("ASCII")
     ascii_hash2 = base64.b32encode(hash2).decode("ASCII")
     assert ascii_hash1 != ascii_hash2
-
 
 
 def test_file_name_with_relative_path_in_relative_path_as_argument(temp_dirs):
@@ -157,7 +153,6 @@ def test_file_name_with_relative_path_in_relative_path_as_argument(temp_dirs):
         os.chdir(old_pwd)
 
 
-
 def test_duplicated_file_mapping_raises_exception(temp_dirs):
     """
     Test that a duplicated mapping raises an exception.
@@ -188,7 +183,6 @@ def test_duplicated_file_mapping_raises_exception(temp_dirs):
     ]
     with pytest.raises(AssertionError):
         hasher.hash(path_mappings)
-
 
 
 def test_duplicated_path_mapping_raises_exception(temp_dirs):
@@ -224,7 +218,6 @@ def test_duplicated_path_mapping_raises_exception(temp_dirs):
     ]
     with pytest.raises(AssertionError):
         hasher.hash(path_mappings)
-
 
 
 def test_duplicated_path_mapping_with_subpath_raises_exception(temp_dirs):

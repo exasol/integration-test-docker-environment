@@ -18,7 +18,6 @@ class HashTempDirTest(unittest.TestCase):
     Deprecated. Replaced by "./test/unit/test_hash_temp_dir_with_files.py
     """
 
-
     def setUp(self):
         self.temp_dir = tempfile.TemporaryDirectory()
         self.temp_path = Path(self.temp_dir.name)
