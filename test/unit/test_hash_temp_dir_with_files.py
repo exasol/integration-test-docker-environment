@@ -20,6 +20,7 @@ HASHER = FileDirectoryListHasher(
     hash_permissions=True,
 )
 
+
 def _create_test_files(*args) -> list[Path]:
     test_file_paths = list()
     for arg in args:
@@ -46,7 +47,6 @@ def test_file_name_with_relative_path(temp_dirs):
     2. Mapping dest="test.txt", src="/tmp/.../$tmpB/test.txt"
     """
     test_path1, test_path2 = temp_dirs
-
 
     test_file1, test_file2 = _create_test_files(test_path1, test_path2)
     mapping1 = PathMapping(PurePath("test.txt"), test_file1)
