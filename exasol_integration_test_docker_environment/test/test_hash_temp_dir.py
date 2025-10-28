@@ -26,6 +26,10 @@ def simple_path_mapping(src: str) -> PathMapping:
 
 
 class HashTempDirTest(unittest.TestCase):
+    """
+    Deprecated. Replaced by "./test/unit/test_hash_temp_dir.py"
+    """
+
     @classmethod
     def setUpClass(self):
         self.temp_dir = tempfile.mkdtemp() + "/" + self.__class__.__name__
