@@ -12,6 +12,23 @@ from exasol_integration_test_docker_environment.lib.docker.images.create.utils.f
     PathMapping,
 )
 
+HASHER = FileDirectoryListHasher(
+    followlinks=True,
+    hashfunc="sha256",
+    hash_file_names=True,
+    hash_directory_names=True,
+    hash_permissions=True,
+)
+
+def _create_test_files(*args) -> list[Path]:
+    test_file_paths = list()
+    for arg in args:
+        arg.mkdir(parents=True, exist_ok=True)
+        test_file_path = arg / "test.txt"
+        test_file_path.write_text("test")
+        test_file_paths.append(test_file_path)
+    return test_file_paths
+
 
 @pytest.fixture
 def temp_dirs(tmp_path):
@@ -29,23 +46,14 @@ def test_file_name_with_relative_path(temp_dirs):
     2. Mapping dest="test.txt", src="/tmp/.../$tmpB/test.txt"
     """
     test_path1, test_path2 = temp_dirs
-    hasher = FileDirectoryListHasher(
-        followlinks=True,
-        hashfunc="sha256",
-        hash_file_names=True,
-        hash_directory_names=True,
-        hash_permissions=True,
-    )
 
-    test_file1 = test_path1 / "test.txt"
-    test_file1.write_text("test")
+
+    test_file1, test_file2 = _create_test_files(test_path1, test_path2)
     mapping1 = PathMapping(PurePath("test.txt"), test_file1)
-    hash1 = hasher.hash([mapping1])
+    hash1 = HASHER.hash([mapping1])
 
-    test_file2 = test_path2 / "test.txt"
-    test_file2.write_text("test")
     mapping2 = PathMapping(PurePath("test.txt"), test_file2)
-    hash2 = hasher.hash([mapping2])
+    hash2 = HASHER.hash([mapping2])
 
     ascii_hash1 = base64.b32encode(hash1).decode("ASCII")
     ascii_hash2 = base64.b32encode(hash2).decode("ASCII")
@@ -59,26 +67,15 @@ def test_file_name_with_relative_path_in_same_sub_path(temp_dirs):
     2. Mapping dest="level0/test.txt", src="/tmp/.../$tmpB/level0/test.txt"
     """
     test_path1, test_path2 = temp_dirs
-    hasher = FileDirectoryListHasher(
-        followlinks=True,
-        hashfunc="sha256",
-        hash_file_names=True,
-        hash_directory_names=True,
-        hash_permissions=True,
-    )
     p1 = test_path1 / "level0"
-    p1.mkdir()
-    test_file1 = p1 / "test.txt"
-    test_file1.write_text("test")
-    mapping1 = PathMapping(PurePath("level0/test.txt"), test_file1)
-    hash1 = hasher.hash([mapping1])
-
     p2 = test_path2 / "level0"
-    p2.mkdir()
-    test_file2 = p2 / "test.txt"
-    test_file2.write_text("test")
+
+    test_file1, test_file2 = _create_test_files(p1, p2)
+    mapping1 = PathMapping(PurePath("level0/test.txt"), test_file1)
+    hash1 = HASHER.hash([mapping1])
+
     mapping2 = PathMapping(PurePath("level0/test.txt"), test_file2)
-    hash2 = hasher.hash([mapping2])
+    hash2 = HASHER.hash([mapping2])
 
     ascii_hash1 = base64.b32encode(hash1).decode("ASCII")
     ascii_hash2 = base64.b32encode(hash2).decode("ASCII")
@@ -93,24 +90,11 @@ def test_file_name_with_relative_path_in_different_sub_path(temp_dirs):
     """
 
     test_path1, test_path2 = temp_dirs
-    hasher = FileDirectoryListHasher(
-        followlinks=True,
-        hashfunc="sha256",
-        hash_file_names=True,
-        hash_directory_names=True,
-        hash_permissions=True,
-    )
     p1 = test_path1 / "level0"
-    p1.mkdir()
-    test_file1 = p1 / "test.txt"
-    test_file1.write_text("test")
-    hash1 = hasher.hash([PathMapping(PurePath("level0/test.txt"), test_file1)])
-
     p2 = test_path2 / "level0" / "level1_0"
-    p2.mkdir(parents=True)
-    test_file2 = p2 / "test.txt"
-    test_file2.write_text("test")
-    hash2 = hasher.hash([PathMapping(PurePath("level0/level1_0/test.txt"), test_file2)])
+    test_file1, test_file2 = _create_test_files(p1, p2)
+    hash1 = HASHER.hash([PathMapping(PurePath("level0/test.txt"), test_file1)])
+    hash2 = HASHER.hash([PathMapping(PurePath("level0/level1_0/test.txt"), test_file2)])
 
     ascii_hash1 = base64.b32encode(hash1).decode("ASCII")
     ascii_hash2 = base64.b32encode(hash2).decode("ASCII")
@@ -126,25 +110,18 @@ def test_file_name_with_relative_path_in_relative_path_as_argument(temp_dirs):
     2. Mapping dest="test.txt", src="test.txt"
     """
     test_path1, test_path2 = temp_dirs
-    hasher = FileDirectoryListHasher(
-        followlinks=True,
-        hashfunc="sha256",
-        hash_file_names=True,
-        hash_directory_names=True,
-        hash_permissions=True,
-    )
     test_file = "test.txt"
     old_pwd = os.getcwd()
     try:
         os.chdir(test_path1)
         Path(test_file).write_text("test")
         mapping1 = PathMapping(PurePath("test.txt"), Path(test_file))
-        hash1 = hasher.hash([mapping1])
+        hash1 = HASHER.hash([mapping1])
 
         os.chdir(test_path2)
         Path(test_file).write_text("test")
         mapping2 = PathMapping(PurePath("test.txt"), Path(test_file))
-        hash2 = hasher.hash([mapping2])
+        hash2 = HASHER.hash([mapping2])
 
         ascii_hash1 = base64.b32encode(hash1).decode("ASCII")
         ascii_hash2 = base64.b32encode(hash2).decode("ASCII")
@@ -160,29 +137,14 @@ def test_duplicated_file_mapping_raises_exception(temp_dirs):
     2. Mapping dest="test.txt", src="/tmp/.../$tmpB/level0/level1_1/test.txt"
     """
     test_path1, test_path2 = temp_dirs
-    hasher = FileDirectoryListHasher(
-        followlinks=True,
-        hashfunc="sha256",
-        hash_file_names=True,
-        hash_directory_names=True,
-        hash_permissions=True,
-    )
-    p1 = test_path1 / "level0" / "level1_0"
-    p1.mkdir(parents=True)
-    test_file1 = p1 / "test.txt"
-    test_file1.write_text("test")
-
-    p2 = test_path2 / "level0" / "level1_1"
-    p2.mkdir(parents=True)
-    test_file2 = p2 / "test.txt"
-    test_file2.write_text("test")
+    test_file1, test_file2 = _create_test_files(test_path1, test_path2)
 
     path_mappings = [
         PathMapping(PurePath("test.txt"), test_file1),
         PathMapping(PurePath("test.txt"), test_file2),
     ]
     with pytest.raises(AssertionError):
-        hasher.hash(path_mappings)
+        HASHER.hash(path_mappings)
 
 
 def test_duplicated_path_mapping_raises_exception(temp_dirs):
@@ -192,23 +154,11 @@ def test_duplicated_path_mapping_raises_exception(temp_dirs):
     2. Mapping dest="test", src="/tmp/.../$tmpB/level0/level1_1", content under src="test/test.txt"
     """
     test_path1, test_path2 = temp_dirs
-    hasher = FileDirectoryListHasher(
-        followlinks=True,
-        hashfunc="sha256",
-        hash_file_names=True,
-        hash_directory_names=True,
-        hash_permissions=True,
-    )
 
     p1 = test_path1 / "level0" / "level1_0" / "test"
-    test_file1 = p1 / "test.txt"
-    p1.mkdir(parents=True)
-    test_file1.write_text("test")
 
     p2 = test_path2 / "level0" / "level1_1" / "test"
-    p2.mkdir(parents=True)
-    test_file2 = p2 / "test.txt"
-    test_file2.write_text("test")
+    _create_test_files(p1, p2)
 
     path1 = p1.parent
     path2 = p2.parent
@@ -217,7 +167,7 @@ def test_duplicated_path_mapping_raises_exception(temp_dirs):
         PathMapping(PurePath("test"), path2),
     ]
     with pytest.raises(AssertionError):
-        hasher.hash(path_mappings)
+        HASHER.hash(path_mappings)
 
 
 def test_duplicated_path_mapping_with_subpath_raises_exception(temp_dirs):
@@ -227,22 +177,10 @@ def test_duplicated_path_mapping_with_subpath_raises_exception(temp_dirs):
     2. Mapping dest="test/abc", src="/tmp/.../$tmpB/level0/level1_1", content under src="test/test.txt"
     """
     test_path1, test_path2 = temp_dirs
-    hasher = FileDirectoryListHasher(
-        followlinks=True,
-        hashfunc="sha256",
-        hash_file_names=True,
-        hash_directory_names=True,
-        hash_permissions=True,
-    )
 
     p1 = test_path1 / "level0" / "level1_0" / "test"
-    test_file1 = p1 / "test.txt"
-    p1.mkdir(parents=True)
-    test_file1.write_text("test")
     p2 = test_path2 / "level0" / "level1_1" / "test"
-    p2.mkdir(parents=True)
-    test_file2 = p2 / "test.txt"
-    test_file2.write_text("test")
+    _create_test_files(p1, p2)
 
     path1 = p1.parent
     path2 = p2.parent
@@ -252,7 +190,7 @@ def test_duplicated_path_mapping_with_subpath_raises_exception(temp_dirs):
         PathMapping(destination_path, path2),
     ]
     with pytest.raises(AssertionError):
-        hasher.hash(path_mappings)
+        HASHER.hash(path_mappings)
 
 
 def test_duplicated_path_mapping_with_destination_subpath_raises_exception(temp_dirs):
@@ -265,21 +203,10 @@ def test_duplicated_path_mapping_with_destination_subpath_raises_exception(temp_
     2. Mapping dest="test/abc", src="/tmp/.../$tmpB", content under src="level0/level1_0/test/test.txt"
     """
     test_path1, test_path2 = temp_dirs
-    hasher = FileDirectoryListHasher(
-        followlinks=True,
-        hashfunc="sha256",
-        hash_file_names=True,
-        hash_directory_names=True,
-        hash_permissions=True,
-    )
+
     p1 = test_path1 / "level1_0" / "test"
-    test_file1 = p1 / "test.txt"
-    p1.mkdir(parents=True)
-    test_file1.write_text("test")
     p2 = test_path2 / "abc" / "level1_0" / "test"
-    p2.mkdir(parents=True)
-    test_file2 = p2 / "test.txt"
-    test_file2.write_text("test")
+    _create_test_files(p1, p2)
 
     path1 = test_path1
     path2 = test_path2
@@ -289,4 +216,4 @@ def test_duplicated_path_mapping_with_destination_subpath_raises_exception(temp_
         PathMapping(PurePath("test"), path2),
     ]
     with pytest.raises(AssertionError):
-        hasher.hash(path_mappings)
+        HASHER.hash(path_mappings)
