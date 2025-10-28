@@ -14,6 +14,10 @@ from exasol_integration_test_docker_environment.lib.docker.images.create.utils.f
 
 
 class HashTempDirTest(unittest.TestCase):
+    """
+    Deprecated. Replaced by "./test/unit/test_hash_temp_dir_with_files.py
+    """
+
 
     def setUp(self):
         self.temp_dir = tempfile.TemporaryDirectory()
