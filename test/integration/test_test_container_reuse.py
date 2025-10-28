@@ -111,10 +111,10 @@ def working_directory(tmp_path_factory):
         resource_directory, temp_directory / "test_test_container_reuse"
     )
     docker_repository_name = "test_test_container_reuse"
-    luigi_utils.clean(docker_repository_name)
     _setup_luigi_config(
         output_directory=output_directory, docker_repository_name=docker_repository_name
     )
+    luigi_utils.clean(docker_repository_name)
     yield working_directory
     luigi_utils.clean(docker_repository_name)
 
