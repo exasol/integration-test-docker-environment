@@ -4,9 +4,10 @@ from typing import Any
 
 import luigi
 import pytest
-from luigi import Task
 
-from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import DependencyLoggerBaseTask
+from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import (
+    DependencyLoggerBaseTask,
+)
 from exasol_integration_test_docker_environment.lib.base.docker_base_task import (
     DockerBaseTask,
 )
@@ -186,7 +187,7 @@ def test_test_container_no_reuse_after_change(working_directory):
     print(p1)
     print(p2)
     assert p1 != p2
-    task.cleanup(False) #Cleanup docker container/image.
+    task.cleanup(False)  # Cleanup docker container/image.
 
 
 def test_test_container_reuse(working_directory):
