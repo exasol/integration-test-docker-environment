@@ -50,6 +50,9 @@ class TestDataPopulateData(PopulateTestDataToDatabase):
 
 
 class TestPopulateData(unittest.TestCase):
+    """
+    Deprecated. Replaced by "./test/integration/test_populate_data.py
+    """
 
     @classmethod
     def setUpClass(cls):

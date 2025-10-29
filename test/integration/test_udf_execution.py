@@ -1,9 +1,7 @@
 import os
-import ssl
 from inspect import cleandoc
 from time import sleep
 
-import pyexasol
 import pytest
 
 from exasol_integration_test_docker_environment.lib.test_environment.db_version import (
@@ -35,17 +33,10 @@ def test_udf_execution(api_context):
         )
 
     with api_context() as db:
-        dbinfo = db.environment_info.database_info
-        dsn = f"{dbinfo.host}:{dbinfo.ports.database}"
-        connection = pyexasol.connect(
-            dsn=dsn,
-            user="sys",
-            password="exasol",
-            websocket_sslopt={"cert_reqs": ssl.CERT_NONE},
-        )
-        if DbVersion.from_db_version_str(db.docker_db_image_version).major == 7:
-            wait_until_container_is_unpacked()
-        connection.execute("CREATE SCHEMA IF NOT EXISTS S")
-        connection.execute(udf_sql(schema="S"))
-        result = connection.execute("SELECT S.python3_test_udf(10)").fetchall()
-        assert result == [(i,) for i in range(10)]
+        with db.create_connection() as connection:
+            if DbVersion.from_db_version_str(db.docker_db_image_version).major == 7:
+                wait_until_container_is_unpacked()
+            connection.execute("CREATE SCHEMA IF NOT EXISTS S")
+            connection.execute(udf_sql(schema="S"))
+            result = connection.execute("SELECT S.python3_test_udf(10)").fetchall()
+            assert result == [(i,) for i in range(10)]
