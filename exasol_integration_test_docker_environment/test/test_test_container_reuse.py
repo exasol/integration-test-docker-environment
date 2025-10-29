@@ -80,6 +80,9 @@ class TestTask(DockerBaseTask, TestContainerParameter):
 
 
 class TestContainerReuseTest(unittest.TestCase):
+    """
+    Deprecated. Replaced by "./test/integration/test_test_container_reuse.py"
+    """
 
     def setUp(self):
         resource_directory = Path(
