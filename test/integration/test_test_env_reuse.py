@@ -68,6 +68,7 @@ def docker_repository(tmp_path, env_name):
     yield _docker_repository_name
     luigi_utils.clean(_docker_repository_name)
 
+
 def _get_instance_ids(test_environment_info) -> tuple[str, str, str]:
     with ContextDockerClient() as docker_client:
         test_container = docker_client.containers.get(
@@ -80,6 +81,7 @@ def _get_instance_ids(test_environment_info) -> tuple[str, str, str]:
             test_environment_info.network_info.network_name
         )
         return test_container.id, db_container.id, network.id
+
 
 class ReusingTestEnv:
 
@@ -99,7 +101,9 @@ class ReusingTestEnv:
             env_info = task.get_result()
 
             ids = _get_instance_ids(env_info)
-            task_success = not cleanup  # Calling task.cleanup(False) will remove container/network/volume, while task.cleanup(True) will not
+            task_success = (
+                not cleanup
+            )  # Calling task.cleanup(False) will remove container/network/volume, while task.cleanup(True) will not
             task.cleanup(task_success)
         except Exception as e:
             task.cleanup(False)
