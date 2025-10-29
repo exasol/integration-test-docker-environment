@@ -1,9 +1,12 @@
 import shutil
 from pathlib import Path
+from typing import Any
 
 import luigi
 import pytest
+from luigi import Task
 
+from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import DependencyLoggerBaseTask
 from exasol_integration_test_docker_environment.lib.base.docker_base_task import (
     DockerBaseTask,
 )
@@ -133,7 +136,7 @@ def _get_test_container_content(
     )
 
 
-def run1(working_directory: Path):
+def run1(working_directory: Path) -> dict[str, Any]:
     task = generate_root_task(
         task_class=TestTask,
         reuse=False,
@@ -153,7 +156,7 @@ def run1(working_directory: Path):
         raise RuntimeError("Error spawning test environment") from e
 
 
-def run2(working_directory: Path):
+def run2(working_directory: Path) -> tuple[DependencyLoggerBaseTask, dict[str, Any]]:
     task = generate_root_task(
         task_class=TestTask,
         reuse=True,
@@ -162,9 +165,8 @@ def run2(working_directory: Path):
     )
     try:
         success = luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
-
         if success:
-            return task.get_result()
+            return task, task.get_result()
         else:
             raise Exception("Task failed")
     except Exception as e:
@@ -176,7 +178,7 @@ def test_test_container_no_reuse_after_change(working_directory):
     p1 = run1(working_directory)
     with _dockerfile(working_directory).open("a") as f:
         f.write("\n#Test\n")
-    p2 = run2(working_directory)
+    task, p2 = run2(working_directory)
     assert "container_id" in p1
     assert "image_id" in p1
     assert "container_id" in p2
@@ -184,13 +186,15 @@ def test_test_container_no_reuse_after_change(working_directory):
     print(p1)
     print(p2)
     assert p1 != p2
+    task.cleanup(False) #Cleanup docker container/image.
 
 
 def test_test_container_reuse(working_directory):
     p1 = run1(working_directory)
-    p2 = run2(working_directory)
+    task, p2 = run2(working_directory)
     assert "container_id" in p1
     assert "image_id" in p1
     print(p1)
     print(p2)
     assert p1 == p2
+    task.cleanup(False)
