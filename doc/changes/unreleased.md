@@ -10,6 +10,7 @@
  - #522: Converted integration API test to pytest - test_generate_graph_plot.py
  - #534: Converted integration API test to pytest - test_hash_temp_dir.py
  - #534: Converted integration API test to pytest - test_hash_temp_dir_with_files.py
+ - #534: Converted integration API test to pytest - test_test_env_reuse.py
 
 ## Dependencies
  - #532: Updated pyexasol and update lock file
