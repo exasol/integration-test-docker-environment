@@ -10,6 +10,10 @@ from exasol_integration_test_docker_environment.lib.docker.images.create.utils.f
 
 
 class TestSymlinkLoops(unittest.TestCase):
+    """
+    Deprecated. Replaced by "./test/unit/test_hash_symlink_loops.py"
+    """
+
     def setUp(self):
         self.temp_dir = tempfile.mkdtemp() + "/" + self.__class__.__name__
         self.temp_dir_dummy = tempfile.mkdtemp()
