@@ -43,7 +43,7 @@ class TestDataPopulateData(PopulateTestDataToDatabase):
         return PurePath("/test_data")
 
     def get_data_file_within_data_path(self) -> PurePath:
-        if DbVersion.from_db_version_str(self.db_version) >= DbVersion(2025, 1, 0):
+        if DbVersion.from_db_version_str(self.db_version) >= DbVersion(2025, 1, 3):
             return PurePath("import_ignore_cert.sql")
         else:
             return PurePath("import.sql")

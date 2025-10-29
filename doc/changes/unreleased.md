@@ -11,5 +11,8 @@
  - #534: Converted integration API test to pytest - test_hash_temp_dir.py
  - #534: Converted integration API test to pytest - test_hash_temp_dir_with_files.py
 
+## features
+ - #517: Added docker-db 2025-1-3
+
 ## Dependencies
  - #532: Updated pyexasol and update lock file
