@@ -1,11 +1,11 @@
 [Global]
     Revision = 16
-    Checksum = b859548089afd15a9f0db789233a66c6
+    Checksum = COMMIT
     ClusterName = cl4
     Platform = Docker
     LicenseFile = /exa/etc/license.exasol_license
     CoredPort = 3250
-    SSHPort = 20002
+    SSHPort = {{ ssh_port }}
     IssueTracker = Salesforce
     XMLRPCPort = 443
     RESTAPIPort = 8000
@@ -19,7 +19,7 @@
     # List of networks for this cluster: 'private' is mandatory, 'public' is optional.
     Networks = private
     # Comma-separated list of nameservers for this cluster.
-    NameServers = 8.8.8.8
+    NameServers = {{ name_servers }}
     Timezone = Europe/Berlin
     LegacyPlatformManager = True
     LicenseRAWMEMWarnThreshold = 80
@@ -31,8 +31,8 @@
     MetaPackage = none
     ConfVersion = 8.60.7
     OSVersion = 8.60.7
-    DBVersion = 2025.1.3
-    ImageVersion = 2025.1.3
+    DBVersion = {{ db_version }}
+    ImageVersion = {{ db_version }}
     # Cored only accepts incomming messages from privileged ports (port number less than 1024).
     CoredUsePrivilegedPorts = False
     # Cored only accepts incomming messages from its own subnet.
@@ -45,9 +45,9 @@
 # SSL options
 [SSL]
     # The SSL certificate, private key and CA for all EXASOL services
-    Cert = /exa/etc/ssl/ssl.crt
-    CertKey = /exa/etc/ssl/ssl.key
-    CertAuth = /exa/etc/ssl/ssl.ca
+    Cert = {{ certificate_dir }}/cert.crt
+    CertKey = {{ certificate_dir }}/cert.key
+    CertAuth = {{ certificate_dir }}/rootCA.crt
     # Options to verify certificates: none, optional, required
     CertVerify = none
     # Domain name in the certifcate
@@ -88,6 +88,7 @@
         Group = root
         LoginEnabled = True
         AdditionalGroups = exausers, exaadm, exadbadm, exastoradm, exabfsadm, exasaasadm
+        AuthorizedKeys = {{ authorized_keys }}
     [[exadefusr]]
         ID = 500
         Group = exausers
@@ -100,7 +101,7 @@
         AdditionalGroups = exasaasadm,
 
 [Node : 11]
-    PrivateNet = 172.17.0.2/16
+    PrivateNet = {{ private_network }}
     PublicNet = 
     Name = n11
     # Affinity decides how this node is used in the cluster. i.e, the possibility to become master
@@ -129,7 +130,7 @@
     # Type of volume: 'data' | 'archive'
     Type = data
     # Volume size (e. g. '1 TiB')
-    Size = 4 GiB
+    Size = {{ disk_size }}
     # Name of the disk to be used for this volume.
     # This disk must exist on all volume nodes.
     Disk = disk1
@@ -160,10 +161,10 @@
     # Unique id of this database.
     ID = GxR05ii_Qom6JIPLoElyTg
     # Version nr. of this database.
-    Version = 2025.1.3
+    Version = {{ db_version }}
     # Memory size over all nodes (e. g. '1 TiB').
-    MemSize = 2 GiB
-    Port = 8563
+    MemSize = {{ mem_size }}
+    Port = {{ db_port }}
     # User and group IDs that own this database (e. g. '1000:1005').
     Owner = 500 : 500
     # Comma-separated list of node IDs for this DB (put reserve nodes at the end, if any).
@@ -176,6 +177,10 @@
     # Setting it to 0 turns off this feature.
     VolumeMoveDelay = 600
     EnableAuditing = True
+    {% if additional_db_parameters %}
+    Params = {{ additional_db_parameters }}
+    {% endif %}
+
     # JDBC driver configuration
     [[JDBC]]
         # BucketFS that contains the JDBC driver
@@ -199,15 +204,34 @@
 [BucketFS : bfsdefault]
     Owner = 500 : 500
     # HTTP port number (0 = disabled)
-    HttpPort = 0
+    HttpPort = {{ bucketfs_port }}
     # HTTPS port number (0 = disabled)
-    HttpsPort = 2581
+    HttpsPort = 0
     SyncKey = WkVLd1hGdElSOGl0UTVrUmo3cXJLMXBiRnFON2hCbmQ=
     SyncPeriod = 30000
     mode = rsync
     bucketvolume = None
     # The default bucket (auto-generated)
     [[Bucket : default]]
+        # ReadPasswd is "read" (without quotes)
         ReadPasswd = QlRJclJHenc4VXljb3gwWG5xTGFZOHlTdW9iRkI2RVo=
+        # WritePasswd is "write" (without quotes)
         WritePasswd = cVhLb29EaEp5eExDZVM4TTkwek5qVUtIMmZQa3NYN2Q=
         Public = True
+        Name = default
+
+    [[Bucket : myudfs]]
+        # ReadPasswd is "read" (without quotes)
+        ReadPasswd = QlRJclJHenc4VXljb3gwWG5xTGFZOHlTdW9iRkI2RVo=
+        # WritePasswd is "write" (without quotes)
+        WritePasswd = cVhLb29EaEp5eExDZVM4TTkwek5qVUtIMmZQa3NYN2Q=
+        Public = True
+        Name = myudfs
+
+    [[Bucket : jdbc_adapter]]
+        # ReadPasswd is "read" (without quotes)
+        ReadPasswd = QlRJclJHenc4VXljb3gwWG5xTGFZOHlTdW9iRkI2RVo=
+        # WritePasswd is "write" (without quotes)
+        WritePasswd = cVhLb29EaEp5eExDZVM4TTkwek5qVUtIMmZQa3NYN2Q=
+        Public = True
+        Name = jdbc-adapter
