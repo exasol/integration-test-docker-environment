@@ -49,6 +49,9 @@ def get_queue_content(q: Queue) -> list[str]:
 
 
 class TestTerminationHandler(unittest.TestCase):
+    """
+    Deprecated. Replaced by ./test/unit/test_termination_handler.py
+    """
 
     def test_success(self):
         q = Queue()
