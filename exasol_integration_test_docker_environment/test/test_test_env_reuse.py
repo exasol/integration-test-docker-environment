@@ -30,11 +30,7 @@ from exasol_integration_test_docker_environment.testing.utils import (
 
 class TestContainerReuseTest(unittest.TestCase):
     """
-    This test spawns a new test environment and, with parameters:
-    * reuse_database_setup=True,
-    * reuse_database=True,
-    * reuse_test_container=True
-    and verifies if the test data was populated to the docker db.
+    Deprecated. Replaced by "./test/integration/test_test_env_reuse.py"
     """
 
     def env_name(self):
