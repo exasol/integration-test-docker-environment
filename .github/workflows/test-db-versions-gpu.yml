@@ -28,6 +28,8 @@ jobs:
         uses: exasol/python-toolbox/.github/actions/python-environment@1.7.4
         with:
           python-version: "3.10"
+      - name: Log GPU environment
+        run: nvidia-smi
 
       - name: Run GPU Tests
         run: poetry run -- nox -s run-all-tests -- --db-version='${{ matrix.exasol_version }}' --test-set=gpu-only
