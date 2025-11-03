@@ -234,5 +234,4 @@
         # WritePasswd is "write" (without quotes)
         WritePasswd = czM3cWExYkgzRFFkQWpCWjlDUXVkMmlmWWhzcTNsdFI=
         Public = True
-        Public = True
         Name = jdbc-adapter
