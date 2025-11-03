@@ -214,24 +214,24 @@
     # The default bucket (auto-generated)
     [[Bucket : default]]
         # ReadPasswd is "read" (without quotes)
-        ReadPasswd = YUdyNmpaM0RzUDMxb1lWSE1YNGRmUEhoUzVaQXFNWXQ=
+        ReadPasswd = cmVhZAo=
         # WritePasswd is "write" (without quotes)
-        WritePasswd = czM3cWExYkgzRFFkQWpCWjlDUXVkMmlmWWhzcTNsdFI=
+        WritePasswd = d3JpdGU=
         Public = True
         Name = default
 
     [[Bucket : myudfs]]
         # ReadPasswd is "read" (without quotes)
-        ReadPasswd = YUdyNmpaM0RzUDMxb1lWSE1YNGRmUEhoUzVaQXFNWXQ=
+        ReadPasswd = cmVhZAo=
         # WritePasswd is "write" (without quotes)
-        WritePasswd = czM3cWExYkgzRFFkQWpCWjlDUXVkMmlmWWhzcTNsdFI=
+        WritePasswd = d3JpdGU=
         Public = True
         Name = myudfs
 
     [[Bucket : jdbc_adapter]]
         # ReadPasswd is "read" (without quotes)
-        ReadPasswd = YUdyNmpaM0RzUDMxb1lWSE1YNGRmUEhoUzVaQXFNWXQ=
+        ReadPasswd = cmVhZAo=
         # WritePasswd is "write" (without quotes)
-        WritePasswd = czM3cWExYkgzRFFkQWpCWjlDUXVkMmlmWWhzcTNsdFI=
+        WritePasswd = d3JpdGU=
         Public = True
         Name = jdbc-adapter
