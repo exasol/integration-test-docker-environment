@@ -32,8 +32,8 @@ def test_gpu(cli_context):
                 db.on_host_docker_environment.environment_info.database_info.container_info.container_name
             )
             print("--------------------Printing docker logs----------------------------")
-            for line in db_container.logs(stdout=True, stderr=True):
-                print(line.decode())
+            logs = db_container.logs(stdout=True, stderr=True)
+            print(logs.decode())
             print("--------------------Finished printing docker logs----------------------------")
 
         port = db.on_host_docker_environment.ports.database
