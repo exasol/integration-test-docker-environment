@@ -13,6 +13,7 @@ import netaddr
 from docker.client import DockerClient
 from docker.models.containers import Container
 from docker.models.volumes import Volume
+from docker.types import DeviceRequest
 from importlib_resources.abc import Traversable
 from jinja2 import Template
 
@@ -83,6 +84,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
     )
     additional_db_parameter: tuple[str, ...] = luigi.ListParameter()
     docker_environment_variables: tuple[str, ...] = luigi.ListParameter()
+    gpus: bool = luigi.BoolParameter(False, significant=False)
     ssh_user: str = luigi.Parameter(default="root")
     ssh_key_file: Union[str, Path, None] = luigi.OptionalParameter(
         default=None, significant=False
@@ -220,6 +222,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                     "bind": CERTIFICATES_MOUNT_DIR,
                     "mode": "rw",
                 }
+            device_requests = self._build_device_requests()
             db_container = docker_client.containers.create(
                 image="%s" % (docker_db_image_info.get_source_complete_name()),
                 name=self.db_container_name,
@@ -230,6 +233,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                 ports=port_mapping,
                 runtime=self.docker_runtime,
                 environment=list(self.docker_environment_variables),
+                device_requests=device_requests,
             )
             enable_ssh_access(db_container, authorized_keys)
             self._connect_docker_network(docker_client, db_container, db_ip_address)
@@ -470,3 +474,10 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                 self.logger.error(
                     f"Error during removing docker volume %s: %s", db_volume_name, e
                 )
+    def _build_device_requests(self) -> list[DeviceRequest]:
+        if self.gpus:
+            return [
+                DeviceRequest(driver='nvidia', count = 'all', capabilities = [['gpu']],)
+            ]
+        else:
+            return []
