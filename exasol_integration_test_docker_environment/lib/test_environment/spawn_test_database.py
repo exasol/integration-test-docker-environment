@@ -480,6 +480,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             return [
                 DeviceRequest(
                     driver="nvidia",
+                    count="all",
                     capabilities=[["gpu"]],
                 )
             ]
