@@ -80,7 +80,7 @@ def spawn_test_environment(
     create_certificates: bool = False,
     additional_db_parameter: tuple[str, ...] = (),
     docker_environment_variable: tuple[str, ...] = (),
-    gpus: bool = False,
+    use_gpus: bool = False,
     source_docker_repository_name: str = DEFAULT_DOCKER_REPOSITORY_NAME,
     source_docker_tag_prefix: str = "",
     source_docker_username: Optional[str] = None,
@@ -166,7 +166,7 @@ def spawn_test_environment(
         test_container_content=None,
         additional_db_parameter=additional_db_parameter,
         docker_environment_variables=docker_environment_variable,
-        gpus=gpus,
+        use_gpus=use_gpus,
     )
     environment_info = run_task(
         task_creator,

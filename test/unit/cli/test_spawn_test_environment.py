@@ -115,8 +115,8 @@ ARGUMENTS_VALUES: dict[str, ARGUMENT_VALUE_TYPE] = {
     "task-dependencies-dot-file": _gen_str_values("test-task-dependency-file"),
     "log-level": _gen_log_level_values(),
     "use-job-specific-log-file": [("True", True), ("False", False)],
-    "gpus": [(None, True)],
-    "no-gpus": [(None, False)],
+    "use-gpus": [(None, True)],
+    "no-use-gpus": [(None, False)],
 }
 
 REQUIRED_ARGS = ("environment-name",)
@@ -163,8 +163,11 @@ DOCKER_ARGS = (
     "docker-db-image-version",
     "docker-db-image-name",
     "docker-environment-variable",
-    "gpus",
 )
+
+GPU_ARGS = ("use-gpus",)
+
+NO_GPU_ARGS = ("no-use-gpus",)
 
 # Valid combination of keys used for the test.
 # REQUIRED_ARGS need to be part in all test sets.
@@ -183,6 +186,8 @@ COMBINATIONS_OF_KEYS = [
     + TARGET_DOCKER_ARGS
     + DOCKER_ARGS
     + NO_CREATE_CERTIFICATE_ARGS,
+    REQUIRED_ARGS + NO_GPU_ARGS,
+    REQUIRED_ARGS + GPU_ARGS,
     REQUIRED_ARGS,
 ]
 
@@ -285,12 +290,12 @@ def _build_expected_call(cli_arguments) -> _Call:
     else:
         create_certificates_value = CLICK_DEFAULT_VALUES["create_certificates"]
 
-    if "gpus" in cli_arguments:
-        gpus_value = cli_arguments["gpus"][1]
-    elif "no-gpus" in cli_arguments:
-        gpus_value = cli_arguments["no-gpus"][1]
+    if "use-gpus" in cli_arguments:
+        gpus_value = cli_arguments["use-gpus"][1]
+    elif "no-use-gpus" in cli_arguments:
+        gpus_value = cli_arguments["no-use-gpus"][1]
     else:
-        gpus_value = CLICK_DEFAULT_VALUES["gpus"]
+        gpus_value = CLICK_DEFAULT_VALUES["use_gpus"]
 
     return call(
         environment_name_value,

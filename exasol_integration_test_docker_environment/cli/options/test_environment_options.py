@@ -76,9 +76,9 @@ docker_db_options = [
                 You can repeat this option to add further environment variables.""",
     ),
     click.option(
-        "--gpus/--no-gpus",
+        "--use-gpus/--no-use-gpus",
         default=False,
-        help="""Configures the nvidia container toolkit for GPU usage if set to True.""",
+        help="""Configures the nvidia container toolkit to use all available GPUs if set to True.""",
     ),
 ]
 

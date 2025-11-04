@@ -162,6 +162,8 @@ The following options are available to customize the test environment.
                                       "HTTPS_PROXY=192.168.1.5". You can repeat
                                       this option to add further environment
                                       variables.
+      --gpus / --no-gpus              Configures the nvidia container toolkit for
+                                      GPU usage if set to True.
       --source-docker-repository-name TEXT
                                       Name of the docker repository for pulling
                                       cached stages. The repository name may
@@ -390,11 +392,11 @@ from a registry and managing their lifecycle to executing the containers on
 your system.  See https://docs.docker.com/engine/daemon/alternative-runtimes/
 for details.
 
+GPU Usage
+~~~~~~~~~
 
-Tested Docker Runtimes
-~~~~~~~~~~~~~~~~~~~~~~
+Use the flag `--use-gpu` to activate all available GPUs in the docker db.
+Additionaly, you need to set the respective db parameter using the `--additional-db-parameter` option, e.g.
+.. code:: console
 
--  Docker Default Runtime
--  `NVIDIA Container
-   Runtime <https://github.com/NVIDIA/nvidia-container-runtime>`__ for
-   GPU accelerated UDFs
+itde spawn-test-environment --environment-name my_env --use-gpu --additional-db-parameter=-enableAcceleratorDeviceDetection=1

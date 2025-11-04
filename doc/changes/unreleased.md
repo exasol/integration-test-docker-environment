@@ -17,6 +17,7 @@
 
 ## features
  - #517: Added docker-db 2025-1-3
+ - #545: Added GPU Option
 
 ## Dependencies
  - #532: Updated pyexasol and update lock file
