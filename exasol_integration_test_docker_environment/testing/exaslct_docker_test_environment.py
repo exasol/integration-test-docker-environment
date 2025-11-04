@@ -1,5 +1,11 @@
+import contextlib
+import ssl
 import subprocess
+from collections.abc import Iterator
 from typing import Optional
+
+import pyexasol
+from pyexasol import ExaConnection
 
 from exasol_integration_test_docker_environment.cli.options.test_environment_options import (
     LATEST_DB_VERSION,
@@ -41,3 +47,17 @@ class ExaslctDockerTestEnvironment:
     def close(self):
         if self.clean_up is not None:
             self.clean_up()
+
+    @contextlib.contextmanager
+    def create_connection(self) -> Iterator[ExaConnection]:
+        host_name = self.database_host
+        port = self.ports.database
+        dsn = f"{host_name}:{port}"
+        connection = pyexasol.connect(
+            dsn=dsn,
+            user="sys",
+            password="exasol",
+            websocket_sslopt={"cert_reqs": ssl.CERT_NONE},
+        )
+        yield connection
+        connection.close()

@@ -11,6 +11,8 @@
  - #534: Converted integration API test to pytest - test_hash_temp_dir.py
  - #534: Converted integration API test to pytest - test_hash_temp_dir_with_files.py
  - #534: Converted integration API test to pytest - test_test_env_reuse.py
+ - #534: Converted integration API test to pytest - test_populate_data.py
+ - #534: Converted integration API test to pytest - test_hash_symlink_loops.py
  - #534: Converted integration API test to pytest - test_termination_handler.py
 
 ## features
