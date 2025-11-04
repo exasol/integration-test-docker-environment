@@ -14,10 +14,9 @@ def test_gpu(cli_context):
             """
     )
     additional_param = [
+        "--gpus",
         "--docker-runtime",
         "nvidia",
-        "--docker-environment-variable",
-        "NVIDIA_VISIBLE_DEVICES=all",
         "--additional-db-parameter",
         "-enableAcceleratorDeviceDetection=1",
     ]

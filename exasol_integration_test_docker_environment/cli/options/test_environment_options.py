@@ -75,6 +75,11 @@ docker_db_options = [
                 For example "HTTPS_PROXY=192.168.1.5".
                 You can repeat this option to add further environment variables.""",
     ),
+    click.option(
+        "--gpus/--no-gpus",
+        default=False,
+        help="""Configures the nvidia container toolkit for GPU usage if set to True.""",
+    ),
 ]
 
 external_db_options = [
