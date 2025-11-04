@@ -1,7 +1,5 @@
-import ssl
 from inspect import cleandoc
 
-import pyexasol
 import pytest
 
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
@@ -27,15 +25,6 @@ def test_gpu(cli_context):
     ]
     with cli_context(name="test_gpu", additional_parameters=additional_param) as db:
         host_name = db.on_host_docker_environment.database_host
-        with ContextDockerClient() as docker_client:
-            db_container = docker_client.containers.get(
-                db.on_host_docker_environment.environment_info.database_info.container_info.container_name
-            )
-            print("--------------------Printing docker logs----------------------------")
-            logs = db_container.logs(stdout=True, stderr=True)
-            print(logs.decode())
-            print("--------------------Finished printing docker logs----------------------------")
-
         port = db.on_host_docker_environment.ports.database
         dsn = f"{host_name}:{port}"
         connection = pyexasol.connect(
