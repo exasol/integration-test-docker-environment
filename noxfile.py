@@ -120,7 +120,7 @@ def run_all_tests(session: nox.Session):
     db_version, test_set = parse_test_arguments(session)
     env = {"EXASOL_VERSION": db_version}
     if test_set == TestSet.GPU_ONLY:
-        session.run("pytest", "-m", "gpu", "-s", "./test/integration", env=env)
+        session.run("pytest", "-m", "gpu", "./test/integration", env=env)
     else:
         session.run("pytest", "./test/unit")
         session.run("pytest", "-m", "not gpu", "./test/integration", env=env)
@@ -150,7 +150,7 @@ def run_minimal_tests(session: nox.Session):
     db_version, test_set = parse_test_arguments(session)
     env = {"EXASOL_VERSION": db_version}
     if test_set == TestSet.GPU_ONLY:
-        session.run("pytest", "-m", "gpu", "-s", "./test/integration", env=env)
+        session.run("pytest", "-m", "gpu", "./test/integration", env=env)
     else:
         minimal_tests = {
             "old-itest": [
