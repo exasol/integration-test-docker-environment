@@ -8,6 +8,7 @@ from exasol_integration_test_docker_environment.lib.models.data.test_container_c
 )
 
 TEST_CONTAINER_ROOT_PATH = Path(__file__).parent / "resources" / "test_container"
+TEST_DATA_ROOT_PATH = Path(__file__).parent / "resources" / "test_data"
 
 FULL_TEST_CONTAINER_PATH = TEST_CONTAINER_ROOT_PATH / "full"
 MOCK_TEST_CONTAINER_PATH = TEST_CONTAINER_ROOT_PATH / "mock"
