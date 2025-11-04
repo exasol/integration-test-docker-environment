@@ -84,7 +84,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
     )
     additional_db_parameter: tuple[str, ...] = luigi.ListParameter()
     docker_environment_variables: tuple[str, ...] = luigi.ListParameter()
-    gpus: bool = luigi.BoolParameter(False, significant=False)
+    gpus: bool = luigi.BoolParameter(default=False, significant=False)
     ssh_user: str = luigi.Parameter(default="root")
     ssh_key_file: Union[str, Path, None] = luigi.OptionalParameter(
         default=None, significant=False
@@ -474,10 +474,15 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                 self.logger.error(
                     f"Error during removing docker volume %s: %s", db_volume_name, e
                 )
+
     def _build_device_requests(self) -> list[DeviceRequest]:
         if self.gpus:
             return [
-                DeviceRequest(driver='nvidia', count = 'all', capabilities = [['gpu']],)
+                DeviceRequest(
+                    driver="nvidia",
+                    count="all",
+                    capabilities=[["gpu"]],
+                )
             ]
         else:
             return []
