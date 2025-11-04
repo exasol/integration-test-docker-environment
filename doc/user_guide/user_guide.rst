@@ -162,8 +162,8 @@ The following options are available to customize the test environment.
                                       "HTTPS_PROXY=192.168.1.5". You can repeat
                                       this option to add further environment
                                       variables.
-      --gpus / --no-gpus              Configures the nvidia container toolkit for
-                                      GPU usage if set to True.
+      --use-gpus / --no-use-gpus      Configures the nvidia container toolkit to
+                                      use all available GPUs if set to True.
       --source-docker-repository-name TEXT
                                       Name of the docker repository for pulling
                                       cached stages. The repository name may
