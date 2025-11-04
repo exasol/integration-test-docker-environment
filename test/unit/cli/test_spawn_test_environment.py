@@ -115,6 +115,8 @@ ARGUMENTS_VALUES: dict[str, ARGUMENT_VALUE_TYPE] = {
     "task-dependencies-dot-file": _gen_str_values("test-task-dependency-file"),
     "log-level": _gen_log_level_values(),
     "use-job-specific-log-file": [("True", True), ("False", False)],
+    "gpus": [(None, True)],
+    "no-gpus": [(None, False)],
 }
 
 REQUIRED_ARGS = ("environment-name",)
@@ -161,6 +163,7 @@ DOCKER_ARGS = (
     "docker-db-image-version",
     "docker-db-image-name",
     "docker-environment-variable",
+    "gpus",
 )
 
 # Valid combination of keys used for the test.
@@ -282,6 +285,13 @@ def _build_expected_call(cli_arguments) -> _Call:
     else:
         create_certificates_value = CLICK_DEFAULT_VALUES["create_certificates"]
 
+    if "gpus" in cli_arguments:
+        gpus_value = cli_arguments["gpus"][1]
+    elif "no-gpus" in cli_arguments:
+        gpus_value = cli_arguments["no-gpus"][1]
+    else:
+        gpus_value = CLICK_DEFAULT_VALUES["gpus"]
+
     return call(
         environment_name_value,
         db_forward_value,
@@ -297,6 +307,7 @@ def _build_expected_call(cli_arguments) -> _Call:
         create_certificates_value,
         additional_db_parameter_value,
         docker_environment_variable_value,
+        gpus_value,
         source_docker_repository_name_value,
         source_docker_tag_prefix_value,
         source_docker_username_value,

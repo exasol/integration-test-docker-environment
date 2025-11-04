@@ -166,7 +166,7 @@ def spawn_test_environment(
         test_container_content=None,
         additional_db_parameter=additional_db_parameter,
         docker_environment_variables=docker_environment_variable,
-        gpus=gpus
+        gpus=gpus,
     )
     environment_info = run_task(
         task_creator,
