@@ -11,7 +11,7 @@
     RESTAPIPort = 8000
     RESTAPIEnabled = True
     RESTAPIPathPrefix = /api/v1
-    RESTAPIAuthPubKey = 
+    RESTAPIAuthPubKey =
     WebUIBackendPort = 4444
     WebUIDomain = exacluster.local
     EnableLoadBalancer = False
@@ -39,7 +39,7 @@
     CoredAllowOnlySameSubnet = True
     # Which subnets Cored will allow messages from. Each subnet must be sepparated by a comma.
     # A subnet is either an IPv4 or IPv6 address in CIDR notation.
-    CoredSubnets = 
+    CoredSubnets =
     BuiltinScriptLanguageNames = slc-9.7.0_c4_7_standard_EXASOL_all_r_4.4/ScriptLanguages_standard_EXASOL_all_r_4.4_slc_v9.7.0_SDFO4XBP,slc-9.7.0_c4_7_standard_EXASOL_all_python_3.10/ScriptLanguages_standard_EXASOL_all_python_3.10_slc_v9.7.0_YOKFLYBV,slc-9.7.0_c4_7_standard_EXASOL_all_java_11/ScriptLanguages_standard_EXASOL_all_java_11_slc_v9.7.0_JL4WRTKT,slc-9.7.0_c4_7_standard_EXASOL_all_java_17/ScriptLanguages_standard_EXASOL_all_java_17_slc_v9.7.0_IGVIAH6K
 
 # SSL options
@@ -51,7 +51,7 @@
     # Options to verify certificates: none, optional, required
     CertVerify = none
     # Domain name in the certifcate
-    CertDomainName = 
+    CertDomainName =
 
 # Docker related options
 [Docker]
@@ -64,7 +64,7 @@
     DeviceType = file
     # Comma-separated list of volumes to be mounted in all containers (e. g. '/mnt/my_data:/exa/my_data:rw' )
     # These user-defined volumes are mounted additionally to the internal ones (like the node root volume)
-    AdditionalVolumes = 
+    AdditionalVolumes =
 
 [Groups]
     [[root]]
@@ -102,7 +102,7 @@
 
 [Node : 11]
     PrivateNet = {{ private_network }}
-    PublicNet = 
+    PublicNet =
     Name = n11
     # Affinity decides how this node is used in the cluster. i.e, the possibility to become master
     Affinity = 11
@@ -121,7 +121,7 @@
     # Enable or disable background recovery / data restoration (does not affect on-demand recovery)
     BgRecEnabled = True
     # Max. throughput for background recovery / data restoration (in MiB/s)
-    BgRecLimit = 
+    BgRecLimit =
     # Space usage threshold (in percent, per node) for sending a warning
     SpaceWarnThreshold = 90
 
@@ -190,7 +190,7 @@
         # Directory within the bucket that contains the drivers
         Dir = drivers/jdbc
         # Additional URLs used to search for JDBC drivers, like: bucketfs://bfs2/bucket3/jdbcdir or file:///exa/etc/jdbc_drivers.
-        AdditionalURLs = 
+        AdditionalURLs =
     # Oracle driver configuration
     [[Oracle]]
         # BucketFS that contains the JDBC drivers
@@ -214,24 +214,24 @@
     # The default bucket (auto-generated)
     [[Bucket : default]]
         # ReadPasswd is "read" (without quotes)
-        ReadPasswd = QlRJclJHenc4VXljb3gwWG5xTGFZOHlTdW9iRkI2RVo=
+        ReadPasswd = cmVhZAo=
         # WritePasswd is "write" (without quotes)
-        WritePasswd = cVhLb29EaEp5eExDZVM4TTkwek5qVUtIMmZQa3NYN2Q=
+        WritePasswd = d3JpdGU=
         Public = True
         Name = default
 
     [[Bucket : myudfs]]
         # ReadPasswd is "read" (without quotes)
-        ReadPasswd = QlRJclJHenc4VXljb3gwWG5xTGFZOHlTdW9iRkI2RVo=
+        ReadPasswd = cmVhZAo=
         # WritePasswd is "write" (without quotes)
-        WritePasswd = cVhLb29EaEp5eExDZVM4TTkwek5qVUtIMmZQa3NYN2Q=
+        WritePasswd = d3JpdGU=
         Public = True
         Name = myudfs
 
     [[Bucket : jdbc_adapter]]
         # ReadPasswd is "read" (without quotes)
-        ReadPasswd = QlRJclJHenc4VXljb3gwWG5xTGFZOHlTdW9iRkI2RVo=
+        ReadPasswd = cmVhZAo=
         # WritePasswd is "write" (without quotes)
-        WritePasswd = cVhLb29EaEp5eExDZVM4TTkwek5qVUtIMmZQa3NYN2Q=
+        WritePasswd = d3JpdGU=
         Public = True
         Name = jdbc-adapter
