@@ -2,8 +2,6 @@ from inspect import cleandoc
 
 import pytest
 
-from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
-
 
 @pytest.mark.gpu
 def test_gpu(cli_context):
@@ -19,22 +17,14 @@ def test_gpu(cli_context):
         "--docker-runtime",
         "nvidia",
         "--docker-environment-variable",
-        "NVIDIA_VISIBLE_DEVICES=1",
+        "NVIDIA_VISIBLE_DEVICES=all",
         "--additional-db-parameter",
         "-enableAcceleratorDeviceDetection=1",
     ]
     with cli_context(name="test_gpu", additional_parameters=additional_param) as db:
-        host_name = db.on_host_docker_environment.database_host
-        port = db.on_host_docker_environment.ports.database
-        dsn = f"{host_name}:{port}"
-        connection = pyexasol.connect(
-            dsn=dsn,
-            user="sys",
-            password="exasol",
-            websocket_sslopt={"cert_reqs": ssl.CERT_NONE},
-        )
-        result = connection.execute(query_accelerator_parameters).fetchall()
-        assert result == [
-            ("1", "acceleratorDeviceDetected"),
-            ("1", "acceleratorDeviceGpuNvidiaDetected"),
-        ]
+        with db.on_host_docker_environment.create_connection() as connection:
+            result = connection.execute(query_accelerator_parameters).fetchall()
+            assert result == [
+                ("1", "acceleratorDeviceDetected"),
+                ("1", "acceleratorDeviceGpuNvidiaDetected"),
+            ]
