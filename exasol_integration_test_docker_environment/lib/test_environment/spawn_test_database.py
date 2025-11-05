@@ -84,7 +84,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
     )
     additional_db_parameter: tuple[str, ...] = luigi.ListParameter()
     docker_environment_variables: tuple[str, ...] = luigi.ListParameter()
-    gpu: tuple[str,...] = luigi.ListParameter()
+    gpu: tuple[str, ...] = luigi.ListParameter()
     ssh_user: str = luigi.Parameter(default="root")
     ssh_key_file: Union[str, Path, None] = luigi.OptionalParameter(
         default=None, significant=False

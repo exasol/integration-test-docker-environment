@@ -79,7 +79,9 @@ docker_db_options = [
         "--gpu",
         multiple=True,
         default=[],
-        help="""Configures the nvidia container toolkit to use the given GPU. Currently only value 'all' is supported.""",
+        help="""Configures the nvidia container toolkit to use the given GPU. 
+                Currently only value 'all' is supported. 
+                For 2025.1.x and later only""",
     ),
 ]
 
