@@ -10,6 +10,8 @@
     XMLRPCPort = 443
     RESTAPIPort = 8000
     RESTAPIEnabled = False
+    RESTAPIPathPrefix = /api/v1
+    RESTAPIAuthPubKey =
     WebUIBackendPort = 4444
     WebUIDomain = exacluster.local
     EnableLoadBalancer = False
@@ -22,7 +24,7 @@
     LegacyPlatformManager = True
     LicenseRAWMEMWarnThreshold = 80
     # Nr. of hugepages ('0' = disabled, 'host' = manually configured on the host, 'auto' = set automatically based on DB config)
-    Hugepages = 0
+    Hugepages = host
     StorageConnectionThreads = 16
     StorageMaxConnections = 1024
     # The meta package name, which was installed by C4 to run this system.
@@ -202,9 +204,9 @@
 [BucketFS : bfsdefault]
     Owner = 500 : 500
     # HTTP port number (0 = disabled)
-    HttpPort = 0
+    HttpPort = {{ bucketfs_port }}
     # HTTPS port number (0 = disabled)
-    HttpsPort = 2581
+    HttpsPort = 0
     SyncKey = T0RxZzNsZlRwWnAzeXM5b01JaUpSN0gxOVRYbklSTGc=
     SyncPeriod = 30000
     mode = rsync
