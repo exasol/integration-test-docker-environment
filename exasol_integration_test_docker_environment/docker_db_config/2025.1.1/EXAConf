@@ -15,7 +15,7 @@
     WebUIBackendPort = 4444
     WebUIDomain = exacluster.local
     EnableLoadBalancer = False
-    AuthenticationToken = OUlGWmxvcDRQb2h5WHpDUjpXT3NuNEdwQWZiN3pUczJwRENad3pqZUxzZDJMb0hOejlEeXBMdHVYSUZIbklMZVFMWHR6T1kxMEtOVXJPRk9i
+    AuthenticationToken = bFFtell6VkVGRU5zSmNlZDp5TVo0d09RbFh5UHJ1a2ozYVdTbnpSUm9Zc2xDMUlpWEd6SzlSNWhrNHlNa0RTUmZQZW9iVGJrSFhCSFZFY1Vm
     # List of networks for this cluster: 'private' is mandatory, 'public' is optional.
     Networks = private
     # Comma-separated list of nameservers for this cluster.
@@ -29,8 +29,8 @@
     StorageMaxConnections = 1024
     # The meta package name, which was installed by C4 to run this system.
     MetaPackage = none
-    ConfVersion = 8.60.7
-    OSVersion = 8.60.7
+    ConfVersion = 8.60.4
+    OSVersion = 8.60.4
     DBVersion = {{ db_version }}
     ImageVersion = {{ db_version }}
     # Cored only accepts incomming messages from privileged ports (port number less than 1024).
@@ -40,7 +40,7 @@
     # Which subnets Cored will allow messages from. Each subnet must be sepparated by a comma.
     # A subnet is either an IPv4 or IPv6 address in CIDR notation.
     CoredSubnets =
-    BuiltinScriptLanguageNames = slc-9.7.0_c4_7_standard_EXASOL_all_r_4.4/ScriptLanguages_standard_EXASOL_all_r_4.4_slc_v9.7.0_SDFO4XBP,slc-9.7.0_c4_7_standard_EXASOL_all_python_3.10/ScriptLanguages_standard_EXASOL_all_python_3.10_slc_v9.7.0_YOKFLYBV,slc-9.7.0_c4_7_standard_EXASOL_all_java_11/ScriptLanguages_standard_EXASOL_all_java_11_slc_v9.7.0_JL4WRTKT,slc-9.7.0_c4_7_standard_EXASOL_all_java_17/ScriptLanguages_standard_EXASOL_all_java_17_slc_v9.7.0_IGVIAH6K
+    BuiltinScriptLanguageNames = slc-9.5.2_c4_7_standard_EXASOL_all_r_4.4/ScriptLanguages_standard_EXASOL_all_r_4.4_slc_v9.5.2_B73KIC35,slc-9.5.2_c4_7_standard_EXASOL_all_python_3.10/ScriptLanguages_standard_EXASOL_all_python_3.10_slc_v9.5.2_7TCLDGWT,slc-9.5.2_c4_7_standard_EXASOL_all_java_11/ScriptLanguages_standard_EXASOL_all_java_11_slc_v9.5.2_Z22VLSNR,slc-9.5.2_c4_7_standard_EXASOL_all_java_17/ScriptLanguages_standard_EXASOL_all_java_17_slc_v9.5.2_QZCLFTGM
 
 # SSL options
 [SSL]
@@ -106,7 +106,7 @@
     Name = n11
     # Affinity decides how this node is used in the cluster. i.e, the possibility to become master
     Affinity = 11
-    UUID = B58112262FB043C994A70C4442F98E904C9B3F39
+    UUID = BE46FE01AFB04575B65578506A46DA6A67B6C605
     DockerVolume = n11
     # Ports to be exposed (container : host)
     ExposedPorts = 8563:8574, 2581:2592
@@ -159,7 +159,7 @@
 # An EXASOL database
 [DB : DB1]
     # Unique id of this database.
-    ID = GxR05ii_Qom6JIPLoElyTg
+    ID = tWQh1f5BQgW8l4VagfF1Rg
     # Version nr. of this database.
     Version = {{ db_version }}
     # Memory size over all nodes (e. g. '1 TiB').
@@ -207,7 +207,7 @@
     HttpPort = {{ bucketfs_port }}
     # HTTPS port number (0 = disabled)
     HttpsPort = 0
-    SyncKey = WkVLd1hGdElSOGl0UTVrUmo3cXJLMXBiRnFON2hCbmQ=
+    SyncKey = YzhRblBFazJpV3dCUGpKcnE2NlZDVjFoa2tSRXFNRHI=
     SyncPeriod = 30000
     mode = rsync
     bucketvolume = None

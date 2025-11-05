@@ -17,6 +17,7 @@
 
 ## features
  - #517: Added docker-db 2025-1-3
+ - #517: Added docker-db 2025-1-1
 
 ## Dependencies
  - #532: Updated pyexasol and update lock file
