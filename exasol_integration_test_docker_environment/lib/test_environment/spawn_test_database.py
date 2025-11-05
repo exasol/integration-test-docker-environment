@@ -84,7 +84,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
     )
     additional_db_parameter: tuple[str, ...] = luigi.ListParameter()
     docker_environment_variables: tuple[str, ...] = luigi.ListParameter()
-    gpu: tuple[str, ...] = luigi.ListParameter()
+    accelerator: tuple[str, ...] = luigi.ListParameter()
     ssh_user: str = luigi.Parameter(default="root")
     ssh_key_file: Union[str, Path, None] = luigi.OptionalParameter(
         default=None, significant=False
@@ -476,7 +476,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                 )
 
     def _build_device_requests(self) -> list[DeviceRequest]:
-        if "all" in self.gpu:
+        if "nvidia=all" in self.accelerator:
             return [
                 DeviceRequest(
                     driver="nvidia",

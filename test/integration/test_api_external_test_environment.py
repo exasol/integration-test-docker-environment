@@ -57,7 +57,7 @@ def spawn_test_environment(request, api_default_env):
         test_container_content=get_test_container_content(),
         additional_db_parameter=(),
         docker_environment_variables=(),
-        gpu=(),
+        accelerator=(),
     )
     ext_environment_info: EnvironmentInfo = run_task(task_creator, 1, None)
     yield ext_environment_name, ext_environment_info, db.name

@@ -115,7 +115,7 @@ ARGUMENTS_VALUES: dict[str, ARGUMENT_VALUE_TYPE] = {
     "task-dependencies-dot-file": _gen_str_values("test-task-dependency-file"),
     "log-level": _gen_log_level_values(),
     "use-job-specific-log-file": [("True", True), ("False", False)],
-    "gpu": _gen_tuple_values("all"),
+    "accelerator": _gen_tuple_values("nvidia=all"),
 }
 
 REQUIRED_ARGS = ("environment-name",)
@@ -152,7 +152,7 @@ DB_ARGS = (
     "nameserver",
     "db-os-access",
     "additional-db-parameter",
-    "gpu",
+    "accelerator",
 )
 
 CREATE_CERTIFICATES_ARGS = ("create-certificates",)
@@ -277,7 +277,7 @@ def _build_expected_call(cli_arguments) -> _Call:
         cli_arguments, "use-job-specific-log-file"
     )
 
-    gpu = _get_optional_value(cli_arguments, "gpu")
+    accelerator = _get_optional_value(cli_arguments, "accelerator")
 
     if "create-certificates" in cli_arguments:
         create_certificates_value = cli_arguments["create-certificates"][1]
@@ -301,7 +301,7 @@ def _build_expected_call(cli_arguments) -> _Call:
         create_certificates_value,
         additional_db_parameter_value,
         docker_environment_variable_value,
-        gpu,
+        accelerator,
         source_docker_repository_name_value,
         source_docker_tag_prefix_value,
         source_docker_username_value,

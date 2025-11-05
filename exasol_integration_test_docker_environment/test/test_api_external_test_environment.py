@@ -64,7 +64,7 @@ class APISpawnTestExternalEnvironmentTest(unittest.TestCase):
             test_container_content=get_test_container_content(),
             additional_db_parameter=(),
             docker_environment_variables=(),
-            gpu=(),
+            accelerator=(),
         )
         cls.ext_environment_info: EnvironmentInfo = run_task(task_creator, 1, None)
 

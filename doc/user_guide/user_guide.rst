@@ -162,10 +162,10 @@ The following options are available to customize the test environment.
                                       "HTTPS_PROXY=192.168.1.5". You can repeat
                                       this option to add further environment
                                       variables.
-      --gpu TEXT                      Configures the nvidia container toolkit to
+      --accelerator TEXT              Configures the nvidia container toolkit to
                                       use the given GPU.  Currently only value
-                                      'all' is supported.  For 2025.1.x and later
-                                      only
+                                      'nvidia=all' is supported.  For 2025.1.x and
+                                      later only
       --source-docker-repository-name TEXT
                                       Name of the docker repository for pulling
                                       cached stages. The repository name may

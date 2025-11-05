@@ -76,11 +76,11 @@ docker_db_options = [
                 You can repeat this option to add further environment variables.""",
     ),
     click.option(
-        "--gpu",
+        "--accelerator",
         multiple=True,
         default=[],
         help="""Configures the nvidia container toolkit to use the given GPU. 
-                Currently only value 'all' is supported. 
+                Currently only value 'nvidia=all' is supported. 
                 For 2025.1.x and later only""",
     ),
 ]

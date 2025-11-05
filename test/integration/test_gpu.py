@@ -15,8 +15,8 @@ def test_gpu(cli_context):
             """
     )
     additional_param = [
-        "--gpu",
-        "all",
+        "--accelerator",
+        "nvidia=all",
         "--additional-db-parameter",
         "-enableAcceleratorDeviceDetection=1",
     ]
@@ -32,7 +32,7 @@ def test_gpu(cli_context):
 def test_gpu_not_equal_all_fails(cli_context):
 
     additional_param = [
-        "--gpu",
+        "--accelerator",
         "something",
         "--additional-db-parameter",
         "-enableAcceleratorDeviceDetection=1",

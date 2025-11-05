@@ -88,7 +88,7 @@ class TestContainerReuseTest(unittest.TestCase):
             test_container_content=get_test_container_content(),
             additional_db_parameter=(),
             docker_environment_variables=(),
-            gpu=(),
+            accelerator=(),
         )
         try:
             success = luigi.build(
