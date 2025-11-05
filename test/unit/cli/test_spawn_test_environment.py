@@ -115,8 +115,7 @@ ARGUMENTS_VALUES: dict[str, ARGUMENT_VALUE_TYPE] = {
     "task-dependencies-dot-file": _gen_str_values("test-task-dependency-file"),
     "log-level": _gen_log_level_values(),
     "use-job-specific-log-file": [("True", True), ("False", False)],
-    "use-gpus": [(None, True)],
-    "no-use-gpus": [(None, False)],
+    "gpu": _gen_tuple_values("all"),
 }
 
 REQUIRED_ARGS = ("environment-name",)
@@ -153,6 +152,7 @@ DB_ARGS = (
     "nameserver",
     "db-os-access",
     "additional-db-parameter",
+    "gpu",
 )
 
 CREATE_CERTIFICATES_ARGS = ("create-certificates",)
@@ -164,10 +164,6 @@ DOCKER_ARGS = (
     "docker-db-image-name",
     "docker-environment-variable",
 )
-
-GPU_ARGS = ("use-gpus",)
-
-NO_GPU_ARGS = ("no-use-gpus",)
 
 # Valid combination of keys used for the test.
 # REQUIRED_ARGS need to be part in all test sets.
@@ -186,8 +182,6 @@ COMBINATIONS_OF_KEYS = [
     + TARGET_DOCKER_ARGS
     + DOCKER_ARGS
     + NO_CREATE_CERTIFICATE_ARGS,
-    REQUIRED_ARGS + NO_GPU_ARGS,
-    REQUIRED_ARGS + GPU_ARGS,
     REQUIRED_ARGS,
 ]
 
@@ -283,19 +277,14 @@ def _build_expected_call(cli_arguments) -> _Call:
         cli_arguments, "use-job-specific-log-file"
     )
 
+    gpu = _get_optional_value(cli_arguments, "gpu")
+
     if "create-certificates" in cli_arguments:
         create_certificates_value = cli_arguments["create-certificates"][1]
     elif "no-create-certificates" in cli_arguments:
         create_certificates_value = cli_arguments["no-create-certificates"][1]
     else:
         create_certificates_value = CLICK_DEFAULT_VALUES["create_certificates"]
-
-    if "use-gpus" in cli_arguments:
-        gpus_value = cli_arguments["use-gpus"][1]
-    elif "no-use-gpus" in cli_arguments:
-        gpus_value = cli_arguments["no-use-gpus"][1]
-    else:
-        gpus_value = CLICK_DEFAULT_VALUES["use_gpus"]
 
     return call(
         environment_name_value,
@@ -312,7 +301,7 @@ def _build_expected_call(cli_arguments) -> _Call:
         create_certificates_value,
         additional_db_parameter_value,
         docker_environment_variable_value,
-        gpus_value,
+        gpu,
         source_docker_repository_name_value,
         source_docker_tag_prefix_value,
         source_docker_username_value,
