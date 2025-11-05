@@ -397,8 +397,8 @@ for details.
 GPU Usage
 ~~~~~~~~~
 
-Use the flag `--use-gpu` to activate all available GPUs in the docker db.
+Use the flag `--accelerator="nvidia=all"` to activate all available NVidia GPUs in the docker db.
 Additionaly, you need to set the respective db parameter using the `--additional-db-parameter` option, e.g.
 .. code:: console
 
-itde spawn-test-environment --environment-name my_env --use-gpu --additional-db-parameter=-enableAcceleratorDeviceDetection=1
+itde spawn-test-environment --environment-name my_env --accelerator="nvidia=all" --additional-db-parameter=-enableAcceleratorDeviceDetection=1
