@@ -3,10 +3,6 @@ from subprocess import CalledProcessError
 
 import pytest
 
-from exasol_integration_test_docker_environment.lib.models.api_errors import (
-    TaskRuntimeError,
-)
-
 
 @pytest.mark.gpu
 def test_gpu(cli_context):
