@@ -14,6 +14,7 @@
  - #534: Converted integration API test to pytest - test_populate_data.py
  - #534: Converted integration API test to pytest - test_hash_symlink_loops.py
  - #534: Converted integration API test to pytest - test_termination_handler.py
+ - #534: Converted integration API test to pytest - test_test_container_reuse.py
 
 ## features
  - #517: Added docker-db 2025-1-3
