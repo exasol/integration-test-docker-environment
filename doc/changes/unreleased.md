@@ -17,8 +17,9 @@
  - #534: Converted integration API test to pytest - test_test_container_reuse.py
 
 ## features
- - #517: Added docker-db 2025-1-3
- - #517: Added docker-db 2025-1-1
+ - #531: Added docker-db 2025-1-3
+ - #531: Added docker-db 2025-1-1
+ - #531: Added docker-db 8-29-12
 
 ## Dependencies
  - #532: Updated pyexasol and update lock file
