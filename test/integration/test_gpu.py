@@ -14,7 +14,8 @@ def test_gpu(cli_context):
             """
     )
     additional_param = [
-        "--use-gpus",
+        "--gpu",
+        "all",
         "--additional-db-parameter",
         "-enableAcceleratorDeviceDetection=1",
     ]
