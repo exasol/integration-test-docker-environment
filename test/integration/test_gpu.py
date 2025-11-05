@@ -1,4 +1,5 @@
 from inspect import cleandoc
+from subprocess import CalledProcessError
 
 import pytest
 
@@ -14,10 +15,8 @@ def test_gpu(cli_context):
             """
     )
     additional_param = [
-        "--docker-runtime",
-        "nvidia",
-        "--docker-environment-variable",
-        "NVIDIA_VISIBLE_DEVICES=all",
+        "--accelerator",
+        "nvidia=all",
         "--additional-db-parameter",
         "-enableAcceleratorDeviceDetection=1",
     ]
@@ -28,3 +27,16 @@ def test_gpu(cli_context):
                 ("1", "acceleratorDeviceDetected"),
                 ("1", "acceleratorDeviceGpuNvidiaDetected"),
             ]
+
+
+def test_gpu_not_equal_all_fails(cli_context):
+
+    additional_param = [
+        "--accelerator",
+        "something",
+        "--additional-db-parameter",
+        "-enableAcceleratorDeviceDetection=1",
+    ]
+    with pytest.raises(CalledProcessError):
+        with cli_context(name="test_gpu", additional_parameters=additional_param):
+            pass

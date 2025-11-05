@@ -23,3 +23,4 @@ class GeneralSpawnTestEnvironmentParameter(OptionalTestContainerParameter):
     create_certificates: bool = luigi.BoolParameter()
     additional_db_parameter: tuple[str, ...] = luigi.ListParameter()
     docker_environment_variables: tuple[str, ...] = luigi.ListParameter()
+    accelerator: tuple[str, ...] = luigi.ListParameter()
