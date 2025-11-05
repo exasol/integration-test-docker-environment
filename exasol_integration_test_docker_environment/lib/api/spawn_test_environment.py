@@ -118,7 +118,9 @@ def spawn_test_environment(
         DbOsAccess[db_os_access] if db_os_access else DbOsAccess.DOCKER_EXEC
     )
     if len(accelerator) > 0 and accelerator != ("nvidia=all",):
-        raise ArgumentConstraintError("accelerator", "Only value 'nvidia=all' is supported")
+        raise ArgumentConstraintError(
+            "accelerator", "Only value 'nvidia=all' is supported"
+        )
 
     set_build_config(
         False,
