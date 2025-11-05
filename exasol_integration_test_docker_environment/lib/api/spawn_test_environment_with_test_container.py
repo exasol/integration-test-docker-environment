@@ -85,6 +85,7 @@ def spawn_test_environment_with_test_container(
     create_certificates: bool = False,
     additional_db_parameter: tuple[str, ...] = (),
     docker_environment_variable: tuple[str, ...] = (),
+    accelerator: tuple[str, ...] = (),
     source_docker_repository_name: str = DEFAULT_DOCKER_REPOSITORY_NAME,
     source_docker_tag_prefix: str = "",
     source_docker_username: Optional[str] = None,
@@ -118,6 +119,9 @@ def spawn_test_environment_with_test_container(
     parsed_db_disk_size = humanfriendly.parse_size(db_disk_size)
     if parsed_db_disk_size < humanfriendly.parse_size("100 MiB"):
         raise ArgumentConstraintError("db_disk_size", "needs to be at least 100 MiB")
+    if len(accelerator) > 0 and accelerator != ("nvidia=all",):
+        raise ArgumentConstraintError("gpu", "Only value 'nvidia=all' is supported")
+
     set_build_config(
         False,
         (),
@@ -166,6 +170,7 @@ def spawn_test_environment_with_test_container(
         test_container_content=test_container_content,
         additional_db_parameter=additional_db_parameter,
         docker_environment_variables=docker_environment_variable,
+        accelerator=accelerator,
     )
     environment_info = run_task(
         task_creator,

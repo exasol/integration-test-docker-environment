@@ -80,6 +80,7 @@ def spawn_test_environment(
     create_certificates: bool = False,
     additional_db_parameter: tuple[str, ...] = (),
     docker_environment_variable: tuple[str, ...] = (),
+    accelerator: tuple[str, ...] = (),
     source_docker_repository_name: str = DEFAULT_DOCKER_REPOSITORY_NAME,
     source_docker_tag_prefix: str = "",
     source_docker_username: Optional[str] = None,
@@ -116,6 +117,10 @@ def spawn_test_environment(
     db_os_access_value = (
         DbOsAccess[db_os_access] if db_os_access else DbOsAccess.DOCKER_EXEC
     )
+    if len(accelerator) > 0 and accelerator != ("nvidia=all",):
+        raise ArgumentConstraintError(
+            "accelerator", "Only value 'nvidia=all' is supported"
+        )
 
     set_build_config(
         False,
@@ -165,6 +170,7 @@ def spawn_test_environment(
         test_container_content=None,
         additional_db_parameter=additional_db_parameter,
         docker_environment_variables=docker_environment_variable,
+        accelerator=accelerator,
     )
     environment_info = run_task(
         task_creator,
