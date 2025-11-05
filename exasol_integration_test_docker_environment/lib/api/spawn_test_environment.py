@@ -117,6 +117,8 @@ def spawn_test_environment(
     db_os_access_value = (
         DbOsAccess[db_os_access] if db_os_access else DbOsAccess.DOCKER_EXEC
     )
+    if len(gpu) > 0 and gpu != ("all",):
+        raise ArgumentConstraintError("gpu", "Only value 'all' is supported")
 
     set_build_config(
         False,

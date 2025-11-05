@@ -119,6 +119,9 @@ def spawn_test_environment_with_test_container(
     parsed_db_disk_size = humanfriendly.parse_size(db_disk_size)
     if parsed_db_disk_size < humanfriendly.parse_size("100 MiB"):
         raise ArgumentConstraintError("db_disk_size", "needs to be at least 100 MiB")
+    if len(gpu) > 0 and gpu != ("all",):
+        raise ArgumentConstraintError("gpu", "Only value 'all' is supported")
+
     set_build_config(
         False,
         (),
