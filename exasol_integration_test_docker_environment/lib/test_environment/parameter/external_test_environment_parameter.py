@@ -20,7 +20,8 @@ class ExternalDatabaseXMLRPCParameter(Config):
 class ExternalDatabaseHostParameter(Config):
     external_exasol_db_host: Optional[str] = luigi.OptionalParameter()
     external_exasol_db_port: int = luigi.IntParameter()
-    external_exasol_bucketfs_port: int = luigi.IntParameter()
+    external_exasol_bucketfs_http_port: int = luigi.IntParameter()
+    external_exasol_bucketfs_https_port: int = luigi.IntParameter()
     external_exasol_ssh_port: int = luigi.IntParameter()
 
 

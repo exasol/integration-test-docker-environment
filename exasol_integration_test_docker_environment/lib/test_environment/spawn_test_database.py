@@ -58,6 +58,7 @@ from exasol_integration_test_docker_environment.lib.test_environment.parameter.d
     DockerDBTestEnvironmentParameter,
 )
 from exasol_integration_test_docker_environment.lib.test_environment.ports import (
+    BucketFSPorts,
     Ports,
     find_free_ports,
 )
@@ -103,9 +104,21 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         self.internal_ports = Ports.default_ports
         if self.ssh_port_forward is None:
             self.ssh_port_forward = str(find_free_ports(1)[0])
+
+        bucketfs_http_port: int = (
+            int(self.bucketfs_http_port_forward)
+            if self.bucketfs_http_port_forward is not None
+            else Ports.default_ports.bucketfs.http
+        )
+        bucketfs_https_port: int = (
+            int(self.bucketfs_https_port_forward)
+            if self.bucketfs_https_port_forward is not None
+            else Ports.default_ports.bucketfs.https
+        )
+
         self.forwarded_ports = Ports(
             database=int_or_none(self.database_port_forward),
-            bucketfs=int_or_none(self.bucketfs_port_forward),
+            bucketfs=BucketFSPorts(bucketfs_http_port, bucketfs_https_port),
             ssh=int_or_none(self.ssh_port_forward),
         )
 
@@ -173,12 +186,15 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         network.connect(container, ipv4_address=ip_address, aliases=aliases)
 
     def _port_mapping(
-        self, internal_ports, forwarded_ports
+        self, internal_ports: Ports, forwarded_ports: Ports
     ) -> dict[str, tuple[str, str]]:
         result = {}
-        for name, internal in internal_ports.__dict__.items():
-            forward = forwarded_ports.__getattribute__(name)
-            if forward:
+        internal_ports_dict = internal_ports.as_dict
+        forwarded_ports_dict = forwarded_ports.as_dict
+
+        for name, internal in internal_ports_dict.items():
+            forward = forwarded_ports_dict.get(name, -1)
+            if forward is not -1:
                 result[f"{internal}/tcp"] = ("0.0.0.0", forward)
         return result
 
@@ -409,7 +425,8 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             db_version=str(self.db_version),
             db_port=self.internal_ports.database,
             ssh_port=self.internal_ports.ssh,
-            bucketfs_port=self.internal_ports.bucketfs,
+            bucketfs_http_port=self.internal_ports.bucketfs.http,
+            bucketfs_https_port=self.internal_ports.bucketfs.https,
             image_version=self.docker_db_image_version,
             mem_size=self.mem_size,
             disk_size=self.disk_size,

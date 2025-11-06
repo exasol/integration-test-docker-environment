@@ -204,9 +204,9 @@
 [BucketFS : bfsdefault]
     Owner = 500 : 500
     # HTTP port number (0 = disabled)
-    HttpPort = {{ bucketfs_port }}
+    HttpPort = {{ bucketfs_http_port }}
     # HTTPS port number (0 = disabled)
-    HttpsPort = 0
+    HttpsPort = {{ bucketfs_https_port }}
     SyncKey = WkVLd1hGdElSOGl0UTVrUmo3cXJLMXBiRnFON2hCbmQ=
     SyncPeriod = 30000
     mode = rsync

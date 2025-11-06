@@ -76,7 +76,8 @@ class ApiTestEnvironment:
             spawn_test_environment_with_test_container(
                 environment_name=on_host_parameter.name,
                 database_port_forward=ports.database,
-                bucketfs_port_forward=ports.bucketfs,
+                bucketfs_port_forward=ports.bucketfs.http,
+                bucketfs_port_https_forward=ports.bucketfs.https,
                 ssh_port_forward=ports.ssh,
                 docker_db_image_version=docker_db_image_version,
                 test_container_content=test_container_content,
@@ -93,12 +94,21 @@ class ApiTestEnvironment:
     ) -> ExaslctDockerTestEnvironment:
         if additional_parameter is None:
             additional_parameter = {}
+
         ports = Ports.random_free()
+        if "bucketfs_port_forward" in additional_parameter:
+            ports.bucketfs.http = additional_parameter["bucketfs_port_forward"]
+            del additional_parameter["bucketfs_port_forward"]
+        if "bucketfs_https_port_forward" in additional_parameter:
+            ports.bucketfs.https = additional_parameter["bucketfs_https_port_forward"]
+            del additional_parameter["bucketfs_https_port_forward"]
+
         on_host = self._get_default_test_environment(name, ports)
         on_host.environment_info, on_host.clean_up = spawn_test_environment(
             environment_name=on_host.name,
             database_port_forward=on_host.ports.database,
-            bucketfs_port_forward=on_host.ports.bucketfs,
+            bucketfs_port_forward=on_host.ports.bucketfs.http,
+            bucketfs_https_port_forward=on_host.ports.bucketfs.https,
             ssh_port_forward=on_host.ports.ssh,
             docker_db_image_version=on_host.docker_db_image_version,
             output_directory=self.output_dir,

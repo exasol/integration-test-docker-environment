@@ -50,7 +50,14 @@ from exasol_integration_test_docker_environment.lib.utils.cli_function_decorator
     type=int,
     default=None,
     show_default=True,
-    help="Host port to which the BucketFS port gets forwarded",
+    help="Host port to which the BucketFS HTTP port gets forwarded",
+)
+@click.option(
+    "--bucketfs-https-port-forward",
+    type=int,
+    default=None,
+    show_default=True,
+    help="Host port to which the BucketFS HTTPS port gets forwarded",
 )
 @click.option(
     "--ssh-port-forward",

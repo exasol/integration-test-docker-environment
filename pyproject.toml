@@ -22,7 +22,7 @@ include = ["docker_db_config", "ext"]
 exclude = ["exasol_integration_test_docker_environment/test"]
 
 [tool.poetry.dependencies]
-python = ">=3.9.2,<3.15"
+python = ">=3.10,<3.15"
 click = ">=7.0"
 # The `sys_platform` marker makes sure the docker dependency is only installed on
 # non windows platforms.
@@ -56,6 +56,7 @@ pytest-check = "2.5.3"
 pyinstaller = "^6.15.0"
 types-pyinstaller = "^6.15.0.20250822"
 dill = "^0.4.0"
+exasol-bucketfs=">=2.1.0,<3"
 
 [build-system]
 requires = [

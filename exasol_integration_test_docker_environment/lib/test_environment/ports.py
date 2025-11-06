@@ -1,6 +1,7 @@
 import socket
 from collections.abc import Generator
 from contextlib import ExitStack
+from dataclasses import dataclass
 from typing import (
     Optional,
 )
@@ -34,6 +35,12 @@ def find_free_ports(num_ports: int) -> list[int]:
     return ports
 
 
+@dataclass
+class BucketFSPorts:
+    http: int = 2580
+    https: int = 2581
+
+
 class PortsType(type):
     """
     The following properties are read-only class attributes:
@@ -44,23 +51,23 @@ class PortsType(type):
 
     @property
     def default_ports(self) -> "Ports":
-        return Ports(database=8563, bucketfs=2580, ssh=22)
+        return Ports(database=8563, bucketfs=BucketFSPorts(), ssh=22)
 
     @property
     def external(self) -> "Ports":
         # For external databases SSH port might depend on version database.
-        return Ports(database=8563, bucketfs=2580, ssh=None)
+        return Ports(database=8563, bucketfs=BucketFSPorts(), ssh=None)
 
     @property
     def forward(self) -> "Ports":
-        return Ports(database=8563, bucketfs=2580, ssh=20002)
+        return Ports(database=8563, bucketfs=BucketFSPorts(), ssh=20002)
 
 
 class Ports(metaclass=PortsType):
     def __init__(
         self,
         database: Optional[int],
-        bucketfs: Optional[int],
+        bucketfs: Optional[BucketFSPorts],
         ssh: Optional[int] = None,
     ) -> None:
         if database is None:
@@ -68,17 +75,26 @@ class Ports(metaclass=PortsType):
         else:
             self.database = database
         if bucketfs is None:
-            self.bucketfs: int = Ports.default_ports.bucketfs
+            self.bucketfs: BucketFSPorts = Ports.default_ports.bucketfs
         else:
             self.bucketfs = bucketfs
         self.ssh = ssh
 
+    @property
+    def as_dict(self) -> dict[str, int]:
+        return {
+            "database": self.database,
+            "ssh": self.ssh,
+            "bucketfs_http": self.bucketfs.http,
+            "bucketfs_https": self.bucketfs.https,
+        }
+
     @classmethod
     def random_free(cls, ssh: bool = True) -> "Ports":
-        count = 3 if ssh else 2
+        count = 4 if ssh else 3
         ports = find_free_ports(count)
         return (
-            Ports(ports[0], ports[1], None)
+            Ports(ports[0], BucketFSPorts(http=ports[1], https=ports[2]), None)
             if not ssh
-            else Ports(ports[0], ports[1], ports[2])
+            else Ports(ports[0], BucketFSPorts(http=ports[1], https=ports[2]), ports[3])
         )

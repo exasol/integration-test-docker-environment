@@ -96,6 +96,6 @@ class IsDatabaseReadyThread(Thread):
     def create_bucketfs_connection_command(self):
         username = "w"
         password = self.database_credentials.bucketfs_write_password
-        cmd = f"""curl --silent --show-error --fail '{username}:{password}@localhost:{self._database_info.ports.bucketfs}'"""
+        cmd = f"""curl --silent --show-error --fail '{username}:{password}@localhost:{self._database_info.ports.bucketfs.http}'"""
         bash_cmd = f"""bash -c "{cmd}" """
         return bash_cmd

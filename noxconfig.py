@@ -18,7 +18,7 @@ class Config:
         / "version.py"
     )
     path_filters: Iterable[str] = ("dist", ".eggs", "venv", "resources")
-    python_versions = ["3.9", "3.10", "3.11", "3.12", "3.13"]
+    python_versions = ["3.10", "3.11", "3.12", "3.13"]
 
 
 PROJECT_CONFIG = Config()

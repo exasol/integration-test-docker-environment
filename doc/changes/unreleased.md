@@ -21,6 +21,7 @@
  - #531: Added docker-db 2025-1-1
  - #531: Added docker-db 8-29-12
  - #545: Added GPU Option
+ - #550: Added support for bucket fs https port
 
 ## Dependencies
  - #532: Updated pyexasol and update lock file
