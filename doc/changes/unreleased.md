@@ -24,3 +24,6 @@
 
 ## Dependencies
  - #532: Updated pyexasol and update lock file
+
+## Bugs
+ - 542: Removed Publishing Docker image from workflow
