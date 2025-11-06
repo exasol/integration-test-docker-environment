@@ -77,6 +77,7 @@ ARGUMENTS_VALUES: dict[str, ARGUMENT_VALUE_TYPE] = {
     "environment-name": _gen_str_values("test-environment"),
     "database-port-forward": _gen_int_values(1234),
     "bucketfs-port-forward": _gen_int_values(3456),
+    "bucketfs-https-port-forward": _gen_int_values(3458),
     "ssh-port-forward": _gen_int_values(5678),
     "db-mem-size": _gen_str_values("64KB"),
     "db-disk-size": _gen_str_values("1MB"),
@@ -146,6 +147,7 @@ UTILITY_ARGS = (
 DB_ARGS = (
     "database-port-forward",
     "bucketfs-port-forward",
+    "bucketfs-https-port-forward",
     "ssh-port-forward",
     "db-mem-size",
     "db-disk-size",
@@ -221,7 +223,8 @@ def _build_expected_call(cli_arguments) -> _Call:
 
     environment_name_value = cli_arguments["environment-name"][1]
     db_forward_value = _get_optional_value(cli_arguments, "database-port-forward")
-    bucket_forward_value = _get_optional_value(cli_arguments, "bucketfs-port-forward")
+    bucket_http_forward_value = _get_optional_value(cli_arguments, "bucketfs-port-forward")
+    bucket_https_forward_value = _get_optional_value(cli_arguments, "bucketfs-https-port-forward")
     ssh_forward_value = _get_optional_value(cli_arguments, "ssh-port-forward")
     db_mem_size_value = _get_optional_value(cli_arguments, "db-mem-size")
     db_disk_size_value = _get_optional_value(cli_arguments, "db-disk-size")
@@ -289,7 +292,8 @@ def _build_expected_call(cli_arguments) -> _Call:
     return call(
         environment_name_value,
         db_forward_value,
-        bucket_forward_value,
+        bucket_http_forward_value,
+        bucket_https_forward_value,
         ssh_forward_value,
         db_mem_size_value,
         db_disk_size_value,

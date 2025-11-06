@@ -81,7 +81,7 @@ class Ports(metaclass=PortsType):
         self.ssh = ssh
 
     @property
-    def as_dict(self) -> dict[str, int]:
+    def as_dict(self) -> dict[str, Optional[int]]:
         return {
             "database": self.database,
             "ssh": self.ssh,

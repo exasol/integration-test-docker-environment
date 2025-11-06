@@ -193,9 +193,9 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         forwarded_ports_dict = forwarded_ports.as_dict
 
         for name, internal in internal_ports_dict.items():
-            forward = forwarded_ports_dict.get(name, -1)
-            if forward is not -1:
-                result[f"{internal}/tcp"] = ("0.0.0.0", forward)
+            forward = forwarded_ports_dict.get(name, None)
+            if forward is not None:
+                result[f"{internal}/tcp"] = ("0.0.0.0", str(forward))
         return result
 
     def _create_database_container(
