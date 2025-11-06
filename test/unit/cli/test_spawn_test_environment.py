@@ -223,8 +223,12 @@ def _build_expected_call(cli_arguments) -> _Call:
 
     environment_name_value = cli_arguments["environment-name"][1]
     db_forward_value = _get_optional_value(cli_arguments, "database-port-forward")
-    bucket_http_forward_value = _get_optional_value(cli_arguments, "bucketfs-port-forward")
-    bucket_https_forward_value = _get_optional_value(cli_arguments, "bucketfs-https-port-forward")
+    bucket_http_forward_value = _get_optional_value(
+        cli_arguments, "bucketfs-port-forward"
+    )
+    bucket_https_forward_value = _get_optional_value(
+        cli_arguments, "bucketfs-https-port-forward"
+    )
     ssh_forward_value = _get_optional_value(cli_arguments, "ssh-port-forward")
     db_mem_size_value = _get_optional_value(cli_arguments, "db-mem-size")
     db_disk_size_value = _get_optional_value(cli_arguments, "db-disk-size")
