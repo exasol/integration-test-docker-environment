@@ -41,6 +41,47 @@ class BucketFSPorts:
     https: int = 2581
 
 
+class BucketFSPorts(int):
+
+    def __new__(cls, http, https=0):
+        obj = int.__new__(cls, http)
+        obj.http = http
+        obj.https = https
+        return obj
+
+    def __int__(self):
+        warnings.warn(
+            "BucketFSPorts is deprecated as an int. Use members `http` and `https` instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return int.__int__(self)
+
+    def __add__(self, other):
+        warnings.warn(
+            "BucketFSPorts is deprecated as an int. Use members `http` and `https` instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return BucketFSPorts(int(self) + int(other), self.https)
+
+    def __sub__(self, other):
+        warnings.warn(
+            "BucketFSPorts is deprecated as an int. Use members `http` and `https` instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return BucketFSPorts(int(self) - int(other), self.https)
+
+    def __str__(self):
+        return f"BucketFSPorts(http={self.http}, https={self.https})"
+
+    def __eq__(self, other):
+        if isinstance(other, BucketFSPorts):
+            return self.http == other.http and self.https == other.https
+        return False
+
+
 class PortsType(type):
     """
     The following properties are read-only class attributes:
@@ -51,16 +92,16 @@ class PortsType(type):
 
     @property
     def default_ports(self) -> "Ports":
-        return Ports(database=8563, bucketfs=BucketFSPorts(), ssh=22)
+        return Ports(database=8563, bucketfs=BucketFSPorts(2580, 2581), ssh=22)
 
     @property
     def external(self) -> "Ports":
         # For external databases SSH port might depend on version database.
-        return Ports(database=8563, bucketfs=BucketFSPorts(), ssh=None)
+        return Ports(database=8563, bucketfs=BucketFSPorts(2580, 2581), ssh=None)
 
     @property
     def forward(self) -> "Ports":
-        return Ports(database=8563, bucketfs=BucketFSPorts(), ssh=20002)
+        return Ports(database=8563, bucketfs=BucketFSPorts(2580, 2581), ssh=20002)
 
 
 class Ports(metaclass=PortsType):

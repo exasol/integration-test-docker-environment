@@ -1,4 +1,5 @@
 import functools
+import warnings
 from typing import (
     Any,
     Callable,
@@ -69,7 +70,6 @@ def spawn_test_environment(
     environment_name: str,
     database_port_forward: Optional[int] = None,
     bucketfs_port_forward: Optional[int] = None,
-    bucketfs_https_port_forward: Optional[int] = None,
     ssh_port_forward: Optional[int] = None,
     db_mem_size: str = "2 GiB",
     db_disk_size: str = "2 GiB",
@@ -96,6 +96,8 @@ def spawn_test_environment(
     task_dependencies_dot_file: Optional[str] = None,
     log_level: Optional[str] = None,
     use_job_specific_log_file: bool = False,
+    bucketfs_http_port_forward: Optional[int] = None,
+    bucketfs_https_port_forward: Optional[int] = None,
 ) -> tuple[EnvironmentInfo, Callable[[], None]]:
     """
     This function spawns a test environment with a docker-db container and a connected test-container.
@@ -121,6 +123,11 @@ def spawn_test_environment(
     if len(accelerator) > 0 and accelerator != ("nvidia=all",):
         raise ArgumentConstraintError(
             "accelerator", "Only value 'nvidia=all' is supported"
+        )
+    if bucketfs_port_forward is not None:
+        warnings.warn(
+            "Parameter 'bucketfs_port_forward' is deprecated. Use 'bucketfs_http_port_forward' instead.",
+            DeprecationWarning,
         )
 
     set_build_config(
@@ -151,6 +158,7 @@ def spawn_test_environment(
         task_class=SpawnTestEnvironmentWithDockerDB,
         environment_name=environment_name,
         database_port_forward=str_or_none(database_port_forward),
+        bucketfs_port_forward=str_or_none(bucketfs_port_forward),
         bucketfs_http_port_forward=str_or_none(bucketfs_port_forward),
         bucketfs_https_port_forward=str_or_none(bucketfs_https_port_forward),
         ssh_port_forward=str_or_none(ssh_port_forward),

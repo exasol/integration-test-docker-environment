@@ -105,15 +105,20 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         if self.ssh_port_forward is None:
             self.ssh_port_forward = str(find_free_ports(1)[0])
 
-        bucketfs_http_port: int = (
-            int(self.bucketfs_http_port_forward)
-            if self.bucketfs_http_port_forward is not None
-            else Ports.default_ports.bucketfs.http
+        def first_of(*args):
+            return next(x for x in args if x is not None)
+
+        bucketfs_http_port: int = int(
+            first_of(
+                self.bucketfs_http_port_forward,
+                self.bucketfs_port_forward,
+                Ports.default_ports.bucketfs.http,
+            )
         )
-        bucketfs_https_port: int = (
-            int(self.bucketfs_https_port_forward)
-            if self.bucketfs_https_port_forward is not None
-            else Ports.default_ports.bucketfs.https
+        bucketfs_https_port: int = int(
+            first_of(
+                self.bucketfs_https_port_forward, Ports.default_ports.bucketfs.https
+            )
         )
 
         self.forwarded_ports = Ports(

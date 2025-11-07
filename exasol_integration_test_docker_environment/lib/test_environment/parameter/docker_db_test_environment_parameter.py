@@ -43,6 +43,9 @@ class DockerDBTestEnvironmentParameter(Config):
     database_port_forward: Optional[str] = luigi.OptionalParameter(
         default=None, significant=False
     )
+    bucketfs_port_forward: Optional[str] = luigi.OptionalParameter(
+        default=None, significant=False
+    )
     bucketfs_http_port_forward: Optional[str] = luigi.OptionalParameter(
         default=None, significant=False
     )

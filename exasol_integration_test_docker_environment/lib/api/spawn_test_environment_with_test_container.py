@@ -74,7 +74,6 @@ def spawn_test_environment_with_test_container(
     test_container_content: TestContainerContentDescription,
     database_port_forward: Optional[int] = None,
     bucketfs_port_forward: Optional[int] = None,
-    bucketfs_port_https_forward: Optional[int] = None,
     ssh_port_forward: Optional[int] = None,
     db_mem_size: str = "2 GiB",
     db_disk_size: str = "2 GiB",
@@ -101,6 +100,8 @@ def spawn_test_environment_with_test_container(
     task_dependencies_dot_file: Optional[str] = None,
     log_level: Optional[str] = None,
     use_job_specific_log_file: bool = False,
+    bucketfs_http_port_forward: Optional[int] = None,
+    bucketfs_https_port_forward: Optional[int] = None,
 ) -> tuple[EnvironmentInfo, Callable[[], None]]:
     """
     This function spawns a test environment with a docker-db container and a connected test-container.
@@ -122,7 +123,11 @@ def spawn_test_environment_with_test_container(
         raise ArgumentConstraintError("db_disk_size", "needs to be at least 100 MiB")
     if len(accelerator) > 0 and accelerator != ("nvidia=all",):
         raise ArgumentConstraintError("gpu", "Only value 'nvidia=all' is supported")
-
+    if bucketfs_port_forward is not None:
+        warnings.warn(
+            "Parameter 'bucketfs_port_forward' is deprecated. Use 'bucketfs_http_port_forward' instead.",
+            DeprecationWarning,
+        )
     set_build_config(
         False,
         (),
@@ -151,7 +156,8 @@ def spawn_test_environment_with_test_container(
         task_class=SpawnTestEnvironmentWithDockerDB,
         environment_name=environment_name,
         database_port_forward=str_or_none(database_port_forward),
-        bucketfs_http_port_forward=str_or_none(bucketfs_port_forward),
+        bucketfs_port_forward=str_or_none(bucketfs_port_forward),
+        bucketfs_http_port_forward=str_or_none(bucketfs_http_port_forward),
         bucketfs_https_port_forward=str_or_none(bucketfs_port_https_forward),
         ssh_port_forward=str_or_none(ssh_port_forward),
         mem_size=db_mem_size,

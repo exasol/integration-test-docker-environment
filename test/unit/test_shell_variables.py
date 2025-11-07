@@ -49,6 +49,7 @@ def test_from_test_environment_info():
         ITDE_TYPE=type
         ITDE_DATABASE_HOST=db-host
         ITDE_DATABASE_DB_PORT=1
+        ITDE_DATABASE_BUCKETFS_PORT=2
         ITDE_DATABASE_BUCKETFS_HTTP_PORT=2
         ITDE_DATABASE_BUCKETFS_HTTPS_PORT=3
         ITDE_DATABASE_SSH_PORT=4
