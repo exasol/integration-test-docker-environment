@@ -76,8 +76,8 @@ class ApiTestEnvironment:
             spawn_test_environment_with_test_container(
                 environment_name=on_host_parameter.name,
                 database_port_forward=ports.database,
-                bucketfs_port_forward=ports.bucketfs,
-                bucketfs_port_https_forward=ports.bucketfs_https,
+                bucketfs_http_port_forward=ports.bucketfs,
+                bucketfs_https_port_forward=ports.bucketfs_https,
                 ssh_port_forward=ports.ssh,
                 docker_db_image_version=docker_db_image_version,
                 test_container_content=test_container_content,
