@@ -25,7 +25,6 @@ from exasol_integration_test_docker_environment.lib.test_environment.parameter.e
     ExternalDatabaseXMLRPCParameter,
 )
 from exasol_integration_test_docker_environment.lib.test_environment.ports import (
-    BucketFSPorts,
     Ports,
 )
 
@@ -50,11 +49,9 @@ class SetupExternalDatabaseHost(
         self.setup_database()
         ports = Ports(
             database=self.external_exasol_db_port,
-            bucketfs=BucketFSPorts(
-                http=self.external_exasol_bucketfs_http_port,
-                https=self.external_exasol_bucketfs_https_port,
-            ),
+            bucketfs=self.external_exasol_bucketfs_http_port,
             ssh=self.external_exasol_ssh_port,
+            bucketfs_https=self.external_exasol_bucketfs_https_port,
         )
         assert database_host is not None
         database_info = DatabaseInfo(host=database_host, ports=ports, reused=False)

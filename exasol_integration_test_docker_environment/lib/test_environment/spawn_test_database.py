@@ -58,7 +58,6 @@ from exasol_integration_test_docker_environment.lib.test_environment.parameter.d
     DockerDBTestEnvironmentParameter,
 )
 from exasol_integration_test_docker_environment.lib.test_environment.ports import (
-    BucketFSPorts,
     Ports,
     find_free_ports,
 )
@@ -112,19 +111,20 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             first_of(
                 self.bucketfs_http_port_forward,
                 self.bucketfs_port_forward,
-                Ports.default_ports.bucketfs.http,
+                Ports.default_ports.bucketfs,
             )
         )
         bucketfs_https_port: int = int(
             first_of(
-                self.bucketfs_https_port_forward, Ports.default_ports.bucketfs.https
+                self.bucketfs_https_port_forward, Ports.default_ports.bucketfs_https
             )
         )
 
         self.forwarded_ports = Ports(
             database=int_or_none(self.database_port_forward),
-            bucketfs=BucketFSPorts(bucketfs_http_port, bucketfs_https_port),
+            bucketfs=bucketfs_http_port,
             ssh=int_or_none(self.ssh_port_forward),
+            bucketfs_https=bucketfs_https_port,
         )
 
     def run_task(self) -> None:
@@ -194,13 +194,10 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         self, internal_ports: Ports, forwarded_ports: Ports
     ) -> dict[str, tuple[str, str]]:
         result = {}
-        internal_ports_dict = internal_ports.as_dict
-        forwarded_ports_dict = forwarded_ports.as_dict
-
-        for name, internal in internal_ports_dict.items():
-            forward = forwarded_ports_dict.get(name, None)
-            if forward is not None:
-                result[f"{internal}/tcp"] = ("0.0.0.0", str(forward))
+        for name, internal in internal_ports.__dict__.items():
+            forward = forwarded_ports.__getattribute__(name)
+            if forward:
+                result[f"{internal}/tcp"] = ("0.0.0.0", forward)
         return result
 
     def _create_database_container(
@@ -430,8 +427,8 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             db_version=str(self.db_version),
             db_port=self.internal_ports.database,
             ssh_port=self.internal_ports.ssh,
-            bucketfs_http_port=self.internal_ports.bucketfs.http,
-            bucketfs_https_port=self.internal_ports.bucketfs.https,
+            bucketfs_http_port=self.internal_ports.bucketfs,
+            bucketfs_https_port=self.internal_ports.bucketfs_https,
             image_version=self.docker_db_image_version,
             mem_size=self.mem_size,
             disk_size=self.disk_size,

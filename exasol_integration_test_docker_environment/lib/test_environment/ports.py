@@ -1,7 +1,6 @@
 import socket
 from collections.abc import Generator
 from contextlib import ExitStack
-from dataclasses import dataclass
 from typing import (
     Optional,
 )
@@ -35,53 +34,6 @@ def find_free_ports(num_ports: int) -> list[int]:
     return ports
 
 
-@dataclass
-class BucketFSPorts:
-    http: int = 2580
-    https: int = 2581
-
-
-class BucketFSPorts(int):
-
-    def __new__(cls, http, https=0):
-        obj = int.__new__(cls, http)
-        obj.http = http
-        obj.https = https
-        return obj
-
-    def __int__(self):
-        warnings.warn(
-            "BucketFSPorts is deprecated as an int. Use members `http` and `https` instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return int.__int__(self)
-
-    def __add__(self, other):
-        warnings.warn(
-            "BucketFSPorts is deprecated as an int. Use members `http` and `https` instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return BucketFSPorts(int(self) + int(other), self.https)
-
-    def __sub__(self, other):
-        warnings.warn(
-            "BucketFSPorts is deprecated as an int. Use members `http` and `https` instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return BucketFSPorts(int(self) - int(other), self.https)
-
-    def __str__(self):
-        return f"BucketFSPorts(http={self.http}, https={self.https})"
-
-    def __eq__(self, other):
-        if isinstance(other, BucketFSPorts):
-            return self.http == other.http and self.https == other.https
-        return False
-
-
 class PortsType(type):
     """
     The following properties are read-only class attributes:
@@ -92,50 +44,46 @@ class PortsType(type):
 
     @property
     def default_ports(self) -> "Ports":
-        return Ports(database=8563, bucketfs=BucketFSPorts(2580, 2581), ssh=22)
+        return Ports(database=8563, bucketfs=2580, ssh=22, bucketfs_https=2581)
 
     @property
     def external(self) -> "Ports":
         # For external databases SSH port might depend on version database.
-        return Ports(database=8563, bucketfs=BucketFSPorts(2580, 2581), ssh=None)
+        return Ports(database=8563, bucketfs=2580, ssh=None, bucketfs_https=2581)
 
     @property
     def forward(self) -> "Ports":
-        return Ports(database=8563, bucketfs=BucketFSPorts(2580, 2581), ssh=20002)
+        return Ports(database=8563, bucketfs=2580, ssh=20002, bucketfs_https=2581)
 
 
 class Ports(metaclass=PortsType):
     def __init__(
         self,
         database: Optional[int],
-        bucketfs: Optional[BucketFSPorts],
+        bucketfs: Optional[int],
         ssh: Optional[int] = None,
+        bucketfs_https: Optional[int] = None,
     ) -> None:
         if database is None:
             self.database: int = Ports.default_ports.database
         else:
             self.database = database
         if bucketfs is None:
-            self.bucketfs: BucketFSPorts = Ports.default_ports.bucketfs
+            self.bucketfs: int = Ports.default_ports.bucketfs
         else:
             self.bucketfs = bucketfs
         self.ssh = ssh
-
-    @property
-    def as_dict(self) -> dict[str, Optional[int]]:
-        return {
-            "database": self.database,
-            "ssh": self.ssh,
-            "bucketfs_http": self.bucketfs.http,
-            "bucketfs_https": self.bucketfs.https,
-        }
+        if bucketfs_https is None:
+            self.bucketfs_https: int = Ports.default_ports.bucketfs_https
+        else:
+            self.bucketfs_https = bucketfs_https
 
     @classmethod
     def random_free(cls, ssh: bool = True) -> "Ports":
         count = 4 if ssh else 3
         ports = find_free_ports(count)
         return (
-            Ports(ports[0], BucketFSPorts(http=ports[1], https=ports[2]), None)
+            Ports(ports[0], ports[1], None, ports[2])
             if not ssh
-            else Ports(ports[0], BucketFSPorts(http=ports[1], https=ports[2]), ports[3])
+            else Ports(ports[0], ports[1], ports[2], ports[3])
         )
