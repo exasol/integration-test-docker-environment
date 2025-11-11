@@ -100,7 +100,7 @@ external_db_options = [
     click.option(
         "--external-exasol-bucketfs-port",
         type=int,
-        default=Ports.external.bucketfs,
+        default=Ports.external.bucketfs_http,
         help="""Bucketfs port of external Exasol DB, needs to be set if --environment-type=external_db""",
     ),
     click.option(

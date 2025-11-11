@@ -111,7 +111,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             first_of(
                 self.bucketfs_http_port_forward,
                 self.bucketfs_port_forward,
-                Ports.default_ports.bucketfs,
+                Ports.default_ports.bucketfs_http,
             )
         )
         bucketfs_https_port: int = int(
@@ -427,7 +427,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             db_version=str(self.db_version),
             db_port=self.internal_ports.database,
             ssh_port=self.internal_ports.ssh,
-            bucketfs_http_port=self.internal_ports.bucketfs,
+            bucketfs_http_port=self.internal_ports.bucketfs_http,
             bucketfs_https_port=self.internal_ports.bucketfs_https,
             image_version=self.docker_db_image_version,
             mem_size=self.mem_size,

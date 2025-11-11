@@ -1,3 +1,4 @@
+import logging
 import socket
 from collections.abc import Generator
 from contextlib import ExitStack
@@ -65,18 +66,82 @@ class Ports(metaclass=PortsType):
         bucketfs_https: Optional[int] = None,
     ) -> None:
         if database is None:
-            self.database: int = Ports.default_ports.database
+            self._database: int = Ports.default_ports.database
         else:
-            self.database = database
+            self._database = database
         if bucketfs is None:
-            self.bucketfs: int = Ports.default_ports.bucketfs
+            self._bucketfs_http: int = Ports.default_ports.bucketfs_http
         else:
-            self.bucketfs = bucketfs
-        self.ssh = ssh
+            self._bucketfs_http = bucketfs
+        self._ssh = ssh
         if bucketfs_https is None:
-            self.bucketfs_https: int = Ports.default_ports.bucketfs_https
+            self._bucketfs_https: int = Ports.default_ports.bucketfs_https
         else:
-            self.bucketfs_https = bucketfs_https
+            self._bucketfs_https = bucketfs_https
+
+    @property
+    def bucketfs(self) -> int:
+        logging.warn(
+            f"Property Ports.bucketfs is deprecated, use Ports.bucketfs_http instead.",
+            DeprecationWarning,
+        )
+        return self._bucketfs_https
+
+    @bucketfs.setter
+    def bucketfs(self, value: int) -> None:
+        logging.warn(
+            f"Property Ports.bucketfs is deprecated, use Ports.bucketfs_http instead.",
+            DeprecationWarning,
+        )
+        self._bucketfs_https = value
+
+    @property
+    def bucketfs_http(self) -> int:
+        return self._bucketfs_http
+
+    @bucketfs_http.setter
+    def bucketfs_http(self, value: int) -> None:
+        logging.warn(
+            f"Setting values of class Ports after instantiation is deprecated.",
+            DeprecationWarning,
+        )
+        self._bucketfs_http = value
+
+    @property
+    def bucketfs_https(self) -> int:
+        return self._bucketfs_https
+
+    @bucketfs_https.setter
+    def bucketfs_https(self, value: int) -> None:
+        logging.warn(
+            f"Setting values of class Ports after instantiation is deprecated.",
+            DeprecationWarning,
+        )
+        self._bucketfs_https = value
+
+    @property
+    def database(self) -> int:
+        return self._database
+
+    @database.setter
+    def database(self, value: int) -> None:
+        logging.warn(
+            f"Setting values of class Ports after instantiation is deprecated.",
+            DeprecationWarning,
+        )
+        self._database = value
+
+    @property
+    def ssh(self) -> Optional[int]:
+        return self._ssh
+
+    @ssh.setter
+    def ssh(self, value: Optional[int]) -> None:
+        logging.warn(
+            f"Setting values of class Ports after instantiation is deprecated.",
+            DeprecationWarning,
+        )
+        self._ssh = value
 
     @classmethod
     def random_free(cls, ssh: bool = True) -> "Ports":

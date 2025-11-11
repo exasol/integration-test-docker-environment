@@ -23,7 +23,7 @@ def _assert_bucketfs(http_port: int, https_port: int, verify: Optional[str] = No
 
 def test_default_ports(api_context):
     with api_context() as db:
-        _assert_bucketfs(db.ports.bucketfs, db.ports.bucketfs_https)
+        _assert_bucketfs(db.ports.bucketfs_http, db.ports.bucketfs_https)
 
 
 def test_custom_ports(api_context):

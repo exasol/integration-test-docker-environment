@@ -41,7 +41,7 @@ def spawn_test_environment(request, api_default_env):
         environment_name=ext_environment_name,
         external_exasol_db_host=db.database_host,
         external_exasol_db_port=db.ports.database,
-        external_exasol_bucketfs_http_port=db.ports.bucketfs,
+        external_exasol_bucketfs_http_port=db.ports.bucketfs_http,
         external_exasol_bucketfs_https_port=db.ports.bucketfs_https,
         external_exasol_ssh_port=db.ports.ssh,
         external_exasol_db_user=db.db_username,

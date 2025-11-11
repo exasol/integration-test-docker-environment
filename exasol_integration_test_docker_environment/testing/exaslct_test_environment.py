@@ -180,7 +180,7 @@ class ExaslctTestEnvironment:
         arguments: list[str] = [
             f"--environment-name {on_host_parameter.name}",
             f"--database-port-forward {on_host_parameter.ports.database}",
-            f"--bucketfs-port-forward {on_host_parameter.ports.bucketfs}",
+            f"--bucketfs-port-forward {on_host_parameter.ports.bucketfs_http}",
             f"--bucketfs-https-port-forward {on_host_parameter.ports.bucketfs_https}",
             f"--ssh-port-forward {on_host_parameter.ports.ssh}",
         ]
