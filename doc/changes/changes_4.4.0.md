@@ -1,7 +1,7 @@
 # 4.4.0 - 2025-11-11
 
 This release adds support for docker-db version 2025.1.3, 2025.1.1 and 8.29.6. Also, it enables configuration for HTTPS on BucketFS and adds a new option for accelerator configuration.
-Besides, it includes several internal improvements.
+Besides, it includes several internal improvements. The minimum Python version was updated to Python 3.10.
 
 
 ## Refactorings
