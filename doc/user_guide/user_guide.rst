@@ -119,7 +119,7 @@ The following options are available to customize the test environment.
                                       forwarded
       --bucketfs-port-forward INTEGER
                                       Host port to which the BucketFS HTTP port
-                                      gets forwarded. Deprecated: Used '--
+                                      gets forwarded. Deprecated: Use '--
                                       bucketfs-http-port-forward' instead.
       --ssh-port-forward INTEGER      Host port to which the SSH port gets
                                       forwarded. If not specified then ITDE
@@ -219,7 +219,7 @@ The following options are available to customize the test environment.
                                       debug log to the job directory in the build
                                       directory
       --bucketfs-http-port-forward INTEGER
-                                      Host port to which the BucketFS HTTPS port
+                                      Host port to which the BucketFS HTTP port
                                       gets forwarded
       --bucketfs-https-port-forward INTEGER
                                       Host port to which the BucketFS HTTPS port
