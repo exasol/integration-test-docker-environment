@@ -24,7 +24,9 @@ from exasol_integration_test_docker_environment.lib.test_environment.parameter.e
     ExternalDatabaseHostParameter,
     ExternalDatabaseXMLRPCParameter,
 )
-from exasol_integration_test_docker_environment.lib.test_environment.ports import Ports
+from exasol_integration_test_docker_environment.lib.test_environment.ports import (
+    Ports,
+)
 
 
 class SetupExternalDatabaseHost(
@@ -47,8 +49,9 @@ class SetupExternalDatabaseHost(
         self.setup_database()
         ports = Ports(
             database=self.external_exasol_db_port,
-            bucketfs=self.external_exasol_bucketfs_port,
+            bucketfs=self.external_exasol_bucketfs_http_port,
             ssh=self.external_exasol_ssh_port,
+            bucketfs_https=self.external_exasol_bucketfs_https_port,
         )
         assert database_host is not None
         database_info = DatabaseInfo(host=database_host, ports=ports, reused=False)
@@ -60,7 +63,10 @@ class SetupExternalDatabaseHost(
             cluster = self.get_xml_rpc_object()
             self.start_database(cluster)
             cluster.bfsdefault.editBucketFS(
-                {"http_port": int(self.external_exasol_bucketfs_port)}
+                {
+                    "http_port": int(self.external_exasol_bucketfs_http_port),
+                    "https_port": int(self.external_exasol_bucketfs_https_port),
+                }
             )
             try:
                 cluster.bfsdefault.addBucket(

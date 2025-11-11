@@ -116,6 +116,8 @@ ARGUMENTS_VALUES: dict[str, ARGUMENT_VALUE_TYPE] = {
     "log-level": _gen_log_level_values(),
     "use-job-specific-log-file": [("True", True), ("False", False)],
     "accelerator": _gen_tuple_values("nvidia=all"),
+    "bucketfs-http-port-forward": _gen_int_values(3458),
+    "bucketfs-https-port-forward": _gen_int_values(3459),
 }
 
 REQUIRED_ARGS = ("environment-name",)
@@ -153,6 +155,8 @@ DB_ARGS = (
     "db-os-access",
     "additional-db-parameter",
     "accelerator",
+    "bucketfs-http-port-forward",
+    "bucketfs-https-port-forward",
 )
 
 CREATE_CERTIFICATES_ARGS = ("create-certificates",)
@@ -222,6 +226,13 @@ def _build_expected_call(cli_arguments) -> _Call:
     environment_name_value = cli_arguments["environment-name"][1]
     db_forward_value = _get_optional_value(cli_arguments, "database-port-forward")
     bucket_forward_value = _get_optional_value(cli_arguments, "bucketfs-port-forward")
+
+    bucket_http_forward_value = _get_optional_value(
+        cli_arguments, "bucketfs-http-port-forward"
+    )
+    bucket_https_forward_value = _get_optional_value(
+        cli_arguments, "bucketfs-https-port-forward"
+    )
     ssh_forward_value = _get_optional_value(cli_arguments, "ssh-port-forward")
     db_mem_size_value = _get_optional_value(cli_arguments, "db-mem-size")
     db_disk_size_value = _get_optional_value(cli_arguments, "db-disk-size")
@@ -316,6 +327,8 @@ def _build_expected_call(cli_arguments) -> _Call:
         task_dependencies_dot_file_value,
         log_level=log_level_value,
         use_job_specific_log_file=use_job_specific_log_file_value,
+        bucketfs_http_port_forward=bucket_http_forward_value,
+        bucketfs_https_port_forward=bucket_https_forward_value,
     )
 
 

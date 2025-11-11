@@ -1,7 +1,9 @@
 from inspect import cleandoc
 from unittest.mock import Mock
 
-from exasol_integration_test_docker_environment.lib.test_environment.ports import Ports
+from exasol_integration_test_docker_environment.lib.test_environment.ports import (
+    Ports,
+)
 from exasol_integration_test_docker_environment.lib.test_environment.shell_variables import (
     ShellVariables,
 )
@@ -21,7 +23,7 @@ def test_from_test_environment_info():
     )
     database_info = Mock(
         host="db-host",
-        ports=Ports(1, 2, 3),
+        ports=Ports(1, 2, 3, 4),
         container_info=container_info,
     )
     test_container_info = Mock(
@@ -47,6 +49,8 @@ def test_from_test_environment_info():
         ITDE_DATABASE_HOST=db-host
         ITDE_DATABASE_DB_PORT=1
         ITDE_DATABASE_BUCKETFS_PORT=2
+        ITDE_DATABASE_BUCKETFS_HTTP_PORT=2
+        ITDE_DATABASE_BUCKETFS_HTTPS_PORT=4
         ITDE_DATABASE_SSH_PORT=3
         ITDE_DATABASE_CONTAINER_NAME=container-name
         ITDE_DATABASE_CONTAINER_NETWORK_ALIASES="cna-1 cna-2"

@@ -27,13 +27,17 @@ class ShellVariables:
         """
         info = test_environment_info
         assert info.database_info.ports.database is not None
-        assert info.database_info.ports.bucketfs is not None
+        assert info.database_info.ports.bucketfs_http is not None
         env: dict[str, str] = {
             "NAME": info.name,
             "TYPE": info.type if isinstance(info.type, str) else info.type.name,
             "DATABASE_HOST": info.database_info.host,
             "DATABASE_DB_PORT": str(info.database_info.ports.database),
-            "DATABASE_BUCKETFS_PORT": str(info.database_info.ports.bucketfs),
+            "DATABASE_BUCKETFS_PORT": str(info.database_info.ports.bucketfs_http),
+            "DATABASE_BUCKETFS_HTTP_PORT": str(info.database_info.ports.bucketfs_http),
+            "DATABASE_BUCKETFS_HTTPS_PORT": str(
+                info.database_info.ports.bucketfs_https
+            ),
             "DATABASE_SSH_PORT": (
                 str(info.database_info.ports.ssh)
                 if info.database_info.ports.ssh is not None
