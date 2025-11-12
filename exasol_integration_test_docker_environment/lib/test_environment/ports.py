@@ -1,5 +1,6 @@
 import logging
 import socket
+import warnings
 from collections.abc import Generator
 from contextlib import ExitStack
 from typing import (
@@ -81,19 +82,19 @@ class Ports(metaclass=PortsType):
 
     @property
     def bucketfs(self) -> int:
-        logging.warn(
+        warnings.warn(
             f"Property Ports.bucketfs is deprecated, use Ports.bucketfs_http instead.",
             DeprecationWarning,
         )
-        return self._bucketfs_https
+        return self._bucketfs_http
 
     @bucketfs.setter
     def bucketfs(self, value: int) -> None:
-        logging.warn(
+        warnings.warn(
             f"Property Ports.bucketfs is deprecated, use Ports.bucketfs_http instead.",
             DeprecationWarning,
         )
-        self._bucketfs_https = value
+        self._bucketfs_http = value
 
     @property
     def bucketfs_http(self) -> int:
@@ -101,7 +102,7 @@ class Ports(metaclass=PortsType):
 
     @bucketfs_http.setter
     def bucketfs_http(self, value: int) -> None:
-        logging.warn(
+        warnings.warn(
             f"Setting values of class Ports after instantiation is deprecated.",
             DeprecationWarning,
         )
@@ -113,7 +114,7 @@ class Ports(metaclass=PortsType):
 
     @bucketfs_https.setter
     def bucketfs_https(self, value: int) -> None:
-        logging.warn(
+        warnings.warn(
             f"Setting values of class Ports after instantiation is deprecated.",
             DeprecationWarning,
         )
@@ -125,7 +126,7 @@ class Ports(metaclass=PortsType):
 
     @database.setter
     def database(self, value: int) -> None:
-        logging.warn(
+        warnings.warn(
             f"Setting values of class Ports after instantiation is deprecated.",
             DeprecationWarning,
         )
@@ -137,7 +138,7 @@ class Ports(metaclass=PortsType):
 
     @ssh.setter
     def ssh(self, value: Optional[int]) -> None:
-        logging.warn(
+        warnings.warn(
             f"Setting values of class Ports after instantiation is deprecated.",
             DeprecationWarning,
         )
