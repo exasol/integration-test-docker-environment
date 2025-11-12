@@ -38,12 +38,3 @@ jobs:
       contents: read
       pages: write
       id-token: write
-
-  publish-docker-runner:
-    name: Publish Runner Docker Image to Dockerhub
-    uses: ./.github/workflows/publish-docker-runner.yml
-    permissions:
-      contents: read
-    secrets:
-      DOCKER_USER_NAME: ${{ secrets.DOCKER_USER_NAME }}
-      DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
