@@ -4,4 +4,5 @@ This hotfix release fixes a bug with the BucketFS ports, in which the wrong Http
 
 ## Bugs
 
+ - 542: Removed Publishing Docker image from workflow
  - #554: Fixed bucketfs ports
