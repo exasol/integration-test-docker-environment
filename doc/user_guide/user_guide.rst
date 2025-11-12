@@ -118,8 +118,9 @@ The following options are available to customize the test environment.
                                       Host port to which the database port gets
                                       forwarded
       --bucketfs-port-forward INTEGER
-                                      Host port to which the BucketFS port gets
-                                      forwarded
+                                      Host port to which the BucketFS HTTP port
+                                      gets forwarded. Deprecated: Use '--
+                                      bucketfs-http-port-forward' instead.
       --ssh-port-forward INTEGER      Host port to which the SSH port gets
                                       forwarded. If not specified then ITDE
                                       selects a random free port.
@@ -217,7 +218,13 @@ The following options are available to customize the test environment.
                                       Use a job specific log file which write the
                                       debug log to the job directory in the build
                                       directory
-
+      --bucketfs-http-port-forward INTEGER
+                                      Host port to which the BucketFS HTTP port
+                                      gets forwarded
+      --bucketfs-https-port-forward INTEGER
+                                      Host port to which the BucketFS HTTPS port
+                                      gets forwarded
+      --help                          Show this message and exit.
 
 You can look at them on the commandline with:
 
@@ -328,7 +335,9 @@ The following config files are available:
       # Database IP in environment docker network
       export ITDE_DATABASE_HOST=172.21.0.2
       export ITDE_DATABASE_DB_PORT=8563
-      export ITDE_DATABASE_BUCKETFS_PORT=2580
+      export ITDE_DATABASE_BUCKETFS_PORT=2580 #Deprecated, use ITDE_DATABASE_BUCKETFS_HTTP_PORT instead
+      export ITDE_DATABASE_BUCKETFS_HTTP_PORT=2580
+      export ITDE_DATABASE_BUCKETFS_HTTPS_PORT=2581
       export ITDE_DATABASE_SSH_PORT=22
       export ITDE_DATABASE_CONTAINER_NAME=db_container_test
       export ITDE_DATABASE_CONTAINER_NETWORK_ALIASES="exasol_test_database db_container_test"

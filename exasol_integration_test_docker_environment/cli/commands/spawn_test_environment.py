@@ -50,7 +50,7 @@ from exasol_integration_test_docker_environment.lib.utils.cli_function_decorator
     type=int,
     default=None,
     show_default=True,
-    help="Host port to which the BucketFS port gets forwarded",
+    help="Host port to which the BucketFS HTTP port gets forwarded. Deprecated: Use '--bucketfs-http-port-forward' instead.",
 )
 @click.option(
     "--ssh-port-forward",
@@ -93,6 +93,20 @@ from exasol_integration_test_docker_environment.lib.utils.cli_function_decorator
 @add_options([tempory_base_directory_option])
 @add_options(system_options)
 @add_options(luigi_logging_options)
+@click.option(
+    "--bucketfs-http-port-forward",
+    type=int,
+    default=None,
+    show_default=True,
+    help="Host port to which the BucketFS HTTP port gets forwarded",
+)
+@click.option(
+    "--bucketfs-https-port-forward",
+    type=int,
+    default=None,
+    show_default=True,
+    help="Host port to which the BucketFS HTTPS port gets forwarded",
+)
 def spawn_test_environment(
     environment_name: str,
     database_port_forward: Optional[int],
@@ -123,6 +137,8 @@ def spawn_test_environment(
     task_dependencies_dot_file: Optional[str],
     log_level: Optional[str],
     use_job_specific_log_file: bool,
+    bucketfs_http_port_forward: Optional[int],
+    bucketfs_https_port_forward: Optional[int],
 ):
     """
     This command spawns a test environment with a docker-db container and a connected test-container.
@@ -160,6 +176,8 @@ def spawn_test_environment(
                 task_dependencies_dot_file,
                 log_level=log_level,
                 use_job_specific_log_file=use_job_specific_log_file,
+                bucketfs_http_port_forward=bucketfs_http_port_forward,
+                bucketfs_https_port_forward=bucketfs_https_port_forward,
             )
         except ArgumentConstraintError as e:
             handle_wrong_argument_error(*e.args)

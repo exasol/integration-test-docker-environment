@@ -103,10 +103,28 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         self.internal_ports = Ports.default_ports
         if self.ssh_port_forward is None:
             self.ssh_port_forward = str(find_free_ports(1)[0])
+
+        def first_of(*args):
+            return next(x for x in args if x is not None)
+
+        bucketfs_http_port: int = int(
+            first_of(
+                self.bucketfs_http_port_forward,
+                self.bucketfs_port_forward,
+                Ports.default_ports.bucketfs_http,
+            )
+        )
+        bucketfs_https_port: int = int(
+            first_of(
+                self.bucketfs_https_port_forward, Ports.default_ports.bucketfs_https
+            )
+        )
+
         self.forwarded_ports = Ports(
             database=int_or_none(self.database_port_forward),
-            bucketfs=int_or_none(self.bucketfs_port_forward),
+            bucketfs=bucketfs_http_port,
             ssh=int_or_none(self.ssh_port_forward),
+            bucketfs_https=bucketfs_https_port,
         )
 
     def run_task(self) -> None:
@@ -173,7 +191,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         network.connect(container, ipv4_address=ip_address, aliases=aliases)
 
     def _port_mapping(
-        self, internal_ports, forwarded_ports
+        self, internal_ports: Ports, forwarded_ports: Ports
     ) -> dict[str, tuple[str, str]]:
         result = {}
         for name, internal in internal_ports.__dict__.items():
@@ -409,7 +427,8 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             db_version=str(self.db_version),
             db_port=self.internal_ports.database,
             ssh_port=self.internal_ports.ssh,
-            bucketfs_port=self.internal_ports.bucketfs,
+            bucketfs_http_port=self.internal_ports.bucketfs_http,
+            bucketfs_https_port=self.internal_ports.bucketfs_https,
             image_version=self.docker_db_image_version,
             mem_size=self.mem_size,
             disk_size=self.disk_size,

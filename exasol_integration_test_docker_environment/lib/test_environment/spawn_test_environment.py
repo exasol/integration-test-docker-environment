@@ -38,8 +38,8 @@ class SpawnTestEnvironment(DependencyLoggerBaseTask, SpawnTestEnvironmentParamet
             raise Exception("external_exasol_db_host not set")
         if self.external_exasol_db_port is None:
             raise Exception("external_exasol_db_port not set")
-        if self.external_exasol_bucketfs_port is None:
-            raise Exception("external_exasol_bucketfs_port not set")
+        if self.external_exasol_bucketfs_http_port is None:
+            raise Exception("external_exasol_bucketfs_http_port not set")
         task = self.create_child_task_with_common_params(
             SpawnTestEnvironmentWithExternalDB,
             db_user=self.external_exasol_db_user,
