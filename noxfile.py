@@ -59,11 +59,10 @@ def get_db_versions_gpu_only() -> list[str]:
     template_path = ROOT / "docker_db_config_template"
     db_versions = [str(path.name) for path in template_path.iterdir() if path.is_dir()]
 
-    # Filter for versions later than or equal to 8.34.0
     db_versions = [
         db_version
         for db_version in db_versions
-        if Version(db_version) >= Version("8.34.0")
+        if Version(db_version) >= Version("2025.1.8")
     ]
     db_versions.append("default")
     return db_versions
@@ -77,12 +76,6 @@ def get_db_versions() -> list[str]:
     # If a user supplies versions with some additions, such as d1, prerelease, we filter these from the version number.
     # However, we use the templates here to generate the test matrix for GitHub Actions.
     # This means we need to adapt the list for images with special names.
-    # We need to remove the version 8.17.0 for the moment, because there exist no docker-db images with that version
-    # on DockerHub, yet. Instead, we add its pre-release version.
-    db_versions.remove("8.17.0")
-    db_versions.append("prerelease-8.17.0")
-    db_versions.remove("7.1.0")
-    db_versions.append("7.1.0-d1")
     return db_versions
 
 
