@@ -358,9 +358,9 @@ The following config files are available:
 Currently supported Exasol Versions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  **7.1**: up to 7.1.29
--  **8**: from 8.17.0 up to 8.34
--  **2025**: 2025.1.1, .3, .8
+-  **7.1**: 7.1.30 and later
+-  **8**: 8.29.13 and later
+-  **2025**: 2025.1.8 and later
 
 If you need further versions, please open an issue.
 

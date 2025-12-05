@@ -15,3 +15,4 @@ Therefore, we removed old configurations from the ITDE and marked this release a
 ## Features
 
  - #558: Added docker-db 2025.1.8
+ - #560: Added docker-db 8.29.13
