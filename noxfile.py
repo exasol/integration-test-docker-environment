@@ -63,7 +63,7 @@ def get_db_versions_gpu_only() -> list[str]:
     db_versions = [
         db_version
         for db_version in db_versions
-        if Version(db_version) >= Version("8.34.0")
+        if Version(db_version) >= Version("2025.1.8")
     ]
     db_versions.append("default")
     return db_versions
