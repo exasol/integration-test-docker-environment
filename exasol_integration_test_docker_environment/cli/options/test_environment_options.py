@@ -22,7 +22,7 @@ test_environment_options = [
     ),
 ]
 
-LATEST_DB_VERSION = """2025.1.3"""
+LATEST_DB_VERSION = """2025.1.8"""
 DEFAULT_MEM_SIZE = """2 GiB"""
 DEFAULT_DISK_SIZE = """2 GiB"""
 
