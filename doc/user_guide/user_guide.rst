@@ -207,7 +207,7 @@ The following options are available to customize the test environment.
                                       .build_output]
       --temporary-base-directory DIRECTORY
                                       Directory where the system creates temporary
-                                      directories.  [default: /tmp]
+                                      directories.  [default: /var/tmp]
       --workers INTEGER               Number of parallel workers  [default: 5]
       --task-dependencies-dot-file PATH
                                       Path where to store the Task Dependency

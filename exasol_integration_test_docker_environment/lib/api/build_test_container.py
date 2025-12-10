@@ -40,7 +40,7 @@ def build_test_container(
     force_rebuild_from: tuple[str, ...] = (),
     force_pull: bool = False,
     output_directory: str = DEFAULT_OUTPUT_DIRECTORY,
-    temporary_base_directory: str = "/tmp",
+    temporary_base_directory: str = "/var/tmp",
     log_build_context_content: bool = False,
     cache_directory: Optional[str] = None,
     build_name: Optional[str] = None,

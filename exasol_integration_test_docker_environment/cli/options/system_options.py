@@ -13,7 +13,7 @@ output_directory_option = click.option(
 tempory_base_directory_option = click.option(
     "--temporary-base-directory",
     type=click.Path(file_okay=False, dir_okay=True),
-    default="/tmp",
+    default="/var/tmp",
     show_default=True,
     help="Directory where the system creates temporary directories.",
 )
