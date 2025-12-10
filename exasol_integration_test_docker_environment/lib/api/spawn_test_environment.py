@@ -91,7 +91,7 @@ def spawn_test_environment(
     target_docker_username: Optional[str] = None,
     target_docker_password: Optional[str] = None,
     output_directory: str = DEFAULT_OUTPUT_DIRECTORY,
-    temporary_base_directory: str = "/tmp",
+    temporary_base_directory: str = "/var/tmp",
     workers: int = 5,
     task_dependencies_dot_file: Optional[str] = None,
     log_level: Optional[str] = None,
