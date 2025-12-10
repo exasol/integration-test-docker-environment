@@ -34,6 +34,7 @@ from exasol_integration_test_docker_environment.testing.exaslct_test_environment
     ExaslctTestEnvironment,
 )
 
+
 def _build_binary(target_path: Path, target_exec_bin_name: str):
     result = subprocess.run(
         [
@@ -51,6 +52,7 @@ def _build_binary(target_path: Path, target_exec_bin_name: str):
     )
     shutil.move(Path("dist") / target_exec_bin_name, target_path)
 
+
 @pytest.fixture(scope="session")
 def itde_binary_name():
     return "itde-int-test"
@@ -62,19 +64,23 @@ def itde_binary(tmp_path_factory, itde_binary_name) -> Path:
     _build_binary(itde_bin_path, itde_binary_name)
     return itde_bin_path / itde_binary_name
 
+
 @pytest.fixture
 def env_name(request):
     return utils.normalize_request_name(request.node.name)
+
 
 @pytest.fixture
 def cli_isolation(request, env_name) -> Iterator[ExaslctTestEnvironment]:
     with build_cli_isolation(request, env_name) as environment:
         yield environment
 
+
 @pytest.fixture
 def bin_isolation(request, env_name, itde_binary) -> Iterator[ExaslctTestEnvironment]:
     with build_cli_isolation(request, env_name, str(itde_binary)) as environment:
         yield environment
+
 
 @pytest.fixture
 def api_isolation(request) -> Iterator[ApiTestEnvironment]:

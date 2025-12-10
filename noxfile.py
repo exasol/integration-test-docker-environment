@@ -294,9 +294,8 @@ def build_standalone_binary(session: nox.Session):
         if build_path.exists():
             shutil.rmtree(str(build_path))
         else:
-            session.warn(
-                f"Expected temporary build path '{build_path}' doesn't exist"
-            )
+            session.warn(f"Expected temporary build path '{build_path}' doesn't exist")
+
 
 @nox.session(name="execute-itde", python=False)
 def execute_itde(session: nox.Session):

@@ -70,9 +70,11 @@ def smoke_test_sql(exaplus_path: str, env: ExaslctDockerTestEnvironment) -> str:
     command_str = " ".join(command)
     return f'bash -c "{command_str}" '
 
+
 @pytest.fixture
 def env_name(request):
-    return "cli" #Use a short name here as the certificate creation requires a short name for the docker db container
+    return "cli"  # Use a short name here as the certificate creation requires a short name for the docker db container
+
 
 @pytest.fixture(params=["cli", "binary"])
 def context(request, cli_context, bin_context):
@@ -96,15 +98,20 @@ def test_db_container_started(context):
             check = NumberCheck(db, containers)
             assert check.count(db_containers) == 1, check.fail("Found no db container")
 
+
 @pytest.fixture(params=[DbOsAccess.DOCKER_EXEC, DbOsAccess.SSH])
 def db_os_access(request):
     return request.param
+
 
 @pytest.fixture(params=[[], ["--create-certificates"]])
 def additional_test_env_parameters(request):
     return request.param
 
-def test_db_available(context, fabric_stdin, db_os_access, additional_test_env_parameters):
+
+def test_db_available(
+    context, fabric_stdin, db_os_access, additional_test_env_parameters
+):
     params = ["--db-os-access", db_os_access.name]
     if additional_test_env_parameters:
         params += additional_test_env_parameters
