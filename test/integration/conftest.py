@@ -1,5 +1,8 @@
 import io
+import shutil
+import subprocess
 from collections.abc import Iterator
+from pathlib import Path
 
 import pytest
 
@@ -9,6 +12,7 @@ from exasol_integration_test_docker_environment.lib.models.config.build_config i
 from exasol_integration_test_docker_environment.test.get_test_container_content import (
     get_test_container_content,
 )
+from exasol_integration_test_docker_environment.testing import utils
 from exasol_integration_test_docker_environment.testing.api_test_environment import (
     ApiTestEnvironment,
 )
@@ -30,12 +34,47 @@ from exasol_integration_test_docker_environment.testing.exaslct_test_environment
     ExaslctTestEnvironment,
 )
 
+def _build_binary(target_path: Path, target_exec_bin_name: str):
+    result = subprocess.run(
+        [
+            "nox",
+            "-s",
+            "build-standalone-binary",
+            "--",
+            "--executable-name",
+            target_exec_bin_name,
+            "--cleanup",
+        ],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    shutil.move(Path("dist") / target_exec_bin_name, target_path)
+
+@pytest.fixture(scope="session")
+def itde_binary_name():
+    return "itde-int-test"
+
+
+@pytest.fixture(scope="session")
+def itde_binary(tmp_path_factory, itde_binary_name) -> Path:
+    itde_bin_path = tmp_path_factory.mktemp("itde-int-test-bin")
+    _build_binary(itde_bin_path, itde_binary_name)
+    return itde_bin_path / itde_binary_name
 
 @pytest.fixture
-def cli_isolation(request) -> Iterator[ExaslctTestEnvironment]:
-    with build_cli_isolation(request) as environment:
+def env_name(request):
+    return utils.normalize_request_name(request.node.name)
+
+@pytest.fixture
+def cli_isolation(request, env_name) -> Iterator[ExaslctTestEnvironment]:
+    with build_cli_isolation(request, env_name) as environment:
         yield environment
 
+@pytest.fixture
+def bin_isolation(request, env_name, itde_binary) -> Iterator[ExaslctTestEnvironment]:
+    with build_cli_isolation(request, env_name, str(itde_binary)) as environment:
+        yield environment
 
 @pytest.fixture
 def api_isolation(request) -> Iterator[ApiTestEnvironment]:
@@ -68,6 +107,27 @@ def cli_context(
             ...
     """
     return build_cli_context_provider(cli_isolation)
+
+
+@pytest.fixture
+def bin_context(
+    bin_isolation,
+) -> CliContextProvider:
+    """
+    Returns a method that test case implementations can use to create a
+    context with a database.
+
+    This fixture should be used on function level, in cases where one
+    database is required per test.
+
+    The test case optionally can pass a name and additional parameters for
+    spawning the database:
+
+    def test_case(cli_context):
+        with cli_context(additional_parameters = ["--option"]):
+            ...
+    """
+    return build_cli_context_provider(bin_isolation)
 
 
 @pytest.fixture

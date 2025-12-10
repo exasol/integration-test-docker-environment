@@ -22,15 +22,15 @@ CliContextProvider: TypeAlias = Callable[
 
 
 @contextlib.contextmanager
-def build_cli_isolation(request) -> Iterator[ExaslctTestEnvironment]:
+def build_cli_isolation(request, env_name="", executable: str = "itde") -> Iterator[ExaslctTestEnvironment]:
     """
     Builds an ExaslctTestEnvironment instance with a proper name based on the pytest request fixture.
     Cleans up the environment automatically on shutdown.
     """
-    testname = utils.normalize_request_name(request.node.name)
+    testname = env_name or utils.normalize_request_name(request.node.name)
     environment = ExaslctTestEnvironment(
         test_object=None,
-        executable="itde",
+        executable=executable,
         clean_images_at_close=True,
         name=testname,
     )
