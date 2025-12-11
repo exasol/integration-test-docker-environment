@@ -19,7 +19,7 @@ jobs:
     uses: ./.github/workflows/matrix-python.yml
 
   test-python-version-all-tests:
-    name: "Run Tests with Python ${{ matrix.python_version }} and Default Exasol Version"
+    name: "Run Tests with Python ${{ matrix.python-version }} and Default Exasol Version"
     permissions:
       contents: read
     needs: [ build-matrix ]
