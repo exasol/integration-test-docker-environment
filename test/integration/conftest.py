@@ -71,14 +71,14 @@ def env_name(request):
 
 
 @pytest.fixture
-def cli_isolation(request, env_name) -> Iterator[ExaslctTestEnvironment]:
-    with build_cli_isolation(request, env_name) as environment:
+def cli_isolation(env_name) -> Iterator[ExaslctTestEnvironment]:
+    with build_cli_isolation(env_name) as environment:
         yield environment
 
 
 @pytest.fixture
-def bin_isolation(request, env_name, itde_binary) -> Iterator[ExaslctTestEnvironment]:
-    with build_cli_isolation(request, env_name, str(itde_binary)) as environment:
+def bin_isolation(env_name, itde_binary) -> Iterator[ExaslctTestEnvironment]:
+    with build_cli_isolation(env_name, str(itde_binary)) as environment:
         yield environment
 
 
@@ -100,7 +100,7 @@ def cli_context(
 ) -> CliContextProvider:
     """
     Returns a method that test case implementations can use to create a
-    context with a database.
+    context with a database. Internally, the Python `itde` script is used to execute all commands.
 
     This fixture should be used on function level, in cases where one
     database is required per test.
@@ -121,7 +121,7 @@ def bin_context(
 ) -> CliContextProvider:
     """
     Returns a method that test case implementations can use to create a
-    context with a database.
+    context with a database. Internally, the dynamically compiled itde binary is used to execute all commands.
 
     This fixture should be used on function level, in cases where one
     database is required per test.
@@ -130,7 +130,7 @@ def bin_context(
     spawning the database:
 
     def test_case(cli_context):
-        with cli_context(additional_parameters = ["--option"]):
+        with bin_context(additional_parameters = ["--option"]):
             ...
     """
     return build_cli_context_provider(bin_isolation)
