@@ -75,15 +75,12 @@ def smoke_test_sql(exaplus_path: str, env: ExaslctDockerTestEnvironment) -> str:
 def env_name(request):
     return "cli"  # Use a short name here as the certificate creation requires a short name for the docker db container
 
+@pytest.fixture
+def context(request):
+    # Look up the fixture whose name is passed in as a parameter
+    return request.getfixturevalue(request.param)
 
-@pytest.fixture(params=["cli", "binary"])
-def context(request, cli_context, bin_context):
-    if request.param == "cli":
-        return cli_context
-    elif request.param == "binary":
-        return bin_context
-
-
+@pytest.mark.parametrize("context", ["cli_context", "bin_context"], indirect=True)
 def test_db_container_started(context):
     with context() as db:
         with ContextDockerClient() as docker_client:
@@ -108,7 +105,7 @@ def db_os_access(request):
 def additional_test_env_parameters(request):
     return request.param
 
-
+@pytest.mark.parametrize("context", ["cli_context", "bin_context"], indirect=True)
 def test_db_available(
     context, fabric_stdin, db_os_access, additional_test_env_parameters
 ):
