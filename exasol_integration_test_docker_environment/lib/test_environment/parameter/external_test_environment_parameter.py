@@ -1,4 +1,3 @@
-
 import luigi
 from luigi import Config
 from luigi.parameter import ParameterVisibility

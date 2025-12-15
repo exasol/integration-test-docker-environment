@@ -1,4 +1,3 @@
-
 from exasol_integration_test_docker_environment.lib.base.info import Info
 from exasol_integration_test_docker_environment.lib.models.data.container_info import (
     ContainerInfo,

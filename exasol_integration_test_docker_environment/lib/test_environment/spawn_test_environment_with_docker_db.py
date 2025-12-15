@@ -1,4 +1,3 @@
-
 from exasol_integration_test_docker_environment.lib.base.db_os_executor import (
     DbOsExecFactory,
     DockerClientFactory,
