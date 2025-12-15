@@ -3,10 +3,6 @@ from collections.abc import (
     Iterator,
 )
 from pathlib import Path
-from typing import (
-    Optional,
-    Union,
-)
 
 import luigi
 
@@ -14,7 +10,6 @@ from exasol_integration_test_docker_environment.abstract_method_exception import
     AbstractMethodException,
 )
 from exasol_integration_test_docker_environment.lib.base.base_task import (
-    BaseTask,
     BaseTaskType,
 )
 from exasol_integration_test_docker_environment.lib.base.docker_base_task import (
@@ -87,12 +82,12 @@ class AbstractSpawnTestEnvironment(
     def run_task(
         self,
     ) -> Iterator[
-        Union[
-            PrepareDockerNetworkForTestEnvironment,
-            CreateSSLCertificatesTask,
-            WaitForTestDockerDatabase,
-            WaitForTestExternalDatabase,
-        ]
+        (
+            PrepareDockerNetworkForTestEnvironment |
+            CreateSSLCertificatesTask |
+            WaitForTestDockerDatabase |
+            WaitForTestExternalDatabase
+        )
     ]:
         test_environment_info = yield from self._attempt_database_start()
         self.return_object(test_environment_info)
@@ -100,12 +95,12 @@ class AbstractSpawnTestEnvironment(
     def _attempt_database_start(
         self,
     ) -> Generator[
-        Union[
-            PrepareDockerNetworkForTestEnvironment,
-            CreateSSLCertificatesTask,
-            WaitForTestDockerDatabase,
-            WaitForTestExternalDatabase,
-        ],
+        (
+            PrepareDockerNetworkForTestEnvironment |
+            CreateSSLCertificatesTask |
+            WaitForTestDockerDatabase |
+            WaitForTestExternalDatabase
+        ),
         None,
         EnvironmentInfo,
     ]:
@@ -181,7 +176,7 @@ class AbstractSpawnTestEnvironment(
                 json,
             )
 
-    def _default_bridge_ip_address(self, test_environment_info) -> Optional[str]:
+    def _default_bridge_ip_address(self, test_environment_info) -> str | None:
         if test_environment_info.database_info.container_info is not None:
             container_name = (
                 test_environment_info.database_info.container_info.container_name
@@ -198,14 +193,14 @@ class AbstractSpawnTestEnvironment(
         )
 
     def _start_database(self, attempt) -> Generator[
-        Union[
-            PrepareDockerNetworkForTestEnvironment,
-            CreateSSLCertificatesTask,
-            WaitForTestDockerDatabase,
-            WaitForTestExternalDatabase,
-        ],
+        (
+            PrepareDockerNetworkForTestEnvironment |
+            CreateSSLCertificatesTask |
+            WaitForTestDockerDatabase |
+            WaitForTestExternalDatabase
+        ),
         None,
-        tuple[DockerNetworkInfo, DatabaseInfo, bool, Optional[ContainerInfo]],
+        tuple[DockerNetworkInfo, DatabaseInfo, bool, ContainerInfo | None],
     ]:
         network_info = yield from self._create_network(attempt)
         ssl_volume_info = None
@@ -221,11 +216,11 @@ class AbstractSpawnTestEnvironment(
 
     def _create_ssl_certificates(
         self,
-    ) -> Generator[CreateSSLCertificatesTask, None, Optional[DockerVolumeInfo]]:
+    ) -> Generator[CreateSSLCertificatesTask, None, DockerVolumeInfo | None]:
         ssl_volume_info_future = yield from self.run_dependencies(
             self.create_ssl_certificates()
         )
-        ssl_volume_info: Optional[DockerVolumeInfo] = self.get_values_from_future(
+        ssl_volume_info: DockerVolumeInfo | None = self.get_values_from_future(
             ssl_volume_info_future
         )
         return ssl_volume_info
@@ -250,9 +245,9 @@ class AbstractSpawnTestEnvironment(
     def _spawn_database_and_test_container(
         self,
         network_info: DockerNetworkInfo,
-        certificate_volume_info: Optional[DockerVolumeInfo],
+        certificate_volume_info: DockerVolumeInfo | None,
         attempt: int,
-    ) -> Generator[BaseTaskType, None, tuple[DatabaseInfo, Optional[ContainerInfo]]]:
+    ) -> Generator[BaseTaskType, None, tuple[DatabaseInfo, ContainerInfo | None]]:
         def volume_name(info):
             return None if info is None else info.volume_name
 
@@ -273,13 +268,13 @@ class AbstractSpawnTestEnvironment(
         futures = yield from self.run_dependencies(child_tasks)
         results = self.get_values_from_futures(futures)
         database_info: DatabaseInfo = results[DATABASE]  # type: ignore
-        test_container_info: Optional[ContainerInfo] = results[TEST_CONTAINER] if self.test_container_content is not None else None  # type: ignore
+        test_container_info: ContainerInfo | None = results[TEST_CONTAINER] if self.test_container_content is not None else None  # type: ignore
         return database_info, test_container_info
 
     def create_spawn_database_task(
         self,
         network_info: DockerNetworkInfo,
-        certificate_volume_info: Optional[DockerVolumeInfo],
+        certificate_volume_info: DockerVolumeInfo | None,
         attempt: int,
     ):
         raise AbstractMethodException()
@@ -303,7 +298,7 @@ class AbstractSpawnTestEnvironment(
     def _wait_for_database(
         self, database_info: DatabaseInfo, attempt: int
     ) -> Generator[
-        Union[WaitForTestDockerDatabase, WaitForTestExternalDatabase], None, bool
+        WaitForTestDockerDatabase | WaitForTestExternalDatabase, None, bool
     ]:
         database_ready_target_future = yield from self.run_dependencies(
             self.create_wait_for_database_task(attempt, database_info)
@@ -315,5 +310,5 @@ class AbstractSpawnTestEnvironment(
 
     def create_wait_for_database_task(
         self, attempt: int, database_info: DatabaseInfo
-    ) -> Union[WaitForTestDockerDatabase, WaitForTestExternalDatabase]:
+    ) -> WaitForTestDockerDatabase | WaitForTestExternalDatabase:
         raise AbstractMethodException()

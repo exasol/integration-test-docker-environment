@@ -1,7 +1,4 @@
 import os
-from collections.abc import Generator
-from contextlib import contextmanager
-from unittest import mock
 from unittest.mock import patch
 
 import pytest

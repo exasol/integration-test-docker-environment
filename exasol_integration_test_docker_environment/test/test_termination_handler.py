@@ -4,7 +4,6 @@ import sys
 import unittest
 from importlib import reload
 from multiprocessing import Queue
-from typing import List
 
 import exasol_integration_test_docker_environment.cli.termination_handler
 

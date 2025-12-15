@@ -6,7 +6,6 @@ from collections.abc import (
 from typing import (
     Any,
     ContextManager,
-    Optional,
     Protocol,
 )
 
@@ -41,8 +40,8 @@ def build_api_isolation(request) -> Iterator[ApiTestEnvironment]:
 class ApiContextProvider(Protocol):
     def __call__(
         self,
-        name: Optional[str],
-        additional_parameters: Optional[dict[str, Any]] = None,
+        name: str | None,
+        additional_parameters: dict[str, Any] | None = None,
     ) -> ContextManager[ExaslctDockerTestEnvironment]: ...
 
 
@@ -56,8 +55,8 @@ def build_api_context_provider(
 
     @contextlib.contextmanager
     def create_context(
-        name: Optional[str] = None,
-        additional_parameters: Optional[dict[str, Any]] = None,
+        name: str | None = None,
+        additional_parameters: dict[str, Any] | None = None,
     ) -> Generator[ExaslctDockerTestEnvironment, None, None]:
         name = name if name else test_environment.name
         spawned = test_environment.spawn_docker_test_environment(
@@ -73,9 +72,9 @@ def build_api_context_provider(
 class ApiContextProviderWithTestContainer(Protocol):
     def __call__(
         self,
-        name: Optional[str],
-        additional_parameters: Optional[dict[str, Any]] = None,
-        test_container_content: Optional[TestContainerContentDescription] = None,
+        name: str | None,
+        additional_parameters: dict[str, Any] | None = None,
+        test_container_content: TestContainerContentDescription | None = None,
     ) -> ContextManager[ExaslctDockerTestEnvironment]: ...
 
 
@@ -91,8 +90,8 @@ def build_api_context_provider_with_test_container(
 
     @contextlib.contextmanager
     def create_context(
-        name: Optional[str] = None,
-        additional_parameters: Optional[dict[str, Any]] = None,
+        name: str | None = None,
+        additional_parameters: dict[str, Any] | None = None,
         test_container_content=default_test_container_content,
     ) -> Generator[ExaslctDockerTestEnvironment, None, None]:
         name = name if name else test_environment.name

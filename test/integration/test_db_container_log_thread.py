@@ -2,9 +2,6 @@ import logging
 import tempfile
 import time
 from pathlib import Path
-from typing import (
-    Optional,
-)
 
 import pytest
 
@@ -29,7 +26,7 @@ def _build_docker_command(logs: list[str]):
     return ["bash", "-c", bash_command]
 
 
-def _run_container_log_thread(logger, logs: list[str]) -> Optional[str]:
+def _run_container_log_thread(logger, logs: list[str]) -> str | None:
     """
     Starts a dummy docker container which prints logs in an endless loop, and calls DBContainerLogThread on that container.
 
