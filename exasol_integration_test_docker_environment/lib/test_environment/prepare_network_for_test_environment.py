@@ -1,4 +1,3 @@
-from typing import Optional
 
 import docker
 import luigi
@@ -15,7 +14,7 @@ class PrepareDockerNetworkForTestEnvironment(DockerBaseTask):
     environment_name: str = luigi.Parameter()
     network_name: str = luigi.Parameter()
     test_container_name: str = luigi.Parameter(significant=False)
-    db_container_name: Optional[str] = luigi.OptionalParameter(
+    db_container_name: str | None = luigi.OptionalParameter(
         default=None, significant=False
     )
     reuse: bool = luigi.BoolParameter(default=False, significant=False)

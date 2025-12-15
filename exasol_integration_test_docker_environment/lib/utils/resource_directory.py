@@ -2,7 +2,6 @@ import logging
 import tempfile
 from pathlib import Path
 from types import ModuleType
-from typing import Optional
 
 import importlib_resources as ir
 
@@ -64,7 +63,7 @@ class ResourceDirectory:
         # We need to transform the module to a string and later back to a module
         # because this class will be pickled by luigi and modules are not supported for serialization
         self._resource_package_str = resource_package.__name__
-        self._tmp_directory: Optional[tempfile.TemporaryDirectory] = None
+        self._tmp_directory: tempfile.TemporaryDirectory | None = None
 
     @property
     def tmp_directory(self):

@@ -1,11 +1,7 @@
-import logging
 import socket
 import warnings
 from collections.abc import Generator
 from contextlib import ExitStack
-from typing import (
-    Optional,
-)
 
 
 def find_free_ports(num_ports: int) -> list[int]:
@@ -61,10 +57,10 @@ class PortsType(type):
 class Ports(metaclass=PortsType):
     def __init__(
         self,
-        database: Optional[int],
-        bucketfs: Optional[int],
-        ssh: Optional[int] = None,
-        bucketfs_https: Optional[int] = None,
+        database: int | None,
+        bucketfs: int | None,
+        ssh: int | None = None,
+        bucketfs_https: int | None = None,
     ) -> None:
         if database is None:
             self._database: int = Ports.default_ports.database
@@ -133,11 +129,11 @@ class Ports(metaclass=PortsType):
         self._database = value
 
     @property
-    def ssh(self) -> Optional[int]:
+    def ssh(self) -> int | None:
         return self._ssh
 
     @ssh.setter
-    def ssh(self, value: Optional[int]) -> None:
+    def ssh(self, value: int | None) -> None:
         warnings.warn(
             f"Setting values of class Ports after instantiation is deprecated.",
             DeprecationWarning,
