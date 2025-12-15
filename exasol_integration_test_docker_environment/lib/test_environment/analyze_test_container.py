@@ -39,13 +39,13 @@ class AnalyzeTestContainer(DockerAnalyzeImageTask, TestContainerParameter):
         if source_docker_repository_config().tag_prefix != "":
             return f"{source_docker_repository_config().tag_prefix}_db-test-container"
         else:
-            return f"db-test-container"
+            return "db-test-container"
 
     def get_target_image_tag(self):
         if target_docker_repository_config().tag_prefix != "":
             return f"{target_docker_repository_config().tag_prefix}_db-test-container"
         else:
-            return f"db-test-container"
+            return "db-test-container"
 
     def get_mapping_of_build_files_and_directories(self):
         return {
