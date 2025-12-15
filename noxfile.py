@@ -1,15 +1,10 @@
 import argparse
 import json
-import os
 import re
 import shutil
 from argparse import ArgumentParser
 from enum import Enum
 from pathlib import Path
-from typing import (
-    List,
-    Optional,
-)
 
 import nox
 import PyInstaller.__main__

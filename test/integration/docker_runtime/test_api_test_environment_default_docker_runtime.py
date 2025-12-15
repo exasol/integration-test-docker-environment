@@ -1,6 +1,5 @@
 from test.integration.docker_runtime.common import (
     assert_container_runtime,
-    default_docker_runtime,
 )
 
 

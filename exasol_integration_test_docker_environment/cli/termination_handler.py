@@ -1,7 +1,6 @@
 import sys
 from datetime import datetime
 from traceback import print_tb
-from typing import Optional
 
 from exasol_integration_test_docker_environment.lib.models.api_errors import (
     TaskRuntimeError,
@@ -19,7 +18,7 @@ class TerminationHandler:
     """
 
     def __init__(self) -> None:
-        self._start_time: Optional[datetime] = None
+        self._start_time: datetime | None = None
 
     def __enter__(self) -> None:
         self._start_time = datetime.now()

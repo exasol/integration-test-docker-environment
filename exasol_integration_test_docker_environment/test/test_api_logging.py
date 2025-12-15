@@ -9,8 +9,6 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import (
     Any,
-    Dict,
-    Optional,
 )
 
 from exasol_integration_test_docker_environment.lib.base.run_task import (
@@ -106,7 +104,7 @@ class APIClientLoggingTest(unittest.TestCase):
 
     @ignore_resource_warning()
     def dummy_api_command(
-        self, log_level: Optional[str], use_job_specific_log_file: bool
+        self, log_level: str | None, use_job_specific_log_file: bool
     ):
         set_build_config(
             False,

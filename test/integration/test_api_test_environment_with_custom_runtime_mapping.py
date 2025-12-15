@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Optional
 
 import pytest
 
@@ -44,7 +43,7 @@ def _assert_deployment_not_shared(environment_info: EnvironmentInfo, temp_path: 
 
 @pytest.fixture
 def make_test_mapping(tmp_path):
-    def make(deployment_target: Optional[str] = None):
+    def make(deployment_target: str | None = None):
         with open(tmp_path / "test.txt", "w") as f:
             f.write("test")
         return TestContainerRuntimeMapping(
