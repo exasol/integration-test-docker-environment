@@ -265,7 +265,9 @@ def build_standalone_binary(session: nox.Session):
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     p.add_argument("--executable-name")
+    p.add_argument("--cleanup", action="store_true", help="Remove temporary files")
     args = p.parse_args(session.posargs)
+
     exe_name = getattr(args, "executable_name")
 
     if bool(exe_name):
@@ -275,11 +277,24 @@ def build_standalone_binary(session: nox.Session):
             f"--name={exe_name}",  # Name of the executable
             "--collect-datas=exasol_integration_test_docker_environment.templates",
             "--collect-datas=exasol_integration_test_docker_environment.docker_db_config",
+            "--collect-datas=exasol_integration_test_docker_environment.certificate_resources",
         ]
         PyInstaller.__main__.run(options)
         print(f"PyInstaller completed building {exe_name}")
     else:
         print("PyInstaller needs a valid executable-name")
+
+    if args.cleanup:
+        spec_file_path = Path() / f"{exe_name}.spec"
+        if spec_file_path.exists():
+            spec_file_path.unlink()
+        else:
+            session.warn(f"Expected spec file '{spec_file_path}' doesn't exist")
+        build_path = ROOT / "build" / exe_name
+        if build_path.exists():
+            shutil.rmtree(str(build_path))
+        else:
+            session.warn(f"Expected temporary build path '{build_path}' doesn't exist")
 
 
 @nox.session(name="execute-itde", python=False)
