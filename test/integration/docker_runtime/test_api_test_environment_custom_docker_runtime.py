@@ -1,6 +1,5 @@
-from test.integration.docker_runtime.common import (
-    assert_container_runtime,
-)
+from test.integration.docker_runtime.common import default_docker_runtime  # noqa: F401
+from test.integration.docker_runtime.common import assert_container_runtime
 
 import pytest
 
