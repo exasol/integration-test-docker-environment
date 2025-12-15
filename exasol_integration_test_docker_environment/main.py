@@ -6,10 +6,10 @@ from exasol_integration_test_docker_environment.cli.cli import cli
 def main():
     # required so the cli will print the available subcommands
     from exasol_integration_test_docker_environment.cli.commands import (
-        environment,
-        health,
-        spawn_test_environment,
-    ) # noqa: F401
+        environment, # noqa: F401
+        health, # noqa: F401
+        spawn_test_environment, # noqa: F401
+    )
 
     cli()
 
