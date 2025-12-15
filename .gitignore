@@ -23,6 +23,7 @@ downloads/
 eggs/
 .eggs/
 lib/
+!/exasol_integration_test_docker_environment/lib/
 lib64/
 parts/
 sdist/
