@@ -106,7 +106,7 @@ max-module-lines = 800
 
 [tool.sonar]
 projectKey = "com.exasol:integration-test-docker-environment"
-hostUrl = "https://sonarcloud.io"
+host.url = "https://sonarcloud.io"
 organization = "exasol"
 
 [tool.pytest.ini_options]
