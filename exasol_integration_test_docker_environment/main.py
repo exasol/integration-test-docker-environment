@@ -7,11 +7,7 @@ def main():
     # required so the cli will print the available subcommands
     from exasol_integration_test_docker_environment.cli.commands import (  # noqa: F401
         environment,
-    )
-    from exasol_integration_test_docker_environment.cli.commands import (  # noqa: F401
         health,
-    )
-    from exasol_integration_test_docker_environment.cli.commands import (  # noqa: F401
         spawn_test_environment,
     )
 
