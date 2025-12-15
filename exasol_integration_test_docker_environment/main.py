@@ -9,7 +9,7 @@ def main():
         environment,
         health,
         spawn_test_environment,
-    )
+    ) # noqa: F401
 
     cli()
 
