@@ -7,9 +7,6 @@ import subprocess
 import tempfile
 from pathlib import Path
 from sys import stderr
-from typing import (
-    Optional,
-)
 
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.lib.docker.container.utils import (
@@ -66,7 +63,7 @@ class ExaslctTestEnvironment:
         test_object: object,
         executable: str = "./exaslct",
         clean_images_at_close: bool = True,
-        name: Optional[str] = None,
+        name: str | None = None,
     ) -> None:
         self.clean_images_at_close = clean_images_at_close
         self.executable = executable
@@ -164,7 +161,7 @@ class ExaslctTestEnvironment:
             print(e, file=stderr)
 
     def spawn_docker_test_environments(
-        self, name: str, additional_parameter: Optional[list[str]] = None
+        self, name: str, additional_parameter: list[str] | None = None
     ) -> SpawnedTestEnvironments:
         ports = Ports.random_free()
         on_host_parameter = ExaslctDockerTestEnvironment(

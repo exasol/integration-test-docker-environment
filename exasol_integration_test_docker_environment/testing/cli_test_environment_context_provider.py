@@ -1,7 +1,7 @@
 import contextlib
+from collections.abc import Callable
 from collections.abc import Iterator
 from typing import (
-    Callable,
     ContextManager,
     Optional,
 )
@@ -23,7 +23,7 @@ CliContextProvider: TypeAlias = Callable[
 
 @contextlib.contextmanager
 def build_cli_isolation(
-    env_name, executable: str = "itde"
+        env_name, executable: str = "itde"
 ) -> Iterator[ExaslctTestEnvironment]:
     """
     Builds an ExaslctTestEnvironment instance with a proper name based on the pytest request fixture.
@@ -40,7 +40,7 @@ def build_cli_isolation(
 
 
 def build_cli_context_provider(
-    test_environment: ExaslctTestEnvironment,
+        test_environment: ExaslctTestEnvironment,
 ) -> CliContextProvider:
     """
     Returns a context provider function which can be used to spawn a Docker DB with custom name
@@ -50,8 +50,8 @@ def build_cli_context_provider(
 
     @contextlib.contextmanager
     def create_context(
-        name: Optional[str] = None,
-        additional_parameters: Optional[list[str]] = None,
+            name: str | None = None,
+            additional_parameters: list[str] | None = None,
     ) -> Iterator[SpawnedTestEnvironments]:
         name = name if name else test_environment.name
         spawned = test_environment.spawn_docker_test_environments(

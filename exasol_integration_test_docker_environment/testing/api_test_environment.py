@@ -3,7 +3,6 @@ import tempfile
 from sys import stderr
 from typing import (
     Any,
-    Optional,
 )
 
 from exasol_integration_test_docker_environment.lib.api import (
@@ -65,7 +64,7 @@ class ApiTestEnvironment:
         self,
         name: str,
         test_container_content: TestContainerContentDescription,
-        additional_parameter: Optional[dict[str, Any]] = None,
+        additional_parameter: dict[str, Any] | None = None,
     ) -> ExaslctDockerTestEnvironment:
         if additional_parameter is None:
             additional_parameter = {}
@@ -90,7 +89,7 @@ class ApiTestEnvironment:
     def spawn_docker_test_environment(
         self,
         name: str,
-        additional_parameter: Optional[dict[str, Any]] = None,
+        additional_parameter: dict[str, Any] | None = None,
     ) -> ExaslctDockerTestEnvironment:
         if additional_parameter is None:
             additional_parameter = {}

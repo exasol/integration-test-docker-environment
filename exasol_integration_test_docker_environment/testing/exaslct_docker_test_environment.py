@@ -2,7 +2,6 @@ import contextlib
 import ssl
 import subprocess
 from collections.abc import Iterator
-from typing import Optional
 
 import pyexasol
 from pyexasol import ExaConnection
@@ -29,8 +28,8 @@ class ExaslctDockerTestEnvironment:
         bucketfs_username: str,
         bucketfs_password: str,
         ports: Ports,
-        environment_info: Optional[EnvironmentInfo] = None,
-        completed_process: Optional[subprocess.CompletedProcess] = None,
+        environment_info: EnvironmentInfo | None = None,
+        completed_process: subprocess.CompletedProcess | None = None,
     ) -> None:
         self.db_password = db_password
         self.db_username = db_username
