@@ -1,6 +1,3 @@
-from typing import (
-    Optional,
-)
 
 from exasol_integration_test_docker_environment.lib.models.data.environment_info import (
     EnvironmentInfo,
@@ -18,7 +15,7 @@ class ShellVariables:
     @classmethod
     def from_test_environment_info(
         cls,
-        default_bridge_ip_address: Optional[str],
+        default_bridge_ip_address: str | None,
         test_environment_info: EnvironmentInfo,
     ) -> "ShellVariables":
         """

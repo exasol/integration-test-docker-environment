@@ -1,7 +1,4 @@
 from pathlib import Path
-from typing import (
-    Optional,
-)
 
 from exasol_integration_test_docker_environment.lib.base.info import Info
 
@@ -27,7 +24,7 @@ class TestContainerRuntimeMapping(Info):
     """
 
     def __init__(
-        self, source: Path, target: str, deployment_target: Optional[str] = None
+        self, source: Path, target: str, deployment_target: str | None = None
     ) -> None:
         self.source = source
         self.target = target
@@ -42,7 +39,7 @@ class TestContainerContentDescription(Info):
 
     def __init__(
         self,
-        docker_file: Optional[str],
+        docker_file: str | None,
         build_files_and_directories: list[TestContainerBuildMapping],
         runtime_mappings: list[TestContainerRuntimeMapping],
     ) -> None:

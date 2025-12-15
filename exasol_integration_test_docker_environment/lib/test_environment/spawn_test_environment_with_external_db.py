@@ -1,4 +1,3 @@
-from typing import Optional
 
 from exasol_integration_test_docker_environment.lib.models.data.database_info import (
     DatabaseInfo,
@@ -53,7 +52,7 @@ class SpawnTestEnvironmentWithExternalDB(
     def create_spawn_database_task(
         self,
         network_info: DockerNetworkInfo,
-        certificate_volume_info: Optional[DockerVolumeInfo],
+        certificate_volume_info: DockerVolumeInfo | None,
         attempt: int,
     ):
         if certificate_volume_info is not None:

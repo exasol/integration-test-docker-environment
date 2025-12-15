@@ -1,4 +1,3 @@
-from typing import Optional
 
 from exasol_integration_test_docker_environment.lib.base.db_os_executor import (
     DbOsExecFactory,
@@ -96,7 +95,7 @@ class SpawnTestEnvironmentWithDockerDB(
     def create_spawn_database_task(
         self,
         network_info: DockerNetworkInfo,
-        certificate_volume_info: Optional[DockerVolumeInfo],
+        certificate_volume_info: DockerVolumeInfo | None,
         attempt: int,
     ):
         def volume_name(info):

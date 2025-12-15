@@ -1,8 +1,4 @@
 from pathlib import Path
-from typing import (
-    Optional,
-    Union,
-)
 
 import importlib_resources
 import luigi
@@ -53,10 +49,10 @@ class SpawnTestContainer(DockerBaseTask, TestContainerParameter):
     no_test_container_cleanup_after_failure: bool = luigi.BoolParameter(
         default=False, significant=False
     )
-    docker_runtime: Optional[str] = luigi.OptionalParameter(
+    docker_runtime: str | None = luigi.OptionalParameter(
         default=None, significant=False
     )
-    certificate_volume_name: Optional[str] = luigi.OptionalParameter(
+    certificate_volume_name: str | None = luigi.OptionalParameter(
         default=None, significant=False
     )
 
@@ -139,7 +135,7 @@ class SpawnTestContainer(DockerBaseTask, TestContainerParameter):
 
     def _try_to_reuse_test_container(
         self, ip_address: str, network_info: DockerNetworkInfo
-    ) -> Optional[ContainerInfo]:
+    ) -> ContainerInfo | None:
         self.logger.info("Try to reuse test container %s", self.test_container_name)
         container_info = None
         try:
@@ -165,7 +161,7 @@ class SpawnTestContainer(DockerBaseTask, TestContainerParameter):
             self.test_container_image_future
         )["test-container"]
 
-        volumes: dict[Union[str, Path], dict[str, str]] = {}
+        volumes: dict[str | Path, dict[str, str]] = {}
         for runtime_mapping in self.test_container_content.runtime_mappings:
             volumes[runtime_mapping.source.absolute()] = {
                 "bind": runtime_mapping.target,

@@ -4,9 +4,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import (
     Any,
-    Callable,
-    Optional,
 )
+from collections.abc import Callable
 
 import luigi
 import networkx
@@ -45,8 +44,8 @@ def generate_root_task(task_class, *args, **kwargs) -> DependencyLoggerBaseTask:
 def run_task(
     task_creator: Callable[[], DependencyLoggerBaseTask],
     workers: int = 2,
-    task_dependencies_dot_file: Optional[str] = None,
-    log_level: Optional[str] = None,
+    task_dependencies_dot_file: str | None = None,
+    log_level: str | None = None,
     use_job_specific_log_file: bool = False,
 ) -> Any:
     setup_worker()
@@ -75,7 +74,7 @@ def run_task(
 def _run_task_with_logging_config(
     task: DependencyLoggerBaseTask,
     log_file_path: Path,
-    log_level: Optional[str],
+    log_level: str | None,
     use_job_specific_log_file: bool,
     workers: int,
 ) -> bool:
@@ -92,7 +91,7 @@ def _handle_task_result(
     no_scheduling_errors: bool,
     success: bool,
     task: DependencyLoggerBaseTask,
-    task_dependencies_dot_file: Optional[str],
+    task_dependencies_dot_file: str | None,
 ) -> Any:
     generate_graph_from_task_dependencies(task, task_dependencies_dot_file)
     if success:
@@ -111,7 +110,7 @@ def _handle_task_result(
 
 
 def generate_graph_from_task_dependencies(
-    task: DependencyLoggerBaseTask, task_dependencies_dot_file: Optional[str]
+    task: DependencyLoggerBaseTask, task_dependencies_dot_file: str | None
 ):
     if task_dependencies_dot_file is not None:
         print(f"Generate Task Dependency Graph to {task_dependencies_dot_file}")
