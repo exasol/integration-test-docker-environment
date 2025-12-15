@@ -2,13 +2,15 @@ import contextlib
 import logging
 import os
 import tempfile
-from collections.abc import Generator
+from collections.abc import (
+    Callable,
+    Generator,
+)
 from dataclasses import dataclass
 from pathlib import Path
 from typing import (
     Any,
 )
-from collections.abc import Callable
 
 import jinja2
 

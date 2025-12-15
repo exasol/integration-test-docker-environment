@@ -1,8 +1,8 @@
 import math
 import time
+from collections.abc import Callable
 from pathlib import Path
 from threading import Thread
-from collections.abc import Callable
 
 from docker.models.containers import Container
 

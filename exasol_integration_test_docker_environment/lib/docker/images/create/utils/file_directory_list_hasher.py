@@ -1,14 +1,14 @@
 import hashlib
 import os
 import stat
+from collections.abc import (
+    Callable,
+)
 from dataclasses import dataclass
 from multiprocessing import Pool
 from pathlib import (
     Path,
     PurePath,
-)
-from collections.abc import (
-    Callable,
 )
 
 import humanfriendly

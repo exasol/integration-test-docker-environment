@@ -43,9 +43,7 @@ class DockerCreateImageTask(DockerBaseTask):
 
     def run_task(
         self,
-    ) -> Iterator[
-        DockerBuildImageTask | DockerLoadImageTask | DockerPullImageTask
-    ]:
+    ) -> Iterator[DockerBuildImageTask | DockerLoadImageTask | DockerPullImageTask]:
         new_image_info = yield from self.build(self.image_info)
         self.return_object(new_image_info)
 
@@ -123,9 +121,7 @@ class DockerCreateImageTaskWithDeps(DockerCreateImageTask):
 
     def run_task(
         self,
-    ) -> Iterator[
-        DockerBuildImageTask | DockerLoadImageTask | DockerPullImageTask
-    ]:
+    ) -> Iterator[DockerBuildImageTask | DockerLoadImageTask | DockerPullImageTask]:
         image_infos = self.get_values_from_futures(self.futures)
         image_info = copy.copy(self.image_info)
         image_info.depends_on_images = image_infos

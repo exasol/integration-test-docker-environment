@@ -83,10 +83,10 @@ class AbstractSpawnTestEnvironment(
         self,
     ) -> Iterator[
         (
-            PrepareDockerNetworkForTestEnvironment |
-            CreateSSLCertificatesTask |
-            WaitForTestDockerDatabase |
-            WaitForTestExternalDatabase
+            PrepareDockerNetworkForTestEnvironment
+            | CreateSSLCertificatesTask
+            | WaitForTestDockerDatabase
+            | WaitForTestExternalDatabase
         )
     ]:
         test_environment_info = yield from self._attempt_database_start()
@@ -96,10 +96,10 @@ class AbstractSpawnTestEnvironment(
         self,
     ) -> Generator[
         (
-            PrepareDockerNetworkForTestEnvironment |
-            CreateSSLCertificatesTask |
-            WaitForTestDockerDatabase |
-            WaitForTestExternalDatabase
+            PrepareDockerNetworkForTestEnvironment
+            | CreateSSLCertificatesTask
+            | WaitForTestDockerDatabase
+            | WaitForTestExternalDatabase
         ),
         None,
         EnvironmentInfo,
@@ -194,10 +194,10 @@ class AbstractSpawnTestEnvironment(
 
     def _start_database(self, attempt) -> Generator[
         (
-            PrepareDockerNetworkForTestEnvironment |
-            CreateSSLCertificatesTask |
-            WaitForTestDockerDatabase |
-            WaitForTestExternalDatabase
+            PrepareDockerNetworkForTestEnvironment
+            | CreateSSLCertificatesTask
+            | WaitForTestDockerDatabase
+            | WaitForTestExternalDatabase
         ),
         None,
         tuple[DockerNetworkInfo, DatabaseInfo, bool, ContainerInfo | None],
@@ -297,9 +297,7 @@ class AbstractSpawnTestEnvironment(
 
     def _wait_for_database(
         self, database_info: DatabaseInfo, attempt: int
-    ) -> Generator[
-        WaitForTestDockerDatabase | WaitForTestExternalDatabase, None, bool
-    ]:
+    ) -> Generator[WaitForTestDockerDatabase | WaitForTestExternalDatabase, None, bool]:
         database_ready_target_future = yield from self.run_dependencies(
             self.create_wait_for_database_task(attempt, database_info)
         )

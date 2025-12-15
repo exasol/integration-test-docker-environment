@@ -103,9 +103,7 @@ class APIClientLoggingTest(unittest.TestCase):
         unittest.util._MAX_LENGTH = self.old_max_length
 
     @ignore_resource_warning()
-    def dummy_api_command(
-        self, log_level: str | None, use_job_specific_log_file: bool
-    ):
+    def dummy_api_command(self, log_level: str | None, use_job_specific_log_file: bool):
         set_build_config(
             False,
             (),

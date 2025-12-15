@@ -163,9 +163,7 @@ class APISpawnTestEnvironmentTestWithCustomRuntimeMapping(unittest.TestCase):
             local_path = temp_path / "test_new.txt"
             self.assertFalse(local_path.exists())
 
-    def _get_test_mapping(
-        self, temp_path: Path, deployment_target: str | None = None
-    ):
+    def _get_test_mapping(self, temp_path: Path, deployment_target: str | None = None):
         with open(temp_path / "test.txt", "w") as f:
             f.write("test")
         return TestContainerRuntimeMapping(
