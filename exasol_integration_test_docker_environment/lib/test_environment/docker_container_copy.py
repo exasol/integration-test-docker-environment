@@ -1,7 +1,6 @@
 import io
 import tarfile
 import time
-from typing import Optional
 
 from docker.models.containers import Container
 
@@ -11,8 +10,8 @@ class DockerContainerCopy:
     def __init__(self, container: Container) -> None:
         super().__init__()
         self.open = True
-        self.file_like_object: Optional[io.BytesIO] = io.BytesIO()
-        self.tar: Optional[tarfile.TarFile] = tarfile.open(
+        self.file_like_object: io.BytesIO | None = io.BytesIO()
+        self.tar: tarfile.TarFile | None = tarfile.open(
             fileobj=self.file_like_object, mode="x"
         )
         self.container = container

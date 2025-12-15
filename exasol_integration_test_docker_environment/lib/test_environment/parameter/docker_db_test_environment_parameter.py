@@ -2,9 +2,6 @@ from enum import (
     Enum,
     auto,
 )
-from typing import (
-    Optional,
-)
 
 import luigi
 from luigi import Config
@@ -28,8 +25,8 @@ class DbOsAccess(Enum):
 
 
 class DockerDBTestEnvironmentParameter(Config):
-    docker_db_image_name: Optional[str] = luigi.OptionalParameter(default=None)
-    docker_db_image_version: Optional[str] = luigi.OptionalParameter(default=None)
+    docker_db_image_name: str | None = luigi.OptionalParameter(default=None)
+    docker_db_image_version: str | None = luigi.OptionalParameter(default=None)
     reuse_database: bool = luigi.BoolParameter(default=False, significant=False)
     db_os_access = luigi.EnumParameter(
         default=DbOsAccess.DOCKER_EXEC, enum=DbOsAccess, significant=False
@@ -40,25 +37,25 @@ class DockerDBTestEnvironmentParameter(Config):
     no_database_cleanup_after_failure: bool = luigi.BoolParameter(
         default=False, significant=False
     )
-    database_port_forward: Optional[str] = luigi.OptionalParameter(
+    database_port_forward: str | None = luigi.OptionalParameter(
         default=None, significant=False
     )
-    bucketfs_port_forward: Optional[str] = luigi.OptionalParameter(
+    bucketfs_port_forward: str | None = luigi.OptionalParameter(
         default=None, significant=False
     )
-    bucketfs_http_port_forward: Optional[str] = luigi.OptionalParameter(
+    bucketfs_http_port_forward: str | None = luigi.OptionalParameter(
         default=None, significant=False
     )
-    bucketfs_https_port_forward: Optional[str] = luigi.OptionalParameter(
+    bucketfs_https_port_forward: str | None = luigi.OptionalParameter(
         default=None, significant=False
     )
-    ssh_port_forward: Optional[str] = luigi.OptionalParameter(
+    ssh_port_forward: str | None = luigi.OptionalParameter(
         default=None, significant=False
     )
-    mem_size: Optional[str] = luigi.OptionalParameter(
+    mem_size: str | None = luigi.OptionalParameter(
         default="2 GiB", significant=False
     )
-    disk_size: Optional[str] = luigi.OptionalParameter(
+    disk_size: str | None = luigi.OptionalParameter(
         default="2 GiB", significant=False
     )
     nameservers: list[str] = luigi.ListParameter(default=[], significant=False)

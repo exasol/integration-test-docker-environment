@@ -4,9 +4,6 @@ from collections.abc import (
     Generator,
     Iterator,
 )
-from typing import (
-    Union,
-)
 
 import luigi
 
@@ -47,13 +44,13 @@ class DockerCreateImageTask(DockerBaseTask):
     def run_task(
         self,
     ) -> Iterator[
-        Union[DockerBuildImageTask, DockerLoadImageTask, DockerPullImageTask]
+        DockerBuildImageTask | DockerLoadImageTask | DockerPullImageTask
     ]:
         new_image_info = yield from self.build(self.image_info)
         self.return_object(new_image_info)
 
     def build(self, image_info: ImageInfo) -> Generator[
-        Union[DockerBuildImageTask, DockerLoadImageTask, DockerPullImageTask],
+        DockerBuildImageTask | DockerLoadImageTask | DockerPullImageTask,
         None,
         ImageInfo,
     ]:
@@ -127,7 +124,7 @@ class DockerCreateImageTaskWithDeps(DockerCreateImageTask):
     def run_task(
         self,
     ) -> Iterator[
-        Union[DockerBuildImageTask, DockerLoadImageTask, DockerPullImageTask]
+        DockerBuildImageTask | DockerLoadImageTask | DockerPullImageTask
     ]:
         image_infos = self.get_values_from_futures(self.futures)
         image_info = copy.copy(self.image_info)

@@ -7,9 +7,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import (
     Any,
-    Callable,
-    Optional,
 )
+from collections.abc import Callable
 
 import jinja2
 
@@ -79,7 +78,7 @@ def restore_logger(logger_creator: Callable[[], logging.Logger]):
 def get_luigi_log_config(
     log_file_target: Path,
     use_job_specific_log_file: bool,
-    log_level: Optional[str] = None,
+    log_level: str | None = None,
 ) -> Generator[Path, None, None]:
     """
     Yields a context manager containing the path of the log-config file.

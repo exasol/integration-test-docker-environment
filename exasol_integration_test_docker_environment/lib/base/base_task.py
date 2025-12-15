@@ -7,7 +7,6 @@ from pathlib import Path
 from typing import (
     Any,
     TypeVar,
-    Union,
 )
 
 import luigi
@@ -192,7 +191,7 @@ class BaseTask(Task):
     def _get_output_path_for_job(self) -> Path:
         return Path(build_config().output_directory, "jobs", self.job_id)
 
-    def _extend_output_path(self) -> Union[tuple[str, ...], str]:
+    def _extend_output_path(self) -> tuple[str, ...] | str:
         extension = self.extend_output_path()
         if extension is None or extension == ():
             return self.task_id
@@ -320,8 +319,8 @@ class BaseTask(Task):
             self._run_dependencies_tasks.append(tasks)
 
     def _generate_run_task_futures(
-        self, completion_targets: Union[Any]
-    ) -> Union[list[Any], dict[Any, Any], RunTaskFuture, Any]:
+        self, completion_targets: Any
+    ) -> list[Any] | dict[Any, Any] | RunTaskFuture | Any:
         if isinstance(completion_targets, dict):
             return {
                 key: self._generate_run_task_futures(task)

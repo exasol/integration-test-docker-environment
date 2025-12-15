@@ -5,7 +5,6 @@ from enum import (
 )
 from typing import (
     Any,
-    Optional,
 )
 
 from exasol_integration_test_docker_environment.lib.base.info import Info
@@ -58,11 +57,11 @@ class ImageInfo(Info):
         target_tag: str,
         hash_value: str,
         commit: str,
-        image_description: Optional[ImageDescription],
+        image_description: ImageDescription | None,
         build_name: str = "",
         build_date_time: datetime = datetime.utcnow(),
-        image_state: Optional[ImageState] = ImageState.NOT_EXISTING,
-        depends_on_images: Optional[dict[str, "ImageInfo"]] = None,
+        image_state: ImageState | None = ImageState.NOT_EXISTING,
+        depends_on_images: dict[str, "ImageInfo"] | None = None,
     ) -> None:
         self.build_name = build_name
         self.date_time = str(build_date_time)
@@ -70,7 +69,7 @@ class ImageInfo(Info):
         self.target_repository_name = target_repository_name
         self.source_repository_name = source_repository_name
         self.image_description = image_description
-        self.image_state: Optional[str] = None
+        self.image_state: str | None = None
         if isinstance(image_state, ImageState):
             self.image_state = image_state.name
         elif isinstance(image_state, str):

@@ -1,4 +1,3 @@
-from typing import Optional
 
 from exasol_integration_test_docker_environment.lib.base.info import Info
 from exasol_integration_test_docker_environment.lib.models.data.container_info import (
@@ -14,9 +13,9 @@ class DatabaseInfo(Info):
         host: str,
         ports: Ports,
         reused: bool,
-        container_info: Optional[ContainerInfo] = None,
-        ssh_info: Optional[SshInfo] = None,
-        forwarded_ports: Optional[Ports] = None,
+        container_info: ContainerInfo | None = None,
+        ssh_info: SshInfo | None = None,
+        forwarded_ports: Ports | None = None,
     ) -> None:
         self.container_info = container_info
         self.ports = ports

@@ -1,8 +1,5 @@
 import getpass
 import os
-from typing import (
-    Optional,
-)
 
 import luigi
 from luigi.parameter import ParameterVisibility
@@ -15,10 +12,10 @@ from exasol_integration_test_docker_environment.cli.options.docker_repository_op
 class source_docker_repository_config(luigi.Config):
     repository_name: str = luigi.Parameter(default=DEFAULT_DOCKER_REPOSITORY_NAME)
     tag_prefix: str = luigi.Parameter(default="")
-    username: Optional[str] = luigi.OptionalParameter(
+    username: str | None = luigi.OptionalParameter(
         default=None, significant=False, visibility=ParameterVisibility.PRIVATE
     )
-    password: Optional[str] = luigi.OptionalParameter(
+    password: str | None = luigi.OptionalParameter(
         default=None, significant=False, visibility=ParameterVisibility.PRIVATE
     )
 
@@ -26,10 +23,10 @@ class source_docker_repository_config(luigi.Config):
 class target_docker_repository_config(luigi.Config):
     repository_name: str = luigi.Parameter(default=DEFAULT_DOCKER_REPOSITORY_NAME)
     tag_prefix: str = luigi.Parameter(default="")
-    username: Optional[str] = luigi.OptionalParameter(
+    username: str | None = luigi.OptionalParameter(
         default=None, significant=False, visibility=ParameterVisibility.PRIVATE
     )
-    password: Optional[str] = luigi.OptionalParameter(
+    password: str | None = luigi.OptionalParameter(
         default=None, significant=False, visibility=ParameterVisibility.PRIVATE
     )
 
@@ -45,9 +42,9 @@ class docker_build_arguments(luigi.Config):
 
 
 def set_docker_repository_config(
-    docker_password: Optional[str],
-    docker_repository_name: Optional[str],
-    docker_username: Optional[str],
+    docker_password: str | None,
+    docker_repository_name: str | None,
+    docker_username: str | None,
     tag_prefix: str,
     kind: str,
 ):

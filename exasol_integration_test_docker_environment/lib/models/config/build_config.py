@@ -1,7 +1,4 @@
 import json
-from typing import (
-    Optional,
-)
 
 import luigi
 
@@ -17,13 +14,13 @@ class build_config(luigi.Config):
     force_rebuild_from: list[str] = luigi.ListParameter(default=[])
     log_build_context_content: bool = luigi.BoolParameter(default=False)
     # keep_build_context = luigi.BoolParameter(False)
-    temporary_base_directory: Optional[str] = luigi.OptionalParameter(default=None)
+    temporary_base_directory: str | None = luigi.OptionalParameter(default=None)
     output_directory: str = luigi.Parameter(default=DEFAULT_OUTPUT_DIRECTORY)
-    cache_directory: Optional[str] = luigi.OptionalParameter(default="")
-    build_name: Optional[str] = luigi.OptionalParameter(default="")
+    cache_directory: str | None = luigi.OptionalParameter(default="")
+    build_name: str | None = luigi.OptionalParameter(default="")
 
 
-def set_output_directory(output_directory: Optional[str]):
+def set_output_directory(output_directory: str | None):
     if output_directory is not None:
         luigi.configuration.get_config().set(
             "build_config", "output_directory", output_directory
@@ -35,10 +32,10 @@ def set_build_config(
     force_rebuild_from: tuple[str, ...],
     force_pull: bool,
     log_build_context_content: bool,
-    output_directory: Optional[str],
-    temporary_base_directory: Optional[str],
-    cache_directory: Optional[str],
-    build_name: Optional[str],
+    output_directory: str | None,
+    temporary_base_directory: str | None,
+    cache_directory: str | None,
+    build_name: str | None,
 ):
     luigi.configuration.get_config().set(
         "build_config", "force_rebuild", str(force_rebuild)

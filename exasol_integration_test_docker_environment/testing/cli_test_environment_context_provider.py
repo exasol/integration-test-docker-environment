@@ -6,7 +6,7 @@ from typing import (
     Optional,
 )
 
-from typing_extensions import TypeAlias  # Needed for Python3.9
+from typing import TypeAlias  # Needed for Python3.9
 
 from exasol_integration_test_docker_environment.testing import utils
 from exasol_integration_test_docker_environment.testing.exaslct_test_environment import (

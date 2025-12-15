@@ -1,7 +1,6 @@
 import time
 from abc import abstractmethod
 from typing import (
-    Optional,
     Protocol,
     runtime_checkable,
 )
@@ -55,7 +54,7 @@ class DockerExecutor(DbOsExecutor):
     def __init__(self, docker_client: DockerClient, container_name: str) -> None:
         self._client = docker_client
         self._container_name = container_name
-        self._container: Optional[Container] = None
+        self._container: Container | None = None
 
     def __enter__(self):
         self._container = self._client.containers.get(self._container_name)
@@ -85,7 +84,7 @@ class SshExecutor(DbOsExecutor):
     def __init__(self, connect_string: str, key_file: str) -> None:
         self._connect_string = connect_string
         self._key_file = key_file
-        self._connection: Optional[fabric.Connection] = None
+        self._connection: fabric.Connection | None = None
 
     def __enter__(self):
         key = SshKey.read_from(self._key_file)
