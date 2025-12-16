@@ -2,9 +2,6 @@ from collections.abc import (
     Generator,
     Iterator,
 )
-from typing import (
-    Optional,
-)
 
 import docker
 import luigi
@@ -32,7 +29,7 @@ CERTIFICATES_MOUNT_PATH = "/certificates"
 
 class CreateSSLCertificatesTask(DockerBaseTask):
     environment_name: str = luigi.Parameter()
-    docker_runtime: Optional[str] = luigi.OptionalParameter(
+    docker_runtime: str | None = luigi.OptionalParameter(
         default=None, significant=False
     )
     db_container_name: str = luigi.Parameter(significant=False)
@@ -51,7 +48,7 @@ class CreateSSLCertificatesTask(DockerBaseTask):
         self._temp_resource_directory = ResourceDirectory(
             exasol_integration_test_docker_environment.certificate_resources.container
         )
-        self.volume_info: Optional[DockerVolumeInfo] = None
+        self.volume_info: DockerVolumeInfo | None = None
         self._temp_resource_directory.create()
 
     def on_failure(self, exception) -> None:

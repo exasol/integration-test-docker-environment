@@ -1,7 +1,3 @@
-from typing import (
-    Optional,
-)
-
 from exasol_integration_test_docker_environment.cli.options.test_environment_options import (
     LATEST_DB_VERSION,
 )
@@ -16,7 +12,7 @@ class DbVersion:
         self.stable = stable
 
     @classmethod
-    def from_db_version_str(cls, db_version_str: Optional[str]):
+    def from_db_version_str(cls, db_version_str: str | None):
         db_version: str = (
             LATEST_DB_VERSION if db_version_str is None else db_version_str
         )
@@ -53,5 +49,5 @@ class DbVersion:
         return self.to_tuple() > other.to_tuple()
 
 
-def db_version_supports_custom_certificates(db_version_str: Optional[str]) -> bool:
+def db_version_supports_custom_certificates(db_version_str: str | None) -> bool:
     return DbVersion.from_db_version_str(db_version_str) > DbVersion(7, 0, 5)

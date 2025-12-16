@@ -1,5 +1,4 @@
 from test.integration.helpers import mock_cast
-from typing import Union
 from unittest.mock import (
     MagicMock,
     call,
@@ -26,7 +25,7 @@ from exasol_integration_test_docker_environment.lib.test_environment.ports impor
 
 def test_executor_closes_client():
     container = create_autospec(DockerContainer)
-    client: Union[MagicMock, DockerClient] = create_autospec(DockerClient)
+    client: MagicMock | DockerClient = create_autospec(DockerClient)
     client.containers.get = MagicMock(return_value=container)
     with DockerExecutor(client, "container_name") as executor:
         executor.exec("sample command")

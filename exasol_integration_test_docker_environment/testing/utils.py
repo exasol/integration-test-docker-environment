@@ -1,10 +1,7 @@
 import os
 import re
 import unittest
-from typing import (
-    Callable,
-    Optional,
-)
+from collections.abc import Callable
 
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 
@@ -20,7 +17,7 @@ def close_environments(*args):
             print(e)
 
 
-def check_db_version_from_env() -> Optional[str]:
+def check_db_version_from_env() -> str | None:
     retval = None
     if "EXASOL_VERSION" in os.environ and os.environ["EXASOL_VERSION"] != "default":
         retval = os.environ["EXASOL_VERSION"]

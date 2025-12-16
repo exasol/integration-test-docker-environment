@@ -5,7 +5,6 @@ import warnings
 from test.matchers import regex_matcher
 from typing import (
     Any,
-    Optional,
 )
 
 import pytest
@@ -101,7 +100,7 @@ def custom_logging():
 
 
 @ignore_resource_warning()
-def dummy_api_command(log_level: Optional[str], use_job_specific_log_file: bool):
+def dummy_api_command(log_level: str | None, use_job_specific_log_file: bool):
     task_creator = lambda: generate_root_task(task_class=DummyTask)
     result = run_task(
         task_creator=task_creator,

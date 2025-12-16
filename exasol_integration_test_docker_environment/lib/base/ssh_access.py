@@ -3,10 +3,6 @@ import os
 import tempfile
 from pathlib import Path
 from string import Template
-from typing import (
-    Optional,
-    Union,
-)
 
 import paramiko
 import portalocker
@@ -26,7 +22,7 @@ def _path(template: str) -> Path:
 
 
 class SshKeyCache:
-    def __init__(self, directory: Optional[Path] = None):
+    def __init__(self, directory: Path | None = None):
         self._directory = directory if directory else _path(_DEFAULT_CACHE_DIR)
 
     @property
@@ -87,7 +83,7 @@ class SshKey:
         return self
 
     @classmethod
-    def read_from(cls, private_key_file: Union[Path, str]) -> "SshKey":
+    def read_from(cls, private_key_file: Path | str) -> "SshKey":
         with open(private_key_file) as file:
             rsa_key = paramiko.RSAKey.from_private_key(file)
         return SshKey(rsa_key)
@@ -98,7 +94,7 @@ class SshKey:
         return SshKey(rsa_key)
 
     @classmethod
-    def from_cache(cls, cache_directory: Optional[Path] = None) -> "SshKey":
+    def from_cache(cls, cache_directory: Path | None = None) -> "SshKey":
         cache = SshKeyCache(cache_directory)
         priv = cache.private_key
         with portalocker.Lock(_path(_LOCK_FILE), "wb", timeout=10) as fh:

@@ -1,7 +1,4 @@
 from collections.abc import Iterable
-from typing import (
-    Optional,
-)
 
 
 class ArgumentConstraintError(ValueError):
@@ -15,11 +12,11 @@ class HealthProblem(RuntimeError):
 class TaskFailures(Exception):
     """Represents a potential cause of a TaskRuntimeError"""
 
-    def __init__(self, inner: Optional[list[str]] = None):
+    def __init__(self, inner: list[str] | None = None):
         super().__init__(self._construct_exception_message(inner))
         self.inner = inner
 
-    def _construct_exception_message(self, failures: Optional[Iterable[str]]) -> str:
+    def _construct_exception_message(self, failures: Iterable[str] | None) -> str:
         if failures is not None:
             formatted_task_failures = "\n".join(failures)
             return f"Following task failures were caught during the execution:\n{formatted_task_failures}"
@@ -30,7 +27,7 @@ class TaskFailures(Exception):
 class TaskRuntimeError(RuntimeError):
     """Represents an error which occurred during execution of a luigi task"""
 
-    def __init__(self, msg: str, inner: Optional[list[str]] = None):
+    def __init__(self, msg: str, inner: list[str] | None = None):
         """
         Creates a TaskRuntimeError
         Args:

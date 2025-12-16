@@ -1,10 +1,8 @@
 import functools
 import warnings
+from collections.abc import Callable
 from typing import (
     Any,
-    Callable,
-    Optional,
-    Tuple,
 )
 
 import humanfriendly
@@ -73,13 +71,13 @@ def _cleanup(environment_info: EnvironmentInfo) -> None:
 def spawn_test_environment_with_test_container(
     environment_name: str,
     test_container_content: TestContainerContentDescription,
-    database_port_forward: Optional[int] = None,
-    bucketfs_port_forward: Optional[int] = None,
-    ssh_port_forward: Optional[int] = None,
+    database_port_forward: int | None = None,
+    bucketfs_port_forward: int | None = None,
+    ssh_port_forward: int | None = None,
     db_mem_size: str = "2 GiB",
     db_disk_size: str = "2 GiB",
     nameserver: tuple[str, ...] = (),
-    docker_runtime: Optional[str] = None,
+    docker_runtime: str | None = None,
     docker_db_image_version: str = LATEST_DB_VERSION,
     docker_db_image_name: str = "exasol/docker-db",
     db_os_access: str = "DOCKER_EXEC",
@@ -89,20 +87,20 @@ def spawn_test_environment_with_test_container(
     accelerator: tuple[str, ...] = (),
     source_docker_repository_name: str = DEFAULT_DOCKER_REPOSITORY_NAME,
     source_docker_tag_prefix: str = "",
-    source_docker_username: Optional[str] = None,
-    source_docker_password: Optional[str] = None,
+    source_docker_username: str | None = None,
+    source_docker_password: str | None = None,
     target_docker_repository_name: str = DEFAULT_DOCKER_REPOSITORY_NAME,
     target_docker_tag_prefix: str = "",
-    target_docker_username: Optional[str] = None,
-    target_docker_password: Optional[str] = None,
+    target_docker_username: str | None = None,
+    target_docker_password: str | None = None,
     output_directory: str = DEFAULT_OUTPUT_DIRECTORY,
     temporary_base_directory: str = "/var/tmp",
     workers: int = 5,
-    task_dependencies_dot_file: Optional[str] = None,
-    log_level: Optional[str] = None,
+    task_dependencies_dot_file: str | None = None,
+    log_level: str | None = None,
     use_job_specific_log_file: bool = False,
-    bucketfs_http_port_forward: Optional[int] = None,
-    bucketfs_https_port_forward: Optional[int] = None,
+    bucketfs_http_port_forward: int | None = None,
+    bucketfs_https_port_forward: int | None = None,
 ) -> tuple[EnvironmentInfo, Callable[[], None]]:
     """
     This function spawns a test environment with a docker-db container and a connected test-container.
@@ -113,7 +111,7 @@ def spawn_test_environment_with_test_container(
 
     """
 
-    def str_or_none(x: Any) -> Optional[str]:
+    def str_or_none(x: Any) -> str | None:
         return str(x) if x is not None else None
 
     parsed_db_mem_size = humanfriendly.parse_size(db_mem_size)

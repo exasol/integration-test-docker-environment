@@ -1,16 +1,10 @@
 import shutil
 import unittest
 from pathlib import Path
-from typing import (
-    Dict,
-    List,
-    Set,
-)
 
 import luigi
 from luigi import Parameter
 
-from exasol_integration_test_docker_environment.lib.base.base_task import BaseTask
 from exasol_integration_test_docker_environment.lib.base.run_task import (
     generate_root_task,
 )

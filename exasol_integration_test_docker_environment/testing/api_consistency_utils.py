@@ -1,7 +1,6 @@
 import inspect
 from typing import (
     Any,
-    Optional,
 )
 
 import click
@@ -34,7 +33,7 @@ def is_click_command(obj: Any) -> bool:
 
 def defaults_of_click_call(
     click_call: click.Command,
-) -> list[tuple[Optional[str], Any]]:
+) -> list[tuple[str | None, Any]]:
     """
     Returns the default values of all None-required parameters of a click-command.
     """
@@ -45,7 +44,7 @@ def defaults_of_click_call(
     ]
 
 
-def param_names_of_click_call(click_call: click.Command) -> list[Optional[str]]:
+def param_names_of_click_call(click_call: click.Command) -> list[str | None]:
     """
     Returns names of all parameters of a click call
     """

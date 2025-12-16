@@ -1,8 +1,3 @@
-from typing import (
-    Optional,
-    Union,
-)
-
 from exasol_integration_test_docker_environment.lib.base.info import Info
 from exasol_integration_test_docker_environment.lib.models.data.container_info import (
     ContainerInfo,
@@ -23,9 +18,9 @@ class EnvironmentInfo(Info):
     def __init__(
         self,
         name: str,
-        env_type: Union[str, EnvironmentType],
+        env_type: str | EnvironmentType,
         database_info: DatabaseInfo,
-        test_container_info: Optional[ContainerInfo],
+        test_container_info: ContainerInfo | None,
         network_info: DockerNetworkInfo,
     ) -> None:
         self.name = name

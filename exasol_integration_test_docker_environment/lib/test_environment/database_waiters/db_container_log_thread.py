@@ -1,11 +1,8 @@
 import math
 import time
+from collections.abc import Callable
 from pathlib import Path
 from threading import Thread
-from typing import (
-    Callable,
-    Optional,
-)
 
 from docker.models.containers import Container
 
@@ -35,9 +32,9 @@ class DBContainerLogThread(Thread):
         self.log_file = log_file
         self.container = container
         self.finish = False
-        self.previous_timestamp: Optional[float] = None
-        self.current_timestamp: Optional[float] = None
-        self.error_message: Optional[str] = None
+        self.previous_timestamp: float | None = None
+        self.current_timestamp: float | None = None
+        self.error_message: str | None = None
         self.ignore_error_return_codes = (
             "(membership) returned with state 1",  # exclude webui not found in 7.0.0
             "rsyslogd) returned with state 1",  # exclude rsyslogd which might crash when running itde under lima
@@ -50,7 +47,7 @@ class DBContainerLogThread(Thread):
         def ignore_return_code(log_line_local):
             return any(x in log_line_local for x in self.ignore_error_return_codes)
 
-        def contains(substr: str, ignore: Optional[Callable[[str], bool]] = None):
+        def contains(substr: str, ignore: Callable[[str], bool] | None = None):
             if not substr in log_line:
                 return False
             return ignore is None or not ignore(log_line)

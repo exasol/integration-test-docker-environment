@@ -1,8 +1,5 @@
 from collections.abc import Generator
 from pathlib import Path
-from typing import (
-    Union,
-)
 
 import luigi
 from luigi import Task
@@ -35,8 +32,8 @@ class DependencyLoggerBaseTask(StoppableBaseTask):
         return Path(self._get_dependencies_path(), "dynamic")
 
     def handle_requires_value(
-        self, tasks: Union[Task, list, tuple, dict]
-    ) -> Union[Task, list, tuple, dict]:
+        self, tasks: Task | list | tuple | dict
+    ) -> Task | list | tuple | dict:
         dependency_path = self._get_dependencies_requires_path()
         if not dependency_path.exists():
             with dependency_path.open("w") as dependencies_file:

@@ -1,9 +1,5 @@
 import math
 from pathlib import Path
-from typing import (
-    Optional,
-    Union,
-)
 
 import docker
 import humanfriendly
@@ -66,7 +62,7 @@ CERTIFICATES_MOUNT_DIR = "/certificates"
 CERTIFICATES_DEFAULT_DIR = "/exa/etc/ssl/"
 
 
-def int_or_none(value: Optional[str]) -> Optional[int]:
+def int_or_none(value: str | None) -> int | None:
     return None if value is None else int(value)
 
 
@@ -76,17 +72,17 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
     attempt: int = luigi.IntParameter(default=1)
     network_info: DockerNetworkInfo = JsonPickleParameter(DockerNetworkInfo, significant=False)  # type: ignore
     ip_address_index_in_subnet: int = luigi.IntParameter(significant=False)
-    docker_runtime: Optional[str] = luigi.OptionalParameter(
+    docker_runtime: str | None = luigi.OptionalParameter(
         default=None, significant=False
     )
-    certificate_volume_name: Optional[str] = luigi.OptionalParameter(
+    certificate_volume_name: str | None = luigi.OptionalParameter(
         default=None, significant=False
     )
     additional_db_parameter: tuple[str, ...] = luigi.ListParameter()
     docker_environment_variables: tuple[str, ...] = luigi.ListParameter()
     accelerator: tuple[str, ...] = luigi.ListParameter()
     ssh_user: str = luigi.Parameter(default="root")
-    ssh_key_file: Union[str, Path, None] = luigi.OptionalParameter(
+    ssh_key_file: str | Path | None = luigi.OptionalParameter(
         default=None, significant=False
     )
 
@@ -140,7 +136,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             )
         self.return_object(database_info)
 
-    def _try_to_reuse_database(self, db_ip_address: str) -> Optional[DatabaseInfo]:
+    def _try_to_reuse_database(self, db_ip_address: str) -> DatabaseInfo | None:
         self.logger.info("Try to reuse database container %s", self.db_container_name)
         try:
             database_info = self._create_database_info(

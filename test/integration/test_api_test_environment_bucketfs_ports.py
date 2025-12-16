@@ -1,5 +1,3 @@
-from typing import Optional
-
 from exasol.bucketfs import Service
 
 from exasol_integration_test_docker_environment.lib.test_environment.ports import (
@@ -7,7 +5,7 @@ from exasol_integration_test_docker_environment.lib.test_environment.ports impor
 )
 
 
-def _bucketfs_access(protocol: str, port: int, verify: Optional[str] = None):
+def _bucketfs_access(protocol: str, port: int, verify: str | None = None):
     URL = f"{protocol}://localhost:{port}"
     CREDENTIALS = {"default": {"username": "w", "password": "write"}}
 
@@ -16,7 +14,7 @@ def _bucketfs_access(protocol: str, port: int, verify: Optional[str] = None):
     assert len(buckets) > 0
 
 
-def _assert_bucketfs(http_port: int, https_port: int, verify: Optional[str] = None):
+def _assert_bucketfs(http_port: int, https_port: int, verify: str | None = None):
     _bucketfs_access("http", http_port, verify)
     _bucketfs_access("https", https_port, verify)
 

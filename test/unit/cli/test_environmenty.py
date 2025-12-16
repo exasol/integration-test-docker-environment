@@ -1,4 +1,3 @@
-import pytest
 from click.testing import CliRunner
 
 from exasol_integration_test_docker_environment.cli.commands.environment import (

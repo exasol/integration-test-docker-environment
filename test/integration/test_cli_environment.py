@@ -1,8 +1,5 @@
 from inspect import cleandoc
 from test.integration.helpers import get_executor_factory
-from typing import (
-    Optional,
-)
 
 import pytest
 
@@ -26,7 +23,7 @@ class NumberCheck:
         self.db = db
         self.all = all
 
-    def count(self, selected: Optional[list[str]] = None):
+    def count(self, selected: list[str] | None = None):
         return len(selected if selected is not None else self.all)
 
     @property

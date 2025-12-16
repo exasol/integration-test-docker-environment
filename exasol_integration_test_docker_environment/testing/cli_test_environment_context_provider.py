@@ -1,12 +1,13 @@
 import contextlib
-from collections.abc import Iterator
-from typing import (
+from collections.abc import (
     Callable,
+    Iterator,
+)
+from typing import TypeAlias  # Needed for Python3.9
+from typing import (
     ContextManager,
     Optional,
 )
-
-from typing_extensions import TypeAlias  # Needed for Python3.9
 
 from exasol_integration_test_docker_environment.testing import utils
 from exasol_integration_test_docker_environment.testing.exaslct_test_environment import (
@@ -50,8 +51,8 @@ def build_cli_context_provider(
 
     @contextlib.contextmanager
     def create_context(
-        name: Optional[str] = None,
-        additional_parameters: Optional[list[str]] = None,
+        name: str | None = None,
+        additional_parameters: list[str] | None = None,
     ) -> Iterator[SpawnedTestEnvironments]:
         name = name if name else test_environment.name
         spawned = test_environment.spawn_docker_test_environments(

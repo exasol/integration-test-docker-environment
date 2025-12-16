@@ -1,5 +1,3 @@
-import unittest
-
 import pytest
 
 from exasol_integration_test_docker_environment.lib.test_environment.ports import (

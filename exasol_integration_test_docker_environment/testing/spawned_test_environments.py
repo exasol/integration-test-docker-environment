@@ -1,5 +1,3 @@
-from typing import Optional
-
 from exasol_integration_test_docker_environment.testing.exaslct_docker_test_environment import (
     ExaslctDockerTestEnvironment,
 )
@@ -9,7 +7,7 @@ class SpawnedTestEnvironments:
     def __init__(
         self,
         on_host_environment: ExaslctDockerTestEnvironment,
-        slc_test_run_environment: Optional[ExaslctDockerTestEnvironment],
+        slc_test_run_environment: ExaslctDockerTestEnvironment | None,
     ) -> None:
         self.on_host_docker_environment = on_host_environment
         self.slc_test_run_environment = slc_test_run_environment

@@ -1,7 +1,3 @@
-from typing import (
-    Optional,
-)
-
 from exasol_integration_test_docker_environment.lib.base.info import Info
 from exasol_integration_test_docker_environment.lib.models.data.docker_network_info import (
     DockerNetworkInfo,
@@ -16,7 +12,7 @@ class ContainerInfo(Info):
         ip_address: str,
         network_aliases: list[str],
         network_info: DockerNetworkInfo,
-        volume_name: Optional[str] = None,
+        volume_name: str | None = None,
     ) -> None:
         self.network_aliases = network_aliases
         self.ip_address = ip_address

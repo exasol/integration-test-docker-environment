@@ -2,9 +2,6 @@ import contextlib
 import warnings
 from collections.abc import Iterator
 from pathlib import Path
-from typing import (
-    Optional,
-)
 
 import luigi
 from luigi.parameter import UnconsumedParameterWarning
@@ -17,7 +14,7 @@ from exasol_integration_test_docker_environment.lib.logging.luigi_log_config imp
 
 @contextlib.contextmanager
 def configure_logging(
-    log_file_path: Path, log_level: Optional[str], use_job_specific_log_file: bool
+    log_file_path: Path, log_level: str | None, use_job_specific_log_file: bool
 ) -> Iterator[dict[str, str]]:
     with get_luigi_log_config(
         log_file_target=log_file_path,
@@ -47,7 +44,7 @@ def configure_logging(
 
 
 def _configure_logging_parameter(
-    log_level: Optional[str], luigi_config: Path, use_job_specific_log_file: bool
+    log_level: str | None, luigi_config: Path, use_job_specific_log_file: bool
 ) -> tuple[bool, dict[str, str]]:
     if use_job_specific_log_file:
         no_configure_logging = False
