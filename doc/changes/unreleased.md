@@ -11,3 +11,4 @@
 ## Internal
 
  - #568: Used automatic formatting tools to upgrade typing to Python 3.10 and remove unused imports
+ - #568: Updated exasol-toolbox to 4.0.0
