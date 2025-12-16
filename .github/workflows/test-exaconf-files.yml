@@ -10,10 +10,10 @@ jobs:
       contents: read
     steps:
       - name: SCM Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@v1
+        uses: exasol/python-toolbox/.github/actions/python-environment@v4
 
       - name: Run Update of EXAConf files
         run: poetry run -- nox -s copy-docker-db-config-templates
@@ -29,4 +29,3 @@ jobs:
         # or alternatively activate the commit hooks (see developer guide).
         run: |
           [ -z "$(git status --porcelain=v1 -uno 2>/dev/null)" ]
-  

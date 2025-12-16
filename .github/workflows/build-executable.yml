@@ -17,10 +17,10 @@ jobs:
       contents: write
     steps:
       - name: SCM Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@v1
+        uses: exasol/python-toolbox/.github/actions/python-environment@v4
 
       - name: Build standalone executable
         run: poetry run -- nox -s build-standalone-binary -- --executable-name "itde_linux_x86-64"
