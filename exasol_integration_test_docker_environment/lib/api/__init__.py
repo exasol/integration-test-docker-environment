@@ -11,3 +11,11 @@ from exasol_integration_test_docker_environment.lib.api.spawn_test_environment i
 from exasol_integration_test_docker_environment.lib.api.spawn_test_environment_with_test_container import (
     spawn_test_environment_with_test_container,
 )
+
+__all__ = [
+    "build_test_container",
+    "health",
+    "push_test_container",
+    "spawn_test_environment",
+    "spawn_test_environment_with_test_container",
+]
