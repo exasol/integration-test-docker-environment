@@ -6,7 +6,7 @@ from exasol_integration_test_docker_environment.cli.cli import cli
 def main():
     # The imports from `commands` are required so that `cli()` will print the available
     # subcommands. Unfortunately, as these are unused imports within this file, an
-    # auto-formatting tool would want to remove them.
+    # auto-formatting tool would want to remove them, so we added # noqa: F401.
     from exasol_integration_test_docker_environment.cli.commands import (  # noqa: F401
         environment,
         health,
