@@ -2,16 +2,60 @@
 name = "exasol-integration-test-docker-environment"
 version = "5.0.0"
 description = "Integration Test Docker Environment for Exasol"
-authors = [
-    {name="Torsten Kilias", email="torsten.kilias@exasol.com"},
-]
-readme = 'README.rst'
+authors = [{ name = "Torsten Kilias", email = "torsten.kilias@exasol.com" }]
+requires-python = ">=3.10,<3.15"
+readme = "README.rst"
 license = "MIT"
-keywords = ['exasol', 'docker', 'testing']
+keywords = [
+    "exasol",
+    "docker",
+    "testing",
+]
+dependencies = [
+    "click>=7.0",
+    # The `sys_platform` marker makes sure the docker dependency is only installed on
+    # non windows platforms.
+    "docker>=4.0.0,!=7.0.0 ; sys_platform != 'win32'",
+    "gitpython>=2.1.0",
+    "humanfriendly>=4.18",
+    "jinja2>=2.10.1",
+    "jsonpickle>=1.1",
+    "luigi>=2.8.4",
+    "netaddr>=0.7.19",
+    "networkx>=2.3",
+    "pydot>=1.4.0",
+    "requests>=2.32.4",
+    "simplejson>=3.16.0",
+    "importlib_resources>=5.4.0", # Needed to copy resource files, can be removed after upgrading to Python 3.9 (see https://docs.python.org/3.11/library/importlib.resources.html#importlib.resources.files)
+    "stopwatch.py>=1.0.0",
+    "fabric>=3.0.1,<4",
+    "portalocker>=2.7.0,<3",
+    "exasol-error-reporting>=1.0.0,<2",
+    "docutils>=0.21.2",
+]
 
 [project.urls]
 homepage = "https://github.com/exasol/integration-test-docker-environment"
 repository = "https://github.com/exasol/integration-test-docker-environment"
+
+[project.scripts]
+itde = "exasol_integration_test_docker_environment.main:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=7.2.2,<8",
+    "toml>=0.10.2",
+    "nox>=2022.1.7,<2023",
+    "mypy>=1.1.1,<2",
+    "pyexasol>=1.1.1, <2.0.0",
+    "exasol-toolbox>=4.0.0,<5",
+    "joblib>=1.4.2,<2",
+    "pytest-check==2.5.3",
+    "pyinstaller>=6.15.0,<7",
+    "types-pyinstaller>=6.15.0.20250822,<7",
+    "dill>=0.4.0,<1.0.0",
+    "exasol-bucketfs>=2.1.0,<3",
+]
 
 [tool.poetry]
 packages = [
@@ -21,56 +65,14 @@ packages = [
 include = ["docker_db_config", "ext"]
 exclude = ["exasol_integration_test_docker_environment/test"]
 
-[tool.poetry.dependencies]
-python = ">=3.10,<3.15"
-click = ">=7.0"
-# The `sys_platform` marker makes sure the docker dependency is only installed on
-# non windows platforms.
-docker = { version = ">=4.0.0,!=7.0.0", markers = "sys_platform != 'win32'" }
-gitpython = ">=2.1.0"
-humanfriendly = ">=4.18"
-jinja2 = ">=2.10.1"
-jsonpickle = ">=1.1"
-luigi = ">=2.8.4"
-netaddr = ">=0.7.19"
-networkx = ">=2.3"
-pydot = ">=1.4.0"
-requests = ">=2.32.4"
-simplejson = ">=3.16.0"
-importlib_resources = ">=5.4.0" #Needed to copy resource files, can be removed after upgrading to Python 3.9 (see https://docs.python.org/3.11/library/importlib.resources.html#importlib.resources.files)
-"stopwatch.py" = ">=1.0.0"
-fabric = "^3.0.1"
-portalocker = "^2.7.0"
-exasol-error-reporting = "^1.0.0"
-docutils = ">=0.21.2"
-
-[tool.poetry.group.dev.dependencies]
-pytest = "^7.2.2"
-toml = ">=0.10.2"
-nox = "^2022.1.7"
-mypy = "^1.1.1"
-pyexasol = ">=1.1.1, <2.0.0"
-exasol-toolbox = "^4.0.0"
-joblib = "^1.4.2"
-pytest-check = "2.5.3"
-pyinstaller = "^6.15.0"
-types-pyinstaller = "^6.15.0.20250822"
-dill = "^0.4.0"
-exasol-bucketfs=">=2.1.0,<3"
-
 [build-system]
 requires = [
     "poetry>=2.0.0",
     "poetry-core"
 ]
 
-[tool.poetry.plugins."console_scripts"]
-itde = 'exasol_integration_test_docker_environment.main:main'
-
-
 [tool.mypy]
 plugins = ["luigi.mypy"]
-
 
 [[tool.mypy.overrides]]
 module = [ "luigi.*", "docker.*", "humanfriendly", "configobj", "toml", "netaddr", "joblib.testing", "networkx",
@@ -92,10 +94,10 @@ force_grid_wrap = 2
 
 [tool.ruff.lint]
 extend-ignore = [
-    "E",      # Syntax errors
-    "F",      # Pyflakes rules (excluding F401)
-    "UP",     # pyupgrade rules
-    "D",      # Docstring rules
+    "E", # Syntax errors
+    "F", # Pyflakes rules (excluding F401)
+    "UP", # pyupgrade rules
+    "D", # Docstring rules
 ]
 extend-select = ["F401"]
 unfixable = []
