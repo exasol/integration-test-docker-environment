@@ -101,9 +101,13 @@ def get_luigi_log_config(
         temp_luigi_conf_path = Path(temp_dir) / "luigi_log.conf"
         with open(temp_luigi_conf_path, "w") as f:
             f.write(rendered_template)
-        with restore_logger(logger_creator=lambda: logging.root), restore_logger(
-            logger_creator=lambda: logging.getLogger(LUIGI_INTERFACE_LOGGER)
-        ), restore_logger(logger_creator=lambda: logging.getLogger(LUIGI_LOGGER)):
+        with (
+            restore_logger(logger_creator=lambda: logging.root),
+            restore_logger(
+                logger_creator=lambda: logging.getLogger(LUIGI_INTERFACE_LOGGER)
+            ),
+            restore_logger(logger_creator=lambda: logging.getLogger(LUIGI_LOGGER)),
+        ):
             if log_level is not None and not use_job_specific_log_file:
                 logging.getLogger(LUIGI_INTERFACE_LOGGER).level = logging.getLevelName(
                     log_level
