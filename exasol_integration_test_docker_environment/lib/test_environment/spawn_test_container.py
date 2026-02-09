@@ -1,6 +1,6 @@
+import importlib.resources
 from pathlib import Path
 
-import importlib.resources
 import luigi
 import netaddr
 from docker.models.containers import Container

@@ -1,10 +1,10 @@
+import importlib.resources
 import math
 from importlib.abc import Traversable
 from pathlib import Path
 
 import docker
 import humanfriendly
-import importlib.resources
 import luigi
 import netaddr
 from docker.client import DockerClient
