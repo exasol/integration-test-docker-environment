@@ -1,16 +1,16 @@
 import math
+from importlib.abc import Traversable
 from pathlib import Path
 
 import docker
 import humanfriendly
-import importlib_resources
+import importlib.resources
 import luigi
 import netaddr
 from docker.client import DockerClient
 from docker.models.containers import Container
 from docker.models.volumes import Volume
 from docker.types import DeviceRequest
-from importlib_resources.abc import Traversable
 from jinja2 import Template
 
 from exasol_integration_test_docker_environment.lib import PACKAGE_NAME
@@ -384,7 +384,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
 
     def _db_file(self, filename: str) -> Traversable:
         return (
-            importlib_resources.files(PACKAGE_NAME)
+            importlib.resources.files(PACKAGE_NAME)
             / self.docker_db_config_resource_name
             / filename
         )
