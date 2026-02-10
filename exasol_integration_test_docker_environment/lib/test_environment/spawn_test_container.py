@@ -1,6 +1,6 @@
+import importlib.resources
 from pathlib import Path
 
-import importlib_resources
 import luigi
 import netaddr
 from docker.models.containers import Container
@@ -250,7 +250,7 @@ class SpawnTestContainer(DockerBaseTask, TestContainerParameter):
         if self.certificate_volume_name is not None:
             script_name = "install_root_certificate.sh"
             script = (
-                importlib_resources.files(PACKAGE_NAME)
+                importlib.resources.files(PACKAGE_NAME)
                 / "certificate_resources"
                 / script_name
             )

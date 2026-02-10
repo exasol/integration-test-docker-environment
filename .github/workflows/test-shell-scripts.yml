@@ -11,7 +11,7 @@ jobs:
       contents: read
     steps:
       - name: SCM Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Run shellcheck
         run: ./scripts/build/shellcheck.sh

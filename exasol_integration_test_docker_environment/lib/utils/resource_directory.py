@@ -1,16 +1,14 @@
+import importlib.resources as ir
 import logging
 import tempfile
+from importlib.abc import Traversable
 from pathlib import Path
 from types import ModuleType
-
-import importlib_resources as ir
 
 LOG = logging.getLogger("resource_directory")
 
 
-def _copy_importlib_resources_file(
-    src_file: ir.abc.Traversable, target_file: Path
-) -> None:
+def _copy_importlib_resources_file(src_file: Traversable, target_file: Path) -> None:
     """
     Uses a given source path "src_file" given as an importlib_resources.abc.Traversable to copy the file it points to
     into the destination denoted by target_path.
@@ -32,7 +30,7 @@ def _copy_importlib_resources_file(
 
 
 def _copy_importlib_resources_dir_tree(
-    src_path: ir.abc.Traversable, target_path: Path
+    src_path: Traversable, target_path: Path
 ) -> None:
     """
     Uses a given source path "scr_path" given as an importlib_resources.abc.Traversable to copy all files/directories

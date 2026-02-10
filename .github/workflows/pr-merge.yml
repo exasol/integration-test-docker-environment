@@ -23,14 +23,6 @@ jobs:
     permissions:
       contents: read
 
-  metrics:
-    name: Report Metrics
-    needs: [ ci-job, fast-tests ]
-    secrets: inherit
-    uses: ./.github/workflows/report.yml
-    permissions:
-      contents: read
-
   publish-docs:
     name: Publish Documentation
     uses: ./.github/workflows/gh-pages.yml
@@ -38,3 +30,12 @@ jobs:
       contents: read
       pages: write
       id-token: write
+
+  metrics:
+    needs:
+      - ci-job
+      - fast-tests
+    uses: ./.github/workflows/report.yml
+    secrets: inherit
+    permissions:
+      contents: read

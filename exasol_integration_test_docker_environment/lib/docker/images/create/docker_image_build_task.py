@@ -53,7 +53,7 @@ class DockerBuildImageTask(DockerImageCreatorBaseTask):
                     buildargs=dict(
                         **image_description.transparent_build_arguments,
                         **image_description.image_changing_build_arguments,
-                        **docker_build_arguments().secret
+                        **docker_build_arguments().secret,
                     ),
                 )
                 self._handle_output(output_generator, self.image_info)
