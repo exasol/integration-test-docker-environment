@@ -28,7 +28,8 @@ jobs:
 
       - id: set-matrix
         run: |
-          RUNNERS=`poetry run -- nox --non-interactive -s 'get-platforms' -- --type='$RUNNER_TYPE`
+          RUNNERS=`poetry run -- nox --non-interactive -s 'get-test-runners' -- --type='$RUNNER_TYPE'`
+          echo "$RUNNERS"
           echo "matrix=$RUNNERS" >> "$GITHUB_OUTPUT"
         env:
           RUNNER_TYPE: ${{ inputs.runner_type }}

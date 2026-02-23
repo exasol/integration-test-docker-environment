@@ -14,8 +14,10 @@ class Platform(Enum):
     X64 = "x64"
     ARM_64 = "arm64"
 
+
 def current_platform() -> Platform:
     import platform
+
     supported_platforms = {
         "x86_64": Platform.X64,
         "amd64": Platform.X64,

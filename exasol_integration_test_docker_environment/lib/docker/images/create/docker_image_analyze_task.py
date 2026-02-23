@@ -22,7 +22,8 @@ from exasol_integration_test_docker_environment.lib.docker.images.create.utils.d
 from exasol_integration_test_docker_environment.lib.docker.images.image_info import (
     ImageDescription,
     ImageInfo,
-    ImageState, current_platform,
+    ImageState,
+    current_platform,
 )
 from exasol_integration_test_docker_environment.lib.models.config.build_config import (
     build_config,

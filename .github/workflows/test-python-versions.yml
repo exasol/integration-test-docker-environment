@@ -35,10 +35,8 @@ jobs:
       - build-matrix
     strategy:
       fail-fast: false
-      matrix:
-        python-version: ${{ fromJson(needs.build-matrix.outputs.matrix) }}.python-version
-        runner: ${{ fromJson(needs.get_test_runners.outputs.matrix) }}
-    runs-on: ${{matrix.runner}}
+      matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
+    runs-on: ${{ fromJson(needs.get_test_runners.outputs.matrix) }}
     steps:
       - name: SCM Checkout
         uses: actions/checkout@v6
