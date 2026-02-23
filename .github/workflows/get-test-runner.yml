@@ -4,11 +4,7 @@ on:
       runner_type:
         description: 'The type of test runners'
         required: true
-        type: choice
-        options:
-          - 'only_default'
-          - 'all'
-          - 'all_except_default'
+        type: string
     outputs:
       matrix:
         description: "The list of runners"
