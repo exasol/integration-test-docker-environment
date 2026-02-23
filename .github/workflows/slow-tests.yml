@@ -23,8 +23,9 @@ jobs:
       contents: read
     uses: ./.github/workflows/test-db-versions-gpu.yml
 
-  additional-platforms-tests:
-    name: Run on additional platforms
-    permissions:
-      contents: read
-    uses: ./.github/workflows/test-db-versions-additional-platforms.yml
+# TODO: https://github.com/exasol/integration-tasks/issues/815
+#  additional-platforms-tests:
+#    name: Run on additional platforms
+#    permissions:
+#      contents: read
+#    uses: ./.github/workflows/test-db-versions-additional-platforms.yml

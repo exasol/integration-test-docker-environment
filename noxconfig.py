@@ -36,6 +36,9 @@ PROJECT_CONFIG = Config(
     python_versions=("3.10", "3.11", "3.12", "3.13"),
     add_to_excluded_python_paths=("resources",),
     test_runners_config=TestRunnersConfig(
-        default_runner="ubuntu-24.04", test_runners=["ubuntu-24.04", "ubuntu-24.04-arm"]
+        default_runner="ubuntu-24.04",
+        test_runners=[
+            "ubuntu-24.04"
+        ],  # TODO https://github.com/exasol/integration-tasks/issues/815
     ),
 )

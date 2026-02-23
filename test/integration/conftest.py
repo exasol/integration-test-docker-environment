@@ -6,7 +6,6 @@ from pathlib import Path
 
 import pytest
 
-from exasol_integration_test_docker_environment.lib.docker.images.image_info import current_platform, Platform
 from exasol_integration_test_docker_environment.lib.models.config.build_config import (
     set_build_config,
 )
@@ -68,8 +67,6 @@ def itde_binary(tmp_path_factory, itde_binary_name) -> Path:
 
 @pytest.fixture
 def env_name(request):
-    if current_platform() == Platform.ARM_64:
-        pytest.skip("Not support on ARM 64 platform")
     return utils.normalize_request_name(request.node.name)
 
 
