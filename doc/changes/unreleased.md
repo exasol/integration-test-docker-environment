@@ -3,6 +3,7 @@
 ## Features
 
  - #558: Added docker-db 2025.1.8
+ - #583: Added platform support for managed docker images 
 
 ## Bugs
 
