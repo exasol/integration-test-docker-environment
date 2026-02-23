@@ -3,6 +3,7 @@ name: Test DB Versions with minimal tests
 # python-version: default as specified
 # database-version: all supported by ITDE
 # tests: minimal (subset of all tests)
+# platform: all
 #
 # Use the specified default version of python and call nox task
 # run_minimal_tests to execute a few selected tests for all versions of Exasol
@@ -12,19 +13,30 @@ on:
  workflow_call:
 
 jobs:
+  get_test_runners:
+    name: Read all additional test runners
+    permissions:
+      contents: read
+    uses: ./.github/workflows/get-test_runner.yml
+    with:
+      runner_type: all
+
   get_exasol_versions:
     permissions:
       contents: read
     uses: ./.github/workflows/get-exasol-versions.yml
 
   test-db-versions-minimal:
-    name: Run Minimal Tests for Exasol ${{ matrix.exasol_version }}
-    needs: get_exasol_versions
+    name: Run Minimal Tests for Exasol ${{ matrix.exasol_version }} on ${{matrix.runner}}
+    needs:
+      - get_exasol_versions
+      - get_test_runners
     strategy:
       fail-fast: false
       matrix:
         exasol_version: ${{fromJson(needs.get_exasol_versions.outputs.matrix)}}
-    runs-on: ubuntu-24.04
+        runner: ${{fromJson(needs.get_test_runners.outputs.matrix)}}
+    runs-on: ${{matrix.runner}}
     permissions:
       contents: read
     steps:

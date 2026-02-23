@@ -19,7 +19,7 @@ ROOT = Path(__file__).parent
 from exasol.toolbox.nox.tasks import *  # type: ignore
 
 # default actions to be run if nothing is explicitly specified with the -s option
-nox.options.sessions = ["project:fix"]
+nox.options.sessions = ["format:fix"]
 
 
 class TestSet(Enum):
@@ -305,3 +305,31 @@ def execute_itde(session: nox.Session):
     session.run(
         f"{exe_name}", "spawn-test-environment", "--environment-name", "test_01"
     )
+
+class TestRunnerType(Enum):
+    ONLY_DEFAULT = "only_default"
+    ALL = "all"
+    ALL_EXCEPT_DEFAULT = "all_except_default"
+
+@nox.session(name="get-test-runners", python=False)
+def get_test_runners(session: nox.Session):
+
+    p = ArgumentParser(
+        usage='nox -s get-test-runners -- --type=only_default|all|all_except_default',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+    p.add_argument("--type", choices=[str(t.value) for t in TestRunnerType])
+    args = p.parse_args(session.posargs)
+
+    test_runner_config = PROJECT_CONFIG.test_runners_config
+
+    if args.type == "only_default":
+        result = test_runner_config.default_runner
+    elif args.type == "all_except_default":
+        result = [runner for runner in test_runner_config.test_runners if runner != test_runner_config.default_runner]
+    elif args.type == "all":
+        result = test_runner_config.test_runners
+    else:
+        raise ValueError(f"Invalid test runner type '{args.type}'")
+    print(json.dumps(result))
+
