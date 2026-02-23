@@ -16,7 +16,7 @@ jobs:
     name: Read all additional test runners
     permissions:
       contents: read
-    uses: ./.github/workflows/get-test_runner.yml
+    uses: ./.github/workflows/get-test-runner.yml
     with:
       runner_type: only_default
 
