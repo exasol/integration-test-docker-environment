@@ -3,6 +3,7 @@ name: Test Python Versions with all tests
 # python-version: All supported Python version
 # database-version: Default
 # tests: all
+# platform: default
 #
 # Call nox task run_tests for all version of Python as defined in the
 # python-toolbox (PTB) using the default version of the Exasol database.
@@ -11,6 +12,13 @@ on:
   workflow_call:
 
 jobs:
+  get_test_runners:
+    name: Read all additional test runners
+    permissions:
+      contents: read
+    uses: ./.github/workflows/get-test-runner.yml
+    with:
+      runner_type: only_default
 
   build-matrix:
     name: Generate Build Matrix
@@ -19,14 +27,16 @@ jobs:
     uses: ./.github/workflows/matrix-python.yml
 
   test-python-version-all-tests:
-    name: "Run Tests with Python ${{ matrix.python-version }} and Default Exasol Version"
+    name: "Run Tests with Python ${{ matrix.python-version }} and Default Exasol Version on ${{matrix.runner}}"
     permissions:
       contents: read
-    needs: [ build-matrix ]
+    needs:
+      - get_test_runners
+      - build-matrix
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
-    runs-on: ubuntu-24.04
+    runs-on: ${{ fromJson(needs.get_test_runners.outputs.matrix) }}
     steps:
       - name: SCM Checkout
         uses: actions/checkout@v6

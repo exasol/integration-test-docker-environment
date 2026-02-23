@@ -1,9 +1,9 @@
 name: Test DB Versions with all tests
 
 # python-version: default as specified
-# database-version: all supported by ITDE
+# database-version: Default
 # tests: all
-# platform: default
+# platform: all except default platform
 #
 # Use the specified default version of python and call nox task run_all_tests for
 # all versions of Exasol database currently supported by the ITDE.
@@ -12,34 +12,24 @@ on:
  workflow_call:
 
 jobs:
-
   get_test_runners:
     name: Read all additional test runners
     permissions:
       contents: read
     uses: ./.github/workflows/get-test-runner.yml
     with:
-      runner_type: only_default
+      runner_type: all_except_default
 
-  get_exasol_versions:
-    name: Read all supported Exasol DB versions
-    permissions:
-      contents: read
-    uses: ./.github/workflows/get-exasol-versions.yml
-
-  test-db-versions-all-tests:
-    needs:
-      - get_exasol_versions
-      - get_test_runners
+  test-add-platforms-all-tests:
+    needs: get_test_runners
     strategy:
       fail-fast: false
       matrix:
-        exasol_version: ${{fromJson(needs.get_exasol_versions.outputs.matrix)}}
         runner: ${{fromJson(needs.get_test_runners.outputs.matrix)}}
     runs-on: ${{matrix.runner}}
     permissions:
       contents: read
-    name: Run all tests for Exasol ${{ matrix.exasol_version }} on ${{matrix.runner}}
+    name: Run all tests on ${{matrix.runner}}
 
     steps:
       - name: SCM Checkout
@@ -55,4 +45,4 @@ jobs:
         run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
       - name: Run all tests
-        run: poetry run -- nox -s run-all-tests -- --db-version='${{ matrix.exasol_version }}' --test-set=default
+        run: poetry run -- nox -s run-all-tests -- --test-set=default

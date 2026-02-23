@@ -23,6 +23,7 @@ from exasol_integration_test_docker_environment.lib.docker.images.image_info imp
     ImageDescription,
     ImageInfo,
     ImageState,
+    current_platform,
 )
 from exasol_integration_test_docker_environment.lib.models.config.build_config import (
     build_config,
@@ -185,6 +186,7 @@ class DockerAnalyzeImageTask(DockerBaseTask):
             depends_on_images=image_info_of_dependencies,
             image_state=None,
             image_description=self.image_description,
+            platform=current_platform(),
         )
         target_image_target = DockerImageTarget(
             self._target_repository_name, image_info.get_target_complete_tag()

@@ -1,0 +1,41 @@
+on:
+  workflow_call:
+    inputs:
+      runner_type:
+        description: 'The type of test runners'
+        required: true
+        type: string
+    outputs:
+      matrix:
+        description: "The list of runners"
+        value: ${{ jobs.get_runners.outputs.matrix }}
+jobs:
+  get_runners:
+    name: "get_platforms type=${{inputs.runner_type}}"
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - name: SCM Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Python & Poetry Environment
+        uses: exasol/python-toolbox/.github/actions/python-environment@v5
+        with:
+          python-version: "3.10"
+          poetry-version: "2.3.0"
+
+
+      - id: set-matrix
+        run: |
+          RUNNERS=`poetry run -- nox --non-interactive -s 'get-test-runners' -- --type=$RUNNER_TYPE`
+          echo "$RUNNERS"
+          echo "matrix=$RUNNERS" >> "$GITHUB_OUTPUT"
+        env:
+          RUNNER_TYPE: ${{ inputs.runner_type }}
+
+      - name: Print matrix
+        run: echo ${{ steps.set-matrix.outputs.matrix }}
+
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}

@@ -10,6 +10,23 @@ from typing import (
 from exasol_integration_test_docker_environment.lib.base.info import Info
 
 
+class Platform(Enum):
+    X64 = "x64"
+    ARM_64 = "arm64"
+
+
+def current_platform() -> Platform:
+    import platform
+
+    supported_platforms = {
+        "x86_64": Platform.X64,
+        "amd64": Platform.X64,
+        "aarch64": Platform.ARM_64,
+        "arm64": Platform.ARM_64,
+    }
+    return supported_platforms[platform.machine()]
+
+
 class ImageState(Enum):
     NOT_EXISTING = auto()
     # After analyze phase or if build phase did touch the image
@@ -62,6 +79,7 @@ class ImageInfo(Info):
         build_date_time: datetime = datetime.utcnow(),
         image_state: ImageState | None = ImageState.NOT_EXISTING,
         depends_on_images: dict[str, "ImageInfo"] | None = None,
+        platform: Platform | None = None,
     ) -> None:
         self.build_name = build_name
         self.date_time = str(build_date_time)
@@ -80,6 +98,7 @@ class ImageInfo(Info):
         self.source_tag = source_tag
         self.target_tag = target_tag
         self.hash = hash_value
+        self.platform = platform
         self.check_complete_tag_length(self.source_tag)
         self.check_complete_tag_length(self.target_tag)
 
@@ -111,7 +130,9 @@ class ImageInfo(Info):
         return truncated_tag
 
     def _create_complete_tag(self, tag):
-        if self.hash == "":
-            return f"{tag}"
-        else:
-            return f"{tag}_{self.hash}"
+        tag_elements = [tag]
+        if self.platform:
+            tag_elements.append(self.platform.value)
+        if self.hash:
+            tag_elements.append(self.hash)
+        return "_".join(tag_elements)
