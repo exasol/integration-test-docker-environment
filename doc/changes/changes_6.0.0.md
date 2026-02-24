@@ -1,10 +1,10 @@
 # 6.0.0 - 2026-02-24
 
 This release adds support for docker db version 2025.1.8 and also adds support to build platform specific docker images.
-The latter is a breaking change, because the docker image tag has changed.
+The latter is a breaking change, because the docker image tag format has changed.
 Additionally, the release fixes a bug when building the binary, where the "certificate_resources" folder was missing, 
 and also a bug for the default values of some of the CLI parameters. 
-Also there were some internal improvements.
+Furthermore there were some internal improvements.
 
 ## Features
 
