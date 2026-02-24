@@ -1,6 +1,6 @@
 [project]
 name = "exasol-integration-test-docker-environment"
-version = "5.0.0"
+version = "6.0.0"
 description = "Integration Test Docker Environment for Exasol"
 authors = [{ name = "Torsten Kilias", email = "torsten.kilias@exasol.com" }]
 requires-python = ">=3.10,<3.15"
