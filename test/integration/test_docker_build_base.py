@@ -118,15 +118,17 @@ def _run_docker_build_base_task_and_check(expected_img_name: str, goals: list[st
             shutil.rmtree(str(task._get_tmp_path_for_job()))
 
 
-def test_default_parameter(clean_images):
+def test_default_parameter(clean_images, running_platform):
     _run_docker_build_base_task_and_check(
-        "exasol-test-docker-build-base:test-analyze-image-1", []
+        f"exasol-test-docker-build-base:test-analyze-image-1_{running_platform.value}_",
+        [],
     )
 
 
-def test_valid_non_default_goal(clean_images):
+def test_valid_non_default_goal(clean_images, running_platform):
     _run_docker_build_base_task_and_check(
-        "exasol-test-docker-build-base:test-analyze-image-2", ["test-analyze-image-2"]
+        f"exasol-test-docker-build-base:test-analyze-image-2_{running_platform.value}_",
+        ["test-analyze-image-2"],
     )
 
 

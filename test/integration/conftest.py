@@ -6,6 +6,10 @@ from pathlib import Path
 
 import pytest
 
+from exasol_integration_test_docker_environment.lib.docker.images.image_info import (
+    Platform,
+    current_platform,
+)
 from exasol_integration_test_docker_environment.lib.models.config.build_config import (
     set_build_config,
 )
@@ -245,3 +249,8 @@ def pytest_collection_modifyitems(items, config):
         config.option.markexpr = f"not gpu"
     elif "gpu" not in markexpr:
         config.option.markexpr = f"not gpu or ({markexpr})"
+
+
+@pytest.fixture
+def running_platform() -> Platform:
+    return current_platform()
