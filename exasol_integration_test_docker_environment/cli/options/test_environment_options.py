@@ -89,6 +89,7 @@ external_db_options = [
     click.option(
         "--external-exasol-db-host",
         type=str,
+        default=None,
         help="""Host name or IP of external Exasol DB, needs to be set if --environment-type=external_db""",
     ),
     click.option(
@@ -106,26 +107,31 @@ external_db_options = [
     click.option(
         "--external-exasol-ssh-port",
         type=int,
+        default=None,
         help="""SSH port of external Exasol DB, needs to be set if --environment-type=external_db""",
     ),
     click.option(
         "--external-exasol-db-user",
         type=str,
+        default=None,
         help="""User for external Exasol DB, needs to be set if --environment-type=external_db""",
     ),
     click.option(
         "--external-exasol-db-password",
         type=str,
+        default=None,
         help="""Database Password for external Exasol DB""",
     ),
     click.option(
         "--external-exasol-bucketfs-write-password",
         type=str,
+        default=None,
         help="""BucketFS write Password for external Exasol DB""",
     ),
     click.option(
         "--external-exasol-xmlrpc-host",
         type=str,
+        default=None,
         help="""Hostname for the xmlrpc server""",
     ),
     click.option(
@@ -145,6 +151,7 @@ external_db_options = [
     click.option(
         "--external-exasol-xmlrpc-password",
         type=str,
+        default=None,
         help="""Password for the xmlrpc server""",
     ),
     click.option(

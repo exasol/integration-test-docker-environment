@@ -16,6 +16,7 @@ build_options = [
         "--force-rebuild-from",
         multiple=True,
         type=str,
+        default=(),
         help="If the option --force-rebuild is given, "
         "this options specifies for which stages and dependent stages system will force a rebuild. "
         "The option can be repeated with different stages. "
