@@ -3,7 +3,7 @@
 This release adds support for docker db version 2025.1.8 and also adds support to build platform specific docker images.
 The latter is a breaking change, because the docker image tag format has changed.
 Additionally, the release fixes a bug when building the binary, where the "certificate_resources" folder was missing, 
-and also a bug for the default values of some of the CLI parameters. 
+a bug for the default values of some of the CLI parameters, and also a bug for serialization of class ImageInfo. 
 Furthermore there were some internal improvements.
 
 ## Features
@@ -15,6 +15,8 @@ Furthermore there were some internal improvements.
 
  - #565: Added folder certificate_resources to binary
  - #588: Set missing default values for click parameter
+ - #589: Fixed serialization of ImageInfo
+
 
 
 ## Internal

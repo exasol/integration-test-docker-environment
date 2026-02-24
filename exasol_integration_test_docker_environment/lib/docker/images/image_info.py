@@ -98,7 +98,13 @@ class ImageInfo(Info):
         self.source_tag = source_tag
         self.target_tag = target_tag
         self.hash = hash_value
-        self.platform = platform
+        self.platform: str | None = None
+        if isinstance(platform, Platform):
+            self.platform = platform.value
+        elif isinstance(platform, str):
+            self.platform = Platform[platform].value
+        elif platform is not None:
+            raise TypeError(f"{type(platform)} for platform not supported")
         self.check_complete_tag_length(self.source_tag)
         self.check_complete_tag_length(self.target_tag)
 
@@ -132,7 +138,7 @@ class ImageInfo(Info):
     def _create_complete_tag(self, tag):
         tag_elements = [tag]
         if self.platform:
-            tag_elements.append(self.platform.value)
+            tag_elements.append(self.platform)
         if self.hash:
             tag_elements.append(self.hash)
         return "_".join(tag_elements)
