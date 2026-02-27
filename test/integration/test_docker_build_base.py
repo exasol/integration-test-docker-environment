@@ -25,6 +25,7 @@ from exasol_integration_test_docker_environment.lib.docker.images.utils import (
 
 class TestDockerBuildBaseTestAnalyzeImage(DockerAnalyzeImageTask):
     task_name = Parameter()
+    add_resources = luigi.DictParameter(default={})
 
     def get_target_repository_name(self) -> str:
         return "exasol-test-docker-build-base"
@@ -42,7 +43,7 @@ class TestDockerBuildBaseTestAnalyzeImage(DockerAnalyzeImageTask):
         return {}
 
     def get_additional_resources(self) -> dict[str, str]:
-        return {"my_package_file.yaml": "some_package_content"}
+        return dict(self.add_resources)
 
     def get_dockerfile(self):
         script_dir = Path(__file__).resolve().parent
@@ -57,12 +58,14 @@ class TestDockerBuildBaseTestAnalyzeImage(DockerAnalyzeImageTask):
 
 class TestDockerBuildBase(DockerBuildBase):
     goals: list[str] = luigi.ListParameter(default=[])
+    add_resources: dict[str, str] = luigi.DictParameter(default={})
 
     def get_goal_class_map(self) -> dict[str, DockerAnalyzeImageTask]:
         goal_class_map: dict[str, DockerAnalyzeImageTask] = {
             "test-analyze-image-1": self.create_child_task(
                 task_class=TestDockerBuildBaseTestAnalyzeImage,
                 task_name="test-analyze-image-1",
+                add_resources=self.add_resources,
             ),
             "test-analyze-image-2": self.create_child_task(
                 TestDockerBuildBaseTestAnalyzeImage, task_name="test-analyze-image-2"
@@ -101,14 +104,44 @@ def clean_images():
     clean()
 
 
-def assert_image_exists(prefix):
+def assert_at_least_one_image_exists(prefix):
     with ContextDockerClient() as docker_client:
         image_list = find_images_by_tag(docker_client, lambda x: x.startswith(prefix))
-        assert len(image_list) == 1, f"Image with prefix {prefix} not found"
-        return image_list[0]
+        assert len(image_list) >= 1, f"Image with prefix {prefix} not found"
+        return image_list
 
 
-def check_docker_image_content(image):
+def _run_docker_build_base_task_and_check(expected_img_name: str, **kwargs):
+    task = generate_root_task(task_class=TestDockerBuildBase, **kwargs)
+    try:
+        luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
+        return assert_at_least_one_image_exists(expected_img_name)
+    finally:
+        if task._get_tmp_path_for_job().exists():
+            shutil.rmtree(str(task._get_tmp_path_for_job()))
+
+
+def test_default_parameter(clean_images, running_platform):
+    _run_docker_build_base_task_and_check(
+        f"exasol-test-docker-build-base:test-analyze-image-1_{running_platform.value}_",
+    )
+
+
+def test_valid_non_default_goal(clean_images, running_platform):
+    _run_docker_build_base_task_and_check(
+        f"exasol-test-docker-build-base:test-analyze-image-2_{running_platform.value}_",
+        goals=["test-analyze-image-2"],
+    )
+
+
+def test_non_valid_non_default_goal(clean_images):
+    with pytest.raises(Exception, match=r"^Unknown goal\(s\).+"):
+        generate_root_task(
+            task_class=TestDockerBuildBase, goals=["test-analyze-image-3"]
+        )
+
+
+def check_docker_add_resources_in_image(image):
     with ContextDockerClient() as docker_client:
         output_bytes = docker_client.containers.run(
             image,
@@ -120,37 +153,35 @@ def check_docker_image_content(image):
         assert output == "some_package_content"
 
 
-def _run_docker_build_base_task_and_check(expected_img_name: str, goals: list[str]):
-    task = (
-        generate_root_task(task_class=TestDockerBuildBase, goals=goals)
-        if goals
-        else generate_root_task(task_class=TestDockerBuildBase)
+def test_docker_img_content(clean_images):
+    img = _run_docker_build_base_task_and_check(
+        f"exasol-test-docker-build-base:test-analyze-image-1_",
+        add_resources={"my_package_file.yaml": "some_package_content"},
     )
-    try:
-        luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
-        img = assert_image_exists(expected_img_name)
-        check_docker_image_content(img)
-    finally:
-        if task._get_tmp_path_for_job().exists():
-            shutil.rmtree(str(task._get_tmp_path_for_job()))
+    assert len(img) == 1
+    check_docker_add_resources_in_image(img[0])
 
 
-def test_default_parameter(clean_images, running_platform):
-    _run_docker_build_base_task_and_check(
-        f"exasol-test-docker-build-base:test-analyze-image-1_{running_platform.value}_",
-        [],
+def test_docker_img_hash_does_not_changes_with_same_resource(clean_images):
+    add_resources = {"my_package_file.yaml": "some_package_content"}
+    exp_image_name = "exasol-test-docker-build-base:test-analyze-image-1_"
+    imgs = _run_docker_build_base_task_and_check(
+        exp_image_name, add_resources=add_resources
     )
-
-
-def test_valid_non_default_goal(clean_images, running_platform):
-    _run_docker_build_base_task_and_check(
-        f"exasol-test-docker-build-base:test-analyze-image-2_{running_platform.value}_",
-        ["test-analyze-image-2"],
+    assert len(imgs) == 1
+    imgs = _run_docker_build_base_task_and_check(
+        exp_image_name, add_resources=add_resources
     )
+    assert len(imgs) == 1
 
 
-def test_non_valid_non_default_goal(clean_images):
-    with pytest.raises(Exception, match=r"^Unknown goal\(s\).+"):
-        generate_root_task(
-            task_class=TestDockerBuildBase, goals=["test-analyze-image-3"]
-        )
+def test_docker_img_hash_changes_with_add_resource(clean_images):
+    exp_image_name = "exasol-test-docker-build-base:test-analyze-image-1_"
+    imgs = _run_docker_build_base_task_and_check(
+        exp_image_name,
+    )
+    assert len(imgs) == 1
+    imgs = _run_docker_build_base_task_and_check(
+        exp_image_name, add_resources={"my_package_file.yaml": "some_package_content"}
+    )
+    assert len(imgs) == 2
