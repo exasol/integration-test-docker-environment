@@ -50,12 +50,14 @@ class ImageDescription:
         image_changing_build_arguments: dict[str, Any],
         transparent_build_arguments: dict[str, Any],
         mapping_of_build_files_and_directories: dict[str, str],
+        additional_resources: dict[str, str],
     ) -> None:
         self.transparent_build_arguments = transparent_build_arguments
         self.image_changing_build_arguments = image_changing_build_arguments
         self.mapping_of_build_files_and_directories = (
             mapping_of_build_files_and_directories
         )
+        self.additional_resources = additional_resources
         self.dockerfile = dockerfile
 
     def __repr__(self):

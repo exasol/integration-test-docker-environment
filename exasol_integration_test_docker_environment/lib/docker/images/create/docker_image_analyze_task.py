@@ -49,11 +49,13 @@ class DockerAnalyzeImageTask(DockerBaseTask):
             **self.get_image_changing_build_arguments(),
             **docker_build_arguments().image_changing,
         }
+        additional_resources = self.get_additional_resources()
         self.image_description = ImageDescription(
             dockerfile=self.get_dockerfile(),
             mapping_of_build_files_and_directories=self.get_mapping_of_build_files_and_directories(),
             image_changing_build_arguments=merged_image_changing_build_arguments,
             transparent_build_arguments=merged_transparent_build_arguments,
+            additional_resources=additional_resources,
         )
         self._dockerfile = self.get_dockerfile()
 
@@ -125,8 +127,18 @@ class DockerAnalyzeImageTask(DockerBaseTask):
         Transparent arguments do not change the contain of the images.
         They are not part of the image hash. A common use case is define a mirror
         from which packages should be installed.
-        Sub classes need to implement this method.
+        Sub classes need to override this method.
         :return: Dictionary of build arguments, where the keys are the argument name
+        """
+        return {}
+
+    def get_additional_resources(self) -> dict[str, str]:
+        """
+        Called by the constructor to get additional resources.
+        For each entry of the dictionary a new file will be created, which can be accessed by the Dockerfile.
+        They are part of the image hash. A common use case is to provide a specific package file for the build-step.
+        Sub classes need to override this method.
+        :return: Dictionary of file-name => file-content.
         """
         return {}
 

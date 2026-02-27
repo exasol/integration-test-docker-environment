@@ -41,6 +41,9 @@ class TestDockerBuildBaseTestAnalyzeImage(DockerAnalyzeImageTask):
     def get_mapping_of_build_files_and_directories(self):
         return {}
 
+    def get_additional_resources(self) -> dict[str, str]:
+        return {"my_package_file.yaml": "some_package_content"}
+
     def get_dockerfile(self):
         script_dir = Path(__file__).resolve().parent
         dockerfile_path = Path(
@@ -102,6 +105,19 @@ def assert_image_exists(prefix):
     with ContextDockerClient() as docker_client:
         image_list = find_images_by_tag(docker_client, lambda x: x.startswith(prefix))
         assert len(image_list) == 1, f"Image with prefix {prefix} not found"
+        return image_list[0]
+
+
+def check_docker_image_content(image):
+    with ContextDockerClient() as docker_client:
+        output_bytes = docker_client.containers.run(
+            image,
+            command="cat /build_info/my_package_file.yaml",
+            remove=True,  # Automatically removes the container when it exits
+        )
+        # Decode the output from bytes to a string
+        output = output_bytes.decode("utf-8").strip()
+        assert output == "some_package_content"
 
 
 def _run_docker_build_base_task_and_check(expected_img_name: str, goals: list[str]):
@@ -112,7 +128,8 @@ def _run_docker_build_base_task_and_check(expected_img_name: str, goals: list[st
     )
     try:
         luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
-        assert_image_exists(expected_img_name)
+        img = assert_image_exists(expected_img_name)
+        check_docker_image_content(img)
     finally:
         if task._get_tmp_path_for_job().exists():
             shutil.rmtree(str(task._get_tmp_path_for_job()))

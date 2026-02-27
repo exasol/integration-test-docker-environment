@@ -63,6 +63,7 @@ class BuildContextHasher:
     ):
         hasher = hashlib.sha256()
         self.add_image_changing_build_arguments(hasher)
+        self.add_additional_resources(hasher)
         self.add_dependencies(hasher, image_info_of_dependencies)
         hasher.update(hash_of_build_context)
         final_hash = hasher.digest()
@@ -81,15 +82,18 @@ class BuildContextHasher:
             hasher.update(key.encode("utf-8"))
             hasher.update(image_name.encode("utf-8"))
 
-    def add_image_changing_build_arguments(self, hasher):
-        arguments = [
-            (key, value)
-            for key, value in self.image_description.image_changing_build_arguments.items()
-        ]
+    def _add_dict(self, hasher, d: dict[str, str]) -> None:
+        arguments = [(key, value) for key, value in d.items()]
         sorted_arguemnts = sorted(arguments, key=lambda t: t[0])
         for key, value in sorted_arguemnts:
             hasher.update(key.encode("utf-8"))
             hasher.update(value.encode("utf-8"))
+
+    def add_image_changing_build_arguments(self, hasher):
+        self._add_dict(hasher, self.image_description.image_changing_build_arguments)
+
+    def add_additional_resources(self, hasher):
+        self._add_dict(hasher, self.image_description.additional_resources)
 
     def _encode_hash(self, hash_of_build_directory):
         base32 = base64.b32encode(hash_of_build_directory)
