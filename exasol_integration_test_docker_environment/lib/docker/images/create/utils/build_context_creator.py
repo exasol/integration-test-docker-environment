@@ -54,10 +54,6 @@ class BuildContextCreator:
         COPY Dockerfile /build_info/dockerfiles/{self._image_info.target_tag}
         """
         )
-        final_dockerfile += "\n".join(
-            f"COPY {add_res_file} /build_info/{add_res_file}"
-            for add_res_file in self._image_description.additional_resources.keys()
-        )
         with open(self._temp_directory + "/Dockerfile", "w") as file:
             file.write(final_dockerfile)
 

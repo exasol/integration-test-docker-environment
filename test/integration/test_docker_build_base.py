@@ -112,7 +112,7 @@ def check_docker_image_content(image):
     with ContextDockerClient() as docker_client:
         output_bytes = docker_client.containers.run(
             image,
-            command="cat /build_info/my_package_file.yaml",
+            command="cat /my_package_file.yaml",
             remove=True,  # Automatically removes the container when it exits
         )
         # Decode the output from bytes to a string
