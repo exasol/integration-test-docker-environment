@@ -12,13 +12,17 @@ from exasol_integration_test_docker_environment.lib.docker.images.image_info imp
 
 
 def _create_image_description(
-    dockerfile: Path, data_file: Path, image_changing_build_arguments: dict[str, str]
+    dockerfile: Path,
+    data_file: Path,
+    image_changing_build_arguments: dict[str, str],
+    add_resources: dict[str, str],
 ) -> ImageDescription:
     return ImageDescription(
         dockerfile=str(dockerfile),
         image_changing_build_arguments=image_changing_build_arguments,
         transparent_build_arguments={"X": "ignored"},
         mapping_of_build_files_and_directories={"context/data.txt": str(data_file)},
+        additional_resources=add_resources,
     )
 
 
@@ -27,11 +31,13 @@ def _hash_from_description(image_description: ImageDescription) -> str:
     return hasher.generate_image_hash({})
 
 
-def test_generate_image_hash_fix_value(
+def test_generate_image_hash_fix_value_no_add_resources(
     tmp_path: Path,
 ):
     """
-    Validate impact of content of "Dockerfile" on hash sum.
+    Validate fix value of hashsum, without adding resources.
+    This test validates that the hash sum did not change, when the BuildContextHasher
+    added the implementation of the  "additional_resources" parameter.
     """
 
     dockerfile = tmp_path / "Dockerfile"
@@ -44,10 +50,36 @@ def test_generate_image_hash_fix_value(
         dockerfile=dockerfile,
         data_file=build_file,
         image_changing_build_arguments={"A": "1", "B": "2"},
+        add_resources={},
     )
 
     hash_one = _hash_from_description(image_description_one)
     expected_hash = "TZVUSOHGBFQGY4WBB3CDR7Y6IBTMSJ6LYEJLLTWBPMCRTYA46M6A"
+    assert hash_one == expected_hash, f"Hash one={hash_one}, hash two={expected_hash}"
+
+
+def test_generate_image_hash_fix_value(
+    tmp_path: Path,
+):
+    """
+    Validate fix value of hashsum, with adding resources.
+    """
+
+    dockerfile = tmp_path / "Dockerfile"
+    dockerfile.write_text("FROM scratch\nCOPY data.txt /data.txt\n")
+
+    build_file = tmp_path / "data.txt"
+    build_file.write_text("identical content")
+
+    image_description_one = _create_image_description(
+        dockerfile=dockerfile,
+        data_file=build_file,
+        image_changing_build_arguments={"A": "1", "B": "2"},
+        add_resources={"ResA:": "some_text", "ResB:": "some_other_text"},
+    )
+
+    hash_one = _hash_from_description(image_description_one)
+    expected_hash = "EJ74MUEJSYSQE3AQM5332TIPKDLWEQ4I2KAE5KNBMDXNW4SW3JMA"
     assert hash_one == expected_hash, f"Hash one={hash_one}, hash two={expected_hash}"
 
 
@@ -75,11 +107,13 @@ def test_generate_image_hash_docker_file_content(
         dockerfile=dockerfile,
         data_file=build_file,
         image_changing_build_arguments={"A": "1", "B": "2"},
+        add_resources={"ResA:": "some_text", "ResB:": "some_other_text"},
     )
     image_description_two = _create_image_description(
         dockerfile=dockerfile,
         data_file=build_file,
         image_changing_build_arguments={"B": "2", "A": "1"},
+        add_resources={"ResB:": "some_other_text", "ResA:": "some_text"},
     )
 
     hash_one = _hash_from_description(image_description_one)
@@ -115,11 +149,13 @@ def test_generate_image_hash_build_file_content(
         dockerfile=dockerfile,
         data_file=build_file,
         image_changing_build_arguments={"A": "1", "B": "2"},
+        add_resources={"ResA:": "some_text", "ResB:": "some_other_text"},
     )
     image_description_two = _create_image_description(
         dockerfile=dockerfile,
         data_file=build_file,
         image_changing_build_arguments={"B": "2", "A": "1"},
+        add_resources={"ResB:": "some_other_text", "ResA:": "some_text"},
     )
 
     hash_one = _hash_from_description(image_description_one)
@@ -155,11 +191,53 @@ def test_generate_image_hash_build_arguments(
         dockerfile=dockerfile,
         data_file=build_file,
         image_changing_build_arguments={"A": "1", "B": "2"},
+        add_resources={"ResA:": "some_text", "ResB:": "some_other_text"},
     )
     image_description_two = _create_image_description(
         dockerfile=dockerfile,
         data_file=build_file,
         image_changing_build_arguments=build_arguments,
+        add_resources={"ResB:": "some_other_text", "ResA:": "some_text"},
+    )
+
+    hash_one = _hash_from_description(image_description_one)
+    hash_two = _hash_from_description(image_description_two)
+
+    result = hash_one == hash_two
+    assert result == expected_result, f"Hash one={hash_one}, hash two={hash_two}"
+
+
+@pytest.mark.parametrize(
+    "add_resources, expected_result",
+    [
+        ({"ResA:": "some_text", "ResB:": "some_other_text"}, True),
+        ({"ResA:": "some_different_text", "ResB:": "some_other_different_text"}, False),
+    ],
+)
+def test_generate_image_hash_add_resources(
+    tmp_path: Path, add_resources: dict[str, str], expected_result: bool
+):
+    """
+    Validate impact of build arguments on hash sum.
+    """
+
+    dockerfile = tmp_path / "Dockerfile"
+    dockerfile.write_text("FROM scratch\nCOPY data.txt /data.txt\n")
+
+    build_file = tmp_path / "data.txt"
+    build_file.write_text("identical content")
+
+    image_description_one = _create_image_description(
+        dockerfile=dockerfile,
+        data_file=build_file,
+        image_changing_build_arguments={"A": "1", "B": "2"},
+        add_resources={"ResA:": "some_text", "ResB:": "some_other_text"},
+    )
+    image_description_two = _create_image_description(
+        dockerfile=dockerfile,
+        data_file=build_file,
+        image_changing_build_arguments={"B": "2", "A": "1"},
+        add_resources=add_resources,
     )
 
     hash_one = _hash_from_description(image_description_one)
@@ -187,6 +265,7 @@ def test_generate_image_hash_transparent_build_arguments(tmp_path: Path):
         image_changing_build_arguments=build_arguments,
         transparent_build_arguments={"X": "something"},
         mapping_of_build_files_and_directories={"context/data.txt": str(build_file)},
+        additional_resources={"ResA:": "some_text", "ResB:": "some_other_text"},
     )
 
     image_description_two = ImageDescription(
@@ -194,6 +273,7 @@ def test_generate_image_hash_transparent_build_arguments(tmp_path: Path):
         image_changing_build_arguments=build_arguments,
         transparent_build_arguments={"Y": "something different"},
         mapping_of_build_files_and_directories={"context/data.txt": str(build_file)},
+        additional_resources={"ResB:": "some_other_text", "ResA:": "some_text"},
     )
 
     hash_one = _hash_from_description(image_description_one)

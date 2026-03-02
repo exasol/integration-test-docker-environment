@@ -27,6 +27,7 @@ class BuildContextCreator:
 
     def prepare_build_context_to_temp_dir(self):
         self._copy_build_files_and_directories()
+        self._create_additional_resource_files()
         self._prepare_dockerfile()
         self._prepare_image_info()
         self._log_build_context()
@@ -86,3 +87,8 @@ class BuildContextCreator:
         return [
             os.path.join(r, file) for r, d, f in os.walk(temp_directory) for file in f
         ]
+
+    def _create_additional_resource_files(self):
+        for key, value in self._image_description.additional_resources.items():
+            res_file_path = Path(self._temp_directory) / key
+            res_file_path.write_text(value)
