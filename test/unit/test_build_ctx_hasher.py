@@ -31,11 +31,13 @@ def _hash_from_description(image_description: ImageDescription) -> str:
     return hasher.generate_image_hash({})
 
 
-def test_generate_image_hash_fix_value(
+def test_generate_image_hash_fix_value_no_add_resources(
     tmp_path: Path,
 ):
     """
-    Validate impact of content of "Dockerfile" on hash sum.
+    Validate fix value of hashsum, without adding resources.
+    This test validates that the hash sum did not change, when the BuildContextHasher
+    added the implementation of the  "additional_resources" parameter.
     """
 
     dockerfile = tmp_path / "Dockerfile"
@@ -48,10 +50,36 @@ def test_generate_image_hash_fix_value(
         dockerfile=dockerfile,
         data_file=build_file,
         image_changing_build_arguments={"A": "1", "B": "2"},
+        add_resources={},
     )
 
     hash_one = _hash_from_description(image_description_one)
     expected_hash = "TZVUSOHGBFQGY4WBB3CDR7Y6IBTMSJ6LYEJLLTWBPMCRTYA46M6A"
+    assert hash_one == expected_hash, f"Hash one={hash_one}, hash two={expected_hash}"
+
+
+def test_generate_image_hash_fix_value(
+    tmp_path: Path,
+):
+    """
+    Validate fix value of hashsum, with adding resources.
+    """
+
+    dockerfile = tmp_path / "Dockerfile"
+    dockerfile.write_text("FROM scratch\nCOPY data.txt /data.txt\n")
+
+    build_file = tmp_path / "data.txt"
+    build_file.write_text("identical content")
+
+    image_description_one = _create_image_description(
+        dockerfile=dockerfile,
+        data_file=build_file,
+        image_changing_build_arguments={"A": "1", "B": "2"},
+        add_resources={"ResA:": "some_text", "ResB:": "some_other_text"},
+    )
+
+    hash_one = _hash_from_description(image_description_one)
+    expected_hash = "EJ74MUEJSYSQE3AQM5332TIPKDLWEQ4I2KAE5KNBMDXNW4SW3JMA"
     assert hash_one == expected_hash, f"Hash one={hash_one}, hash two={expected_hash}"
 
 
