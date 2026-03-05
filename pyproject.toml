@@ -73,7 +73,7 @@ requires = [
 plugins = ["luigi.mypy"]
 
 [[tool.mypy.overrides]]
-module = [ "luigi.*", "docker.*", "humanfriendly", "configobj", "toml", "netaddr", "joblib.testing", "networkx",
+module = [ "luigi.*", "docker.*", "humanfriendly", "configobj", "toml", "netaddr", "networkx",
             "fabric", "requests", "pyexasol", "paramiko.ssh_exception", "six", "jsonpickle",
             "paramiko", "networkx.classes"]
 ignore_missing_imports = true
