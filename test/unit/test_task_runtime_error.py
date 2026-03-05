@@ -4,7 +4,6 @@ import traceback
 from test.matchers import regex_matcher
 
 import pytest
-from joblib.testing import fixture
 
 from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import (
     DependencyLoggerBaseTask,
@@ -57,7 +56,7 @@ class SingleFailingTask(DependencyLoggerBaseTask):
 
 class TestSingleTaskFailure:
 
-    @fixture(scope="class")
+    @pytest.fixture(scope="class")
     def exception_from_sut(self) -> TaskRuntimeError:
         def task_creator():
             return generate_root_task(task_class=SingleFailingTask)
@@ -69,7 +68,7 @@ class TestSingleTaskFailure:
             run_task(task_creator=task_creator, workers=3)
         return raises.value
 
-    @fixture
+    @pytest.fixture
     def formatted_cause(self, exception_from_sut):
         cause = exception_from_sut.__cause__
         formatted_cause = "".join(
@@ -97,7 +96,7 @@ class TestSingleTaskFailure:
 
 class TestMultipleTaskFailure:
 
-    @fixture(scope="class")
+    @pytest.fixture(scope="class")
     def exception_from_sut(self) -> TaskRuntimeError:
         def task_creator():
             return generate_root_task(task_class=CompositeFailingTask)
@@ -109,7 +108,7 @@ class TestMultipleTaskFailure:
             run_task(task_creator=task_creator, workers=3)
         return raises.value
 
-    @fixture
+    @pytest.fixture
     def formatted_cause(self, exception_from_sut):
         cause = exception_from_sut.__cause__
         formatted_cause = "".join(

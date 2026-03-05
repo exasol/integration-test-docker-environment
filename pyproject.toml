@@ -48,7 +48,6 @@ dev = [
     "mypy>=1.1.1,<2",
     "pyexasol>=1.1.1, <3.0.0",
     "exasol-toolbox>=5.1.1,<6",
-    "joblib>=1.4.2,<2",
     "pytest-check==2.5.3",
     "pyinstaller>=6.15.0,<7",
     "types-pyinstaller>=6.15.0.20250822,<7",
@@ -74,7 +73,7 @@ requires = [
 plugins = ["luigi.mypy"]
 
 [[tool.mypy.overrides]]
-module = [ "luigi.*", "docker.*", "humanfriendly", "configobj", "toml", "netaddr", "joblib.testing", "networkx",
+module = [ "luigi.*", "docker.*", "humanfriendly", "configobj", "toml", "netaddr", "networkx",
             "fabric", "requests", "pyexasol", "paramiko.ssh_exception", "six", "jsonpickle",
             "paramiko", "networkx.classes"]
 ignore_missing_imports = true
