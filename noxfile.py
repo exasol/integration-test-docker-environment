@@ -19,7 +19,7 @@ ROOT = Path(__file__).parent
 from exasol.toolbox.nox.tasks import *  # type: ignore
 
 # default actions to be run if nothing is explicitly specified with the -s option
-nox.options.sessions = ["project:fix"]
+nox.options.sessions = ["format:fix"]
 
 
 class TestSet(Enum):
