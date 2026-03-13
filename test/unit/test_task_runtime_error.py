@@ -33,7 +33,7 @@ class CompositeFailingTask(DependencyLoggerBaseTask):
 class FailingTask1(DependencyLoggerBaseTask):
 
     def run_task(self):
-        # The sleep is needed to garantuee that both FailingTasks are started before one fails,
+        # The sleep is needed to guarantee that both FailingTasks are started before one fails,
         # because otherwise the other one won't be started
         time.sleep(0.1)
         raise RuntimeError(f"Error in {self.__class__.__name__} occurred.")
@@ -42,7 +42,7 @@ class FailingTask1(DependencyLoggerBaseTask):
 class FailingTask2(DependencyLoggerBaseTask):
 
     def run_task(self):
-        # The sleep is needed to garantuee that both FailingTasks are started before one fails,
+        # The sleep is needed to guarantee that both FailingTasks are started before one fails,
         # because otherwise the other one won't be started
         time.sleep(0.1)
         raise RuntimeError(f"Error in {self.__class__.__name__} occurred.")
