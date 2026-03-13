@@ -82,6 +82,7 @@ def default_log_path(job_id):
 
 
 class TestTask(DependencyLoggerBaseTask):
+    __test__ = False
     x = luigi.Parameter()
 
     def run_task(self):
