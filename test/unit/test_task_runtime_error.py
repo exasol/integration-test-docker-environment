@@ -21,10 +21,10 @@ from exasol_integration_test_docker_environment.lib.models.api_errors import (
 class CompositeFailingTask(DependencyLoggerBaseTask):
 
     def register_required(self):
-        self.dependencies = self.register_dependencies(
+        dependencies = self.register_dependencies(
             [self.create_child_task(FailingTask1), self.create_child_task(FailingTask2)]
         )
-        return self.dependencies
+        return dependencies
 
     def run_task(self):
         pass
