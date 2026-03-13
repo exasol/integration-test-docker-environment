@@ -126,7 +126,8 @@ class DependencyLoggerBaseTask(StoppableBaseTask):
     def get_task_description(self) -> TaskDescription:
         return TaskDescription(id=self.task_id, representation=str(self))
 
-    def flatten_tasks(self, generator: Generator) -> list["DependencyLoggerBaseTask"]:
+    @staticmethod
+    def flatten_tasks(generator: Generator) -> list["DependencyLoggerBaseTask"]:
         return [
             task
             for task in luigi.task.flatten(generator)
