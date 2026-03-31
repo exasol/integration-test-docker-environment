@@ -47,7 +47,7 @@ dev = [
     "nox>=2022.1.7,<2023",
     "mypy>=1.1.1,<2",
     "pyexasol>=1.1.1, <3.0.0",
-    "exasol-toolbox>=5.1.1,<6",
+    "exasol-toolbox>=6.1.1,<7",
     "pytest-check==2.5.3",
     "pyinstaller>=6.15.0,<7",
     "types-pyinstaller>=6.15.0.20250822,<7",
@@ -65,7 +65,7 @@ exclude = ["exasol_integration_test_docker_environment/test"]
 
 [build-system]
 requires = [
-    "poetry>=2.0.0",
+    "poetry>=2.3.0",
     "poetry-core"
 ]
 
