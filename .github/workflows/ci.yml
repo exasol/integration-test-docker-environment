@@ -13,7 +13,7 @@ jobs:
     uses: ./.github/workflows/merge-gate.yml
     secrets: inherit
     permissions:
-      contents: read
+      contents: write
 
   report:
     name: Report
