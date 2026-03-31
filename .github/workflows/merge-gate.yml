@@ -1,0 +1,64 @@
+name: Merge-Gate
+
+on:
+  workflow_call:
+
+jobs:
+  run-fast-checks:
+    name: Fast Checks
+    uses: ./.github/workflows/checks.yml
+    permissions:
+      contents: read
+
+  fast-tests:
+    name: Fast Tests
+    uses: ./.github/workflows/fast-tests.yml
+    permissions:
+      contents: read
+
+  approve-run-slow-tests:
+    name: Approve Running Slow Tests?
+    runs-on: "ubuntu-24.04"
+    permissions:
+      contents: read
+    # Even though the environment "manual-approval" will be created automatically,
+    # it still needs to be configured to require interactive review.
+    # See project settings on GitHub (Settings / Environments / manual-approval).
+    environment: manual-approval
+    steps:
+      - name: Tests
+        run: echo "Slow tests approved"
+
+  slow-tests:
+    name: Slow Tests
+    needs: approve-run-slow-tests
+    permissions:
+      contents: read
+    uses: ./.github/workflows/slow-tests.yml
+    # Do not inherit secrets because ITDE Slow Tests does not need it
+
+  standalone-executable:
+    needs: [ fast-tests ]
+    name: Create a standalone linux executable
+    uses: ./.github/workflows/build-executable.yml
+    with:
+      release-tag: ''
+    permissions:
+      contents: write
+
+  # This job ensures inputs have been executed successfully.
+  allow-merge:
+    name: Allow Merge
+    runs-on: "ubuntu-24.04"
+    permissions:
+      contents: read
+    # If you need additional jobs to be part of the merge gate, add them below
+    needs:
+      - run-fast-checks
+      - fast-tests
+      - slow-tests
+      - standalone-executable
+    # Each job requires a step, so we added this dummy step.
+    steps:
+      - name: Approve
+        run: echo "Merge Approved"

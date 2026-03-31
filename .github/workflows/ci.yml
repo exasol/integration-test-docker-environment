@@ -2,80 +2,24 @@ name: CI
 
 on:
   pull_request:
-      types: [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened]
   schedule:
     # At 00:00 on every 7th day-of-month from 1 through 31. (https://crontab.guru)
     - cron: "0 0 1/7 * *"
 
 jobs:
-
-  checks:
-    name: Checks
-    uses: ./.github/workflows/checks.yml
-    permissions:
-      contents: read
-
-  fast-tests:
-    name: Fast Tests
-    uses: ./.github/workflows/fast-tests.yml
-    permissions:
-      contents: read
-
-  slow-tests-approval:
-    name: Approve Slow Tests
-    runs-on: ubuntu-24.04
-    permissions:
-      contents: read
-
-    # Even though the environment "manual-approval" will be created automatically,
-    # it still needs to be configured to require interactive review.
-    # See project settings on GitHub (Settings / Environments / manual-approval).
-    environment: manual-approval
-
-    # Replace the steps below with the required actions
-    # and/or add additional jobs if required
-    # Note:
-    #   If you add additional jobs, make sure they are added as a requirement
-    #   to the approve-merge job's input requirements (needs).
-    steps:
-      - name: Tests
-        run: echo "Slow tests approved"
-
-  slow-tests:
-    name: Slow Tests
-    needs: slow-tests-approval
-    permissions:
-      contents: read
-    uses: ./.github/workflows/slow-tests.yml
-    #Do not inherit secrets because ITDE Slow Tests does not need it
-
-  standalone-executable:
-    needs: [fast-tests]
-    name: Create a standalone linux executable
-    uses: ./.github/workflows/build-executable.yml
-    with:
-      release-tag: ''
-    permissions:
-      contents: write
-
-  metrics:
-    name: Report Metrics
-    needs: [ checks, fast-tests ]
+  merge-gate:
+    name: Merge Gate
+    uses: ./.github/workflows/merge-gate.yml
     secrets: inherit
     permissions:
       contents: read
-    uses: ./.github/workflows/report.yml
 
-  # This job ensures inputs have been executed successfully.
-  approve-merge:
-    name: Allow Merge
-    runs-on: ubuntu-24.04
+  report:
+    name: Report
+    needs:
+      - merge-gate
+    uses: ./.github/workflows/report.yml
+    secrets: inherit
     permissions:
       contents: read
-    # If you need additional jobs to be part of the merge gate, add them below
-    needs: [ checks, fast-tests, slow-tests, standalone-executable ]
-
-    # Each job requires a step, so we added this dummy step.
-    steps:
-      - name: Approve
-        run: echo "Merge Approved"
