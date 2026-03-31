@@ -42,8 +42,7 @@ def test_from_test_environment_info():
         "ip-address",
         test_environment,
     )
-    assert actual.render().strip() == cleandoc(
-        """
+    assert actual.render().strip() == cleandoc("""
         ITDE_NAME=name
         ITDE_TYPE=type
         ITDE_DATABASE_HOST=db-host
@@ -60,5 +59,4 @@ def test_from_test_environment_info():
         ITDE_TEST_CONTAINER_NAME=test-container-name
         ITDE_TEST_CONTAINER_NETWORK_ALIASES="tcna-1 tcna-2"
         ITDE_TEST_CONTAINER_IP_ADDRESS=tc-ip
-        """
-    )
+        """)

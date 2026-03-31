@@ -17,8 +17,7 @@ def test_udf_execution(api_context):
         sleep(5 * 60)
 
     def udf_sql(schema: str) -> str:
-        return cleandoc(
-            f"""
+        return cleandoc(f"""
             --/
             CREATE OR REPLACE PYTHON3 SCALAR SCRIPT
               {schema}.python3_test_udf(count INT)
@@ -29,8 +28,7 @@ def test_udf_execution(api_context):
                 for i in range(ctx.count):
                     ctx.emit(i)
             /
-            """
-        )
+            """)
 
     with api_context() as db:
         with db.create_connection() as connection:

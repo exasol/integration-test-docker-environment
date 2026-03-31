@@ -450,7 +450,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         self.logger.info(
             f"Creating database volume of size {device_size_in_megabytes / 1024} GB using and overhead factor of {overhead_factor}"
         )
-        (exit_code, output) = preparation_container.exec_run(
+        exit_code, output = preparation_container.exec_run(
             cmd=f"bash /init_db.sh {device_size_in_megabytes}"
         )
         if exit_code != 0:
