@@ -34,13 +34,11 @@ class NumberCheck:
         )
 
     def fail(self, prefix) -> str:
-        return cleandoc(
-            f"""
+        return cleandoc(f"""
             {prefix} in {self.all}.
             Startup log was:
             {self.log}
-            """
-        )
+            """)
 
 
 def smoke_test_sql(exaplus_path: str, env: ExaslctDockerTestEnvironment) -> str:
