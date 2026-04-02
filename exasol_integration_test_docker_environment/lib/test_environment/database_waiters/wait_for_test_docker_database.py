@@ -34,13 +34,17 @@ from exasol_integration_test_docker_environment.lib.test_environment.database_wa
 
 class WaitForTestDockerDatabase(DockerBaseTask, DatabaseCredentialsParameter):
     environment_name: str = luigi.Parameter()
-    database_info: DatabaseInfo = JsonPickleParameter(DatabaseInfo, significant=False)  # type: ignore
+    database_info: DatabaseInfo = JsonPickleParameter(
+        cls=DatabaseInfo, significant=False
+    )
     db_startup_timeout_in_seconds: int = luigi.IntParameter(
         default=10 * 60, significant=False
     )
     attempt: int = luigi.IntParameter(default=1)
     docker_db_image_version: str = luigi.Parameter()
-    executor_factory: DbOsExecFactory = JsonPickleParameter(DbOsExecFactory, significant=False)  # type: ignore
+    executor_factory: DbOsExecFactory = JsonPickleParameter(
+        cls=DbOsExecFactory, significant=False
+    )
 
     def run_task(self) -> None:
         with self._get_docker_client() as docker_client:

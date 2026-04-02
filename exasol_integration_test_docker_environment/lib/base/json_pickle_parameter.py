@@ -23,15 +23,15 @@ class JsonPickleParameter(Parameter):
         visibility=ParameterVisibility.PUBLIC,
     ) -> None:
         super().__init__(
-            default,
-            is_global,
-            significant,
-            description,
-            config_path,
-            positional,
-            always_in_help,
-            batch_method,
-            visibility,
+            default=default,
+            is_global=is_global,
+            significant=significant,
+            description=description,
+            config_path=config_path,
+            positional=positional,
+            always_in_help=always_in_help,
+            batch_method=batch_method,
+            visibility=visibility,
         )
         self.cls = cls
         self._is_optional = is_optional

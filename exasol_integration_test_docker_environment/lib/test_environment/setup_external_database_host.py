@@ -36,7 +36,9 @@ class SetupExternalDatabaseHost(
     DatabaseCredentialsParameter,
 ):
     environment_name: str = luigi.Parameter()
-    network_info: DockerNetworkInfo = JsonPickleParameter(DockerNetworkInfo, significant=False)  # type: ignore
+    network_info: DockerNetworkInfo = JsonPickleParameter(
+        cls=DockerNetworkInfo, significant=False
+    )
     attempt: int = luigi.IntParameter(default=1)
 
     def run_task(self) -> None:

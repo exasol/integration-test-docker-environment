@@ -11,7 +11,7 @@ class build_config(luigi.Config):
     force_pull: bool = luigi.BoolParameter(default=False)
     force_load: bool = luigi.BoolParameter(default=False)
     force_rebuild: bool = luigi.BoolParameter(default=False)
-    force_rebuild_from: list[str] = luigi.ListParameter(default=[])
+    force_rebuild_from: tuple[str, ...] = luigi.ListParameter(default=tuple())
     log_build_context_content: bool = luigi.BoolParameter(default=False)
     # keep_build_context = luigi.BoolParameter(False)
     temporary_base_directory: str | None = luigi.OptionalParameter(default=None)
