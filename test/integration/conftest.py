@@ -3,6 +3,9 @@ import shutil
 import subprocess
 from collections.abc import Iterator
 from pathlib import Path
+from test.integration.get_test_container_content import (
+    get_test_container_content,
+)
 
 import pytest
 
@@ -12,9 +15,6 @@ from exasol_integration_test_docker_environment.lib.docker.images.image_info imp
 )
 from exasol_integration_test_docker_environment.lib.models.config.build_config import (
     set_build_config,
-)
-from exasol_integration_test_docker_environment.test.get_test_container_content import (
-    get_test_container_content,
 )
 from exasol_integration_test_docker_environment.testing import utils
 from exasol_integration_test_docker_environment.testing.api_test_environment import (
