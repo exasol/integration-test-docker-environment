@@ -1,5 +1,8 @@
 import shutil
 from pathlib import Path
+from test.integration.get_test_container_content import (
+    TEST_CONTAINER_REUSE_ROOT_PATH,
+)
 from typing import Any
 
 import luigi
@@ -35,9 +38,6 @@ from exasol_integration_test_docker_environment.lib.test_environment.prepare_net
 )
 from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_container import (
     SpawnTestContainer,
-)
-from exasol_integration_test_docker_environment.test.get_test_container_content import (
-    TEST_CONTAINER_REUSE_ROOT_PATH,
 )
 from exasol_integration_test_docker_environment.testing import luigi_utils
 

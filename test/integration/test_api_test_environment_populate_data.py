@@ -1,5 +1,10 @@
 from collections.abc import Iterator
 from pathlib import PurePath
+from test.integration.get_test_container_content import (
+    FULL_TEST_CONTAINER_PATH,
+    TEST_DATA_ROOT_PATH,
+    get_test_container_content,
+)
 
 import luigi
 import pytest
@@ -15,11 +20,6 @@ from exasol_integration_test_docker_environment.lib.test_environment.database_se
 )
 from exasol_integration_test_docker_environment.lib.test_environment.db_version import (
     DbVersion,
-)
-from exasol_integration_test_docker_environment.test.get_test_container_content import (
-    FULL_TEST_CONTAINER_PATH,
-    TEST_DATA_ROOT_PATH,
-    get_test_container_content,
 )
 from exasol_integration_test_docker_environment.testing.api_test_environment import (
     ApiTestEnvironment,
