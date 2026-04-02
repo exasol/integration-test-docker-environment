@@ -118,10 +118,10 @@ def run_minimal_tests(session: nox.Session):
     """
     This nox task runs selected tests.
     There are two options: `--db-version` and `--test-set`.
-    It `test-set` is set to `gpu-only`,
+    If `test-set` is set to `gpu-only`,
     then only the minimal GPU tests will be executed, using the
     specified version of Exasol database.
-    Otherwise, it executes  new unit tests and selected integration tests using the
+    Otherwise, it executes new unit tests and selected integration tests using the
     specified version of Exasol database.
     """
     db_version, test_set = parse_test_arguments(session)
