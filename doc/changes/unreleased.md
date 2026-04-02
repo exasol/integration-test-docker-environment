@@ -17,6 +17,7 @@ To ensure usage of secure packages, it is up to the user to similarly relock the
 
 ## Refactoring:
 - #602: Removed joblib Python module dependency
+- #594: Removed old integration tests
 
 ## Bug Fixes:
 - #600: Fixed nox session name

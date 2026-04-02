@@ -101,7 +101,6 @@ def run_all_tests(session: nox.Session):
         This nox tasks runs 3 different groups of tests for the ITDE:
         1. new unit tests (using pytest framework)
         2. new integration tests (also using pytest), excluding GPU Tests.
-        3. old tests (mainly integration tests) using python module "unitest"
     If test-set is set to "gpu-only":
         This nox tasks runs only the GPU specific integration tests using pytest.
     """
@@ -112,16 +111,6 @@ def run_all_tests(session: nox.Session):
     else:
         session.run("pytest", "./test/unit")
         session.run("pytest", "-m", "not gpu", "./test/integration", env=env)
-        with session.chdir(ROOT):
-            session.run(
-                "python",
-                "-u",
-                "-m",
-                "unittest",
-                "discover",
-                "./exasol_integration_test_docker_environment/test",
-                env=env,
-            )
 
 
 @nox.session(name="run-minimal-tests", python=False)
@@ -132,7 +121,7 @@ def run_minimal_tests(session: nox.Session):
     It `test-set` is set to `gpu-only`,
     then only the minimal GPU tests will be executed, using the
     specified version of Exasol database.
-    Otherwise, it executes  new unit tests and selected old and new integration tests using the
+    Otherwise, it executes  new unit tests and selected integration tests using the
     specified version of Exasol database.
     """
     db_version, test_set = parse_test_arguments(session)
@@ -141,12 +130,7 @@ def run_minimal_tests(session: nox.Session):
         session.run("pytest", "-m", "gpu", "./test/integration", env=env)
     else:
         minimal_tests = {
-            "old-itest": [
-                # "test_cli_test_environment.py",
-                "test_doctor.py",
-                "test_termination_handler.py",
-            ],
-            "new-itest": [
+            "itest": [
                 "test_api_test_environment.py",
                 "test_cli_environment.py",
                 "test_db_container_log_thread.py",
@@ -156,7 +140,7 @@ def run_minimal_tests(session: nox.Session):
             "unit": ["./test/unit"],
         }
         session.run("pytest", *minimal_tests["unit"])
-        for test in minimal_tests["new-itest"]:
+        for test in minimal_tests["itest"]:
             session.run(
                 "pytest",
                 "-m",
@@ -164,14 +148,6 @@ def run_minimal_tests(session: nox.Session):
                 f"./test/integration/{test}",
                 env=env,
             )
-        with session.chdir(ROOT):
-            for test in minimal_tests["old-itest"]:
-                session.run(
-                    "python",
-                    "-u",
-                    f"./exasol_integration_test_docker_environment/test/{test}",
-                    env=env,
-                )
 
 
 @nox.session(name="get-all-db-versions", python=False)
