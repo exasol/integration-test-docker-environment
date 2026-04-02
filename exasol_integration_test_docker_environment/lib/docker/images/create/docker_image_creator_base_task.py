@@ -15,7 +15,7 @@ class DockerImageCreatorBaseTask(DockerBaseTask):
     image_name: str = luigi.Parameter()
     # ParameterVisibility needs to be hidden instead of private, because otherwise a MissingParameter gets thrown
     image_info: ImageInfo = JsonPickleParameter(
-        ImageInfo,
+        cls=ImageInfo,
         visibility=luigi.parameter.ParameterVisibility.HIDDEN,
         significant=True,
-    )  # type: ignore
+    )

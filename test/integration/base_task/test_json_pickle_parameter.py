@@ -49,7 +49,7 @@ class RootTestTaskSuccess(BaseTestTask):
 
 
 class ChildTaskWithJsonPickleInput(BaseTestTask):
-    parameter_1 = JsonPickleParameter(Data)
+    parameter_1 = JsonPickleParameter(cls=Data)
 
     def run_task(self):
         time.sleep(1)

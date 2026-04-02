@@ -3,7 +3,7 @@ name = "exasol-integration-test-docker-environment"
 version = "6.1.0"
 description = "Integration Test Docker Environment for Exasol"
 authors = [{ name = "Torsten Kilias", email = "torsten.kilias@exasol.com" }]
-requires-python = ">=3.10,<3.15"
+requires-python = ">=3.10,<3.14"
 readme = "README.rst"
 license = "MIT"
 keywords = [
@@ -20,7 +20,7 @@ dependencies = [
     "humanfriendly>=4.18",
     "jinja2>=2.10.1",
     "jsonpickle>=1.1",
-    "luigi (>=2.8.4, <=3.6.0)", #Newer versions change API of luigi.ListParameter()
+    "luigi (>=3.8.0, <4)", #Newer versions change API of luigi.ListParameter()
     "netaddr>=0.7.19",
     "networkx>=2.3",
     "pydot>=1.4.0",

@@ -54,4 +54,6 @@ class DockerDBTestEnvironmentParameter(Config):
     )
     mem_size: str | None = luigi.OptionalParameter(default="2 GiB", significant=False)
     disk_size: str | None = luigi.OptionalParameter(default="2 GiB", significant=False)
-    nameservers: list[str] = luigi.ListParameter(default=[], significant=False)
+    nameservers: tuple[str, ...] = luigi.ListParameter(
+        default=tuple(), significant=False
+    )

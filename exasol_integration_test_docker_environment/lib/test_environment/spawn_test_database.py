@@ -70,7 +70,9 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
     environment_name: str = luigi.Parameter()
     db_container_name: str = luigi.Parameter()
     attempt: int = luigi.IntParameter(default=1)
-    network_info: DockerNetworkInfo = JsonPickleParameter(DockerNetworkInfo, significant=False)  # type: ignore
+    network_info: DockerNetworkInfo = JsonPickleParameter(
+        cls=DockerNetworkInfo, significant=False
+    )
     ip_address_index_in_subnet: int = luigi.IntParameter(significant=False)
     docker_runtime: str | None = luigi.OptionalParameter(
         default=None, significant=False

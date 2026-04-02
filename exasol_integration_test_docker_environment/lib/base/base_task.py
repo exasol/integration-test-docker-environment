@@ -113,8 +113,8 @@ BaseTaskType = TypeVar("BaseTaskType", bound="BaseTask")
 
 
 class BaseTask(Task):
-    caller_output_path: tuple[str] = luigi.ListParameter(
-        default=[], significant=False, visibility=ParameterVisibility.HIDDEN
+    caller_output_path: tuple[str, ...] = luigi.ListParameter(
+        default=tuple(), significant=False, visibility=ParameterVisibility.HIDDEN
     )
     job_id: str = luigi.Parameter()
 

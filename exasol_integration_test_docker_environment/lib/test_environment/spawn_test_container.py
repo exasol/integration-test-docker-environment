@@ -38,8 +38,8 @@ class SpawnTestContainer(DockerBaseTask, TestContainerParameter):
     environment_name: str = luigi.Parameter()
     test_container_name: str = luigi.Parameter()
     network_info: DockerNetworkInfo = JsonPickleParameter(
-        DockerNetworkInfo, significant=False
-    )  # type: ignore
+        cls=DockerNetworkInfo, significant=False
+    )
     ip_address_index_in_subnet: int = luigi.IntParameter(significant=False)
     attempt: int = luigi.IntParameter(default=1)
     reuse_test_container: bool = luigi.BoolParameter(default=False, significant=False)

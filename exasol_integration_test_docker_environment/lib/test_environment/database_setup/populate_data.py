@@ -26,8 +26,8 @@ class PopulateTestDataToDatabase(DockerBaseTask, DatabaseCredentialsParameter):
 
     environment_name: str = luigi.Parameter()
     test_environment_info: EnvironmentInfo = JsonPickleParameter(
-        EnvironmentInfo, significant=False
-    )  # type: ignore
+        cls=EnvironmentInfo, significant=False
+    )
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)

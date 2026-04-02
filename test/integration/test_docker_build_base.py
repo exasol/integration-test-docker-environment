@@ -28,7 +28,7 @@ from exasol_integration_test_docker_environment.lib.docker.images.utils import (
 
 class TestDockerBuildBaseTestAnalyzeImage(DockerAnalyzeImageTask):
     task_name = Parameter()
-    add_resources = luigi.DictParameter(default={})
+    add_resources: dict[str, str] = luigi.DictParameter(default={})
 
     def get_target_repository_name(self) -> str:
         return "exasol-test-docker-build-base"
@@ -60,7 +60,7 @@ class TestDockerBuildBaseTestAnalyzeImage(DockerAnalyzeImageTask):
 
 
 class TestDockerBuildBase(DockerBuildBase):
-    goals: list[str] = luigi.ListParameter(default=[])
+    goals: tuple[str, ...] = luigi.ListParameter(default=tuple())
     add_resources: dict[str, str] = luigi.DictParameter(default={})
 
     def get_goal_class_map(self) -> dict[str, DockerAnalyzeImageTask]:

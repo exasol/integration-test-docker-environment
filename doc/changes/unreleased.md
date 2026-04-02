@@ -18,6 +18,7 @@ To ensure usage of secure packages, it is up to the user to similarly relock the
 ## Refactoring:
 - #602: Removed joblib Python module dependency
 - #594: Removed old integration tests
+- #599: Updated luigi to latest version 3.8.0
 
 ## Bug Fixes:
 - #600: Fixed nox session name
