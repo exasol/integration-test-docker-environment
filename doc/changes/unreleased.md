@@ -24,3 +24,4 @@ To ensure usage of secure packages, it is up to the user to similarly relock the
 
 ## Security Issues:
 - #611: Updated to PTB 6.1.1 & fixed vulnerabilities by re-locking transitive dependencies
+- #627: Updated to PTB 7.0.0, updated `pytest` to 9.0.3, & fixed vulnerabilities by re-locking transitive dependencies
