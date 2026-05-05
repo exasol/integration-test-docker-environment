@@ -60,6 +60,7 @@ from exasol_integration_test_docker_environment.lib.test_environment.ports impor
 
 CERTIFICATES_MOUNT_DIR = "/certificates"
 CERTIFICATES_DEFAULT_DIR = "/exa/etc/ssl/"
+VOLUME_PREPARATION_IMAGE = "ubuntu:22.04"
 
 
 def int_or_none(value: str | None) -> int | None:
@@ -367,9 +368,10 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         if remove_old_instances:
             self._remove_container(container_name)
             self._remove_volume(volume_name)
+        docker_client.images.pull(VOLUME_PREPARATION_IMAGE)
         volume = docker_client.volumes.create(volume_name)
         container = docker_client.containers.run(
-            image="ubuntu:22.04",
+            image=VOLUME_PREPARATION_IMAGE,
             name=container_name,
             auto_remove=True,
             command="sleep infinity",

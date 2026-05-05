@@ -64,9 +64,11 @@ def sshd_container(request):
     @contextlib.contextmanager
     def create_context(ssh_port_forward: int, public_key: str) -> DockerContainer:
         client = docker.from_env()
+        image_name = "linuxserver/openssh-server:9.3_p2-r0-ls123"
+        client.images.pull(image_name)
         container = client.containers.run(
             name=testname,
-            image="linuxserver/openssh-server:9.3_p2-r0-ls123",
+            image=image_name,
             detach=True,
             ports={"2222/tcp": ssh_port_forward},
             environment={"PUBLIC_KEY": public_key},

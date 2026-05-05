@@ -11,4 +11,4 @@
 
 ## Security Issues:
 - #611: Updated to PTB 6.1.1 & fixed vulnerabilities by re-locking transitive dependencies
-- #627: Updated to PTB 7.0.0, updated `pytest` to 9.0.3, & fixed vulnerabilities by re-locking transitive dependencies
+- #627: Updated to PTB 7.0.0, updated `pytest` to 9.0.3, fixed vulnerabilities by re-locking transitive dependencies, and modified tests to pull docker images first
