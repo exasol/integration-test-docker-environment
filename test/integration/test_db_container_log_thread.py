@@ -35,8 +35,10 @@ def _run_container_log_thread(logger, logs: list[str]) -> str | None:
     with tempfile.TemporaryDirectory() as tmpDir:
         with ContextDockerClient(timeout=3600) as client:
             try:
+                image_name = "ubuntu"
+                client.images.pull(image_name)
                 container = client.containers.run(
-                    "ubuntu", _build_docker_command(logs), detach=True
+                    image_name, _build_docker_command(logs), detach=True
                 )
                 thread = DBContainerLogThread(
                     container, logger, Path(tmpDir) / "log.txt", "test"
