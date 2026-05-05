@@ -26,6 +26,7 @@ jobs:
     name: Fast Report
     needs:
       - run-fast-checks
+      - fast-tests
     uses: ./.github/workflows/report.yml
     secrets: inherit
     permissions:
