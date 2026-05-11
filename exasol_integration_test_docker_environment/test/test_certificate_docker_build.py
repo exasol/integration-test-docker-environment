@@ -1,6 +1,6 @@
 import unittest
 
-import luigi
+from exasol_integration_test_docker_environment.lib.base import luigi_compat as luigi
 
 import exasol_integration_test_docker_environment.certificate_resources.container
 from exasol_integration_test_docker_environment.lib.base.run_task import (

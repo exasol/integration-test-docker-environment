@@ -1,7 +1,7 @@
 from collections.abc import Iterator
 from pathlib import PurePath
 
-import luigi
+from exasol_integration_test_docker_environment.lib.base import luigi_compat as luigi
 import pytest
 
 from exasol_integration_test_docker_environment.lib.base.run_task import (

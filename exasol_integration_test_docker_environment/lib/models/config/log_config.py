@@ -1,6 +1,6 @@
 from enum import Enum
 
-import luigi
+from exasol_integration_test_docker_environment.lib.base import luigi_compat as luigi
 
 
 class WriteLogFilesToConsole(Enum):

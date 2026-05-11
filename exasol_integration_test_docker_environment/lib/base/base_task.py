@@ -9,13 +9,13 @@ from typing import (
     TypeVar,
 )
 
-import luigi
-from luigi import (
+from exasol_integration_test_docker_environment.lib.base import luigi_compat as luigi
+from exasol_integration_test_docker_environment.lib.base.luigi_compat import (
     Task,
     util,
+    ParameterVisibility,
+    TASK_ID_TRUNCATE_HASH,
 )
-from luigi.parameter import ParameterVisibility
-from luigi.task import TASK_ID_TRUNCATE_HASH
 
 from exasol_integration_test_docker_environment.abstract_method_exception import (
     AbstractMethodException,

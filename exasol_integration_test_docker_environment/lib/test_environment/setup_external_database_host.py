@@ -3,7 +3,7 @@ from time import sleep
 from urllib.parse import quote_plus
 from xmlrpc.client import ServerProxy
 
-import luigi
+from exasol_integration_test_docker_environment.lib.base import luigi_compat as luigi
 
 from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import (
     DependencyLoggerBaseTask,

@@ -5,7 +5,7 @@ from pathlib import Path
 
 import docker
 import humanfriendly
-import luigi
+from exasol_integration_test_docker_environment.lib.base import luigi_compat as luigi
 import netaddr
 from docker.client import DockerClient
 from docker.models.containers import Container

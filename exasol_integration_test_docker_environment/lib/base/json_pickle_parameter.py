@@ -1,5 +1,5 @@
 import jsonpickle
-from luigi.parameter import (
+from exasol_integration_test_docker_environment.lib.base.luigi_compat import (
     Parameter,
     ParameterVisibility,
     _no_value,

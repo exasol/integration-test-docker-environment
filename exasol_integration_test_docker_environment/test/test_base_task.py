@@ -2,11 +2,8 @@ import shutil
 import time
 import unittest
 
-import luigi
-from luigi import (
-    Config,
-    Parameter,
-)
+from exasol_integration_test_docker_environment.lib.base import luigi_compat as luigi
+from exasol_integration_test_docker_environment.lib.base.luigi_compat import Config, Parameter
 
 from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import (
     DependencyLoggerBaseTask,
