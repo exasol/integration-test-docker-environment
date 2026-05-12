@@ -24,6 +24,7 @@ dependencies = [
     "netaddr>=0.7.19",
     "networkx>=2.3",
     "pydot>=1.4.0",
+    "ray>=2.0.0,<3",
     "requests>=2.32.4",
     "simplejson>=3.16.0",
     "stopwatch.py>=1.0.0",
