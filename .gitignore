@@ -160,3 +160,6 @@ itde/
 /.lint.txt
 /.security.json
 /.sonar
+
+# AI
+/.serena
