@@ -16,6 +16,7 @@ def assert_container_runtime(container_name, expected_runtime):
 @pytest.fixture(scope="module")
 def default_docker_runtime(default_ubuntu_version):
     with ContextDockerClient() as docker_client:
+        docker_client.images.pull(default_ubuntu_version)
         tmp_container = docker_client.containers.create(default_ubuntu_version, "echo")
         try:
             tmp_container.reload()

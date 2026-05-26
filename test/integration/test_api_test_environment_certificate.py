@@ -1,11 +1,12 @@
+from test.integration.get_test_container_content import (
+    get_test_container_content,
+)
+
 import pytest
 
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.lib.test_environment.db_version import (
     db_version_supports_custom_certificates,
-)
-from exasol_integration_test_docker_environment.test.get_test_container_content import (
-    get_test_container_content,
 )
 from exasol_integration_test_docker_environment.testing.api_test_environment import (
     ApiTestEnvironment,

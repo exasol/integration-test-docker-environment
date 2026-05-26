@@ -46,14 +46,12 @@ class BuildContextCreator:
             for key, image_info in self._image_info_of_dependencies.items()
         }
         final_dockerfile = template.render(**image_names_of_dependencies)
-        final_dockerfile += textwrap.dedent(
-            f"""
+        final_dockerfile += textwrap.dedent(f"""
         RUN mkdir -p /build_info/image_info
         COPY image_info /build_info/image_info/{self._image_info.target_tag}
         RUN mkdir -p /build_info/dockerfiles
         COPY Dockerfile /build_info/dockerfiles/{self._image_info.target_tag}
-        """
-        )
+        """)
         with open(self._temp_directory + "/Dockerfile", "w") as file:
             file.write(final_dockerfile)
 

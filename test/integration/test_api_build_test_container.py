@@ -1,3 +1,8 @@
+from test.integration.get_test_container_content import (
+    MOCK_TEST_CONTAINER_PATH,
+    get_test_container_content,
+)
+
 import docker
 import pytest
 
@@ -5,10 +10,6 @@ from exasol_integration_test_docker_environment.lib import api
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.lib.docker.images.image_info import (
     ImageState,
-)
-from exasol_integration_test_docker_environment.test.get_test_container_content import (
-    MOCK_TEST_CONTAINER_PATH,
-    get_test_container_content,
 )
 
 TEST_CONTAINER_CONTENT = get_test_container_content(MOCK_TEST_CONTAINER_PATH)

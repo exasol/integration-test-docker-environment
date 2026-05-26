@@ -23,7 +23,7 @@ class DockerPushImageTask(DockerPushImageBaseTask):
         RequiredTaskInfo,
         visibility=luigi.parameter.ParameterVisibility.HIDDEN,
         significant=True,
-    )  # type:ignore
+    )  # type: ignore
 
     def get_docker_image_task(self):
         module = importlib.import_module(self.required_task_info.module_name)

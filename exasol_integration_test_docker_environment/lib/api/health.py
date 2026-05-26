@@ -25,13 +25,11 @@ def health():
     if not errors:
         return
 
-    message = cleandoc(
-        """
+    message = cleandoc("""
         {count} problem(s) have been identified.
 
         {problems}
-        """
-    ).format(
+        """).format(
         count=len(errors),
         problems="\n".join(f"{error.value}" for error in errors),
     )

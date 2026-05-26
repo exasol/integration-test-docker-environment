@@ -67,10 +67,10 @@ class IsDatabaseReadyThread(Thread):
                     )
                     self.finish = True
                 while not self.finish:
-                    (exit_code_db_connection, self.output_db_connection) = (
-                        executor.exec(db_connection_command)
+                    exit_code_db_connection, self.output_db_connection = executor.exec(
+                        db_connection_command
                     )
-                    (exit_code_bucketfs_connection, self.output_bucketfs_connection) = (
+                    exit_code_bucketfs_connection, self.output_bucketfs_connection = (
                         executor.exec(bucket_fs_connection_command)
                     )
                     if (
