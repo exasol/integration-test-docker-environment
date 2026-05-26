@@ -1,8 +1,10 @@
 import pickle
 from pathlib import Path
 
-from luigi import LocalTarget
-from luigi.format import NopFormat
+from exasol_integration_test_docker_environment.lib.base.luigi_compat import (
+    LocalTarget,
+    NopFormat,
+)
 
 FORMAT = NopFormat()
 

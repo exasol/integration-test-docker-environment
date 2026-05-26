@@ -7,10 +7,10 @@ from typing import (
     Any,
 )
 
-import luigi
 import networkx
 from networkx.classes import DiGraph
 
+from exasol_integration_test_docker_environment.lib.base import ray_runner
 from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import (
     DependencyLoggerBaseTask,
 )
@@ -48,7 +48,6 @@ def run_task(
     log_level: str | None = None,
     use_job_specific_log_file: bool = False,
 ) -> Any:
-    setup_worker()
     task = task_creator()
     success = False
     log_file_path = get_log_path(task.job_id)
@@ -78,13 +77,8 @@ def _run_task_with_logging_config(
     use_job_specific_log_file: bool,
     workers: int,
 ) -> bool:
-    with configure_logging(
-        log_file_path, log_level, use_job_specific_log_file
-    ) as run_kwargs:
-        no_scheduling_errors = luigi.build(
-            [task], workers=workers, local_scheduler=True, **run_kwargs
-        )
-        return no_scheduling_errors
+    with configure_logging(log_file_path, log_level, use_job_specific_log_file):
+        return ray_runner.build([task], workers=workers)
 
 
 def _handle_task_result(
@@ -103,10 +97,8 @@ def _handle_task_result(
             msg=f"Task {task} (or any of it's subtasks) failed.", inner=task_failures
         ) from TaskFailures(inner=task_failures)
     elif not no_scheduling_errors:
-        logging.error(f"Task {task} failed. : luigi reported a scheduling error.")
-        raise TaskRuntimeError(
-            msg=f"Task {task} failed. reason: luigi reported a scheduling error."
-        )
+        logging.error(f"Task {task} failed. : scheduling error.")
+        raise TaskRuntimeError(msg=f"Task {task} failed. reason: scheduling error.")
 
 
 def generate_graph_from_task_dependencies(
@@ -146,8 +138,3 @@ def collect_dependencies(task: DependencyLoggerBaseTask) -> set[TaskDependency]:
                     if task_dependency.state == DependencyState.requested.name:
                         dependencies.add(task_dependency)
     return dependencies
-
-
-def setup_worker():
-    luigi.configuration.get_config().set("worker", "wait_interval", str(0.1))
-    luigi.configuration.get_config().set("worker", "wait_jitter", str(0.5))

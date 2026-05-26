@@ -1,11 +1,12 @@
 import getpass
 import os
 
-import luigi
-from luigi.parameter import ParameterVisibility
-
 from exasol_integration_test_docker_environment.cli.options.docker_repository_options import (
     DEFAULT_DOCKER_REPOSITORY_NAME,
+)
+from exasol_integration_test_docker_environment.lib.base import luigi_compat as luigi
+from exasol_integration_test_docker_environment.lib.base.luigi_compat import (
+    ParameterVisibility,
 )
 
 

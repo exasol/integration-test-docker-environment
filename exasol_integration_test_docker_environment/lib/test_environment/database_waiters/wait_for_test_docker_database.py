@@ -6,9 +6,9 @@ from datetime import (
     timedelta,
 )
 
-import luigi
 from docker.models.containers import Container
 
+from exasol_integration_test_docker_environment.lib.base import luigi_compat as luigi
 from exasol_integration_test_docker_environment.lib.base.db_os_executor import (
     DbOsExecFactory,
 )

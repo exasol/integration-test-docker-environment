@@ -1,10 +1,9 @@
 import json
 
-import luigi
-
 from exasol_integration_test_docker_environment.cli.options.system_options import (
     DEFAULT_OUTPUT_DIRECTORY,
 )
+from exasol_integration_test_docker_environment.lib.base import luigi_compat as luigi
 
 
 class build_config(luigi.Config):

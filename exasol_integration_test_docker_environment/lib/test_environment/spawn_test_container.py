@@ -1,12 +1,12 @@
 import importlib.resources
 from pathlib import Path
 
-import luigi
 import netaddr
 from docker.models.containers import Container
 from docker.transport import unixconn
 
 from exasol_integration_test_docker_environment.lib import PACKAGE_NAME
+from exasol_integration_test_docker_environment.lib.base import luigi_compat as luigi
 from exasol_integration_test_docker_environment.lib.base.docker_base_task import (
     DockerBaseTask,
 )

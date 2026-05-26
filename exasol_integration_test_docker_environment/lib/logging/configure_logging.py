@@ -1,55 +1,29 @@
 import contextlib
-import warnings
+import logging
 from collections.abc import Iterator
 from pathlib import Path
-
-import luigi
-from luigi.parameter import UnconsumedParameterWarning
-from luigi.setup_logging import InterfaceLogging
-
-from exasol_integration_test_docker_environment.lib.logging.luigi_log_config import (
-    get_luigi_log_config,
-)
 
 
 @contextlib.contextmanager
 def configure_logging(
     log_file_path: Path, log_level: str | None, use_job_specific_log_file: bool
-) -> Iterator[dict[str, str]]:
-    with get_luigi_log_config(
-        log_file_target=log_file_path,
-        log_level=log_level,
-        use_job_specific_log_file=use_job_specific_log_file,
-    ) as luigi_config:
-        no_configure_logging, run_kwargs = _configure_logging_parameter(
-            log_level=log_level,
-            luigi_config=luigi_config,
-            use_job_specific_log_file=use_job_specific_log_file,
-        )
-        # We need to set InterfaceLogging._configured to false,
-        # because otherwise luigi doesn't accept the new config.
-        InterfaceLogging._configured = False
-        luigi.configuration.get_config().set(
-            "core", "no_configure_logging", str(no_configure_logging)
-        )
-        with warnings.catch_warnings():
-            # This filter is necessary, because luigi uses the config no_configure_logging,
-            # but doesn't define it, which seems to be a bug in luigi
-            warnings.filterwarnings(
-                action="ignore",
-                category=UnconsumedParameterWarning,
-                message=".*no_configure_logging.*",
-            )
-            yield run_kwargs
+) -> Iterator[None]:
+    """Set up optional file-based logging for a task run.
 
-
-def _configure_logging_parameter(
-    log_level: str | None, luigi_config: Path, use_job_specific_log_file: bool
-) -> tuple[bool, dict[str, str]]:
+    When *use_job_specific_log_file* is ``True``, a ``FileHandler`` pointing
+    to *log_file_path* is attached to the root logger for the duration of the
+    ``with`` block and removed afterwards.
+    """
+    handlers: list[logging.Handler] = []
     if use_job_specific_log_file:
-        no_configure_logging = False
-        run_kwargs = {"logging_conf_file": f"{luigi_config}"}
-    else:
-        no_configure_logging = True
-        run_kwargs = {}
-    return no_configure_logging, run_kwargs
+        log_file_path.parent.mkdir(parents=True, exist_ok=True)
+        level = getattr(logging, (log_level or "INFO").upper(), logging.INFO)
+        handler = logging.FileHandler(str(log_file_path))
+        handler.setLevel(level)
+        logging.getLogger().addHandler(handler)
+        handlers.append(handler)
+    try:
+        yield
+    finally:
+        for h in handlers:
+            logging.getLogger().removeHandler(h)

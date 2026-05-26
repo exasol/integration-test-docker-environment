@@ -5,7 +5,6 @@ from pathlib import Path
 
 import docker
 import humanfriendly
-import luigi
 import netaddr
 from docker.client import DockerClient
 from docker.models.containers import Container
@@ -14,6 +13,7 @@ from docker.types import DeviceRequest
 from jinja2 import Template
 
 from exasol_integration_test_docker_environment.lib import PACKAGE_NAME
+from exasol_integration_test_docker_environment.lib.base import luigi_compat as luigi
 from exasol_integration_test_docker_environment.lib.base.docker_base_task import (
     DockerBaseTask,
 )

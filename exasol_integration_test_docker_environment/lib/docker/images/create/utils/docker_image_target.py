@@ -1,10 +1,10 @@
 import docker
-import luigi
 
+from exasol_integration_test_docker_environment.lib.base.luigi_compat import Target
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 
 
-class DockerImageTarget(luigi.Target):
+class DockerImageTarget(Target):
     def __init__(self, image_name: str, image_tag: str) -> None:
         self.image_name = image_name
         self.image_tag = image_tag
