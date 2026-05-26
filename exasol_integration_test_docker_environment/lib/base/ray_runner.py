@@ -13,10 +13,10 @@ Execution model
   atomic — two Ray workers that independently try to schedule the same
   ``task_id`` always get back the same ``ObjectRef``.
 """
+
 from __future__ import annotations
 
 import types
-from typing import Optional
 
 import ray
 
@@ -32,13 +32,13 @@ class TaskRegistry:
 
     def set_self(self, handle: ray.actor.ActorHandle) -> None:
         self._handle: ray.actor.ActorHandle = handle
-        self._refs: dict[str, Optional[ray.ObjectRef]] = {}
+        self._refs: dict[str, ray.ObjectRef | None] = {}
 
     def schedule(
         self,
         task: Task,
         dep_refs: list[ray.ObjectRef],
-    ) -> Optional[ray.ObjectRef]:
+    ) -> ray.ObjectRef | None:
         """Atomically check + submit *task*.
 
         *task* is passed directly; Ray serialises it automatically.
@@ -82,9 +82,7 @@ def _drive(task: Task, registry: ray.actor.ActorHandle) -> None:
         yielded = next(gen)
         while True:
             futures: list[ray.ObjectRef] = [
-                f
-                for t in flatten(yielded)
-                if (f := _schedule(t, registry)) is not None
+                f for t in flatten(yielded) if (f := _schedule(t, registry)) is not None
             ]
             ray.get(futures)
             gen.send(_map_outputs(yielded))
@@ -92,15 +90,13 @@ def _drive(task: Task, registry: ray.actor.ActorHandle) -> None:
         pass
 
 
-def _schedule(task: Task, registry: ray.actor.ActorHandle) -> Optional[ray.ObjectRef]:
+def _schedule(task: Task, registry: ray.actor.ActorHandle) -> ray.ObjectRef | None:
     """Schedule *task* and all its static deps; return ``ObjectRef`` or ``None``."""
     if task.complete():
         return None
 
     dep_refs: list[ray.ObjectRef] = [
-        f
-        for d in flatten(task.requires())
-        if (f := _schedule(d, registry)) is not None
+        f for d in flatten(task.requires()) if (f := _schedule(d, registry)) is not None
     ]
 
     # Round-trip to actor (~1 ms); returns the task's ObjectRef without

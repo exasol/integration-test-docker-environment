@@ -3,6 +3,7 @@ Minimal re-implementation of the Luigi API used in this project.
 Replace ``import luigi`` with ``from ... import luigi_compat as luigi`` or use
 the individual names exported from this module.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -10,7 +11,7 @@ import json
 import os
 from enum import Enum
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -22,6 +23,7 @@ TASK_ID_TRUNCATE_HASH: int = 10
 # ---------------------------------------------------------------------------
 # Parameter visibility
 # ---------------------------------------------------------------------------
+
 
 class ParameterVisibility(Enum):
     PUBLIC = "public"
@@ -40,6 +42,7 @@ _no_value: object = object()
 # Parameter classes
 # ---------------------------------------------------------------------------
 
+
 class Parameter:
     """Base parameter descriptor.
 
@@ -53,8 +56,8 @@ class Parameter:
         default: Any = _no_value,
         is_global: bool = False,
         significant: bool = True,
-        description: Optional[str] = None,
-        config_path: Optional[dict] = None,
+        description: str | None = None,
+        config_path: dict | None = None,
         positional: bool = True,
         always_in_help: bool = False,
         batch_method: Any = None,
@@ -138,12 +141,12 @@ class DictParameter(Parameter):
 class OptionalParameter(Parameter):
     """Parameter whose value may be ``None`` / empty."""
 
-    def normalize(self, value: Any) -> Optional[str]:
+    def normalize(self, value: Any) -> str | None:
         if value == "" or value is None:
             return None
         return str(value)
 
-    def parse(self, s: str) -> Optional[str]:
+    def parse(self, s: str) -> str | None:
         if s == "" or s is None:
             return None
         return s
@@ -177,14 +180,17 @@ class EnumParameter(Parameter):
 # I/O format stub (used by PickleTarget)
 # ---------------------------------------------------------------------------
 
+
 class NopFormat:
     """Stub that signals binary (pass-through) I/O to LocalTarget."""
+
     pass
 
 
 # ---------------------------------------------------------------------------
 # Metaclass that collects Parameter descriptors
 # ---------------------------------------------------------------------------
+
 
 class _TaskMeta(type):
     """Walks the MRO and collects all ``Parameter`` instances into ``_params``."""
@@ -194,7 +200,7 @@ class _TaskMeta(type):
         name: str,
         bases: tuple,
         namespace: dict,
-    ) -> "_TaskMeta":
+    ) -> _TaskMeta:
         cls = super().__new__(mcs, name, bases, namespace)
         params: dict[str, Parameter] = {}
         for base in reversed(cls.__mro__):
@@ -208,6 +214,7 @@ class _TaskMeta(type):
 # ---------------------------------------------------------------------------
 # Task base class
 # ---------------------------------------------------------------------------
+
 
 class Task(metaclass=_TaskMeta):
     """Minimal replacement for ``luigi.Task``."""
@@ -299,6 +306,7 @@ class Task(metaclass=_TaskMeta):
 # Config class
 # ---------------------------------------------------------------------------
 
+
 class Config(Task):
     """Replacement for ``luigi.Config``.
 
@@ -320,6 +328,7 @@ class Config(Task):
 # ---------------------------------------------------------------------------
 # LocalTarget
 # ---------------------------------------------------------------------------
+
 
 class LocalTarget:
     """Replacement for ``luigi.LocalTarget``."""
@@ -346,13 +355,17 @@ class LocalTarget:
         binary = isinstance(self._format, NopFormat)
         if mode == "w":
             Path(self.path).parent.mkdir(parents=True, exist_ok=True)
-            return open(self.path, "wb" if binary else "w", **(
-                {} if binary else {"encoding": "utf-8"}
-            ))
+            return open(
+                self.path,
+                "wb" if binary else "w",
+                **({} if binary else {"encoding": "utf-8"}),
+            )
         # read
-        return open(self.path, "rb" if binary else "r", **(
-            {} if binary else {"encoding": "utf-8"}
-        ))
+        return open(
+            self.path,
+            "rb" if binary else "r",
+            **({} if binary else {"encoding": "utf-8"}),
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -372,8 +385,8 @@ class ConfigurationManager:
         self,
         section: str,
         key: str,
-        default: Optional[str] = None,
-    ) -> Optional[str]:
+        default: str | None = None,
+    ) -> str | None:
         return _config_store.get((section.lower(), key.lower()), default)
 
 
@@ -388,6 +401,7 @@ def get_config() -> ConfigurationManager:
 # ---------------------------------------------------------------------------
 # Utilities
 # ---------------------------------------------------------------------------
+
 
 def flatten(struct: Any) -> list:
     """Recursively flatten a nested structure of Tasks into a flat list."""
@@ -428,24 +442,29 @@ def _compute_task_id(task_family: str, significant_params: dict[str, str]) -> st
 # Namespace shims — allow ``luigi.configuration.get_config()``, etc.
 # ---------------------------------------------------------------------------
 
+
 class configuration:  # noqa: N801
     """Shim for ``luigi.configuration``."""
+
     get_config = staticmethod(get_config)
 
 
 class task:  # noqa: N801
     """Shim for ``luigi.task``."""
+
     TASK_ID_TRUNCATE_HASH = TASK_ID_TRUNCATE_HASH
     flatten = staticmethod(flatten)
 
 
 class util:  # noqa: N801
     """Shim for ``luigi.util``."""
+
     common_params = staticmethod(common_params)
 
 
 class parameter:  # noqa: N801
     """Shim for ``luigi.parameter``."""
+
     ParameterVisibility = ParameterVisibility
     _no_value = _no_value
     UnconsumedParameterWarning = UserWarning  # stub — configure_logging is rewritten
@@ -460,6 +479,7 @@ class format:  # noqa: N801
 # Target — abstract base for non-file-based targets (e.g. DockerImageTarget)
 # ---------------------------------------------------------------------------
 
+
 class Target:
     """Replacement for ``luigi.Target``."""
 
@@ -471,6 +491,10 @@ class Target:
 # build() shim — allows test code to call luigi.build(...) unchanged
 # ---------------------------------------------------------------------------
 
+
 def build(tasks: list, workers: int = 1, **_ignored) -> bool:
-    from exasol_integration_test_docker_environment.lib.base import ray_runner  # lazy to avoid circular import
+    from exasol_integration_test_docker_environment.lib.base import (
+        ray_runner,  # lazy to avoid circular import
+    )
+
     return ray_runner.build(tasks, workers=workers)

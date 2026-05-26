@@ -1,10 +1,10 @@
 import shutil
 from pathlib import Path
 
-from exasol_integration_test_docker_environment.lib.base import luigi_compat as luigi
-from exasol_integration_test_docker_environment.lib.base.luigi_compat import Parameter
 import pytest
 
+from exasol_integration_test_docker_environment.lib.base import luigi_compat as luigi
+from exasol_integration_test_docker_environment.lib.base.luigi_compat import Parameter
 from exasol_integration_test_docker_environment.lib.base.run_task import (
     generate_root_task,
 )

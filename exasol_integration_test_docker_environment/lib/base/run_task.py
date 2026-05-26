@@ -98,9 +98,7 @@ def _handle_task_result(
         ) from TaskFailures(inner=task_failures)
     elif not no_scheduling_errors:
         logging.error(f"Task {task} failed. : scheduling error.")
-        raise TaskRuntimeError(
-            msg=f"Task {task} failed. reason: scheduling error."
-        )
+        raise TaskRuntimeError(msg=f"Task {task} failed. reason: scheduling error.")
 
 
 def generate_graph_from_task_dependencies(

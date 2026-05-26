@@ -1,8 +1,10 @@
 from test.integration.base_task.base_task import BaseTestTask
 
 from exasol_integration_test_docker_environment.lib.base import luigi_compat as luigi
-from exasol_integration_test_docker_environment.lib.base.luigi_compat import BoolParameter, IntParameter
-
+from exasol_integration_test_docker_environment.lib.base.luigi_compat import (
+    BoolParameter,
+    IntParameter,
+)
 from exasol_integration_test_docker_environment.lib.base.run_task import (
     generate_root_task,
 )

@@ -1,8 +1,8 @@
-from exasol_integration_test_docker_environment.lib.base import luigi_compat as luigi
-from exasol_integration_test_docker_environment.lib.base.luigi_compat import ParameterVisibility
-
 from exasol_integration_test_docker_environment.lib.base.json_pickle_parameter import (
     JsonPickleParameter,
+)
+from exasol_integration_test_docker_environment.lib.base.luigi_compat import (
+    ParameterVisibility,
 )
 from exasol_integration_test_docker_environment.lib.models.data.test_container_content_description import (
     TestContainerContentDescription,

@@ -4,6 +4,7 @@ from typing import (
 )
 
 import jsonpickle
+
 from exasol_integration_test_docker_environment.lib.base.luigi_compat import LocalTarget
 
 

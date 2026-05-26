@@ -1,7 +1,6 @@
 from collections.abc import Iterator
 
 from exasol_integration_test_docker_environment.lib.base import luigi_compat as luigi
-
 from exasol_integration_test_docker_environment.lib.docker.images.create.docker_build_base import (
     DockerBuildBase,
 )
