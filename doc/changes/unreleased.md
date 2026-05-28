@@ -6,6 +6,9 @@
 - #602: Removed joblib Python module dependency
 - #594: Removed old integration tests
 
+## Features:
+- #626: ImageInfo uses now build_name in the target tag if available
+
 ## Bug Fixes:
 - #600: Fixed nox session name
 
