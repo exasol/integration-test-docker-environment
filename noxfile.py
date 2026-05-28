@@ -14,7 +14,6 @@ from packaging.version import Version
 from noxconfig import PROJECT_CONFIG
 
 ROOT = Path(__file__).parent
-UNSUPPORTED_DB_VERSIONS = {"7.1.30"}
 
 # imports all nox task provided by the toolbox
 from exasol.toolbox.nox.tasks import *  # type: ignore
@@ -59,7 +58,6 @@ def get_db_versions_gpu_only() -> list[str]:
         db_version
         for db_version in db_versions
         if Version(db_version) >= Version("2025.1.8")
-        and db_version not in UNSUPPORTED_DB_VERSIONS
     ]
     db_versions.append("default")
     return db_versions
@@ -67,11 +65,7 @@ def get_db_versions_gpu_only() -> list[str]:
 
 def get_db_versions() -> list[str]:
     template_path = ROOT / "docker_db_config_template"
-    db_versions = [
-        str(path.name)
-        for path in template_path.iterdir()
-        if path.is_dir() and path.name not in UNSUPPORTED_DB_VERSIONS
-    ]
+    db_versions = [str(path.name) for path in template_path.iterdir() if path.is_dir()]
     db_versions.append("default")
     # The ITDE only supports EXAConf templates for docker-db versions in the format major.minor.bugfix.
     # If a user supplies versions with some additions, such as d1, prerelease, we filter these from the version number.
