@@ -180,11 +180,14 @@ def test_docker_img_hash_does_not_changes_with_same_resource(clean_images: None)
 
 def test_docker_img_hash_changes_if_resource_changes(clean_images: None):
     exp_image_name = "exasol-test-docker-build-base:test-analyze-image-1_"
-    imgs = _run_docker_build_base_task_and_check(
+    first_imgs = _run_docker_build_base_task_and_check(
         exp_image_name, add_resources={"my_package_file.yaml": "some_package_content_a"}
     )
-    assert len(imgs) == 1
-    imgs = _run_docker_build_base_task_and_check(
+    assert len(first_imgs) == 1
+    first_image_id = first_imgs[0].id
+    second_imgs = _run_docker_build_base_task_and_check(
         exp_image_name, add_resources={"my_package_file.yaml": "some_package_content_b"}
     )
-    assert len(imgs) == 2
+    assert len(second_imgs) == 2
+    assert len({image.id for image in second_imgs}) == 2
+    assert first_image_id in {image.id for image in second_imgs}

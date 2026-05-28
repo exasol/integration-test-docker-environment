@@ -30,12 +30,16 @@ class ImageInfoTest(unittest.TestCase):
     def test_source_tag_keeps_hash(self):
         image_info = self._create_image_info(build_name="BUILD")
         self.assertEqual("flavor-goal_x64_HASH", image_info.get_source_complete_tag())
-        self.assertEqual("repo:flavor-goal_x64_HASH", image_info.get_source_complete_name())
+        self.assertEqual(
+            "repo:flavor-goal_x64_HASH", image_info.get_source_complete_name()
+        )
 
     def test_target_tag_uses_build_name_when_set(self):
         image_info = self._create_image_info(build_name="BUILD")
         self.assertEqual("flavor-goal_x64_BUILD", image_info.get_target_complete_tag())
-        self.assertEqual("repo:flavor-goal_x64_BUILD", image_info.get_target_complete_name())
+        self.assertEqual(
+            "repo:flavor-goal_x64_BUILD", image_info.get_target_complete_name()
+        )
 
     def test_target_tag_falls_back_to_hash_when_build_name_missing(self):
         image_info = self._create_image_info()
