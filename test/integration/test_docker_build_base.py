@@ -5,31 +5,28 @@ import luigi
 import pytest
 from luigi import Parameter
 
-from exasol_integration_test_docker_environment.cli.options.system_options import (
-    DEFAULT_OUTPUT_DIRECTORY,
-)
 from exasol_integration_test_docker_environment.lib.base.run_task import (
     generate_root_task,
 )
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
-from exasol_integration_test_docker_environment.lib.docker.images.clean.clean_images import (
-    CleanImagesStartingWith,
+from exasol_integration_test_docker_environment.lib.docker.images import (
+    image_info,
+    utils as image_utils,
 )
-from exasol_integration_test_docker_environment.lib.docker.images.create.docker_build_base import (
-    DockerBuildBase,
+from exasol_integration_test_docker_environment.lib.docker.images.clean import (
+    clean_images as clean_images_mod,
 )
-from exasol_integration_test_docker_environment.lib.docker.images.create.docker_image_analyze_task import (
-    DockerAnalyzeImageTask,
+from exasol_integration_test_docker_environment.lib.docker.images.create import (
+    docker_build_base,
+    docker_image_analyze_task,
 )
-from exasol_integration_test_docker_environment.lib.docker.images.image_info import (
-    Platform,
-)
-from exasol_integration_test_docker_environment.lib.docker.images.utils import (
-    find_images_by_tag,
-)
-from exasol_integration_test_docker_environment.lib.models.config.build_config import (
-    set_build_config,
-)
+from exasol_integration_test_docker_environment.lib.models.config import build_config
+from exasol_integration_test_docker_environment.cli.options import system_options
+
+CleanImagesStartingWith = clean_images_mod.CleanImagesStartingWith
+DockerAnalyzeImageTask = docker_image_analyze_task.DockerAnalyzeImageTask
+DockerBuildBase = docker_build_base.DockerBuildBase
+Platform = image_info.Platform
 
 
 class TestDockerBuildBaseTestAnalyzeImage(DockerAnalyzeImageTask):
@@ -115,7 +112,9 @@ def clean_images():
 
 def assert_at_least_one_image_exists(prefix: str):
     with ContextDockerClient() as docker_client:
-        image_list = find_images_by_tag(docker_client, lambda x: x.startswith(prefix))
+        image_list = image_utils.find_images_by_tag(
+            docker_client, lambda x: x.startswith(prefix)
+        )
         assert len(image_list) >= 1, f"Image with prefix {prefix} not found"
         return image_list
 
@@ -123,12 +122,12 @@ def assert_at_least_one_image_exists(prefix: str):
 def _run_docker_build_base_task_and_check(
     expected_img_name: str, build_name: str = "", **kwargs
 ):
-    set_build_config(
+    build_config.set_build_config(
         force_rebuild=False,
         force_rebuild_from=(),
         force_pull=False,
         log_build_context_content=False,
-        output_directory=DEFAULT_OUTPUT_DIRECTORY,
+        output_directory=system_options.DEFAULT_OUTPUT_DIRECTORY,
         temporary_base_directory=None,
         cache_directory=None,
         build_name=build_name,
