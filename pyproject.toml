@@ -64,10 +64,8 @@ include = ["docker_db_config", "ext"]
 exclude = ["exasol_integration_test_docker_environment/test"]
 
 [build-system]
-requires = [
-    "poetry>=2.3.0",
-    "poetry-core"
-]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
 
 [tool.mypy]
 plugins = ["luigi.mypy"]
