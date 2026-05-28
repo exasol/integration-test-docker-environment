@@ -5,12 +5,15 @@ import luigi
 import pytest
 from luigi import Parameter
 
+from exasol_integration_test_docker_environment.cli.options import system_options
 from exasol_integration_test_docker_environment.lib.base.run_task import (
     generate_root_task,
 )
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.lib.docker.images import (
     image_info,
+)
+from exasol_integration_test_docker_environment.lib.docker.images import (
     utils as image_utils,
 )
 from exasol_integration_test_docker_environment.lib.docker.images.clean import (
@@ -21,7 +24,6 @@ from exasol_integration_test_docker_environment.lib.docker.images.create import 
     docker_image_analyze_task,
 )
 from exasol_integration_test_docker_environment.lib.models.config import build_config
-from exasol_integration_test_docker_environment.cli.options import system_options
 
 CleanImagesStartingWith = clean_images_mod.CleanImagesStartingWith
 DockerAnalyzeImageTask = docker_image_analyze_task.DockerAnalyzeImageTask
