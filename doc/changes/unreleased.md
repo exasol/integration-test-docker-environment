@@ -6,9 +6,11 @@
 - #602: Removed joblib Python module dependency
 - #594: Removed old integration tests
 
+## Features:
+- #626: ImageInfo uses now build_name in the target tag if available
+
 ## Bug Fixes:
 - #600: Fixed nox session name
-- #626: ImageInfo uses now build_name in the target tag if available
 
 ## Security Issues:
 - #611: Updated to PTB 6.1.1 & fixed vulnerabilities by re-locking transitive dependencies
