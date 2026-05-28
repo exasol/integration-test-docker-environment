@@ -5,6 +5,9 @@ import luigi
 import pytest
 from luigi import Parameter
 
+from exasol_integration_test_docker_environment.cli.options.system_options import (
+    DEFAULT_OUTPUT_DIRECTORY,
+)
 from exasol_integration_test_docker_environment.lib.base.run_task import (
     generate_root_task,
 )
@@ -23,6 +26,9 @@ from exasol_integration_test_docker_environment.lib.docker.images.image_info imp
 )
 from exasol_integration_test_docker_environment.lib.docker.images.utils import (
     find_images_by_tag,
+)
+from exasol_integration_test_docker_environment.lib.models.config.build_config import (
+    set_build_config,
 )
 
 
@@ -114,7 +120,19 @@ def assert_at_least_one_image_exists(prefix: str):
         return image_list
 
 
-def _run_docker_build_base_task_and_check(expected_img_name: str, **kwargs):
+def _run_docker_build_base_task_and_check(
+    expected_img_name: str, build_name: str = "", **kwargs
+):
+    set_build_config(
+        force_rebuild=False,
+        force_rebuild_from=(),
+        force_pull=False,
+        log_build_context_content=False,
+        output_directory=DEFAULT_OUTPUT_DIRECTORY,
+        temporary_base_directory=None,
+        cache_directory=None,
+        build_name=build_name,
+    )
     task = generate_root_task(task_class=TestDockerBuildBase, **kwargs)
     try:
         luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
@@ -191,3 +209,22 @@ def test_docker_img_hash_changes_if_resource_changes(clean_images: None):
     assert len(second_imgs) == 2
     assert len({image.id for image in second_imgs}) == 2
     assert first_image_id in {image.id for image in second_imgs}
+
+
+def test_docker_img_uses_build_name_when_set(
+    clean_images: None, running_platform: Platform
+):
+    build_name = "integration"
+    exp_image_name = (
+        f"exasol-test-docker-build-base:test-analyze-image-1_{running_platform.value}_"
+    )
+    imgs = _run_docker_build_base_task_and_check(
+        exp_image_name,
+        build_name=build_name,
+        add_resources={"my_package_file.yaml": "some_package_content_build_name"},
+    )
+    assert len(imgs) == 1
+    assert imgs[0].tags == [
+        f"exasol-test-docker-build-base:test-analyze-image-1_"
+        f"{running_platform.value}_{build_name}"
+    ]
