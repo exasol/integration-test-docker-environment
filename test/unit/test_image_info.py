@@ -1,3 +1,5 @@
+from typing import Any
+
 import pytest
 
 from exasol_integration_test_docker_environment.lib.docker.images.image_info import (
@@ -10,8 +12,8 @@ from exasol_integration_test_docker_environment.lib.docker.images.image_info imp
 
 def _create_image_info(
     build_name: str = "",
-    platform: Platform | str | None = Platform.X64,
-    image_state: ImageState | str | None = ImageState.NOT_EXISTING,
+    platform: Any = Platform.X64,
+    image_state: Any = ImageState.NOT_EXISTING,
     source_tag: str = "flavor-goal",
     target_tag: str = "flavor-goal",
     hash_value: str = "HASH",
