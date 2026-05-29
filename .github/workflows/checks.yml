@@ -187,9 +187,3 @@ jobs:
       - name: Build Package
         id: build-package
         run: poetry run -- nox -s package:check
-
-  EXAConf-files:
-    name: Test EXAConf files
-    permissions:
-      contents: read
-    uses: ./.github/workflows/test-exaconf-files.yml

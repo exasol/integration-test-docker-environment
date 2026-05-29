@@ -1,0 +1,23 @@
+name: Fast-Tests-Extension
+
+on:
+  workflow_call:
+
+jobs:
+  EXAConf-files:
+    name: Test EXAConf files
+    permissions:
+      contents: read
+    uses: ./.github/workflows/test-exaconf-files.yml
+
+  db-version-minimal-tests:
+    name: Run Db Versions Minimal Tests
+    permissions:
+      contents: read
+    uses: ./.github/workflows/test-db-versions-minimal.yml
+
+  test-shell-scripts:
+    name: Test Shell Scripts
+    permissions:
+      contents: read
+    uses: ./.github/workflows/test-shell-scripts.yml
