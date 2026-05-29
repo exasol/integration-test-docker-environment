@@ -5,25 +5,30 @@ import luigi
 import pytest
 from luigi import Parameter
 
+from exasol_integration_test_docker_environment.cli.options import system_options
 from exasol_integration_test_docker_environment.lib.base.run_task import (
     generate_root_task,
 )
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
-from exasol_integration_test_docker_environment.lib.docker.images.clean.clean_images import (
-    CleanImagesStartingWith,
+from exasol_integration_test_docker_environment.lib.docker.images import (
+    image_info,
 )
-from exasol_integration_test_docker_environment.lib.docker.images.create.docker_build_base import (
-    DockerBuildBase,
+from exasol_integration_test_docker_environment.lib.docker.images import (
+    utils as image_utils,
 )
-from exasol_integration_test_docker_environment.lib.docker.images.create.docker_image_analyze_task import (
-    DockerAnalyzeImageTask,
+from exasol_integration_test_docker_environment.lib.docker.images.clean import (
+    clean_images as clean_images_mod,
 )
-from exasol_integration_test_docker_environment.lib.docker.images.image_info import (
-    Platform,
+from exasol_integration_test_docker_environment.lib.docker.images.create import (
+    docker_build_base,
+    docker_image_analyze_task,
 )
-from exasol_integration_test_docker_environment.lib.docker.images.utils import (
-    find_images_by_tag,
-)
+from exasol_integration_test_docker_environment.lib.models.config import build_config
+
+CleanImagesStartingWith = clean_images_mod.CleanImagesStartingWith
+DockerAnalyzeImageTask = docker_image_analyze_task.DockerAnalyzeImageTask
+DockerBuildBase = docker_build_base.DockerBuildBase
+Platform = image_info.Platform
 
 
 class TestDockerBuildBaseTestAnalyzeImage(DockerAnalyzeImageTask):
@@ -109,12 +114,26 @@ def clean_images():
 
 def assert_at_least_one_image_exists(prefix: str):
     with ContextDockerClient() as docker_client:
-        image_list = find_images_by_tag(docker_client, lambda x: x.startswith(prefix))
+        image_list = image_utils.find_images_by_tag(
+            docker_client, lambda x: x.startswith(prefix)
+        )
         assert len(image_list) >= 1, f"Image with prefix {prefix} not found"
         return image_list
 
 
-def _run_docker_build_base_task_and_check(expected_img_name: str, **kwargs):
+def _run_docker_build_base_task_and_check(
+    expected_img_name: str, build_name: str = "", **kwargs
+):
+    build_config.set_build_config(
+        force_rebuild=False,
+        force_rebuild_from=(),
+        force_pull=False,
+        log_build_context_content=False,
+        output_directory=system_options.DEFAULT_OUTPUT_DIRECTORY,
+        temporary_base_directory=None,
+        cache_directory=None,
+        build_name=build_name,
+    )
     task = generate_root_task(task_class=TestDockerBuildBase, **kwargs)
     try:
         luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
@@ -180,11 +199,33 @@ def test_docker_img_hash_does_not_changes_with_same_resource(clean_images: None)
 
 def test_docker_img_hash_changes_if_resource_changes(clean_images: None):
     exp_image_name = "exasol-test-docker-build-base:test-analyze-image-1_"
-    imgs = _run_docker_build_base_task_and_check(
+    first_imgs = _run_docker_build_base_task_and_check(
         exp_image_name, add_resources={"my_package_file.yaml": "some_package_content_a"}
     )
-    assert len(imgs) == 1
-    imgs = _run_docker_build_base_task_and_check(
+    assert len(first_imgs) == 1
+    first_image_id = first_imgs[0].id
+    second_imgs = _run_docker_build_base_task_and_check(
         exp_image_name, add_resources={"my_package_file.yaml": "some_package_content_b"}
     )
-    assert len(imgs) == 2
+    assert len(second_imgs) == 2
+    assert len({image.id for image in second_imgs}) == 2
+    assert first_image_id in {image.id for image in second_imgs}
+
+
+def test_docker_img_uses_build_name_when_set(
+    clean_images: None, running_platform: Platform
+):
+    build_name = "integration"
+    exp_image_name = (
+        f"exasol-test-docker-build-base:test-analyze-image-1_{running_platform.value}_"
+    )
+    imgs = _run_docker_build_base_task_and_check(
+        exp_image_name,
+        build_name=build_name,
+        add_resources={"my_package_file.yaml": "some_package_content_build_name"},
+    )
+    assert len(imgs) == 1
+    assert imgs[0].tags == [
+        f"exasol-test-docker-build-base:test-analyze-image-1_"
+        f"{running_platform.value}_{build_name}"
+    ]

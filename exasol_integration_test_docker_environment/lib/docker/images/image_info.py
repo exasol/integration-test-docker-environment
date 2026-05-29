@@ -107,12 +107,15 @@ class ImageInfo(Info):
             self.platform = Platform[platform].value
         elif platform is not None:
             raise TypeError(f"{type(platform)} for platform not supported")
-        self.check_complete_tag_length(self.source_tag)
-        self.check_complete_tag_length(self.target_tag)
+        self.check_complete_tag_length(self.source_tag, self.hash)
+        self.check_complete_tag_length(self.target_tag, self._target_tag_suffix())
 
-    def check_complete_tag_length(self, tag):
+    def _target_tag_suffix(self) -> str:
+        return self.build_name if self.build_name else self.hash
+
+    def check_complete_tag_length(self, tag: str, suffix: str) -> None:
         complete_tag_length_limit = self.DOCKER_TAG_LENGTH_LIMIT + self.MAX_TAG_SURPLUS
-        complete_tag = self._create_complete_tag(tag)
+        complete_tag = self._create_complete_tag(tag, suffix)
         if len(complete_tag) > complete_tag_length_limit:
             raise Exception(
                 f"Complete Tag to long by {len(complete_tag) - complete_tag_length_limit}:  {complete_tag}"
@@ -125,22 +128,24 @@ class ImageInfo(Info):
         return f"{self.source_repository_name}:{self.get_source_complete_tag()}"
 
     def get_source_complete_tag(self):
-        return self._create_truncated_complete_tag(self.source_tag)
+        return self._create_truncated_complete_tag(self.source_tag, self.hash)
 
     def get_target_complete_tag(self):
-        return self._create_truncated_complete_tag(self.target_tag)
+        return self._create_truncated_complete_tag(
+            self.target_tag, self._target_tag_suffix()
+        )
 
-    def _create_truncated_complete_tag(self, tag: str) -> str:
+    def _create_truncated_complete_tag(self, tag: str, suffix: str) -> str:
         # we must truncate the tag to 128 characters, because this is the limit of docker tags
         # refer here https://docs.docker.com/engine/reference/commandline/tag/
-        complete_tag = self._create_complete_tag(tag)
+        complete_tag = self._create_complete_tag(tag, suffix)
         truncated_tag = complete_tag[:128]
         return truncated_tag
 
-    def _create_complete_tag(self, tag):
+    def _create_complete_tag(self, tag: str, suffix: str) -> str:
         tag_elements = [tag]
         if self.platform:
             tag_elements.append(self.platform)
-        if self.hash:
-            tag_elements.append(self.hash)
+        if suffix:
+            tag_elements.append(suffix)
         return "_".join(tag_elements)
