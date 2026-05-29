@@ -5,6 +5,7 @@
 ## Refactoring:
 - #602: Removed joblib Python module dependency
 - #594: Removed old integration tests
+- #627: Updated to PTB 8.1.1
 
 ## Features:
 - #626: ImageInfo uses now build_name in the target tag if available

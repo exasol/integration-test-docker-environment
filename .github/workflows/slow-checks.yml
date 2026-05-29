@@ -1,4 +1,4 @@
-name: Slow Tests
+name: Slow-Checks
 
 on:
   workflow_call:

@@ -1,0 +1,13 @@
+name: Merge-Gate-Extension
+
+on:
+  workflow_call:
+
+jobs:
+  standalone-executable:
+    name: Create a standalone Linux executable
+    uses: ./.github/workflows/build-executable.yml
+    with:
+      release-tag: ''
+    permissions:
+      contents: write
