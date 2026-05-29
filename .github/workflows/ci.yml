@@ -1,7 +1,7 @@
 # This should be generated and maintained by the exasol-toolbox.
 # However, there is an open issue due to a `merge-gate` needing `write` permissions.
 # This will be resolved in:
-#  https://github.com/exasol/integration-test-docker-environment/issues/630.1.1.
+#  https://github.com/exasol/integration-test-docker-environment/issues/630
 name: CI
 
 on:

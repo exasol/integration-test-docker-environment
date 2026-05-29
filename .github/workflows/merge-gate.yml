@@ -2,7 +2,7 @@
 # However, there is an open issue due to
 # - `slow-checks.yml` and `merge-gate-extension.yml` not needing access to secrets
 # - `merge-gate-extensions.yml` needing write access and `run-fast-tasts`
-#  https://github.com/exasol/integration-test-docker-environment/issues/630.1.1.
+#  https://github.com/exasol/integration-test-docker-environment/issues/630
 name: Merge-Gate
 
 on:
