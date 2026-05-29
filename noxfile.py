@@ -11,8 +11,6 @@ import PyInstaller.__main__
 import toml
 from packaging.version import Version
 
-from noxconfig import PROJECT_CONFIG
-
 ROOT = Path(__file__).parent
 
 # imports all nox task provided by the toolbox
@@ -187,16 +185,6 @@ def copy_docker_db_config_templates(session: nox.Session):
     with session.chdir(ROOT):
         session.run("cp", "-rL", "docker_db_config_template", str(target_path))
     session.run("git", "add", str(target_path))
-
-
-@nox.session(name="test:unit", python=False)
-def itde_unit_tests(session: nox.Session) -> None:
-    """Runs all unit tests"""
-    from exasol.toolbox.nox._shared import _context
-    from exasol.toolbox.nox._test import _unit_tests
-
-    context = _context(session, coverage=True)
-    _unit_tests(session, PROJECT_CONFIG, context)
 
 
 @nox.session(name="update-default-db-version", python=False)
