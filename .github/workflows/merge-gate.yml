@@ -1,13 +1,12 @@
+# This should be generated and maintained by the exasol-toolbox.
+# However, there is an open issue due to
+# - `slow-checks.yml` and `merge-gate-extension.yml` not needing access to secrets
+# - `merge-gate-extensions.yml` needing write access and `run-fast-tasts`
+#  https://github.com/exasol/integration-test-docker-environment/issues/630.1.1.
 name: Merge-Gate
 
 on:
   workflow_call:
-    inputs:
-      root-event:
-        description: GitHub event triggering the root workflow ci.yml
-        required: false
-        type: string
-        default: unknown
 
 jobs:
   run-fast-checks:
@@ -16,7 +15,7 @@ jobs:
     permissions:
       contents: read
 
-  fast-tests:
+  run-fast-tests:
     name: Fast Tests
     uses: ./.github/workflows/fast-tests.yml
     permissions:
@@ -26,7 +25,7 @@ jobs:
     name: Fast Report
     needs:
       - run-fast-checks
-      - fast-tests
+      - run-fast-tests
     uses: ./.github/workflows/report.yml
     secrets: inherit
     permissions:
@@ -34,7 +33,6 @@ jobs:
 
   approve-run-slow-tests:
     name: Approve Running Slow Tests?
-    if: ${{ inputs.root-event != 'schedule' }}
     runs-on: "ubuntu-24.04"
     permissions:
       contents: read
@@ -46,36 +44,42 @@ jobs:
       - name: Tests
         run: echo "Slow tests approved"
 
-  slow-tests:
-    name: Slow Tests
-    needs: approve-run-slow-tests
+  run-slow-checks:
+    name: Slow Checks
+    needs:
+      - approve-run-slow-tests
+    uses: ./.github/workflows/slow-checks.yml
+    # Do not inherit secrets because ITDE Slow Tests does not need it
     permissions:
       contents: read
-    uses: ./.github/workflows/slow-tests.yml
-    # Do not inherit secrets because ITDE Slow Tests does not need it
 
-  standalone-executable:
-    needs: [ fast-tests ]
-    name: Create a standalone linux executable
-    uses: ./.github/workflows/build-executable.yml
-    with:
-      release-tag: ''
+  merge-gate-extension:
+    uses: ./.github/workflows/merge-gate-extension.yml
+    needs:
+      - run-fast-tests
+    # Do not inherit secrets because ITDE merge-gate tests does not need it
     permissions:
       contents: write
 
   # This job ensures inputs have been executed successfully.
   allow-merge:
     name: Allow Merge
+    if: ${{ !cancelled() }}
     runs-on: "ubuntu-24.04"
     permissions:
       contents: read
     # If you need additional jobs to be part of the merge gate, add them below
     needs:
       - run-fast-checks
-      - fast-tests
-      - slow-tests
-      - standalone-executable
-    # Each job requires a step, so we added this dummy step.
+      - run-slow-checks
+      - merge-gate-extension
+    # To prevent accidentally merges, this step is required. For more details
+    # see: https://github.com/exasol/python-toolbox/issues/563
     steps:
-      - name: Approve
-        run: echo "Merge Approved"
+      - name: Branch Protection - failure if any ancestor failed or was cancelled
+        if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+        run: |
+          echo '${{ toJSON(needs) }}'
+          exit 1
+      - name: branch protection
+        run: echo "All required checks passed. Merge allowed."
