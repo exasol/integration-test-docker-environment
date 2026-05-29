@@ -5,3 +5,10 @@ workflows:
     #   https://github.com/exasol/integration-test-docker-environment/issues/630
     remove_jobs:
       - check-workflows
+  - name: periodic-validation
+    # This is needed because the `slow-checks.yml` would run against several DB
+    # and Python versions. We want to reduce this for the periodic validations.
+    # This should be resolved in:
+    #   https://github.com/exasol/integration-test-docker-environment/issues/632
+    remove_jobs:
+      - run-slow-checks

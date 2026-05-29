@@ -20,19 +20,11 @@ jobs:
     permissions:
       contents: read
 
-  run-slow-checks:
-    name: Slow Checks
-    uses: ./.github/workflows/slow-checks.yml
-    secrets: inherit
-    permissions:
-      contents: read
-
   report:
     name: Report
     needs:
       - run-fast-checks
       - run-fast-tests
-      - run-slow-checks
     uses: ./.github/workflows/report.yml
     secrets: inherit
     permissions:
