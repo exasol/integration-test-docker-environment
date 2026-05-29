@@ -2,6 +2,8 @@
 
 ## Summary
 
+ImageInfo uses now build_name in the target tag if available. Furthermore, some refactoring, internal fixes and updates.
+
 ## Security Issues
 
 This release fixes vulnerabilities by updating dependencies:
