@@ -1,3 +1,7 @@
+# This should be generated and maintained by the exasol-toolbox.
+# However, there is an open issue due to a manually added job, which
+# will be resolved in:
+#  https://github.com/exasol/integration-test-docker-environment/issues/630
 name: CD
 
 on:
