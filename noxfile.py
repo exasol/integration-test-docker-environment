@@ -9,12 +9,13 @@ from pathlib import Path
 import nox
 import PyInstaller.__main__
 import toml
-from packaging.version import Version
 
 ROOT = Path(__file__).parent
 
 # imports all nox task provided by the toolbox
 from exasol.toolbox.nox.tasks import *  # type: ignore
+
+from noxconfig import PROJECT_CONFIG
 
 # default actions to be run if nothing is explicitly specified with the -s option
 nox.options.sessions = ["format:fix"]
@@ -40,36 +41,22 @@ def parse_test_arguments(session: nox.Session):
     args = parser.parse_args(session.posargs)
     db_version = args.db_version
     if args.test_set == TestSet.GPU_ONLY:
-        if db_version not in get_db_versions_gpu_only():
-            parser.error(f"db-version must be one of {get_db_versions_gpu_only()}")
+        if db_version not in PROJECT_CONFIG.db_versions_gpu_only:
+            parser.error(
+                f"db-version must be one of {PROJECT_CONFIG.db_versions_gpu_only}"
+            )
     else:
-        if db_version not in get_db_versions():
-            parser.error(f"db-version must be one of {get_db_versions()}")
+        if db_version not in PROJECT_CONFIG.db_versions:
+            parser.error(f"db-version must be one of {PROJECT_CONFIG.db_versions}")
     return db_version, args.test_set
 
 
 def get_db_versions_gpu_only() -> list[str]:
-    template_path = ROOT / "docker_db_config_template"
-    db_versions = [str(path.name) for path in template_path.iterdir() if path.is_dir()]
-
-    db_versions = [
-        db_version
-        for db_version in db_versions
-        if Version(db_version) >= Version("2025.1.8")
-    ]
-    db_versions.append("default")
-    return db_versions
+    return PROJECT_CONFIG.db_versions_gpu_only
 
 
 def get_db_versions() -> list[str]:
-    template_path = ROOT / "docker_db_config_template"
-    db_versions = [str(path.name) for path in template_path.iterdir() if path.is_dir()]
-    db_versions.append("default")
-    # The ITDE only supports EXAConf templates for docker-db versions in the format major.minor.bugfix.
-    # If a user supplies versions with some additions, such as d1, prerelease, we filter these from the version number.
-    # However, we use the templates here to generate the test matrix for GitHub Actions.
-    # This means we need to adapt the list for images with special names.
-    return db_versions
+    return PROJECT_CONFIG.db_versions
 
 
 def get_default_db_version(file_name: Path) -> str:
@@ -157,9 +144,9 @@ def get_all_db_versions(session: nox.Session):
 
     args = parser().parse_args(session.posargs)
     if args.gpu_only:
-        print(json.dumps(get_db_versions_gpu_only()))
+        print(json.dumps(PROJECT_CONFIG.db_versions_gpu_only))
     else:
-        print(json.dumps(get_db_versions()))
+        print(json.dumps(PROJECT_CONFIG.db_versions))
 
 
 @nox.session(name="release", python=False)
