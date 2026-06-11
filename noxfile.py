@@ -1,5 +1,4 @@
 import argparse
-import json
 import re
 import shutil
 from argparse import ArgumentParser
@@ -128,25 +127,6 @@ def run_minimal_tests(session: nox.Session):
                 f"./test/integration/{test}",
                 env=env,
             )
-
-
-@nox.session(name="get-all-db-versions", python=False)
-def get_all_db_versions(session: nox.Session):
-    """Returns all, known, db-versions as JSON string"""
-
-    def parser() -> ArgumentParser:
-        p = ArgumentParser(
-            usage="nox -s get-all-db-versions -- [--gpu-only]",
-            formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        )
-        p.add_argument("--gpu-only", action="store_true")
-        return p
-
-    args = parser().parse_args(session.posargs)
-    if args.gpu_only:
-        print(json.dumps(PROJECT_CONFIG.db_versions_gpu_only))
-    else:
-        print(json.dumps(PROJECT_CONFIG.db_versions))
 
 
 @nox.session(name="release", python=False)
