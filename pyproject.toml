@@ -47,7 +47,7 @@ dev = [
     "nox>=2022.1.7,<2023",
     "mypy>=1.1.1,<2",
     "pyexasol>=1.1.1, <3.0.0",
-    "exasol-toolbox>=8.1.1,<9",
+    "exasol-toolbox @ git+https://github.com/exasol/python-toolbox.git@feature/654_add_and_use_general_matrix",
     "pytest-check==2.5.3",
     "pyinstaller>=6.15.0,<7",
     "types-pyinstaller>=6.15.0.20250822,<7",
