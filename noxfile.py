@@ -48,14 +48,6 @@ def parse_test_arguments(session: nox.Session):
     return args.db_version, args.test_set
 
 
-def get_db_versions_gpu_only() -> list[str]:
-    return PROJECT_CONFIG.db_versions_gpu_only
-
-
-def get_db_versions() -> list[str]:
-    return PROJECT_CONFIG.db_versions
-
-
 def get_default_db_version(file_name: Path) -> str:
     with open(file_name) as txt_file:
         file_content = txt_file.read()
