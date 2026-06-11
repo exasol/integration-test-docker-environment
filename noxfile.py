@@ -38,16 +38,14 @@ def parse_test_arguments(session: nox.Session):
         help="Test set name",
     )
     args = parser.parse_args(session.posargs)
-    db_version = args.db_version
-    if args.test_set == TestSet.GPU_ONLY:
-        if db_version not in PROJECT_CONFIG.db_versions_gpu_only:
-            parser.error(
-                f"db-version must be one of {PROJECT_CONFIG.db_versions_gpu_only}"
-            )
-    else:
-        if db_version not in PROJECT_CONFIG.db_versions:
-            parser.error(f"db-version must be one of {PROJECT_CONFIG.db_versions}")
-    return db_version, args.test_set
+    valid_db_versions = (
+        PROJECT_CONFIG.db_versions_gpu_only
+        if args.test_set == TestSet.GPU_ONLY
+        else PROJECT_CONFIG.db_versions
+    )
+    if args.db_version not in valid_db_versions:
+        parser.error(f"db-version must be one of {valid_db_versions}")
+    return args.db_version, args.test_set
 
 
 def get_db_versions_gpu_only() -> list[str]:
