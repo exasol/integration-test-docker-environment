@@ -4,23 +4,22 @@ on:
   workflow_call:
 
 jobs:
-  get_exasol_versions_with_gpu:
-    uses: ./.github/workflows/get-exasol-versions.yml
+  build_matrix:
     permissions:
       contents: read
+    uses: ./.github/workflows/matrix.yml
     with:
-      only_gpu: true
+      matrix_keys_json: '["db_versions_gpu_only"]'
   test-docker-gpu:
-    name: Run GPU Tests for Exasol  ${{ matrix.exasol_version }}
+    name: Run GPU Tests for Exasol  ${{ matrix.db_versions_gpu_only }}
     runs-on:
       labels: int-linux-x64-4core-gpu-t4-ubuntu24.04-1
     permissions:
       contents: read
-    needs: get_exasol_versions_with_gpu
+    needs: build_matrix
     strategy:
       fail-fast: false
-      matrix:
-        exasol_version: ${{fromJson(needs.get_exasol_versions_with_gpu.outputs.matrix)}}
+      matrix: ${{ fromJson(needs.build_matrix.outputs.matrix) }}
     steps:
       - name: SCM Checkout
         uses: actions/checkout@v6
@@ -39,4 +38,4 @@ jobs:
 
 
       - name: Run GPU Tests
-        run: poetry run -- nox -s run-all-tests -- --db-version='${{ matrix.exasol_version }}' --test-set=gpu-only
+        run: poetry run -- nox -s run-all-tests -- --db-version='${{ matrix.db_versions_gpu_only }}' --test-set=gpu-only
