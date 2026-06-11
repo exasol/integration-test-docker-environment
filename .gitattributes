@@ -12,7 +12,7 @@ exasol_integration_test_docker_environment/docker_db_config/**/* linguist-genera
 .github/workflows/dependency-update.yml     linguist-generated=true
 .github/workflows/fast-tests.yml            linguist-generated=true
 .github/workflows/gh-pages.yml              linguist-generated=true
-.github/workflows/matrix-python.yml         linguist-generated=true
+.github/workflows/matrix.yml                linguist-generated=true
 .github/workflows/periodic-validation.yml   linguist-generated=true
 .github/workflows/pr-merge.yml              linguist-generated=true
 .github/workflows/report.yml                linguist-generated=true
