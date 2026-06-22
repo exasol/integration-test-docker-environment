@@ -9,3 +9,7 @@
 ## Refactorings
 
  - #635: Removed broken release nox session in noxfile
+
+## Bugs
+
+ - #642: Fixed `DockerBuildImageTask` if base image is not in local docker registry
