@@ -360,7 +360,9 @@ Currently supported Exasol Versions
 
 -  **7.1**: 7.1.30 and later
 -  **8**: 8.29.13 and later
--  **2025**: 2026.1.0 and later
+-  **2025.1**: 2025.1.8
+-  **2026.1**: 2026.1.0
+
 
 If you need further versions, please open an issue.
 
