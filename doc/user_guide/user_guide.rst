@@ -238,7 +238,7 @@ The integration-test-docker-environment command line tool
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Besides, the already mentioned command ``spawn-test-environment``, the
-integration-test-docker-environemnt command line tool provides a couple
+integration-test-docker-environment command line tool provides a couple
 of other helpful tools.
 
 Run ``main.py --help``, to get a list of the available commands:
@@ -360,7 +360,7 @@ Currently supported Exasol Versions
 
 -  **7.1**: 7.1.30 and later
 -  **8**: 8.29.13 and later
--  **2025.1**: 2025.1.8
+-  **2025.1**: 2025.1.8 and 2025.1.11
 -  **2026.1**: 2026.1.0
 
 
@@ -408,8 +408,8 @@ for details.
 GPU Usage
 ~~~~~~~~~
 
-Use the flag `--accelerator="nvidia=all"` to activate all available NVidia GPUs in the docker db.
-Additionaly, you need to set the respective db parameter using the `--additional-db-parameter` option, e.g.
+Use the flag `--accelerator="nvidia=all"` to activate all available Nvidia GPUs in the docker db.
+Additionally, you need to set the respective db parameter using the `--additional-db-parameter` option, e.g.
 .. code:: console
 
 itde spawn-test-environment --environment-name my_env --accelerator="nvidia=all" --additional-db-parameter=-enableAcceleratorDeviceDetection=1
