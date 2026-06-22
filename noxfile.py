@@ -8,7 +8,6 @@ from pathlib import Path
 
 import nox
 import PyInstaller.__main__
-import toml
 from packaging.version import Version
 
 ROOT = Path(__file__).parent
@@ -160,14 +159,6 @@ def get_all_db_versions(session: nox.Session):
         print(json.dumps(get_db_versions_gpu_only()))
     else:
         print(json.dumps(get_db_versions()))
-
-
-@nox.session(name="release", python=False)
-def release(session: nox.Session):
-    project = toml.load(ROOT / "pyproject.toml")
-    version = project["tool"]["poetry"]["version"]
-    session.run("git", "tag", version)
-    session.run("git", "push", "origin", version)
 
 
 @nox.session(name="copy-docker-db-config-templates", python=False)
