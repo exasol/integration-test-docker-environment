@@ -4,7 +4,8 @@
 
 ## Features 
 
- - #640: Support for 2026.1.0
+ - #640: Added support for 2026.1.0
+ - #640: Added support for 2025.1.11
 
 ## Refactorings
 
