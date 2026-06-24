@@ -12,29 +12,33 @@ on:
 
 jobs:
 
-  build-matrix:
+  build_matrix:
     name: Generate Build Matrix
     permissions:
       contents: read
-    uses: ./.github/workflows/matrix-python.yml
+    uses: ./.github/workflows/matrix.yml
+    with:
+      matrix_keys_json: '["python_versions"]'
 
   test-python-version-all-tests:
-    name: "Run Tests with Python ${{ matrix.python-version }} and Default Exasol Version"
+    name: "Run Tests with Python ${{ matrix.python_versions }} and Default Exasol Version"
     permissions:
       contents: read
-    needs: [ build-matrix ]
+    needs: build_matrix
     strategy:
       fail-fast: false
-      matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
+      matrix: ${{ fromJson(needs.build_matrix.outputs.matrix) }}
     runs-on: ubuntu-24.04
     steps:
       - name: SCM Checkout
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Setup Python & Poetry Environment
         uses: exasol/python-toolbox/.github/actions/python-environment@v6
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: ${{ matrix.python_versions }}
           poetry-version: "2.3.0"
 
       - name: Allow unprivileged user namespaces

@@ -1,7 +1,5 @@
-# This should be generated and maintained by the exasol-toolbox.
-# However, there is an open issue due to a manually added job, which
-# will be resolved in:
-#  https://github.com/exasol/integration-test-docker-environment/issues/630
+# Generated and maintained by the exasol-toolbox.
+# Last generated with exasol-toolbox version 10.0.0.
 name: CD
 
 on:
@@ -27,15 +25,15 @@ jobs:
     secrets:
       PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
 
-  standalone-executable:
+  cd-extension:
+    name: Extension
+    uses: ./.github/workflows/cd-extension.yml
     needs:
-     - build-and-publish
-    name: Create a standalone linux executable
-    uses: ./.github/workflows/build-executable.yml
-    with:
-      release-tag: ${{ github.ref_name }}
+      - check-release-tag
     permissions:
       contents: write
+    with:
+      release-tag: ${{ github.ref_name }}
 
   publish-docs:
     needs:

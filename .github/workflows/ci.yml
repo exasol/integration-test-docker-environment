@@ -1,7 +1,5 @@
-# This should be generated and maintained by the exasol-toolbox.
-# However, there is an open issue due to a `merge-gate` needing `write` permissions.
-# This will be resolved in:
-#  https://github.com/exasol/integration-test-docker-environment/issues/630
+# Generated and maintained by the exasol-toolbox.
+# Last generated with exasol-toolbox version 10.0.0.
 name: CI
 
 on:
@@ -12,9 +10,10 @@ jobs:
   merge-gate:
     name: Merge Gate
     uses: ./.github/workflows/merge-gate.yml
-    secrets: inherit
+    secrets:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
     permissions:
-      contents: write
+      contents: read
 
   report:
     name: Report
@@ -26,6 +25,7 @@ jobs:
       needs.merge-gate.result != 'skipped' &&
       needs.merge-gate.result != 'cancelled'
     uses: ./.github/workflows/report.yml
-    secrets: inherit
+    secrets:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
     permissions:
       contents: read

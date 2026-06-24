@@ -11,26 +11,29 @@ on:
  workflow_call:
 
 jobs:
-  get_exasol_versions:
+  build_matrix:
     name: Read all supported Exasol DB versions
     permissions:
       contents: read
-    uses: ./.github/workflows/get-exasol-versions.yml
+    uses: ./.github/workflows/matrix.yml
+    with:
+      matrix_keys_json: '["db_versions"]'
 
   test-db-versions-all-tests:
-    needs: get_exasol_versions
+    needs: build_matrix
     strategy:
       fail-fast: false
-      matrix:
-        exasol_version: ${{fromJson(needs.get_exasol_versions.outputs.matrix)}}
+      matrix: ${{ fromJson(needs.build_matrix.outputs.matrix) }}
     runs-on: ubuntu-24.04
     permissions:
       contents: read
-    name: Run all tests for Exasol ${{ matrix.exasol_version }}
+    name: Run all tests for Exasol ${{ matrix.db_versions }}
 
     steps:
       - name: SCM Checkout
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Setup Python & Poetry Environment
         uses: exasol/python-toolbox/.github/actions/python-environment@v6
@@ -42,4 +45,6 @@ jobs:
         run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
       - name: Run all tests
-        run: poetry run -- nox -s run-all-tests -- --db-version='${{ matrix.exasol_version }}' --test-set=default
+        run: poetry run -- nox -s run-all-tests -- --db-version=${MATRIX_DB_VERSION} --test-set=default
+        env:
+          MATRIX_DB_VERSION: ${{ matrix.db_versions }}

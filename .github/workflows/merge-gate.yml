@@ -1,12 +1,12 @@
-# This should be generated and maintained by the exasol-toolbox.
-# However, there is an open issue due to
-# - `slow-checks.yml` and `merge-gate-extension.yml` not needing access to secrets
-# - `merge-gate-extensions.yml` needing write access and `run-fast-tasts`
-#  https://github.com/exasol/integration-test-docker-environment/issues/630
+# Generated and maintained by the exasol-toolbox.
+# Last generated with exasol-toolbox version 10.0.0.
 name: Merge-Gate
 
 on:
   workflow_call:
+    secrets:
+      SONAR_TOKEN:
+        required: true
 
 jobs:
   run-fast-checks:
@@ -27,7 +27,8 @@ jobs:
       - run-fast-checks
       - run-fast-tests
     uses: ./.github/workflows/report.yml
-    secrets: inherit
+    secrets:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
     permissions:
       contents: read
 
@@ -49,17 +50,14 @@ jobs:
     needs:
       - approve-run-slow-tests
     uses: ./.github/workflows/slow-checks.yml
-    # Do not inherit secrets because ITDE Slow Tests does not need it
     permissions:
       contents: read
 
   merge-gate-extension:
+    name: Extension
     uses: ./.github/workflows/merge-gate-extension.yml
-    needs:
-      - run-fast-tests
-    # Do not inherit secrets because ITDE merge-gate tests does not need it
     permissions:
-      contents: write
+      contents: read
 
   # This job ensures inputs have been executed successfully.
   allow-merge:
@@ -79,8 +77,10 @@ jobs:
     steps:
       - name: Branch Protection - failure if any ancestor failed or was cancelled
         if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+        env:
+          NEEDS_JSON: ${{ toJSON(needs) }}
         run: |
-          echo '${{ toJSON(needs) }}'
+          echo "$NEEDS_JSON"
           exit 1
       - name: branch protection
         run: echo "All required checks passed. Merge allowed."

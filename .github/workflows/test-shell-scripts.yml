@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: SCM Checkout
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Run shellcheck
         run: ./scripts/build/shellcheck.sh
