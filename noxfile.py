@@ -1,5 +1,4 @@
 import argparse
-import json
 import re
 import shutil
 from argparse import ArgumentParser
@@ -8,7 +7,8 @@ from pathlib import Path
 
 import nox
 import PyInstaller.__main__
-from packaging.version import Version
+
+from noxconfig import PROJECT_CONFIG
 
 ROOT = Path(__file__).parent
 
@@ -37,44 +37,20 @@ def parse_test_arguments(session: nox.Session):
         help="Test set name",
     )
     args = parser.parse_args(session.posargs)
-    db_version = args.db_version
-    if args.test_set == TestSet.GPU_ONLY:
-        if db_version not in get_db_versions_gpu_only():
-            parser.error(f"db-version must be one of {get_db_versions_gpu_only()}")
-    else:
-        if db_version not in get_db_versions():
-            parser.error(f"db-version must be one of {get_db_versions()}")
-    return db_version, args.test_set
-
-
-def get_db_versions_gpu_only() -> list[str]:
-    template_path = ROOT / "docker_db_config_template"
-    db_versions = [str(path.name) for path in template_path.iterdir() if path.is_dir()]
-
-    db_versions = [
-        db_version
-        for db_version in db_versions
-        if Version(db_version) >= Version("2025.1.8")
-    ]
-    db_versions.append("default")
-    return db_versions
-
-
-def get_db_versions() -> list[str]:
-    template_path = ROOT / "docker_db_config_template"
-    db_versions = [str(path.name) for path in template_path.iterdir() if path.is_dir()]
-    db_versions.append("default")
-    # The ITDE only supports EXAConf templates for docker-db versions in the format major.minor.bugfix.
-    # If a user supplies versions with some additions, such as d1, prerelease, we filter these from the version number.
-    # However, we use the templates here to generate the test matrix for GitHub Actions.
-    # This means we need to adapt the list for images with special names.
-    return db_versions
+    valid_db_versions = (
+        PROJECT_CONFIG.db_versions_gpu_only
+        if args.test_set == TestSet.GPU_ONLY
+        else PROJECT_CONFIG.db_versions
+    )
+    if args.db_version not in valid_db_versions:
+        parser.error(f"db-version must be one of {valid_db_versions}")
+    return args.db_version, args.test_set
 
 
 def get_default_db_version(file_name: Path) -> str:
     with open(file_name) as txt_file:
         file_content = txt_file.read()
-        pattern = r"\s*LATEST_DB_VERSION\s*=\s*[\"']+([\d\.]+)[\"']+"
+        pattern = r"LATEST_DB_VERSION\s*=\s*\"\"\"(\d{4}\.\d+\.\d+)\"\"\""
         match = re.search(pattern, file_content)
         return match.group(1) if match else ""
 
@@ -82,7 +58,7 @@ def get_default_db_version(file_name: Path) -> str:
 def replace_string_in_file(
     file_name: Path, old_string: str, str_to_replace: str
 ) -> bool:
-    is_ok = file_name.is_file() and bool(old_string) and bool(str_to_replace)
+    file_name.is_file() and bool(old_string) and bool(str_to_replace)
     file_content = file_name.read_text()
     updated_text = file_content.replace(old_string, str_to_replace)
     with open(file_name, "w") as txt_file:
@@ -101,10 +77,11 @@ def run_all_tests(session: nox.Session):
     """
     db_version, test_set = parse_test_arguments(session)
     env = {"EXASOL_VERSION": db_version}
+    test_directory: Path = ROOT / "test" / "integration"
     if test_set == TestSet.GPU_ONLY:
-        session.run("pytest", "-m", "gpu", "./test/integration", env=env)
+        session.run("pytest", "-m", "gpu", str(test_directory), env=env)
     else:
-        session.run("pytest", "-m", "not gpu", "./test/integration", env=env)
+        session.run("pytest", "-m", "not gpu", str(test_directory), env=env)
 
 
 @nox.session(name="run-minimal-tests", python=False)
@@ -140,25 +117,6 @@ def run_minimal_tests(session: nox.Session):
                 f"./test/integration/{test}",
                 env=env,
             )
-
-
-@nox.session(name="get-all-db-versions", python=False)
-def get_all_db_versions(session: nox.Session):
-    """Returns all, known, db-versions as JSON string"""
-
-    def parser() -> ArgumentParser:
-        p = ArgumentParser(
-            usage="nox -s get-all-db-versions -- [--gpu-only]",
-            formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        )
-        p.add_argument("--gpu-only", action="store_true")
-        return p
-
-    args = parser().parse_args(session.posargs)
-    if args.gpu_only:
-        print(json.dumps(get_db_versions_gpu_only()))
-    else:
-        print(json.dumps(get_db_versions()))
 
 
 @nox.session(name="copy-docker-db-config-templates", python=False)
