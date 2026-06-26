@@ -1,5 +1,7 @@
 import logging
+import multiprocessing
 import os
+import sys
 from collections.abc import Callable
 from datetime import datetime
 from pathlib import Path
@@ -149,5 +151,7 @@ def collect_dependencies(task: DependencyLoggerBaseTask) -> set[TaskDependency]:
 
 
 def setup_worker():
+    if sys.platform != "win32":
+        multiprocessing.set_start_method("fork", force=True)
     luigi.configuration.get_config().set("worker", "wait_interval", str(0.1))
     luigi.configuration.get_config().set("worker", "wait_jitter", str(0.5))
