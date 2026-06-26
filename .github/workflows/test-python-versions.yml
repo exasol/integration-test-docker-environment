@@ -2,10 +2,10 @@ name: Test Python Versions with all tests
 
 # python-version: All supported Python version
 # database-version: Default
-# tests: all
+# tests: all (dynamic matrix)
 #
-# Call nox task run_tests for all version of Python as defined in the
-# python-toolbox (PTB) using the default version of the Exasol database.
+# Execute one dynamic test target per matrix entry for all supported Python
+# versions using the default Exasol database version.
 
 on:
   workflow_call:
@@ -18,10 +18,10 @@ jobs:
       contents: read
     uses: ./.github/workflows/matrix.yml
     with:
-      matrix_keys_json: '["python_versions"]'
+      matrix_keys_json: '["python_versions", "integration_test_targets"]'
 
   test-python-version-all-tests:
-    name: "Run Tests with Python ${{ matrix.python_versions }} and Default Exasol Version"
+    name: "Run Tests with Python ${{ matrix.python_versions }} - ${{ matrix.integration_test_targets }}"
     permissions:
       contents: read
     needs: build_matrix
@@ -45,4 +45,6 @@ jobs:
         run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
       - name: Run all tests
-        run: poetry run -- nox -s run-all-tests -- --db-version=default --test-set=default
+        run: poetry run -- nox -s run-integration-tests -- --db-version=default --test-target=${MATRIX_TEST_TARGET}
+        env:
+          MATRIX_TEST_TARGET: ${{ matrix.integration_test_targets }}
