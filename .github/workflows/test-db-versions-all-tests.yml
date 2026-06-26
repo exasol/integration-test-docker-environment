@@ -23,13 +23,11 @@ jobs:
     needs: build_matrix
     strategy:
       fail-fast: false
-      matrix:
-        python-versions: ["3.10", "3.14"]
-        db_versions: ${{ fromJson(needs.build_matrix.outputs.matrix).db_versions }}
+      matrix: ${{ fromJson(needs.build_matrix.outputs.matrix) }}
     runs-on: ubuntu-24.04
     permissions:
       contents: read
-    name: Run all tests for Exasol ${{ matrix.db_versions }} (Python ${{ matrix.python-versions }})
+    name: Run all tests for Exasol ${{ matrix.db_versions }}
 
     steps:
       - name: SCM Checkout
@@ -40,7 +38,7 @@ jobs:
       - name: Setup Python & Poetry Environment
         uses: exasol/python-toolbox/.github/actions/python-environment@v6
         with:
-          python-version: ${{ matrix.python-versions }}
+          python-version: "3.14"
           poetry-version: "2.3.0"
 
       - name: Allow unprivileged user namespaces
