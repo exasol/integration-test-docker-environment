@@ -72,6 +72,6 @@ class Config(BaseConfig):
 PROJECT_CONFIG = Config(
     root_path=Path(__file__).parent,
     project_name="exasol_integration_test_docker_environment",
-    python_versions=("3.10", "3.11", "3.12", "3.13"),
+    python_versions=("3.10", "3.11", "3.12", "3.13", "3.14"),
     add_to_excluded_python_paths=("resources",),
 )
