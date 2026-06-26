@@ -1,12 +1,13 @@
 import importlib.resources as ir
 import logging
-import tempfile
 import sys
+import tempfile
 
 if sys.version_info >= (3, 11):
     from importlib.resources.abc import Traversable
 else:
     from importlib.abc import Traversable
+
 from pathlib import Path
 from types import ModuleType
 
