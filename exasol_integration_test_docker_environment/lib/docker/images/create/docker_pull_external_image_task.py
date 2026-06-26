@@ -26,7 +26,9 @@ class DockerPullExternalImageTask(DockerBaseTask):
         auth_config = self._get_auth_config()
         repository, tag = _split_image_reference(self.image_reference)
         with self._get_docker_client() as docker_client:
-            docker_client.images.pull(repository=repository, tag=tag, auth_config=auth_config)
+            docker_client.images.pull(
+                repository=repository, tag=tag, auth_config=auth_config
+            )
         self.return_object(self.image_reference)
 
     def _is_locally_available(self) -> bool:

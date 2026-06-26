@@ -26,8 +26,12 @@ def find_missing_external_image_references(
     image_info: ImageInfo, image_exists: Callable[[str], bool]
 ) -> list[str]:
     rendered_dockerfile = render_dockerfile_content(image_info)
-    external_references = find_external_image_references(rendered_dockerfile, image_info)
-    return [reference for reference in external_references if not image_exists(reference)]
+    external_references = find_external_image_references(
+        rendered_dockerfile, image_info
+    )
+    return [
+        reference for reference in external_references if not image_exists(reference)
+    ]
 
 
 def find_external_image_references(
@@ -45,7 +49,10 @@ def find_external_image_references(
             if stage_alias is not None:
                 stage_aliases.add(stage_alias)
             _append_external_reference(
-                external_references, from_reference, dependency_image_names, stage_aliases
+                external_references,
+                from_reference,
+                dependency_image_names,
+                stage_aliases,
             )
         elif _starts_with_instruction(line, "COPY"):
             for copy_reference in _parse_copy_from_references(line):
@@ -91,7 +98,10 @@ def _parse_from_instruction(line: str) -> tuple[str, str | None]:
         raise ValueError(f"Invalid FROM instruction: {line}")
     reference = tokens[reference_index]
     stage_alias = None
-    if reference_index + 2 < len(tokens) and tokens[reference_index + 1].upper() == "AS":
+    if (
+        reference_index + 2 < len(tokens)
+        and tokens[reference_index + 1].upper() == "AS"
+    ):
         stage_alias = tokens[reference_index + 2]
     return reference, stage_alias
 

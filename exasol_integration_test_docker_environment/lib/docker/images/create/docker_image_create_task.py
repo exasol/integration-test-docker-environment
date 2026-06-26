@@ -16,17 +16,17 @@ from exasol_integration_test_docker_environment.lib.base.json_pickle_parameter i
 from exasol_integration_test_docker_environment.lib.docker.images.create.docker_image_build_task import (
     DockerBuildImageTask,
 )
-from exasol_integration_test_docker_environment.lib.docker.images.create.docker_pull_external_image_task import (
-    DockerPullExternalImageTask,
-)
-from exasol_integration_test_docker_environment.lib.docker.images.create.utils.dockerfile_reference_analyzer import (
-    find_missing_external_image_references,
-)
 from exasol_integration_test_docker_environment.lib.docker.images.create.docker_image_load_task import (
     DockerLoadImageTask,
 )
 from exasol_integration_test_docker_environment.lib.docker.images.create.docker_image_pull_task import (
     DockerPullImageTask,
+)
+from exasol_integration_test_docker_environment.lib.docker.images.create.docker_pull_external_image_task import (
+    DockerPullExternalImageTask,
+)
+from exasol_integration_test_docker_environment.lib.docker.images.create.utils.dockerfile_reference_analyzer import (
+    find_missing_external_image_references,
 )
 from exasol_integration_test_docker_environment.lib.docker.images.image_info import (
     ImageInfo,
@@ -105,7 +105,8 @@ class DockerCreateImageTask(DockerBaseTask):
     ) -> list[DockerPullExternalImageTask]:
         with self._get_docker_client() as docker_client:
             missing_references = find_missing_external_image_references(
-                image_info, lambda reference: self._image_exists(docker_client, reference)
+                image_info,
+                lambda reference: self._image_exists(docker_client, reference),
             )
         return [
             self.create_child_task(

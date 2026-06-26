@@ -1,6 +1,6 @@
 import multiprocessing
-from pathlib import Path
 import sys
+from pathlib import Path
 
 import docker
 import luigi
@@ -64,7 +64,9 @@ class _FakeApi:
     def __init__(self, backend) -> None:
         self._backend = backend
 
-    def build(self, path: str, nocache: bool, tag: str, rm: bool, buildargs, pull: bool):
+    def build(
+        self, path: str, nocache: bool, tag: str, rm: bool, buildargs, pull: bool
+    ):
         self._backend.build_calls.append({"tag": tag, "pull": pull, "path": path})
         self._backend.local_images[tag] = True
         return [b'{"stream":"Successfully built"}']

@@ -216,10 +216,14 @@ def test_external_pull_graph_uses_local_registry_only_for_external_images(
         set_docker_repository_config(None, LOCAL_BUILD_REPOSITORY, None, "", "target")
         task = generate_root_task(task_class=ExternalImagePullGraphBuild)
         try:
-            result = luigi.build([task], workers=3, local_scheduler=True, log_level="INFO")
+            result = luigi.build(
+                [task], workers=3, local_scheduler=True, log_level="INFO"
+            )
             assert result
             image_infos = task.get_result()
-            final_image_reference = image_infos["final-image"].get_target_complete_name()
+            final_image_reference = image_infos[
+                "final-image"
+            ].get_target_complete_name()
             assert (
                 _read_marker_file(final_image_reference, "/markers/build-step-base.txt")
                 == "build-step-base"
