@@ -17,6 +17,12 @@ from exasol.toolbox.nox.tasks import *  # type: ignore
 # default actions to be run if nothing is explicitly specified with the -s option
 nox.options.sessions = ["format:fix"]
 
+
+def _validate_db_version(db_version: str, valid_db_versions: list[str], parser):
+    if db_version not in valid_db_versions:
+        parser.error(f"db-version must be one of {valid_db_versions}")
+
+
 def parse_test_arguments(session: nox.Session):
     parser = ArgumentParser(
         usage=f"nox -s {session.name} -- [--db-version DB_VERSION] -- --test-target TEST_TARGET"
@@ -24,9 +30,16 @@ def parse_test_arguments(session: nox.Session):
     parser.add_argument("--db-version", default="default")
     parser.add_argument("--test-target", required=True, help="Pytest path to execute")
     args = parser.parse_args(session.posargs)
-    if args.db_version not in PROJECT_CONFIG.db_versions:
-        parser.error(f"db-version must be one of {PROJECT_CONFIG.db_versions}")
+    _validate_db_version(args.db_version, PROJECT_CONFIG.db_versions, parser)
     return args.db_version, args.test_target
+
+
+def parse_gpu_test_arguments(session: nox.Session) -> str:
+    parser = ArgumentParser(usage=f"nox -s {session.name} -- [--db-version DB_VERSION]")
+    parser.add_argument("--db-version", default="default")
+    args = parser.parse_args(session.posargs)
+    _validate_db_version(args.db_version, PROJECT_CONFIG.db_versions_gpu_only, parser)
+    return args.db_version
 
 
 def get_default_db_version(file_name: Path) -> str:
@@ -54,16 +67,23 @@ def run_integration_tests(session: nox.Session):
     Run the selected non-GPU integration test target for the given Exasol version.
     """
     db_version, test_target = parse_test_arguments(session)
-    valid_targets = (
-        set(PROJECT_CONFIG.integration_test_targets)
-        | set(PROJECT_CONFIG.minimal_integration_test_targets)
+    valid_targets = set(PROJECT_CONFIG.integration_test_targets) | set(
+        PROJECT_CONFIG.minimal_integration_test_targets
     )
     if test_target not in valid_targets:
-        session.error(
-            f"test-target must be one of {sorted(valid_targets)}"
-        )
+        session.error(f"test-target must be one of {sorted(valid_targets)}")
     env = {"EXASOL_VERSION": db_version}
     session.run("pytest", "-m", "not gpu", test_target, env=env)
+
+
+@nox.session(name="run-gpu-tests", python=False)
+def run_gpu_tests(session: nox.Session):
+    """
+    Run the GPU integration tests for the given Exasol version.
+    """
+    db_version = parse_gpu_test_arguments(session)
+    env = {"EXASOL_VERSION": db_version}
+    session.run("pytest", "-m", "gpu", "./test/integration", env=env)
 
 
 @nox.session(name="copy-docker-db-config-templates", python=False)

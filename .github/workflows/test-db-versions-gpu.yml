@@ -41,6 +41,6 @@ jobs:
 
 
       - name: Run GPU Tests
-        run: poetry run -- nox -s run-all-tests -- --db-version=${MATRIX_DB_VERSION_GPU_ONLY} --test-set=gpu-only
+        run: poetry run -- nox -s run-gpu-tests -- --db-version=${MATRIX_DB_VERSION_GPU_ONLY}
         env:
           MATRIX_DB_VERSION_GPU_ONLY: ${{ matrix.db_versions_gpu_only }}
