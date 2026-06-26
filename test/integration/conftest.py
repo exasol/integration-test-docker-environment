@@ -1,6 +1,8 @@
 import io
+import multiprocessing
 import shutil
 import subprocess
+import sys
 from collections.abc import Iterator
 from pathlib import Path
 from test.integration.get_test_container_content import (
@@ -225,6 +227,13 @@ def fabric_stdin(monkeypatch):
 
 @pytest.fixture
 def luigi_output(tmp_path):
+    # Luigi uses an in-memory config singleton. On Python 3.14+, the default
+    # multiprocessing start method changed from fork to forkserver, so worker
+    # processes would start fresh without inheriting that singleton. Explicitly
+    # using fork keeps workers as copies of the main process, preserving the
+    # in-memory Luigi config (including the pytest-specific output directory).
+    if sys.platform != "win32":
+        multiprocessing.set_start_method("fork", force=True)
     set_build_config(
         False,
         (),
