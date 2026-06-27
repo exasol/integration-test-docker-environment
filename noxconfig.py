@@ -100,7 +100,7 @@ class Config(BaseConfig):
         Coverage is enabled only for Python 3.10 rows, and every row includes the
         precomputed artifact name the workflow should use when coverage is collected.
         """
-        rows = []
+        rows: list[dict[str, str | bool]] = []
         for python_version in self.python_versions:
             for test_target in self.integration_test_targets:
                 rows.append(
