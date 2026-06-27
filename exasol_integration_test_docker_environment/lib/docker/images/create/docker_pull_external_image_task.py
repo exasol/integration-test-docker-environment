@@ -36,13 +36,14 @@ class DockerPullExternalImageTask(DockerBaseTask):
         return image_target.exists()
 
     def _get_auth_config(self) -> dict[str, str] | None:
+        repository_config = source_docker_repository_config()
         if (
-            source_docker_repository_config().username is not None
-            and source_docker_repository_config().password is not None
+            repository_config.username is not None
+            and repository_config.password is not None
         ):
             return {
-                "username": source_docker_repository_config().username,
-                "password": source_docker_repository_config().password,
+                "username": repository_config.username,
+                "password": repository_config.password,
             }
         return None
 

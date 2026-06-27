@@ -37,6 +37,13 @@ from exasol_integration_test_docker_environment.lib.docker.images.required_task_
     RequiredTaskInfoDict,
 )
 
+DockerCreateTaskDependency = (
+    DockerBuildImageTask
+    | DockerLoadImageTask
+    | DockerPullImageTask
+    | DockerPullExternalImageTask
+)
+
 
 class DockerCreateImageTask(DockerBaseTask):
     image_name: str = luigi.Parameter()
@@ -49,18 +56,13 @@ class DockerCreateImageTask(DockerBaseTask):
 
     def run_task(
         self,
-    ) -> Iterator[DockerBuildImageTask | DockerLoadImageTask | DockerPullImageTask]:
+    ) -> Iterator[DockerCreateTaskDependency]:
         new_image_info = yield from self.build(self.image_info)
         self.return_object(new_image_info)
 
-    def build(self, image_info: ImageInfo) -> Generator[
-        DockerBuildImageTask
-        | DockerLoadImageTask
-        | DockerPullImageTask
-        | DockerPullExternalImageTask,
-        None,
-        ImageInfo,
-    ]:
+    def build(
+        self, image_info: ImageInfo
+    ) -> Generator[DockerCreateTaskDependency, None, ImageInfo]:
         if image_info.image_state == ImageState.NEEDS_TO_BE_BUILD.name:
             external_pull_tasks = self._create_external_pull_tasks(image_info)
             if external_pull_tasks:
@@ -155,7 +157,7 @@ class DockerCreateImageTaskWithDeps(DockerCreateImageTask):
 
     def run_task(
         self,
-    ) -> Iterator[DockerBuildImageTask | DockerLoadImageTask | DockerPullImageTask]:
+    ) -> Iterator[DockerCreateTaskDependency]:
         image_infos = self.get_values_from_futures(self.futures)
         image_info = copy.copy(self.image_info)
         image_info.depends_on_images = image_infos
