@@ -27,7 +27,8 @@ jobs:
     needs: build_matrix
     strategy:
       fail-fast: false
-      matrix: ${{ fromJson(needs.build_matrix.outputs.matrix).slow_python_test_matrix }}
+      matrix:
+        include: ${{ fromJson(needs.build_matrix.outputs.matrix).slow_python_test_matrix }}
     runs-on: ubuntu-24.04
     steps:
       - name: SCM Checkout

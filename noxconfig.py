@@ -93,7 +93,7 @@ class Config(BaseConfig):
 
     @computed_field  # type: ignore[misc]
     @property
-    def slow_python_test_matrix(self) -> dict[str, list[dict[str, str | bool]]]:
+    def slow_python_test_matrix(self) -> list[dict[str, str | bool]]:
         """
         Return the expanded matrix rows for the slow Python-version workflow.
 
@@ -114,7 +114,7 @@ class Config(BaseConfig):
                         ),
                     }
                 )
-        return {"include": rows}
+        return rows
 
     def _discover_integration_test_targets(self) -> list[str]:
         test_root = self.root_path / "test" / "integration"
