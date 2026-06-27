@@ -40,6 +40,8 @@ from exasol_integration_test_docker_environment.testing.exaslct_test_environment
     ExaslctTestEnvironment,
 )
 
+CLI_ENVIRONMENT_TEST_PREFIX = "test_cli_environment_"
+
 
 def _build_binary(target_path: Path, target_exec_bin_name: str):
     result = subprocess.run(
@@ -73,6 +75,10 @@ def itde_binary(tmp_path_factory, itde_binary_name) -> Path:
 
 @pytest.fixture
 def env_name(request):
+    if Path(str(request.fspath)).name.startswith(CLI_ENVIRONMENT_TEST_PREFIX):
+        # Certificate creation requires a short environment name so the
+        # derived Docker container name stays within the allowed length.
+        return "cli"
     return utils.normalize_request_name(request.node.name)
 
 

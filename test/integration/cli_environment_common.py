@@ -1,5 +1,5 @@
 from inspect import cleandoc
-from test.integration.helpers import get_executor_factory
+from typing import Any, cast
 
 import pytest
 
@@ -16,15 +16,16 @@ from exasol_integration_test_docker_environment.testing.exaslct_docker_test_envi
 from exasol_integration_test_docker_environment.testing.spawned_test_environments import (
     SpawnedTestEnvironments,
 )
+from test.integration.helpers import get_executor_factory
 
 
 class NumberCheck:
-    def __init__(self, db: SpawnedTestEnvironments, all: list[str]) -> None:
+    def __init__(self, db: SpawnedTestEnvironments, all_names: list[str]) -> None:
         self.db = db
-        self.all = all
+        self.all_names = all_names
 
-    def count(self, selected: list[str] | None = None):
-        return len(selected if selected is not None else self.all)
+    def count(self, selected: list[str] | None = None) -> int:
+        return len(selected if selected is not None else self.all_names)
 
     @property
     def log(self) -> str:
@@ -33,17 +34,17 @@ class NumberCheck:
             "utf8"
         )
 
-    def fail(self, prefix) -> str:
+    def fail(self, prefix: str) -> str:
         return cleandoc(f"""
-            {prefix} in {self.all}.
+            {prefix} in {self.all_names}.
             Startup log was:
             {self.log}
             """)
 
 
 def smoke_test_sql(exaplus_path: str, env: ExaslctDockerTestEnvironment) -> str:
-    def quote(s):
-        return f"'{s}'"
+    def quote(value: str) -> str:
+        return f"'{value}'"
 
     assert env.environment_info
     db_info = env.environment_info.database_info
@@ -66,61 +67,56 @@ def smoke_test_sql(exaplus_path: str, env: ExaslctDockerTestEnvironment) -> str:
     return f'bash -c "{command_str}" '
 
 
-@pytest.fixture
-def env_name(request):
-    return "cli"  # Use a short name here as the certificate creation requires a short name for the docker db container
-
-
-@pytest.fixture
-def context(request):
-    # Look up the fixture whose name is passed in as a parameter
-    return request.getfixturevalue(request.param)
-
-
-@pytest.mark.parametrize("context", ["cli_context", "bin_context"], indirect=True)
-def test_db_container_started(context):
+def assert_db_container_started(
+    request: pytest.FixtureRequest, context_fixture_name: str
+) -> None:
+    context: Any = request.getfixturevalue(context_fixture_name)
     with context() as db:
         with ContextDockerClient() as docker_client:
             name = db.on_host_docker_environment.name
             containers = [
-                c.name for c in docker_client.containers.list() if name in c.name
+                container.name
+                for container in docker_client.containers.list()
+                if name in container.name
             ]
             check = NumberCheck(db, containers)
             assert check.count() == 1, check.fail("Not exactly 1 container")
 
-            db_containers = [c for c in containers if "db_container" in c]
-            check = NumberCheck(db, containers)
+            db_containers = [
+                container for container in containers if "db_container" in container
+            ]
             assert check.count(db_containers) == 1, check.fail("Found no db container")
 
 
-@pytest.fixture(params=[DbOsAccess.DOCKER_EXEC, DbOsAccess.SSH])
-def db_os_access(request):
-    return request.param
-
-
-@pytest.fixture(params=[[], ["--create-certificates"]])
-def additional_test_env_parameters(request):
-    return request.param
-
-
-@pytest.mark.parametrize("context", ["cli_context", "bin_context"], indirect=True)
-def test_db_available(
-    context, fabric_stdin, db_os_access, additional_test_env_parameters
-):
+def build_additional_parameters(
+    db_os_access: DbOsAccess, create_certificates: bool
+) -> list[str]:
     params = ["--db-os-access", db_os_access.name]
-    if additional_test_env_parameters:
-        params += additional_test_env_parameters
+    if create_certificates:
+        params.append("--create-certificates")
+    return params
+
+
+def assert_db_available(
+    request: pytest.FixtureRequest,
+    context_fixture_name: str,
+    db_os_access: DbOsAccess,
+    create_certificates: bool,
+) -> None:
+    context: Any = request.getfixturevalue(context_fixture_name)
+    params = build_additional_parameters(db_os_access, create_certificates)
     with context(name="db_avail", additional_parameters=params) as db:
         with ContextDockerClient() as docker_client:
             dbinfo = db.on_host_docker_environment.environment_info.database_info
             db_container_name = dbinfo.container_info.container_name
             db_container = docker_client.containers.get(db_container_name)
             executor_factory = get_executor_factory(dbinfo, db_os_access)
-            with executor_factory.executor() as executor:
+            with cast(Any, executor_factory.executor()) as executor:
                 executor.prepare()
                 exaplus = find_exaplus(db_container, executor)
-                command = smoke_test_sql(exaplus, db.on_host_docker_environment)
+                command = smoke_test_sql(str(exaplus), db.on_host_docker_environment)
                 exit_code, output = db_container.exec_run(command)
-                assert (
-                    exit_code == 0
-                ), f"Error while executing 'exaplus' in test container. Got output:\n {output}"
+                assert exit_code == 0, (
+                    "Error while executing 'exaplus' in test container. "
+                    f"Got output:\n {output}"
+                )
