@@ -72,9 +72,7 @@ def run_integration_tests(session: nox.Session):
     Run the selected non-GPU integration test target for the given Exasol version.
     """
     db_version, test_target, collect_coverage = parse_test_arguments(session)
-    valid_targets = set(PROJECT_CONFIG.integration_test_targets) | set(
-        PROJECT_CONFIG.minimal_integration_test_targets
-    )
+    valid_targets = set(PROJECT_CONFIG.integration_test_targets)
     if test_target not in valid_targets:
         session.error(f"test-target must be one of {sorted(valid_targets)}")
     env = {"EXASOL_VERSION": db_version}

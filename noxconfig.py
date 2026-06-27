@@ -14,22 +14,6 @@ from exasol_integration_test_docker_environment.cli.options.test_environment_opt
 
 class Config(BaseConfig):
     _INTEGRATION_TEST_DIRS = ("base_task", "docker_runtime")
-    _MINIMAL_INTEGRATION_TEST_TARGETS = (
-        "test/integration/base_task",
-        "test/integration/test_api_logging.py",
-        "test/integration/test_api_test_environment.py",
-        "test/integration/test_cli_environment_bin_docker_exec.py",
-        "test/integration/test_cli_environment_bin_docker_exec_certificates.py",
-        "test/integration/test_cli_environment_bin_ssh.py",
-        "test/integration/test_cli_environment_bin_ssh_certificates.py",
-        "test/integration/test_cli_environment_cli_docker_exec.py",
-        "test/integration/test_cli_environment_cli_docker_exec_certificates.py",
-        "test/integration/test_cli_environment_cli_ssh.py",
-        "test/integration/test_cli_environment_cli_ssh_certificates.py",
-        "test/integration/test_cli_environment_bin_container_started.py",
-        "test/integration/test_cli_environment_cli_container_started.py",
-        "test/integration/test_db_container_log_thread.py",
-    )
 
     @computed_field  # type: ignore[misc]
     @property
@@ -86,19 +70,6 @@ class Config(BaseConfig):
         Return dynamic non-GPU integration test targets for CI matrix generation.
         """
         return self._discover_integration_test_targets()
-
-    @computed_field  # type: ignore[misc]
-    @property
-    def minimal_integration_test_targets(self) -> list[str]:
-        """
-        Return the minimal non-GPU integration test targets for CI matrix generation.
-        """
-        valid_targets = set(self._discover_integration_test_targets())
-        return sorted(
-            target
-            for target in self._MINIMAL_INTEGRATION_TEST_TARGETS
-            if target in valid_targets
-        )
 
     @computed_field  # type: ignore[misc]
     @property
