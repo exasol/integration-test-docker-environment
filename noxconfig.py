@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 from exasol.toolbox.config import BaseConfig
@@ -90,6 +91,31 @@ class Config(BaseConfig):
             if target in valid_targets
         )
 
+    @computed_field  # type: ignore[misc]
+    @property
+    def slow_python_test_matrix(self) -> dict[str, list[dict[str, str | bool]]]:
+        """
+        Return the expanded matrix rows for the slow Python-version workflow.
+
+        Coverage is enabled only for Python 3.10 rows, and every row includes the
+        precomputed artifact name the workflow should use when coverage is collected.
+        """
+        rows = []
+        for python_version in self.python_versions:
+            for test_target in self.integration_test_targets:
+                rows.append(
+                    {
+                        "python_versions": python_version,
+                        "integration_test_targets": test_target,
+                        "collect_coverage": python_version == "3.10",
+                        "coverage_artifact_name": (
+                            f"coverage-python{python_version}-slow-"
+                            f"{self._sanitize_artifact_name(test_target)}"
+                        ),
+                    }
+                )
+        return {"include": rows}
+
     def _discover_integration_test_targets(self) -> list[str]:
         test_root = self.root_path / "test" / "integration"
         targets = [
@@ -110,6 +136,11 @@ class Config(BaseConfig):
         ]
         normalized_db_versions.append("default")
         return normalized_db_versions
+
+    @staticmethod
+    def _sanitize_artifact_name(target: str) -> str:
+        sanitized = re.sub(r"[/.]+", "-", target)
+        return sanitized.strip("-")
 
 
 PROJECT_CONFIG = Config(

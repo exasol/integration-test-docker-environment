@@ -29,9 +29,14 @@ def parse_test_arguments(session: nox.Session):
     )
     parser.add_argument("--db-version", default="default")
     parser.add_argument("--test-target", required=True, help="Pytest path to execute")
+    parser.add_argument(
+        "--coverage",
+        action="store_true",
+        help="Collect coverage for the selected integration test target.",
+    )
     args = parser.parse_args(session.posargs)
     _validate_db_version(args.db_version, PROJECT_CONFIG.db_versions, parser)
-    return args.db_version, args.test_target
+    return args.db_version, args.test_target, args.coverage
 
 
 def parse_gpu_test_arguments(session: nox.Session) -> str:
@@ -66,14 +71,28 @@ def run_integration_tests(session: nox.Session):
     """
     Run the selected non-GPU integration test target for the given Exasol version.
     """
-    db_version, test_target = parse_test_arguments(session)
+    db_version, test_target, collect_coverage = parse_test_arguments(session)
     valid_targets = set(PROJECT_CONFIG.integration_test_targets) | set(
         PROJECT_CONFIG.minimal_integration_test_targets
     )
     if test_target not in valid_targets:
         session.error(f"test-target must be one of {sorted(valid_targets)}")
     env = {"EXASOL_VERSION": db_version}
-    session.run("pytest", "-m", "not gpu", test_target, env=env)
+    if collect_coverage:
+        session.run("coverage", "erase", env=env)
+        session.run(
+            "coverage",
+            "run",
+            "--source=exasol_integration_test_docker_environment",
+            "-m",
+            "pytest",
+            "-m",
+            "not gpu",
+            test_target,
+            env=env,
+        )
+    else:
+        session.run("pytest", "-m", "not gpu", test_target, env=env)
 
 
 @nox.session(name="run-gpu-tests", python=False)

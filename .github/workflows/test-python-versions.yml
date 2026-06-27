@@ -18,7 +18,7 @@ jobs:
       contents: read
     uses: ./.github/workflows/matrix.yml
     with:
-      matrix_keys_json: '["python_versions", "integration_test_targets"]'
+      matrix_keys_json: '["slow_python_test_matrix"]'
 
   test-python-version-all-tests:
     name: "Run Tests with Python ${{ matrix.python_versions }} - ${{ matrix.integration_test_targets }}"
@@ -27,7 +27,7 @@ jobs:
     needs: build_matrix
     strategy:
       fail-fast: false
-      matrix: ${{ fromJson(needs.build_matrix.outputs.matrix) }}
+      matrix: ${{ fromJson(needs.build_matrix.outputs.matrix).slow_python_test_matrix }}
     runs-on: ubuntu-24.04
     steps:
       - name: SCM Checkout
@@ -45,6 +45,22 @@ jobs:
         run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
       - name: Run all tests
+        if: ${{ !matrix.collect_coverage }}
         run: poetry run -- nox -s run-integration-tests -- --db-version=default --test-target=${MATRIX_TEST_TARGET}
         env:
           MATRIX_TEST_TARGET: ${{ matrix.integration_test_targets }}
+
+      - name: Run all tests with coverage
+        if: ${{ matrix.collect_coverage }}
+        run: poetry run -- nox -s run-integration-tests -- --db-version=default --test-target=${MATRIX_TEST_TARGET} --coverage
+        env:
+          MATRIX_TEST_TARGET: ${{ matrix.integration_test_targets }}
+
+      - name: Upload Coverage Artifact
+        if: ${{ matrix.collect_coverage }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ matrix.coverage_artifact_name }}
+          path: .coverage
+          include-hidden-files: true
+          overwrite: false
