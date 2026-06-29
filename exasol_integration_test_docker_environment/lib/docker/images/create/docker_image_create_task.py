@@ -64,9 +64,9 @@ class DockerCreateImageTask(DockerBaseTask):
         self, image_info: ImageInfo
     ) -> Generator[DockerCreateTaskDependency, None, ImageInfo]:
         if image_info.image_state == ImageState.NEEDS_TO_BE_BUILD.name:
-            external_pull_tasks = self._create_external_pull_tasks(image_info)
-            if external_pull_tasks:
-                yield from self.run_dependencies(external_pull_tasks)
+#            external_pull_tasks = self._create_external_pull_tasks(image_info)
+#            if external_pull_tasks:
+#                yield from self.run_dependencies(external_pull_tasks)
             build_img_task: DockerBuildImageTask = self.create_child_task(
                 DockerBuildImageTask, image_name=self.image_name, image_info=image_info
             )
