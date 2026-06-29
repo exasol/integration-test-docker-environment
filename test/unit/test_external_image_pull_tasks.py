@@ -1,6 +1,7 @@
 import multiprocessing
 import sys
 from pathlib import Path
+from unittest.mock import Mock
 
 import docker
 import luigi
@@ -20,6 +21,10 @@ from exasol_integration_test_docker_environment.lib.models.config.build_config i
 )
 from exasol_integration_test_docker_environment.lib.models.config.docker_config import (
     set_docker_repository_config,
+)
+from test.integration.test_external_image_pull_graph import (
+    _is_image_available_locally,
+    _mirror_image_to_registry,
 )
 
 TEST_GRAPH_ROOT: Path | None = None
@@ -276,3 +281,76 @@ def test_build_schedules_only_external_pulls(monkeypatch, luigi_output, tmp_path
         assert any("final-image" in tag for tag in built_tags)
     finally:
         TEST_GRAPH_ROOT = None
+
+
+def test_mirror_image_to_registry_pulls_pushes_and_clears_local_cache(monkeypatch):
+    image_reference = "busybox:1.36.1"
+    registry_reference = "registry.local/test/busybox:1.36.1"
+    image = Mock()
+    docker_client = Mock()
+    docker_client.images.get.return_value = image
+
+    class _ContextManager:
+        def __enter__(self):
+            return docker_client
+
+        def __exit__(self, exc_type, exc_val, exc_tb):
+            return False
+
+    monkeypatch.setattr(
+        "test.integration.test_external_image_pull_graph.ContextDockerClient",
+        lambda: _ContextManager(),
+    )
+
+    _mirror_image_to_registry(image_reference, registry_reference)
+
+    docker_client.images.pull.assert_called_once_with("busybox", "1.36.1")
+    docker_client.images.get.assert_called_once_with(image_reference)
+    image.tag.assert_called_once_with(
+        repository="registry.local/test/busybox",
+        tag="1.36.1",
+    )
+    docker_client.images.push.assert_called_once_with(
+        repository="registry.local/test/busybox",
+        tag="1.36.1",
+    )
+    docker_client.images.remove.assert_any_call(image_reference, force=True)
+    docker_client.images.remove.assert_any_call(registry_reference, force=True)
+
+
+def test_is_image_available_locally_returns_false_for_missing_image(monkeypatch):
+    docker_client = Mock()
+    docker_client.images.get.side_effect = docker.errors.ImageNotFound("missing")
+
+    class _ContextManager:
+        def __enter__(self):
+            return docker_client
+
+        def __exit__(self, exc_type, exc_val, exc_tb):
+            return False
+
+    monkeypatch.setattr(
+        "test.integration.test_external_image_pull_graph.ContextDockerClient",
+        lambda: _ContextManager(),
+    )
+
+    assert _is_image_available_locally("busybox:1.36.1") is False
+
+
+def test_is_image_available_locally_returns_true_for_present_image(monkeypatch):
+    docker_client = Mock()
+
+    class _ContextManager:
+        def __enter__(self):
+            return docker_client
+
+        def __exit__(self, exc_type, exc_val, exc_tb):
+            return False
+
+    monkeypatch.setattr(
+        "test.integration.test_external_image_pull_graph.ContextDockerClient",
+        lambda: _ContextManager(),
+    )
+
+    assert _is_image_available_locally("busybox:1.36.1") is True
+    docker_client.images.get.assert_called_once_with("busybox:1.36.1")

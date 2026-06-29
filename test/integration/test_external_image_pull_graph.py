@@ -1,6 +1,7 @@
 import shutil
 from pathlib import Path
 
+import docker
 import luigi
 
 from exasol_integration_test_docker_environment.lib.base.run_task import (
@@ -29,6 +30,8 @@ RESOURCE_ROOT = (
 )
 TEST_GRAPH_ROOT: Path | None = None
 LOCAL_BUILD_REPOSITORY = "itde-test-external-pull-graph"
+BUSYBOX_REFERENCE = "busybox:1.36.1"
+LOCAL_BUSYBOX_REFERENCE = ""
 EXTERNAL_FROM_REFERENCE = ""
 EXTERNAL_COPY_REFERENCE = ""
 
@@ -145,12 +148,13 @@ class ExternalImagePullGraphBuild(DockerBuildBase):
 def _prepare_graph_workspace(target_root: Path) -> Path:
     workspace = target_root / "external-image-pull-graph"
     shutil.copytree(RESOURCE_ROOT, workspace)
-    final_dockerfile = workspace / "final_image" / "Dockerfile"
-    final_dockerfile.write_text(
-        final_dockerfile.read_text()
-        .replace("__EXTERNAL_FROM__", EXTERNAL_FROM_REFERENCE)
-        .replace("__EXTERNAL_COPY__", EXTERNAL_COPY_REFERENCE)
-    )
+    for dockerfile in workspace.rglob("Dockerfile"):
+        dockerfile.write_text(
+            dockerfile.read_text()
+            .replace("__BUSYBOX__", LOCAL_BUSYBOX_REFERENCE)
+            .replace("__EXTERNAL_FROM__", EXTERNAL_FROM_REFERENCE)
+            .replace("__EXTERNAL_COPY__", EXTERNAL_COPY_REFERENCE)
+        )
     return workspace
 
 
@@ -172,6 +176,26 @@ def _build_and_push_external_image(
         docker_client.images.remove(registry_reference, force=True)
 
 
+def _mirror_image_to_registry(image_reference: str, registry_reference: str) -> None:
+    repository, tag = _split_image_reference(registry_reference)
+    with ContextDockerClient() as docker_client:
+        docker_client.images.pull(*_split_image_reference(image_reference))
+        image = docker_client.images.get(image_reference)
+        image.tag(repository=repository, tag=tag)
+        docker_client.images.push(repository=repository, tag=tag)
+        docker_client.images.remove(image_reference, force=True)
+        docker_client.images.remove(registry_reference, force=True)
+
+
+def _is_image_available_locally(image_reference: str) -> bool:
+    with ContextDockerClient() as docker_client:
+        try:
+            docker_client.images.get(image_reference)
+        except docker.errors.ImageNotFound:
+            return False
+    return True
+
+
 def _read_marker_file(image_reference: str, marker_path: str) -> str:
     with ContextDockerClient() as docker_client:
         output = docker_client.containers.run(
@@ -186,11 +210,16 @@ def test_external_pull_graph_uses_local_registry_only_for_external_images(
     luigi_output, tmp_path: Path
 ):
     global TEST_GRAPH_ROOT
+    global LOCAL_BUSYBOX_REFERENCE
     global EXTERNAL_FROM_REFERENCE
     global EXTERNAL_COPY_REFERENCE
     with LocalDockerRegistryContextManager("external-pull-graph") as docker_registry:
+        LOCAL_BUSYBOX_REFERENCE = f"{docker_registry.name}/busybox:1.36.1"
         EXTERNAL_FROM_REFERENCE = f"{docker_registry.name}/external-from:1"
         EXTERNAL_COPY_REFERENCE = f"{docker_registry.name}/external-copy:1"
+        _mirror_image_to_registry(BUSYBOX_REFERENCE, LOCAL_BUSYBOX_REFERENCE)
+        assert not _is_image_available_locally(BUSYBOX_REFERENCE)
+        assert not _is_image_available_locally(LOCAL_BUSYBOX_REFERENCE)
         TEST_GRAPH_ROOT = _prepare_graph_workspace(tmp_path)
         _build_and_push_external_image(
             TEST_GRAPH_ROOT / "external_from",
@@ -243,11 +272,13 @@ def test_external_pull_graph_uses_local_registry_only_for_external_images(
                 == "external-copy"
             )
             assert sorted(docker_registry.repositories) == [
+                "external-pull-graph/busybox",
                 "external-pull-graph/external-copy",
                 "external-pull-graph/external-from",
             ]
         finally:
             TEST_GRAPH_ROOT = None
+            LOCAL_BUSYBOX_REFERENCE = ""
             EXTERNAL_FROM_REFERENCE = ""
             EXTERNAL_COPY_REFERENCE = ""
             luigi_utils.clean(LOCAL_BUILD_REPOSITORY)
