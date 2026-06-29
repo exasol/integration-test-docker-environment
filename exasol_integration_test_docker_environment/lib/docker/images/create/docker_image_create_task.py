@@ -22,12 +22,6 @@ from exasol_integration_test_docker_environment.lib.docker.images.create.docker_
 from exasol_integration_test_docker_environment.lib.docker.images.create.docker_image_pull_task import (
     DockerPullImageTask,
 )
-from exasol_integration_test_docker_environment.lib.docker.images.create.docker_pull_external_image_task import (
-    DockerPullExternalImageTask,
-)
-from exasol_integration_test_docker_environment.lib.docker.images.create.utils.dockerfile_reference_analyzer import (
-    find_missing_external_image_references,
-)
 from exasol_integration_test_docker_environment.lib.docker.images.image_info import (
     ImageInfo,
     ImageState,
@@ -41,7 +35,6 @@ DockerCreateTaskDependency = (
     DockerBuildImageTask
     | DockerLoadImageTask
     | DockerPullImageTask
-    | DockerPullExternalImageTask
 )
 
 
@@ -64,9 +57,6 @@ class DockerCreateImageTask(DockerBaseTask):
         self, image_info: ImageInfo
     ) -> Generator[DockerCreateTaskDependency, None, ImageInfo]:
         if image_info.image_state == ImageState.NEEDS_TO_BE_BUILD.name:
-            external_pull_tasks = self._create_external_pull_tasks(image_info)
-            if external_pull_tasks:
-                yield from self.run_dependencies(external_pull_tasks)
             build_img_task: DockerBuildImageTask = self.create_child_task(
                 DockerBuildImageTask, image_name=self.image_name, image_info=image_info
             )
@@ -101,28 +91,6 @@ class DockerCreateImageTask(DockerBaseTask):
                 image_info.image_state,
                 image_info.get_target_complete_name(),
             )
-
-    def _create_external_pull_tasks(
-        self, image_info: ImageInfo
-    ) -> list[DockerPullExternalImageTask]:
-        with self._get_docker_client() as docker_client:
-            missing_references = find_missing_external_image_references(
-                image_info,
-                lambda reference: self._image_exists(docker_client, reference),
-            )
-        return [
-            self.create_child_task(
-                DockerPullExternalImageTask, image_reference=image_reference
-            )
-            for image_reference in missing_references
-        ]
-
-    def _image_exists(self, docker_client, image_reference: str) -> bool:
-        try:
-            docker_client.images.get(image_reference)
-            return True
-        except Exception:
-            return False
 
     def rename_source_image_to_target_image(self, image_info) -> None:
         with self._get_docker_client() as docker_client:

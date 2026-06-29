@@ -206,7 +206,7 @@ def _read_marker_file(image_reference: str, marker_path: str) -> str:
     return output.decode("utf-8").strip()
 
 
-def test_external_pull_graph_uses_local_registry_only_for_external_images(
+def test_external_pull_graph_builds_mixed_local_and_external_image_references(
     luigi_output, tmp_path: Path
 ):
     global TEST_GRAPH_ROOT
