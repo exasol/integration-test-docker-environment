@@ -14,6 +14,7 @@ from exasol_integration_test_docker_environment.cli.options.test_environment_opt
 
 class Config(BaseConfig):
     _INTEGRATION_TEST_DIRS = ("base_task", "docker_runtime")
+    _GPU_TEST_FILES = frozenset(("test_gpu.py",))
 
     @computed_field  # type: ignore[misc]
     @property
@@ -105,7 +106,7 @@ class Config(BaseConfig):
         targets.extend(
             str(path.relative_to(self.root_path))
             for path in sorted(test_root.glob("test_*.py"))
-            if path.name != "test_gpu.py"
+            if path.name not in self._GPU_TEST_FILES
         )
         return sorted(targets)
 

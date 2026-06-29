@@ -7,5 +7,5 @@ from exasol_integration_test_docker_environment.lib.test_environment.parameter.d
 )
 
 
-def test_db_available_cli_ssh(request, fabric_stdin):
-    assert_db_available(request, "cli_context", DbOsAccess.SSH, False)
+def test_db_available_cli_ssh(cli_context, fabric_stdin):
+    assert_db_available(cli_context, DbOsAccess.SSH, False)
