@@ -76,7 +76,9 @@ def test_render_dockerfile_content_without_dependencies(tmp_path: Path):
     dockerfile.write_text("FROM scratch\nCOPY file.txt /file.txt\n")
     image_info = _create_image_info(dockerfile, {})
 
-    assert render_dockerfile_content(image_info) == "FROM scratch\nCOPY file.txt /file.txt"
+    assert (
+        render_dockerfile_content(image_info) == "FROM scratch\nCOPY file.txt /file.txt"
+    )
 
 
 def test_render_dockerfile_content_with_dependency_placeholder(tmp_path: Path):
@@ -101,7 +103,9 @@ def test_render_dockerfile_content_requires_image_description():
     image_info = _create_dependency_image_info("dependency/repo", "dependency-tag")
     image_info.image_description = None
 
-    with pytest.raises(ValueError, match="image_info.image_description must not be None"):
+    with pytest.raises(
+        ValueError, match="image_info.image_description must not be None"
+    ):
         render_dockerfile_content(image_info)
 
 
@@ -153,7 +157,9 @@ def test_prepare_build_context_copies_directory_mapping(tmp_path: Path):
     log_dir = tmp_path / "logs"
     log_dir.mkdir()
 
-    BuildContextCreator(str(build_dir), image_info, log_dir).prepare_build_context_to_temp_dir()
+    BuildContextCreator(
+        str(build_dir), image_info, log_dir
+    ).prepare_build_context_to_temp_dir()
 
     assert (build_dir / "copied_dir" / "nested.txt").read_text() == "nested payload"
 
@@ -171,7 +177,9 @@ def test_prepare_build_context_raises_for_invalid_mapping_source(tmp_path: Path)
     log_dir.mkdir()
 
     with pytest.raises(Exception, match="neither a file or a directory"):
-        BuildContextCreator(str(build_dir), image_info, log_dir).prepare_build_context_to_temp_dir()
+        BuildContextCreator(
+            str(build_dir), image_info, log_dir
+        ).prepare_build_context_to_temp_dir()
 
 
 def test_prepare_build_context_does_not_log_when_disabled(
@@ -191,7 +199,9 @@ def test_prepare_build_context_does_not_log_when_disabled(
     log_dir = tmp_path / "logs"
     log_dir.mkdir()
 
-    BuildContextCreator(str(build_dir), image_info, log_dir).prepare_build_context_to_temp_dir()
+    BuildContextCreator(
+        str(build_dir), image_info, log_dir
+    ).prepare_build_context_to_temp_dir()
 
     assert not (log_dir / "docker-build-context.log").exists()
     assert not (log_dir / "Dockerfile.generated").exists()
@@ -214,7 +224,9 @@ def test_prepare_build_context_logs_when_enabled(
     log_dir = tmp_path / "logs"
     log_dir.mkdir()
 
-    BuildContextCreator(str(build_dir), image_info, log_dir).prepare_build_context_to_temp_dir()
+    BuildContextCreator(
+        str(build_dir), image_info, log_dir
+    ).prepare_build_context_to_temp_dir()
 
     context_log = log_dir / "docker-build-context.log"
     generated_dockerfile_log = log_dir / "Dockerfile.generated"
