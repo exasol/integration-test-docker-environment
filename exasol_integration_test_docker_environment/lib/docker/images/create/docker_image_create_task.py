@@ -32,9 +32,7 @@ from exasol_integration_test_docker_environment.lib.docker.images.required_task_
 )
 
 DockerCreateTaskDependency = (
-    DockerBuildImageTask
-    | DockerLoadImageTask
-    | DockerPullImageTask
+    DockerBuildImageTask | DockerLoadImageTask | DockerPullImageTask
 )
 
 

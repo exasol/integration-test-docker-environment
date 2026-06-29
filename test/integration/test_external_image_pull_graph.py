@@ -41,9 +41,7 @@ class ExternalImageGraphTaskMixin:
         return Path(self.graph_root)
 
 
-class BuildStepBaseAnalyzeTask(
-    ExternalImageGraphTaskMixin, DockerAnalyzeImageTask
-):
+class BuildStepBaseAnalyzeTask(ExternalImageGraphTaskMixin, DockerAnalyzeImageTask):
     def get_source_repository_name(self) -> str:
         return self.local_build_repository
 
