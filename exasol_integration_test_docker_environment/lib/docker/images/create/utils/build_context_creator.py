@@ -4,7 +4,7 @@ import shutil
 import textwrap
 from pathlib import Path
 
-from exasol_integration_test_docker_environment.lib.docker.images.create.utils.dockerfile_reference_analyzer import (
+from exasol_integration_test_docker_environment.lib.docker.images.create.utils.dockerfile_renderer import (
     render_dockerfile_content,
 )
 from exasol_integration_test_docker_environment.lib.docker.images.image_info import (
