@@ -28,20 +28,27 @@ from exasol_integration_test_docker_environment.testing.docker_registry import (
 RESOURCE_ROOT = (
     Path(__file__).resolve().parent / "resources" / "test_external_image_pull_graph"
 )
-TEST_GRAPH_ROOT: Path | None = None
 LOCAL_BUILD_REPOSITORY = "itde-test-external-pull-graph"
 BUSYBOX_REFERENCE = "busybox:1.36.1"
-LOCAL_BUSYBOX_REFERENCE = ""
-EXTERNAL_FROM_REFERENCE = ""
-EXTERNAL_COPY_REFERENCE = ""
 
 
-class BuildStepBaseAnalyzeTask(DockerAnalyzeImageTask):
+class ExternalImageGraphTaskMixin:
+    graph_root: str = luigi.Parameter()
+    local_build_repository: str = luigi.Parameter()
+
+    @property
+    def graph_root_path(self) -> Path:
+        return Path(self.graph_root)
+
+
+class BuildStepBaseAnalyzeTask(
+    ExternalImageGraphTaskMixin, DockerAnalyzeImageTask
+):
     def get_source_repository_name(self) -> str:
-        return LOCAL_BUILD_REPOSITORY
+        return self.local_build_repository
 
     def get_target_repository_name(self) -> str:
-        return LOCAL_BUILD_REPOSITORY
+        return self.local_build_repository
 
     def get_source_image_tag(self):
         return "build-step-base"
@@ -50,27 +57,27 @@ class BuildStepBaseAnalyzeTask(DockerAnalyzeImageTask):
         return "build-step-base"
 
     def get_mapping_of_build_files_and_directories(self):
-        assert TEST_GRAPH_ROOT is not None
         return {
             "build-step-base.txt": str(
-                TEST_GRAPH_ROOT / "build_step_base" / "build-step-base.txt"
+                self.graph_root_path / "build_step_base" / "build-step-base.txt"
             ),
         }
 
     def get_dockerfile(self):
-        assert TEST_GRAPH_ROOT is not None
-        return str(TEST_GRAPH_ROOT / "build_step_base" / "Dockerfile")
+        return str(self.graph_root_path / "build_step_base" / "Dockerfile")
 
     def is_rebuild_requested(self) -> bool:
         return True
 
 
-class BuildStepCopySourceAnalyzeTask(DockerAnalyzeImageTask):
+class BuildStepCopySourceAnalyzeTask(
+    ExternalImageGraphTaskMixin, DockerAnalyzeImageTask
+):
     def get_source_repository_name(self) -> str:
-        return LOCAL_BUILD_REPOSITORY
+        return self.local_build_repository
 
     def get_target_repository_name(self) -> str:
-        return LOCAL_BUILD_REPOSITORY
+        return self.local_build_repository
 
     def get_source_image_tag(self):
         return "build-step-copy-source"
@@ -79,29 +86,27 @@ class BuildStepCopySourceAnalyzeTask(DockerAnalyzeImageTask):
         return "build-step-copy-source"
 
     def get_mapping_of_build_files_and_directories(self):
-        assert TEST_GRAPH_ROOT is not None
         return {
             "build-step-copy-source.txt": str(
-                TEST_GRAPH_ROOT
+                self.graph_root_path
                 / "build_step_copy_source"
                 / "build-step-copy-source.txt"
             ),
         }
 
     def get_dockerfile(self):
-        assert TEST_GRAPH_ROOT is not None
-        return str(TEST_GRAPH_ROOT / "build_step_copy_source" / "Dockerfile")
+        return str(self.graph_root_path / "build_step_copy_source" / "Dockerfile")
 
     def is_rebuild_requested(self) -> bool:
         return True
 
 
-class FinalAnalyzeTask(DockerAnalyzeImageTask):
+class FinalAnalyzeTask(ExternalImageGraphTaskMixin, DockerAnalyzeImageTask):
     def get_source_repository_name(self) -> str:
-        return LOCAL_BUILD_REPOSITORY
+        return self.local_build_repository
 
     def get_target_repository_name(self) -> str:
-        return LOCAL_BUILD_REPOSITORY
+        return self.local_build_repository
 
     def get_source_image_tag(self):
         return "final-image"
@@ -113,8 +118,7 @@ class FinalAnalyzeTask(DockerAnalyzeImageTask):
         return {}
 
     def get_dockerfile(self):
-        assert TEST_GRAPH_ROOT is not None
-        return str(TEST_GRAPH_ROOT / "final_image" / "Dockerfile")
+        return str(self.graph_root_path / "final_image" / "Dockerfile")
 
     def is_rebuild_requested(self) -> bool:
         return True
@@ -127,9 +131,16 @@ class FinalAnalyzeTask(DockerAnalyzeImageTask):
 
 
 class ExternalImagePullGraphBuild(DockerBuildBase):
+    graph_root: str = luigi.Parameter()
+    local_build_repository: str = luigi.Parameter(default=LOCAL_BUILD_REPOSITORY)
+
     def get_goal_class_map(self) -> dict[str, DockerAnalyzeImageTask]:
         return {
-            "final-image": self.create_child_task(FinalAnalyzeTask),
+            "final-image": self.create_child_task(
+                FinalAnalyzeTask,
+                graph_root=self.graph_root,
+                local_build_repository=self.local_build_repository,
+            ),
         }
 
     def get_default_goals(self) -> set[str]:
@@ -145,15 +156,20 @@ class ExternalImagePullGraphBuild(DockerBuildBase):
         self.return_object(image_infos)
 
 
-def _prepare_graph_workspace(target_root: Path) -> Path:
+def _prepare_graph_workspace_with_references(
+    target_root: Path,
+    local_busybox_reference: str,
+    external_from_reference: str,
+    external_copy_reference: str,
+) -> Path:
     workspace = target_root / "external-image-pull-graph"
     shutil.copytree(RESOURCE_ROOT, workspace)
     for dockerfile in workspace.rglob("Dockerfile"):
         dockerfile.write_text(
             dockerfile.read_text()
-            .replace("__BUSYBOX__", LOCAL_BUSYBOX_REFERENCE)
-            .replace("__EXTERNAL_FROM__", EXTERNAL_FROM_REFERENCE)
-            .replace("__EXTERNAL_COPY__", EXTERNAL_COPY_REFERENCE)
+            .replace("__BUSYBOX__", local_busybox_reference)
+            .replace("__EXTERNAL_FROM__", external_from_reference)
+            .replace("__EXTERNAL_COPY__", external_copy_reference)
         )
     return workspace
 
@@ -209,27 +225,28 @@ def _read_marker_file(image_reference: str, marker_path: str) -> str:
 def test_external_pull_graph_builds_mixed_local_and_external_image_references(
     luigi_output, tmp_path: Path
 ):
-    global TEST_GRAPH_ROOT
-    global LOCAL_BUSYBOX_REFERENCE
-    global EXTERNAL_FROM_REFERENCE
-    global EXTERNAL_COPY_REFERENCE
     with LocalDockerRegistryContextManager("external-pull-graph") as docker_registry:
-        LOCAL_BUSYBOX_REFERENCE = f"{docker_registry.name}/busybox:1.36.1"
-        EXTERNAL_FROM_REFERENCE = f"{docker_registry.name}/external-from:1"
-        EXTERNAL_COPY_REFERENCE = f"{docker_registry.name}/external-copy:1"
-        _mirror_image_to_registry(BUSYBOX_REFERENCE, LOCAL_BUSYBOX_REFERENCE)
+        local_busybox_reference = f"{docker_registry.name}/busybox:1.36.1"
+        external_from_reference = f"{docker_registry.name}/external-from:1"
+        external_copy_reference = f"{docker_registry.name}/external-copy:1"
+        _mirror_image_to_registry(BUSYBOX_REFERENCE, local_busybox_reference)
         assert not _is_image_available_locally(BUSYBOX_REFERENCE)
-        assert not _is_image_available_locally(LOCAL_BUSYBOX_REFERENCE)
-        TEST_GRAPH_ROOT = _prepare_graph_workspace(tmp_path)
-        _build_and_push_external_image(
-            TEST_GRAPH_ROOT / "external_from",
-            "external-pull-graph-local-external-from:1",
-            EXTERNAL_FROM_REFERENCE,
+        assert not _is_image_available_locally(local_busybox_reference)
+        test_graph_root = _prepare_graph_workspace_with_references(
+            tmp_path,
+            local_busybox_reference,
+            external_from_reference,
+            external_copy_reference,
         )
         _build_and_push_external_image(
-            TEST_GRAPH_ROOT / "external_copy",
+            test_graph_root / "external_from",
+            "external-pull-graph-local-external-from:1",
+            external_from_reference,
+        )
+        _build_and_push_external_image(
+            test_graph_root / "external_copy",
             "external-pull-graph-local-external-copy:1",
-            EXTERNAL_COPY_REFERENCE,
+            external_copy_reference,
         )
         set_build_config(
             True,
@@ -243,7 +260,11 @@ def test_external_pull_graph_builds_mixed_local_and_external_image_references(
         )
         set_docker_repository_config(None, LOCAL_BUILD_REPOSITORY, None, "", "source")
         set_docker_repository_config(None, LOCAL_BUILD_REPOSITORY, None, "", "target")
-        task = generate_root_task(task_class=ExternalImagePullGraphBuild)
+        task = generate_root_task(
+            task_class=ExternalImagePullGraphBuild,
+            graph_root=str(test_graph_root),
+            local_build_repository=LOCAL_BUILD_REPOSITORY,
+        )
         try:
             result = luigi.build(
                 [task], workers=3, local_scheduler=True, log_level="INFO"
@@ -277,8 +298,4 @@ def test_external_pull_graph_builds_mixed_local_and_external_image_references(
                 "external-pull-graph/external-from",
             ]
         finally:
-            TEST_GRAPH_ROOT = None
-            LOCAL_BUSYBOX_REFERENCE = ""
-            EXTERNAL_FROM_REFERENCE = ""
-            EXTERNAL_COPY_REFERENCE = ""
             luigi_utils.clean(LOCAL_BUILD_REPOSITORY)
