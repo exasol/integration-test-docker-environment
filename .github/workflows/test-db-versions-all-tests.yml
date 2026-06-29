@@ -45,7 +45,7 @@ jobs:
         run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
       - name: Run all tests
-        run: "poetry run -- nox -s run-integration-tests -- --db-version=${MATRIX_DB_VERSION} --test-target=${MATRIX_TEST_TARGET}"
+        run: poetry run -- nox -s run-integration-tests -- --db-version="${MATRIX_DB_VERSION}" --test-target="${MATRIX_TEST_TARGET}"
         env:
           MATRIX_DB_VERSION: ${{ matrix.db_versions }}
           MATRIX_TEST_TARGET: ${{ matrix.integration_test_targets }}
