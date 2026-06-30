@@ -3,5 +3,5 @@ from test.integration.cli_environment_common import (
 )
 
 
-def test_db_container_started_cli(request):
-    assert_db_container_started(request, "cli_context")
+def test_db_container_started_cli(cli_context):
+    assert_db_container_started(cli_context)

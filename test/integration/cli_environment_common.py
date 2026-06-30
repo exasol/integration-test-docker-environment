@@ -5,14 +5,15 @@ from typing import (
     cast,
 )
 
-import pytest
-
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.lib.test_environment.database_setup.find_exaplus_in_db_container import (
     find_exaplus,
 )
 from exasol_integration_test_docker_environment.lib.test_environment.parameter.docker_db_test_environment_parameter import (
     DbOsAccess,
+)
+from exasol_integration_test_docker_environment.testing.cli_test_environment_context_provider import (
+    CliContextProvider,
 )
 from exasol_integration_test_docker_environment.testing.exaslct_docker_test_environment import (
     ExaslctDockerTestEnvironment,
@@ -70,11 +71,8 @@ def smoke_test_sql(exaplus_path: str, env: ExaslctDockerTestEnvironment) -> str:
     return f'bash -c "{command_str}" '
 
 
-def assert_db_container_started(
-    request: pytest.FixtureRequest, context_fixture_name: str
-) -> None:
-    context: Any = request.getfixturevalue(context_fixture_name)
-    with context() as db:
+def assert_db_container_started(context: CliContextProvider) -> None:
+    with context(None, None) as db:
         with ContextDockerClient() as docker_client:
             name = db.on_host_docker_environment.name
             containers = [
@@ -101,16 +99,16 @@ def build_additional_parameters(
 
 
 def assert_db_available(
-    request: pytest.FixtureRequest,
-    context_fixture_name: str,
+    context: CliContextProvider,
     db_os_access: DbOsAccess,
     create_certificates: bool,
 ) -> None:
-    context: Any = request.getfixturevalue(context_fixture_name)
     params = build_additional_parameters(db_os_access, create_certificates)
-    with context(name="db_avail", additional_parameters=params) as db:
+    with context("db_avail", params) as db:
         with ContextDockerClient() as docker_client:
+            assert db.on_host_docker_environment.environment_info
             dbinfo = db.on_host_docker_environment.environment_info.database_info
+            assert dbinfo.container_info
             db_container_name = dbinfo.container_info.container_name
             db_container = docker_client.containers.get(db_container_name)
             executor_factory = get_executor_factory(dbinfo, db_os_access)
