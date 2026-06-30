@@ -2,22 +2,22 @@ name: Test DB Versions with all tests
 
 # python-version: default as specified
 # database-version: all supported by ITDE
-# tests: all
+# tests: all (dynamic matrix)
 #
-# Use the specified default version of python and call nox task run_all_tests for
-# all versions of Exasol database currently supported by the ITDE.
+# Use the specified default version of python and execute one dynamic test target
+# per matrix entry for all supported Exasol database versions.
 
 on:
  workflow_call:
 
 jobs:
   build_matrix:
-    name: Read all supported Exasol DB versions
+    name: Read all supported Exasol DB versions and test targets
     permissions:
       contents: read
     uses: ./.github/workflows/matrix.yml
     with:
-      matrix_keys_json: '["db_versions"]'
+      matrix_keys_json: '["db_versions", "integration_test_targets"]'
 
   test-db-versions-all-tests:
     needs: build_matrix
@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-24.04
     permissions:
       contents: read
-    name: Run all tests for Exasol ${{ matrix.db_versions }}
+    name: Run tests for Exasol ${{ matrix.db_versions }} - ${{ matrix.integration_test_targets }}
 
     steps:
       - name: SCM Checkout
@@ -45,6 +45,7 @@ jobs:
         run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
       - name: Run all tests
-        run: poetry run -- nox -s run-all-tests -- --db-version=${MATRIX_DB_VERSION} --test-set=default
+        run: poetry run -- nox -s run-integration-tests -- --db-version="${MATRIX_DB_VERSION}" --test-target="${MATRIX_TEST_TARGET}"
         env:
           MATRIX_DB_VERSION: ${{ matrix.db_versions }}
+          MATRIX_TEST_TARGET: ${{ matrix.integration_test_targets }}

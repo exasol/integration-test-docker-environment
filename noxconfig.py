@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 from exasol.toolbox.config import BaseConfig
@@ -12,6 +13,9 @@ from exasol_integration_test_docker_environment.cli.options.test_environment_opt
 
 
 class Config(BaseConfig):
+    _INTEGRATION_TEST_DIRS = ("base_task", "docker_runtime")
+    _GPU_TEST_FILES = frozenset(("test_gpu.py",))
+
     @computed_field  # type: ignore[misc]
     @property
     def source_code_path(self) -> Path:
@@ -60,6 +64,52 @@ class Config(BaseConfig):
         ]
         return Config._normalize_default_version(db_versions)
 
+    @computed_field  # type: ignore[misc]
+    @property
+    def integration_test_targets(self) -> list[str]:
+        """
+        Return dynamic non-GPU integration test targets for CI matrix generation.
+        """
+        return self._discover_integration_test_targets()
+
+    @computed_field  # type: ignore[misc]
+    @property
+    def slow_python_test_matrix(self) -> list[dict[str, str | bool]]:
+        """
+        Return the expanded matrix rows for the slow Python-version workflow.
+
+        Coverage is enabled only for Python 3.10 rows, and every row includes the
+        precomputed artifact name the workflow should use when coverage is collected.
+        """
+        rows: list[dict[str, str | bool]] = []
+        for python_version in self.python_versions:
+            for test_target in self.integration_test_targets:
+                rows.append(
+                    {
+                        "python_versions": python_version,
+                        "integration_test_targets": test_target,
+                        "collect_coverage": python_version == "3.10",
+                        "coverage_artifact_name": (
+                            f"coverage-python{python_version}-slow-"
+                            f"{self._sanitize_artifact_name(test_target)}"
+                        ),
+                    }
+                )
+        return rows
+
+    def _discover_integration_test_targets(self) -> list[str]:
+        test_root = self.root_path / "test" / "integration"
+        targets = [
+            str((test_root / directory).relative_to(self.root_path))
+            for directory in self._INTEGRATION_TEST_DIRS
+        ]
+        targets.extend(
+            str(path.relative_to(self.root_path))
+            for path in sorted(test_root.glob("test_*.py"))
+            if path.name not in self._GPU_TEST_FILES
+        )
+        return sorted(targets)
+
     @staticmethod
     def _normalize_default_version(db_versions: list[str]) -> list[str]:
         normalized_db_versions = [
@@ -67,6 +117,11 @@ class Config(BaseConfig):
         ]
         normalized_db_versions.append("default")
         return normalized_db_versions
+
+    @staticmethod
+    def _sanitize_artifact_name(target: str) -> str:
+        sanitized = re.sub(r"[/.]+", "-", target)
+        return sanitized.strip("-")
 
 
 PROJECT_CONFIG = Config(
