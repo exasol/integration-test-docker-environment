@@ -4,8 +4,9 @@ import shutil
 import textwrap
 from pathlib import Path
 
-from jinja2 import Template
-
+from exasol_integration_test_docker_environment.lib.docker.images.create.utils.dockerfile_renderer import (
+    render_dockerfile_content,
+)
 from exasol_integration_test_docker_environment.lib.docker.images.image_info import (
     ImageInfo,
     ImageState,
@@ -38,14 +39,7 @@ class BuildContextCreator:
             file.write(self._image_info.to_json())
 
     def _prepare_dockerfile(self):
-        with open(self._image_description.dockerfile) as file:
-            dockerfile_content = file.read()
-        template = Template(dockerfile_content)
-        image_names_of_dependencies = {
-            key: image_info.get_target_complete_name()
-            for key, image_info in self._image_info_of_dependencies.items()
-        }
-        final_dockerfile = template.render(**image_names_of_dependencies)
+        final_dockerfile = render_dockerfile_content(self._image_info)
         final_dockerfile += textwrap.dedent(f"""
         RUN mkdir -p /build_info/image_info
         COPY image_info /build_info/image_info/{self._image_info.target_tag}

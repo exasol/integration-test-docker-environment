@@ -55,7 +55,7 @@ class DockerBuildImageTask(DockerImageCreatorBaseTask):
                         **image_description.image_changing_build_arguments,
                         **docker_build_arguments().secret,
                     ),
-                    pull=True,
+                    pull=False,
                 )
                 self._handle_output(output_generator, self.image_info)
         finally:
