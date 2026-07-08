@@ -1144,14 +1144,14 @@ types-requests = ">=2.31.0.6,<3.0.0.0"
 
 [[package]]
 name = "exasol-toolbox"
-version = "10.0.0"
+version = "10.2.1"
 description = "Your one-stop solution for managing all standard tasks and core workflows of your Python project."
 optional = false
 python-versions = "<4.0,>=3.10"
 groups = ["dev"]
 files = [
-    {file = "exasol_toolbox-10.0.0-py3-none-any.whl", hash = "sha256:98c0456e7526ccffdfe74c727e74b706f9e613a0e42d6fffa8a0cbd2412299b8"},
-    {file = "exasol_toolbox-10.0.0.tar.gz", hash = "sha256:c2002f4cf7e8f94c9c72289a4acb98bfe6fa123942f488ecb5c84d82e92dd770"},
+    {file = "exasol_toolbox-10.2.1-py3-none-any.whl", hash = "sha256:a997bc35976b64b94afb7ddd2be4ddcdecb0e3be422aace2a7c9b95d18c4933b"},
+    {file = "exasol_toolbox-10.2.1.tar.gz", hash = "sha256:c3ec4a4371208306c6a1f185862fa6786a92fbea4068529c4fb0ebb0c2d9ba7d"},
 ]
 
 [package.dependencies]
@@ -4960,4 +4960,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.15"
-content-hash = "578d5604245bd5ba0b01a49aa6ef60c79e25bad786fb7eca8b5f5392b0c9939b"
+content-hash = "da55548b1cfa4c7f4fe046e002c121b47fcf07f831e4aefe4c39eb48c76a9436"
