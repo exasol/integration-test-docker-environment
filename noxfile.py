@@ -165,6 +165,7 @@ def build_standalone_binary(session: nox.Session):
             "--collect-datas=exasol_integration_test_docker_environment.templates",
             "--collect-datas=exasol_integration_test_docker_environment.docker_db_config",
             "--collect-datas=exasol_integration_test_docker_environment.certificate_resources",
+            "--collect-datas=rfc3987_syntax",
         ]
         PyInstaller.__main__.run(options)
         print(f"PyInstaller completed building {exe_name}")
