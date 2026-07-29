@@ -96,7 +96,7 @@ def test_render_dockerfile_content_with_dependency_placeholder(tmp_path: Path):
 
     rendered = render_dockerfile_content(image_info)
 
-    assert rendered == "FROM dependency/repo:dependency-tag_x64_build"
+    assert rendered == "FROM dependency/repo:dependency-tag_x64_HASH"
 
 
 def test_render_dockerfile_content_requires_image_description():
@@ -135,7 +135,7 @@ def test_prepare_build_context_creates_files_and_updates_image_info(tmp_path: Pa
     assert (build_dir / "data.txt").read_text() == "payload"
     assert (build_dir / "config.txt").read_text() == "config"
     generated_dockerfile = (build_dir / "Dockerfile").read_text()
-    assert "FROM dependency/repo:dependency-tag_x64_build" in generated_dockerfile
+    assert "FROM dependency/repo:dependency-tag_x64_HASH" in generated_dockerfile
     assert "COPY image_info /build_info/image_info/target-tag" in generated_dockerfile
     assert image_info.image_state == ImageState.WAS_BUILD.name
     stored_image_info = (build_dir / "image_info").read_text()
