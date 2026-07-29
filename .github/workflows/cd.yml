@@ -1,5 +1,5 @@
 # Generated and maintained by the exasol-toolbox.
-# Last generated with exasol-toolbox version 10.2.1.
+# Last generated with exasol-toolbox version 10.4.0.
 name: CD
 
 on:
@@ -34,6 +34,7 @@ jobs:
       - build-and-publish
     permissions:
       contents: write
+
 
   publish-docs:
     needs:
