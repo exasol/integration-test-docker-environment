@@ -22,7 +22,7 @@ jobs:
       matrix: ${{ fromJson(needs.build_matrix.outputs.matrix) }}
     steps:
       - name: SCM Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
 
