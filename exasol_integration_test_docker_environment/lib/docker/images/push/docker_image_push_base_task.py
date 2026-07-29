@@ -46,18 +46,30 @@ class DockerPushImageBaseTask(DockerBaseTask):
                 "password": target_docker_repository_config().password,
             }
             with self._get_docker_client() as docker_client:
-                self.logger.info(
-                    f"Push images to repo={image_info.get_target_complete_name()}, "
-                    f"tag={image_info.get_target_complete_tag()}"
+                self._push_tag(
+                    docker_client,
+                    image_info,
+                    image_info.get_target_complete_tag(),
+                    auth_config,
                 )
-                generator = docker_client.images.push(
-                    repository=image_info.get_target_complete_name(),
-                    tag=image_info.get_target_complete_tag(),
-                    auth_config=auth_config,
-                    stream=True,
-                )
-                self._handle_output(generator, image_info)
+                build_name_tag = image_info.get_target_build_name_complete_tag()
+                if build_name_tag:
+                    self._push_tag(
+                        docker_client, image_info, build_name_tag, auth_config
+                    )
         self.return_object(image_info)
+
+    def _push_tag(self, docker_client, image_info, tag, auth_config) -> None:
+        self.logger.info(
+            "Push image to repo=%s, tag=%s", image_info.target_repository_name, tag
+        )
+        generator = docker_client.images.push(
+            repository=image_info.target_repository_name,
+            tag=tag,
+            auth_config=auth_config,
+            stream=True,
+        )
+        self._handle_output(generator, image_info)
 
     def _handle_output(self, output_generator, image_info: ImageInfo):
         log_file_path = Path(self.get_log_path(), "push.log")
