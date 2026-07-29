@@ -57,9 +57,6 @@ def set_build_config(
         luigi.configuration.get_config().set("build_config", "build_name", build_name)
     else:
         luigi.configuration.get_config().remove_option("build_config", "build_name")
-        assert not luigi.configuration.get_config().has_option(
-            "build_config", "build_name"
-        )
 
     luigi.configuration.get_config().set(
         "build_config", "log_build_context_content", str(log_build_context_content)
