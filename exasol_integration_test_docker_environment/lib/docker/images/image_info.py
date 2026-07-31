@@ -108,10 +108,9 @@ class ImageInfo(Info):
         elif platform is not None:
             raise TypeError(f"{type(platform)} for platform not supported")
         self.check_complete_tag_length(self.source_tag, self.hash)
-        self.check_complete_tag_length(self.target_tag, self._target_tag_suffix())
-
-    def _target_tag_suffix(self) -> str:
-        return self.build_name if self.build_name else self.hash
+        self.check_complete_tag_length(self.target_tag, self.hash)
+        if self.build_name:
+            self.check_complete_tag_length(self.target_tag, self.build_name)
 
     def check_complete_tag_length(self, tag: str, suffix: str) -> None:
         complete_tag_length_limit = self.DOCKER_TAG_LENGTH_LIMIT + self.MAX_TAG_SURPLUS
@@ -131,9 +130,12 @@ class ImageInfo(Info):
         return self._create_truncated_complete_tag(self.source_tag, self.hash)
 
     def get_target_complete_tag(self):
-        return self._create_truncated_complete_tag(
-            self.target_tag, self._target_tag_suffix()
-        )
+        return self._create_truncated_complete_tag(self.target_tag, self.hash)
+
+    def get_target_build_name_complete_tag(self) -> str | None:
+        if not self.build_name:
+            return None
+        return self._create_truncated_complete_tag(self.target_tag, self.build_name)
 
     def _create_truncated_complete_tag(self, tag: str, suffix: str) -> str:
         # we must truncate the tag to 128 characters, because this is the limit of docker tags

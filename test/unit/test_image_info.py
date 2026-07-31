@@ -45,11 +45,23 @@ def test_source_tag_keeps_hash():
     assert image_info.get_source_complete_name() == "repo:flavor-goal_x64_HASH"
 
 
-def test_target_tag_uses_build_name_when_set():
+def test_target_tag_keeps_hash_when_build_name_is_set():
     image_info = _create_image_info(build_name="BUILD")
 
-    assert image_info.get_target_complete_tag() == "flavor-goal_x64_BUILD"
-    assert image_info.get_target_complete_name() == "repo:flavor-goal_x64_BUILD"
+    assert image_info.get_target_complete_tag() == "flavor-goal_x64_HASH"
+    assert image_info.get_target_complete_name() == "repo:flavor-goal_x64_HASH"
+
+
+def test_target_build_name_tag_uses_build_name_when_set():
+    image_info = _create_image_info(build_name="BUILD")
+
+    assert image_info.get_target_build_name_complete_tag() == "flavor-goal_x64_BUILD"
+
+
+def test_target_build_name_tag_is_missing_without_build_name():
+    image_info = _create_image_info()
+
+    assert image_info.get_target_build_name_complete_tag() is None
 
 
 def test_target_tag_falls_back_to_hash_when_build_name_missing():

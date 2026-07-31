@@ -121,9 +121,7 @@ def assert_at_least_one_image_exists(prefix: str):
         return image_list
 
 
-def _run_docker_build_base_task_and_check(
-    expected_img_name: str, build_name: str = "", **kwargs
-):
+def _default_build_config():
     build_config.set_build_config(
         force_rebuild=False,
         force_rebuild_from=(),
@@ -132,8 +130,14 @@ def _run_docker_build_base_task_and_check(
         output_directory=system_options.DEFAULT_OUTPUT_DIRECTORY,
         temporary_base_directory=None,
         cache_directory=None,
-        build_name=build_name,
+        build_name="",
     )
+
+
+def _run_docker_build_base_task_and_check(
+    expected_img_name: str, build_config_callback=_default_build_config, **kwargs
+):
+    build_config_callback()
     task = generate_root_task(task_class=TestDockerBuildBase, **kwargs)
     try:
         luigi.build([task], workers=1, local_scheduler=True, log_level="INFO")
@@ -215,17 +219,70 @@ def test_docker_img_hash_changes_if_resource_changes(clean_images: None):
 def test_docker_img_uses_build_name_when_set(
     clean_images: None, running_platform: Platform
 ):
-    build_name = "integration"
+    BUILD_NAME = "integration"
+
+    def _custom_build_name_build_config():
+        build_config.set_build_config(
+            force_rebuild=False,
+            force_rebuild_from=(),
+            force_pull=False,
+            log_build_context_content=False,
+            output_directory=system_options.DEFAULT_OUTPUT_DIRECTORY,
+            temporary_base_directory=None,
+            cache_directory=None,
+            build_name=BUILD_NAME,
+        )
+
     exp_image_name = (
         f"exasol-test-docker-build-base:test-analyze-image-1_{running_platform.value}_"
     )
     imgs = _run_docker_build_base_task_and_check(
         exp_image_name,
-        build_name=build_name,
+        build_config_callback=_custom_build_name_build_config,
         add_resources={"my_package_file.yaml": "some_package_content_build_name"},
     )
     assert len(imgs) == 1
-    assert imgs[0].tags == [
+    assert (
         f"exasol-test-docker-build-base:test-analyze-image-1_"
-        f"{running_platform.value}_{build_name}"
-    ]
+        f"{running_platform.value}_{BUILD_NAME}"
+    ) in imgs[0].tags
+    assert len(imgs[0].tags) == 2
+
+
+def test_docker_img_build_name_reset(clean_images: None, running_platform: Platform):
+    BUILD_NAME = "integration"
+
+    def _custom_build_name_build_config_reset():
+        build_config.set_build_config(
+            force_rebuild=False,
+            force_rebuild_from=(),
+            force_pull=False,
+            log_build_context_content=False,
+            output_directory=system_options.DEFAULT_OUTPUT_DIRECTORY,
+            temporary_base_directory=None,
+            cache_directory=None,
+            build_name=BUILD_NAME,
+        )
+
+        build_config.set_build_config(
+            force_rebuild=False,
+            force_rebuild_from=(),
+            force_pull=False,
+            log_build_context_content=False,
+            output_directory=system_options.DEFAULT_OUTPUT_DIRECTORY,
+            temporary_base_directory=None,
+            cache_directory=None,
+            build_name=None,
+        )
+
+    exp_image_name = (
+        f"exasol-test-docker-build-base:test-analyze-image-1_{running_platform.value}_"
+    )
+    imgs = _run_docker_build_base_task_and_check(
+        exp_image_name,
+        build_config_callback=_custom_build_name_build_config_reset,
+        add_resources={"my_package_file.yaml": "some_package_content_build_name"},
+    )
+    assert len(imgs) == 1
+    assert len(imgs[0].tags) == 1
+    assert BUILD_NAME not in imgs[0].tags[0]
