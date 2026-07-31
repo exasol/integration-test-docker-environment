@@ -60,9 +60,10 @@ class DockerBuildImageTask(DockerImageCreatorBaseTask):
                 self._handle_output(output_generator, self.image_info)
                 build_name_tag = self.image_info.get_target_build_name_complete_tag()
                 if build_name_tag:
-                    docker_client.images.get(
+                    image = docker_client.images.get(
                         self.image_info.get_target_complete_name()
-                    ).tag(
+                    )
+                    image.tag(
                         repository=self.image_info.target_repository_name,
                         tag=build_name_tag,
                     )

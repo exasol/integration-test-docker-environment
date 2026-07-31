@@ -24,13 +24,11 @@ def test_docker_push(api_isolation):
             assert (
                 len(images["tags"]) == 2
             ), f"{images} doesn't have the expected 2 tags, it has {len(images['tags'])}"
-            assert any(
-                image_info.get_target_complete_tag() in tag for tag in images["tags"]
-            )
-            assert any(
-                image_info.get_target_build_name_complete_tag() in tag
-                for tag in images["tags"]
-            )
+            expected_tags = {
+                image_info.get_target_complete_tag(),
+                image_info.get_target_build_name_complete_tag(),
+            }
+            assert set(images["tags"]) == expected_tags
 
         finally:
             luigi_utils.clean(docker_repository_name)
