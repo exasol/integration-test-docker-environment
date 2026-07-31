@@ -1,6 +1,7 @@
 # Changes
 
 * [unreleased](unreleased.md)
+* [6.5.0](changes_6.5.0.md)
 * [6.4.1](changes_6.4.1.md)
 * [6.4.0](changes_6.4.0.md)
 * [6.3.0](changes_6.3.0.md)
@@ -78,6 +79,7 @@ changes_0.3.0
 changes_0.2.0
 changes_0.1.0
 unreleased
+changes_6.5.0
 changes_6.4.1
 changes_6.4.0
 changes_6.3.0
