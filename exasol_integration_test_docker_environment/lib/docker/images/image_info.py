@@ -1,4 +1,7 @@
-from datetime import datetime, timezone
+from datetime import (
+    datetime,
+    timezone,
+)
 from enum import (
     Enum,
     auto,
