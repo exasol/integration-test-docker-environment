@@ -65,7 +65,7 @@ def test_symlink_detection_size(temp_dirs):
         )
 
 
-def test_symlink_no_loop(temp_dirs, request):
+def test_symlink_no_loop(temp_dirs):
     temp_dir, temp_dir_dummy = temp_dirs
     symlink_dest = _generate_test_dir(temp_dir, with_symlink_loop=False)
     os.symlink(temp_dir_dummy, symlink_dest)

@@ -21,10 +21,10 @@ from exasol_integration_test_docker_environment.lib.models.api_errors import (
 class CompositeFailingTask(DependencyLoggerBaseTask):
 
     def register_required(self):
-        self.dependencies = self.register_dependencies(
+        dependencies = self.register_dependencies(
             [self.create_child_task(FailingTask1), self.create_child_task(FailingTask2)]
         )
-        return self.dependencies
+        return dependencies
 
     def run_task(self):
         pass
@@ -33,7 +33,7 @@ class CompositeFailingTask(DependencyLoggerBaseTask):
 class FailingTask1(DependencyLoggerBaseTask):
 
     def run_task(self):
-        # The sleep is needed to garantuee that both FailingTasks are started before one fails,
+        # The sleep is needed to guarantee that both FailingTasks are started before one fails,
         # because otherwise the other one won't be started
         time.sleep(0.1)
         raise RuntimeError(f"Error in {self.__class__.__name__} occurred.")
@@ -42,7 +42,7 @@ class FailingTask1(DependencyLoggerBaseTask):
 class FailingTask2(DependencyLoggerBaseTask):
 
     def run_task(self):
-        # The sleep is needed to garantuee that both FailingTasks are started before one fails,
+        # The sleep is needed to guarantee that both FailingTasks are started before one fails,
         # because otherwise the other one won't be started
         time.sleep(0.1)
         raise RuntimeError(f"Error in {self.__class__.__name__} occurred.")

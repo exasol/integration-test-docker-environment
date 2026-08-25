@@ -18,7 +18,7 @@ def test_docker_connection_attempt_on_non_existing_unix_socket_returns_false(
     """
     Regression:  https://github.com/exasol/integration-test-docker-environment/issues/17
 
-    Cause: If docker tries to use a unix socket to connect to the docker deamon but the associated
+    Cause: If docker tries to use a unix socket to connect to the docker daemon but the associated
            file of the unix socket is not existent, creating a docker client using
            `docker.from_env()` will fail with an exception.
     """

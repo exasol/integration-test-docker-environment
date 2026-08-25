@@ -1,4 +1,7 @@
-from datetime import datetime
+from datetime import (
+    datetime,
+    timezone,
+)
 from enum import (
     Enum,
     auto,
@@ -78,7 +81,7 @@ class ImageInfo(Info):
         commit: str,
         image_description: ImageDescription | None,
         build_name: str = "",
-        build_date_time: datetime = datetime.utcnow(),
+        build_date_time: datetime = datetime.now(tz=timezone.utc),
         image_state: ImageState | None = ImageState.NOT_EXISTING,
         depends_on_images: dict[str, "ImageInfo"] | None = None,
         platform: Platform | None = None,
