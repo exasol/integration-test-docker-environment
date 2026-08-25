@@ -62,7 +62,7 @@ class DockerBuildBase(DependencyLoggerBaseTask):
             difference = goals.difference(self.available_goals)
             raise Exception(
                 f"Unknown goal(s) {difference}, "
-                f"following goals are avaialable {self.available_goals}"
+                f"following goals are available {self.available_goals}"
             )
 
     def _check_if_build_steps_to_rebuild_are_valid_goals(self):
@@ -71,7 +71,7 @@ class DockerBuildBase(DependencyLoggerBaseTask):
             difference = build_steps_to_rebuild.difference(self.available_goals)
             raise Exception(
                 f"Unknown build stages {difference} forced to rebuild, "
-                f"following stages are avaialable {self.available_goals}"
+                f"following stages are available {self.available_goals}"
             )
 
     def create_build_tasks(
