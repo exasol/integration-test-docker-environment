@@ -52,6 +52,9 @@ class DockerDBTestEnvironmentParameter(Config):
     ssh_port_forward: str | None = luigi.OptionalParameter(
         default=None, significant=False
     )
+    confd_port_forward: str | None = luigi.OptionalParameter(
+        default=None, significant=False
+    )
     mem_size: str | None = luigi.OptionalParameter(default="2 GiB", significant=False)
     disk_size: str | None = luigi.OptionalParameter(default="2 GiB", significant=False)
     nameservers: list[str] = luigi.ListParameter(default=[], significant=False)

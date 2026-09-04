@@ -394,6 +394,34 @@ running the Exasol database. If you do not specify a port then ITDE will
 select a random free port.
 
 
+ConfD JSON-RPC Access
+""""""""""""""""""""""
+
+Disposable Docker-DB environments expose ConfD JSON-RPC only when explicitly
+requested. ConfD listens at ``https://127.0.0.1:<forwarded-port>/rest`` and
+uses container port ``443/tcp``. This is the HTTPS JSON-RPC endpoint; the
+``XMLRPCPort`` name in EXAConf does not identify its protocol.
+
+Use ``--confd-port-forward <port>`` (or the ``confd_port_forward`` argument of
+``spawn_test_environment``) to publish it. ITDE always binds this mapping to
+``127.0.0.1``; it never uses an all-interface default. The endpoint uses the
+Docker-DB TLS certificate. Test clients should validate it where their test
+trust configuration permits; a test that deliberately accepts the disposable
+self-signed certificate must remain loopback-only.
+
+.. code:: console
+
+   itde spawn-test-environment --environment-name my_env --confd-port-forward 8443
+
+ConfD authenticates requests with an ``Authorization: Bearer <token>`` header.
+Downstream test infrastructure can call
+``extract_confd_bearer_token(environment_info)`` from
+``exasol_integration_test_docker_environment.lib.api``. The function reads the
+token from the disposable container only, does not add it to ``EnvironmentInfo``
+or ITDE output, and omits command output from failures. Treat its return value
+as a secret: do not log, serialize, or include it in assertion messages.
+
+
 Docker Runtimes
 ~~~~~~~~~~~~~~~
 
