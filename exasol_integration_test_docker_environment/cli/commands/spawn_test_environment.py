@@ -103,6 +103,13 @@ from exasol_integration_test_docker_environment.lib.utils.cli_function_decorator
     show_default=True,
     help="Host port to which the BucketFS HTTPS port gets forwarded",
 )
+@click.option(
+    "--confd-port-forward",
+    type=int,
+    default=None,
+    show_default=True,
+    help="Host loopback port to which ConfD HTTPS JSON-RPC (443/tcp) gets forwarded.",
+)
 def spawn_test_environment(
     environment_name: str,
     database_port_forward: int | None,
@@ -135,6 +142,7 @@ def spawn_test_environment(
     use_job_specific_log_file: bool,
     bucketfs_http_port_forward: int | None,
     bucketfs_https_port_forward: int | None,
+    confd_port_forward: int | None,
 ):
     """
     This command spawns a test environment with a docker-db container and a connected test-container.
@@ -142,6 +150,12 @@ def spawn_test_environment(
     """
     with TerminationHandler():
         try:
+            optional_port_forwards = {
+                "bucketfs_http_port_forward": bucketfs_http_port_forward,
+                "bucketfs_https_port_forward": bucketfs_https_port_forward,
+            }
+            if confd_port_forward is not None:
+                optional_port_forwards["confd_port_forward"] = confd_port_forward
             api.spawn_test_environment(
                 environment_name,
                 database_port_forward,
@@ -172,8 +186,7 @@ def spawn_test_environment(
                 task_dependencies_dot_file,
                 log_level=log_level,
                 use_job_specific_log_file=use_job_specific_log_file,
-                bucketfs_http_port_forward=bucketfs_http_port_forward,
-                bucketfs_https_port_forward=bucketfs_https_port_forward,
+                **optional_port_forwards,
             )
         except ArgumentConstraintError as e:
             handle_wrong_argument_error(*e.args)
