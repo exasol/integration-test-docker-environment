@@ -1,3 +1,5 @@
+from typing import Any
+
 import click
 
 from exasol_integration_test_docker_environment.cli.cli import cli
@@ -157,7 +159,7 @@ def spawn_test_environment(
     """
     with TerminationHandler():
         try:
-            optional_port_forwards = {
+            optional_port_forwards: dict[str, Any] = {
                 "bucketfs_http_port_forward": bucketfs_http_port_forward,
                 "bucketfs_https_port_forward": bucketfs_https_port_forward,
             }

@@ -418,9 +418,9 @@ ConfD remains loopback-only. Setting a bind address applies to ConfD as well.
 
    itde spawn-test-environment --environment-name my_env --confd-port-forward 8443
 
-ConfD authentication follows the database's standard ConfD configuration. See
-the `ConfD authentication documentation <https://docs.exasol.com/db/latest/confd/confd.htm#Authentication>`_
-for the supported authentication method.
+ConfD uses Basic authentication with a user name and password. See the
+`ConfD authentication documentation <https://docs.exasol.com/db/latest/confd/confd.htm#Authentication>`_
+for credential management.
 
 
 Docker Runtimes

@@ -51,3 +51,6 @@ def test_port_bind_address_applies_to_all_forwarded_ports():
 
     assert mapping["443/tcp"] == ("192.0.2.1", 5)
     assert mapping["8563/tcp"] == ("192.0.2.1", 1)
+    assert mapping["2580/tcp"] == ("192.0.2.1", 2)
+    assert mapping["22/tcp"] == ("192.0.2.1", 3)
+    assert mapping["2581/tcp"] == ("192.0.2.1", 4)
