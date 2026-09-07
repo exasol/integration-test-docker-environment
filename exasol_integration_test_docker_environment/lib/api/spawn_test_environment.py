@@ -16,9 +16,6 @@ from exasol_integration_test_docker_environment.cli.options.system_options impor
 from exasol_integration_test_docker_environment.cli.options.test_environment_options import (
     LATEST_DB_VERSION,
 )
-from exasol_integration_test_docker_environment.lib.api.port_forwarding import (
-    confd_port_forwarding_parameters,
-)
 from exasol_integration_test_docker_environment.lib.base.run_task import (
     generate_root_task,
     run_task,
@@ -166,7 +163,8 @@ def spawn_test_environment(
         bucketfs_http_port_forward=str_or_none(bucketfs_port_forward),
         bucketfs_https_port_forward=str_or_none(bucketfs_https_port_forward),
         ssh_port_forward=str_or_none(ssh_port_forward),
-        **confd_port_forwarding_parameters(confd_port_forward, port_bind_address),
+        confd_port_forward=str_or_none(confd_port_forward),
+        port_bind_address=port_bind_address,
         mem_size=db_mem_size,
         disk_size=db_disk_size,
         nameservers=nameserver,
