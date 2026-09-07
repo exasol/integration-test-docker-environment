@@ -44,6 +44,9 @@ from exasol_integration_test_docker_environment.lib.models.data.environment_info
 from exasol_integration_test_docker_environment.lib.models.data.test_container_content_description import (
     TestContainerContentDescription,
 )
+from exasol_integration_test_docker_environment.lib.api.port_forwarding import (
+    confd_port_forwarding_parameters,
+)
 from exasol_integration_test_docker_environment.lib.test_environment.parameter.docker_db_test_environment_parameter import (
     DbOsAccess,
 )
@@ -161,8 +164,7 @@ def spawn_test_environment_with_test_container(
         bucketfs_http_port_forward=str_or_none(bucketfs_http_port_forward),
         bucketfs_https_port_forward=str_or_none(bucketfs_https_port_forward),
         ssh_port_forward=str_or_none(ssh_port_forward),
-        confd_port_forward=str_or_none(confd_port_forward),
-        port_bind_address=port_bind_address,
+        **confd_port_forwarding_parameters(confd_port_forward, port_bind_address),
         mem_size=db_mem_size,
         disk_size=db_disk_size,
         nameservers=nameserver,

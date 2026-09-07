@@ -160,6 +160,7 @@ DB_ARGS = (
     "bucketfs-http-port-forward",
     "bucketfs-https-port-forward",
     "confd-port-forward",
+    "port-bind-address",
 )
 
 CREATE_CERTIFICATES_ARGS = ("create-certificates",)
