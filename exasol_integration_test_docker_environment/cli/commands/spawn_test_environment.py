@@ -116,7 +116,7 @@ from exasol_integration_test_docker_environment.lib.utils.cli_function_decorator
     "--port-bind-address",
     type=str,
     default=None,
-    help="Host address to bind all forwarded ports to. Defaults to all interfaces, except ConfD which defaults to loopback.",
+    help="Host address to bind all forwarded ports to. Defaults to loopback.",
 )
 def spawn_test_environment(
     environment_name: str,

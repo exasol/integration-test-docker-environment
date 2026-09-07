@@ -411,8 +411,8 @@ self-signed certificate must remain loopback-only.
 
 To choose a bind address for every forwarded port, use
 ``--port-bind-address <address>`` (or ``port_bind_address`` in the API). By
-default, existing database, BucketFS, and SSH forwards bind to all interfaces;
-ConfD remains loopback-only. Setting a bind address applies to ConfD as well.
+default, all forwarded ports bind to loopback. Setting a bind address applies
+to every forwarded port, including ConfD.
 
 .. code:: console
 

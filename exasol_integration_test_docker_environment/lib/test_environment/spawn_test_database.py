@@ -201,11 +201,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         for name, internal in internal_ports.__dict__.items():
             forward = forwarded_ports.__getattribute__(name)
             if forward:
-                # Preserve existing public bindings by default, while keeping
-                # ConfD local unless callers explicitly choose otherwise.
-                bind_address = configured_bind_address or (
-                    "127.0.0.1" if name == "_confd" else "0.0.0.0"
-                )
+                bind_address = configured_bind_address or "127.0.0.1"
                 result[f"{internal}/tcp"] = (bind_address, forward)
         return result
 
