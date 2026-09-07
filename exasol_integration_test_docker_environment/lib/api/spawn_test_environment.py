@@ -16,6 +16,9 @@ from exasol_integration_test_docker_environment.cli.options.system_options impor
 from exasol_integration_test_docker_environment.cli.options.test_environment_options import (
     LATEST_DB_VERSION,
 )
+from exasol_integration_test_docker_environment.lib.api.port_forwarding import (
+    confd_port_forwarding_parameters,
+)
 from exasol_integration_test_docker_environment.lib.base.run_task import (
     generate_root_task,
     run_task,
@@ -40,9 +43,6 @@ from exasol_integration_test_docker_environment.lib.models.config.docker_config 
 )
 from exasol_integration_test_docker_environment.lib.models.data.environment_info import (
     EnvironmentInfo,
-)
-from exasol_integration_test_docker_environment.lib.api.port_forwarding import (
-    confd_port_forwarding_parameters,
 )
 from exasol_integration_test_docker_environment.lib.test_environment.parameter.docker_db_test_environment_parameter import (
     DbOsAccess,
