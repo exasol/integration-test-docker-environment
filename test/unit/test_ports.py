@@ -1,4 +1,7 @@
 from exasol_integration_test_docker_environment.lib.test_environment.ports import Ports
+from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_database import (
+    SpawnTestDockerDatabase,
+)
 
 
 def test_forward_ports():
@@ -8,6 +11,7 @@ def test_forward_ports():
     assert p.bucketfs_http == 2580
     assert p.ssh == 20002
     assert p.bucketfs_https == 2581
+    assert p.confd is None
 
 
 def test_default_ports():
@@ -17,6 +21,7 @@ def test_default_ports():
     assert p.bucketfs_http == 2580
     assert p.ssh == 22
     assert p.bucketfs_https == 2581
+    assert p.confd == 443
 
 
 def test_external_ports():
@@ -26,3 +31,26 @@ def test_external_ports():
     assert p.bucketfs_http == 2580
     assert p.ssh is None
     assert p.bucketfs_https == 2581
+    assert p.confd is None
+
+
+def test_default_port_bindings_are_limited_to_loopback():
+    mapping = SpawnTestDockerDatabase._port_mapping(
+        object(), Ports.default_ports, Ports(1, 2, 3, 4, confd=5)
+    )
+
+    assert mapping["443/tcp"] == ("127.0.0.1", 5)
+    assert mapping["8563/tcp"] == ("127.0.0.1", 1)
+
+
+def test_port_bind_address_applies_to_all_forwarded_ports():
+    task = type("Task", (), {"port_bind_address": "192.0.2.1"})()
+    mapping = SpawnTestDockerDatabase._port_mapping(
+        task, Ports.default_ports, Ports(1, 2, 3, 4, confd=5)
+    )
+
+    assert mapping["443/tcp"] == ("192.0.2.1", 5)
+    assert mapping["8563/tcp"] == ("192.0.2.1", 1)
+    assert mapping["2580/tcp"] == ("192.0.2.1", 2)
+    assert mapping["22/tcp"] == ("192.0.2.1", 3)
+    assert mapping["2581/tcp"] == ("192.0.2.1", 4)

@@ -42,16 +42,22 @@ class PortsType(type):
 
     @property
     def default_ports(self) -> "Ports":
-        return Ports(database=8563, bucketfs=2580, ssh=22, bucketfs_https=2581)
+        return Ports(
+            database=8563, bucketfs=2580, ssh=22, bucketfs_https=2581, confd=443
+        )
 
     @property
     def external(self) -> "Ports":
         # For external databases SSH port might depend on version database.
-        return Ports(database=8563, bucketfs=2580, ssh=None, bucketfs_https=2581)
+        return Ports(
+            database=8563, bucketfs=2580, ssh=None, bucketfs_https=2581, confd=None
+        )
 
     @property
     def forward(self) -> "Ports":
-        return Ports(database=8563, bucketfs=2580, ssh=20002, bucketfs_https=2581)
+        return Ports(
+            database=8563, bucketfs=2580, ssh=20002, bucketfs_https=2581, confd=None
+        )
 
 
 class Ports(metaclass=PortsType):
@@ -61,6 +67,7 @@ class Ports(metaclass=PortsType):
         bucketfs: int | None,
         ssh: int | None = None,
         bucketfs_https: int | None = None,
+        confd: int | None = None,
     ) -> None:
         if database is None:
             self._database: int = Ports.default_ports.database
@@ -71,6 +78,7 @@ class Ports(metaclass=PortsType):
         else:
             self._bucketfs_http = bucketfs
         self._ssh = ssh
+        self._confd = confd
         if bucketfs_https is None:
             self._bucketfs_https: int = Ports.default_ports.bucketfs_https
         else:
@@ -139,6 +147,11 @@ class Ports(metaclass=PortsType):
             DeprecationWarning,
         )
         self._ssh = value
+
+    @property
+    def confd(self) -> int | None:
+        """The ConfD HTTPS JSON-RPC port, when it is reachable."""
+        return self._confd
 
     @classmethod
     def random_free(cls, ssh: bool = True) -> "Ports":

@@ -78,6 +78,8 @@ ARGUMENTS_VALUES: dict[str, ARGUMENT_VALUE_TYPE] = {
     "database-port-forward": _gen_int_values(1234),
     "bucketfs-port-forward": _gen_int_values(3456),
     "ssh-port-forward": _gen_int_values(5678),
+    "confd-port-forward": _gen_int_values(5679),
+    "port-bind-address": _gen_str_values("127.0.0.1"),
     "db-mem-size": _gen_str_values("64KB"),
     "db-disk-size": _gen_str_values("1MB"),
     "nameserver": _gen_tuple_values("1.1.1.1"),
@@ -157,6 +159,8 @@ DB_ARGS = (
     "accelerator",
     "bucketfs-http-port-forward",
     "bucketfs-https-port-forward",
+    "confd-port-forward",
+    "port-bind-address",
 )
 
 CREATE_CERTIFICATES_ARGS = ("create-certificates",)
@@ -233,6 +237,8 @@ def _build_expected_call(cli_arguments) -> _Call:
     bucket_https_forward_value = _get_optional_value(
         cli_arguments, "bucketfs-https-port-forward"
     )
+    confd_forward_value = _get_optional_value(cli_arguments, "confd-port-forward")
+    port_bind_address_value = _get_optional_value(cli_arguments, "port-bind-address")
     ssh_forward_value = _get_optional_value(cli_arguments, "ssh-port-forward")
     db_mem_size_value = _get_optional_value(cli_arguments, "db-mem-size")
     db_disk_size_value = _get_optional_value(cli_arguments, "db-disk-size")
@@ -297,6 +303,17 @@ def _build_expected_call(cli_arguments) -> _Call:
     else:
         create_certificates_value = CLICK_DEFAULT_VALUES["create_certificates"]
 
+    keyword_arguments = {
+        "log_level": log_level_value,
+        "use_job_specific_log_file": use_job_specific_log_file_value,
+        "bucketfs_http_port_forward": bucket_http_forward_value,
+        "bucketfs_https_port_forward": bucket_https_forward_value,
+    }
+    if confd_forward_value is not None:
+        keyword_arguments["confd_port_forward"] = confd_forward_value
+    if port_bind_address_value is not None:
+        keyword_arguments["port_bind_address"] = port_bind_address_value
+
     return call(
         environment_name_value,
         db_forward_value,
@@ -325,10 +342,7 @@ def _build_expected_call(cli_arguments) -> _Call:
         temporary_base_directory_value,
         workers_value,
         task_dependencies_dot_file_value,
-        log_level=log_level_value,
-        use_job_specific_log_file=use_job_specific_log_file_value,
-        bucketfs_http_port_forward=bucket_http_forward_value,
-        bucketfs_https_port_forward=bucket_https_forward_value,
+        **keyword_arguments,
     )
 
 

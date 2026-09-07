@@ -127,6 +127,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
             bucketfs=bucketfs_http_port,
             ssh=int_or_none(self.ssh_port_forward),
             bucketfs_https=bucketfs_https_port,
+            confd=int_or_none(self.confd_port_forward),
         )
 
     def run_task(self) -> None:
@@ -194,12 +195,14 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
 
     def _port_mapping(
         self, internal_ports: Ports, forwarded_ports: Ports
-    ) -> dict[str, tuple[str, str]]:
-        result = {}
+    ) -> dict[str, int | tuple[str, int]]:
+        result: dict[str, int | tuple[str, int]] = {}
+        configured_bind_address = getattr(self, "port_bind_address", None)
         for name, internal in internal_ports.__dict__.items():
             forward = forwarded_ports.__getattribute__(name)
             if forward:
-                result[f"{internal}/tcp"] = ("0.0.0.0", forward)
+                bind_address = configured_bind_address or "127.0.0.1"
+                result[f"{internal}/tcp"] = (bind_address, forward)
         return result
 
     def _create_database_container(
