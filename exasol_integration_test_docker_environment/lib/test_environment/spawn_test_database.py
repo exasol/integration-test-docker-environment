@@ -197,15 +197,16 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         self, internal_ports: Ports, forwarded_ports: Ports
     ) -> dict[str, int | tuple[str, int]]:
         result: dict[str, int | tuple[str, int]] = {}
+        configured_bind_address = getattr(self, "port_bind_address", None)
         for name, internal in internal_ports.__dict__.items():
             forward = forwarded_ports.__getattribute__(name)
             if forward:
-                if name == "_confd":
-                    # ConfD authenticates with a bearer token, so its
-                    # test-only host mapping must remain loopback-only.
-                    result[f"{internal}/tcp"] = ("127.0.0.1", forward)
-                else:
-                    result[f"{internal}/tcp"] = forward
+                # Preserve existing public bindings by default, while keeping
+                # ConfD local unless callers explicitly choose otherwise.
+                bind_address = configured_bind_address or (
+                    "127.0.0.1" if name == "_confd" else "0.0.0.0"
+                )
+                result[f"{internal}/tcp"] = (bind_address, forward)
         return result
 
     def _create_database_container(

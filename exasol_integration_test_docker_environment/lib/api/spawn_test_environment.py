@@ -98,6 +98,7 @@ def spawn_test_environment(
     bucketfs_http_port_forward: int | None = None,
     bucketfs_https_port_forward: int | None = None,
     confd_port_forward: int | None = None,
+    port_bind_address: str | None = None,
 ) -> tuple[EnvironmentInfo, Callable[[], None]]:
     """
     This function spawns a test environment with a docker-db container and a connected test-container.
@@ -163,6 +164,7 @@ def spawn_test_environment(
         bucketfs_https_port_forward=str_or_none(bucketfs_https_port_forward),
         ssh_port_forward=str_or_none(ssh_port_forward),
         confd_port_forward=str_or_none(confd_port_forward),
+        port_bind_address=port_bind_address,
         mem_size=db_mem_size,
         disk_size=db_disk_size,
         nameservers=nameserver,

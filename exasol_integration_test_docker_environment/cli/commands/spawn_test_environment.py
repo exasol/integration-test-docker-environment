@@ -108,7 +108,13 @@ from exasol_integration_test_docker_environment.lib.utils.cli_function_decorator
     type=int,
     default=None,
     show_default=True,
-    help="Host loopback port to which ConfD HTTPS JSON-RPC (443/tcp) gets forwarded.",
+    help="Host port to which ConfD HTTPS JSON-RPC (443/tcp) gets forwarded.",
+)
+@click.option(
+    "--port-bind-address",
+    type=str,
+    default=None,
+    help="Host address to bind all forwarded ports to. Defaults to all interfaces, except ConfD which defaults to loopback.",
 )
 def spawn_test_environment(
     environment_name: str,
@@ -143,6 +149,7 @@ def spawn_test_environment(
     bucketfs_http_port_forward: int | None,
     bucketfs_https_port_forward: int | None,
     confd_port_forward: int | None,
+    port_bind_address: str | None,
 ):
     """
     This command spawns a test environment with a docker-db container and a connected test-container.
@@ -156,6 +163,8 @@ def spawn_test_environment(
             }
             if confd_port_forward is not None:
                 optional_port_forwards["confd_port_forward"] = confd_port_forward
+            if port_bind_address is not None:
+                optional_port_forwards["port_bind_address"] = port_bind_address
             api.spawn_test_environment(
                 environment_name,
                 database_port_forward,

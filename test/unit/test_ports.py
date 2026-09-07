@@ -34,10 +34,20 @@ def test_external_ports():
     assert p.confd is None
 
 
-def test_confd_forwarding_is_limited_to_loopback():
+def test_default_port_bindings_keep_confd_on_loopback():
     mapping = SpawnTestDockerDatabase._port_mapping(
         object(), Ports.default_ports, Ports(1, 2, 3, 4, confd=5)
     )
 
     assert mapping["443/tcp"] == ("127.0.0.1", 5)
-    assert mapping["8563/tcp"] == 1
+    assert mapping["8563/tcp"] == ("0.0.0.0", 1)
+
+
+def test_port_bind_address_applies_to_all_forwarded_ports():
+    task = type("Task", (), {"port_bind_address": "192.0.2.1"})()
+    mapping = SpawnTestDockerDatabase._port_mapping(
+        task, Ports.default_ports, Ports(1, 2, 3, 4, confd=5)
+    )
+
+    assert mapping["443/tcp"] == ("192.0.2.1", 5)
+    assert mapping["8563/tcp"] == ("192.0.2.1", 1)

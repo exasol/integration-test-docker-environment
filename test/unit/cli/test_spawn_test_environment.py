@@ -79,6 +79,7 @@ ARGUMENTS_VALUES: dict[str, ARGUMENT_VALUE_TYPE] = {
     "bucketfs-port-forward": _gen_int_values(3456),
     "ssh-port-forward": _gen_int_values(5678),
     "confd-port-forward": _gen_int_values(5679),
+    "port-bind-address": _gen_str_values("127.0.0.1"),
     "db-mem-size": _gen_str_values("64KB"),
     "db-disk-size": _gen_str_values("1MB"),
     "nameserver": _gen_tuple_values("1.1.1.1"),
@@ -236,6 +237,7 @@ def _build_expected_call(cli_arguments) -> _Call:
         cli_arguments, "bucketfs-https-port-forward"
     )
     confd_forward_value = _get_optional_value(cli_arguments, "confd-port-forward")
+    port_bind_address_value = _get_optional_value(cli_arguments, "port-bind-address")
     ssh_forward_value = _get_optional_value(cli_arguments, "ssh-port-forward")
     db_mem_size_value = _get_optional_value(cli_arguments, "db-mem-size")
     db_disk_size_value = _get_optional_value(cli_arguments, "db-disk-size")
@@ -308,6 +310,8 @@ def _build_expected_call(cli_arguments) -> _Call:
     }
     if confd_forward_value is not None:
         keyword_arguments["confd_port_forward"] = confd_forward_value
+    if port_bind_address_value is not None:
+        keyword_arguments["port_bind_address"] = port_bind_address_value
 
     return call(
         environment_name_value,

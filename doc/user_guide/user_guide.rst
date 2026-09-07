@@ -403,23 +403,24 @@ uses container port ``443/tcp``. This is the HTTPS JSON-RPC endpoint; the
 ``XMLRPCPort`` name in EXAConf does not identify its protocol.
 
 Use ``--confd-port-forward <port>`` (or the ``confd_port_forward`` argument of
-``spawn_test_environment``) to publish it. ITDE always binds this mapping to
-``127.0.0.1``; it never uses an all-interface default. The endpoint uses the
+``spawn_test_environment``) to publish it. By default, ITDE binds this mapping
+to ``127.0.0.1``. The endpoint uses the
 Docker-DB TLS certificate. Test clients should validate it where their test
 trust configuration permits; a test that deliberately accepts the disposable
 self-signed certificate must remain loopback-only.
+
+To choose a bind address for every forwarded port, use
+``--port-bind-address <address>`` (or ``port_bind_address`` in the API). By
+default, existing database, BucketFS, and SSH forwards bind to all interfaces;
+ConfD remains loopback-only. Setting a bind address applies to ConfD as well.
 
 .. code:: console
 
    itde spawn-test-environment --environment-name my_env --confd-port-forward 8443
 
-ConfD authenticates requests with an ``Authorization: Bearer <token>`` header.
-Downstream test infrastructure can call
-``extract_confd_bearer_token(environment_info)`` from
-``exasol_integration_test_docker_environment.lib.api``. The function reads the
-token from the disposable container only, does not add it to ``EnvironmentInfo``
-or ITDE output, and omits command output from failures. Treat its return value
-as a secret: do not log, serialize, or include it in assertion messages.
+ConfD authentication follows the database's standard ConfD configuration. See
+the `ConfD authentication documentation <https://docs.exasol.com/db/latest/confd/confd.htm#Authentication>`_
+for the supported authentication method.
 
 
 Docker Runtimes
