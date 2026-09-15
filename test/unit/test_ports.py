@@ -36,7 +36,9 @@ def test_external_ports():
 
 def test_default_port_bindings_are_limited_to_loopback():
     mapping = SpawnTestDockerDatabase._port_mapping(
-        object(), Ports.default_ports, Ports(1, 2, 3, 4, confd=5)
+        type("Task", (), {"port_bind_address": None})(),
+        Ports.default_ports,
+        Ports(1, 2, 3, 4, confd=5),
     )
 
     assert mapping["443/tcp"] == ("127.0.0.1", 5)
