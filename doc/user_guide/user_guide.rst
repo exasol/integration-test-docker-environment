@@ -394,6 +394,41 @@ running the Exasol database. If you do not specify a port then ITDE will
 select a random free port.
 
 
+ConfD HTTPS Access
+"""""""""""""""""""
+
+Disposable Docker-DB environments expose the Docker-DB ConfD HTTPS port only
+when explicitly requested. ITDE forwards container port ``443/tcp`` to
+``https://127.0.0.1:<forwarded-port>``. It provides transport reachability,
+while your client selects the ConfD protocol and endpoint path it requires.
+
+Use ``--confd-port-forward <port>`` (or the ``confd_port_forward`` argument of
+``spawn_test_environment``) to publish it. By default, ITDE binds this mapping
+to ``127.0.0.1``. The endpoint uses the
+Docker-DB TLS certificate. Test clients should validate it where their test
+trust configuration permits; a test that deliberately accepts the disposable
+self-signed certificate must remain loopback-only.
+
+To choose a bind address for every forwarded port, use
+``--port-bind-address <address>`` (or ``port_bind_address`` in the API). By
+default, all forwarded ports bind to loopback. Setting a bind address applies
+to every forwarded port, including ConfD.
+
+.. code:: console
+
+   itde spawn-test-environment --environment-name my_env --confd-port-forward 8443
+
+Use a ConfD system user and password with clients that use ConfD Basic
+authentication. ITDE does not create or manage ConfD users, extract a bearer
+token, or parse ``/exa/etc/EXAConf`` for credentials. This lets downstream
+fixtures connect through the explicit, local host boundary without coupling to
+the Docker-DB configuration-file format.
+
+See the
+`ConfD authentication documentation <https://docs.exasol.com/db/latest/confd/confd.htm#Authentication>`_
+for ConfD user and credential management.
+
+
 Docker Runtimes
 ~~~~~~~~~~~~~~~
 
