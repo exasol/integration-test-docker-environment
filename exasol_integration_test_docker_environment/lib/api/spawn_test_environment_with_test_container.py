@@ -162,7 +162,7 @@ def spawn_test_environment_with_test_container(
         bucketfs_https_port_forward=str_or_none(bucketfs_https_port_forward),
         ssh_port_forward=str_or_none(ssh_port_forward),
         confd_port_forward=str_or_none(confd_port_forward),
-        **{"port_bind_address": port_bind_address},
+        port_bind_address=port_bind_address,
         mem_size=db_mem_size,
         disk_size=db_disk_size,
         nameservers=nameserver,

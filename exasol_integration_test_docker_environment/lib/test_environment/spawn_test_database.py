@@ -197,7 +197,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         self, internal_ports: Ports, forwarded_ports: Ports
     ) -> dict[str, int | tuple[str, int]]:
         result: dict[str, int | tuple[str, int]] = {}
-        configured_bind_address = getattr(self, "port_bind_address", None)
+        configured_bind_address = self.port_bind_address
         for name, internal in internal_ports.__dict__.items():
             forward = forwarded_ports.__getattribute__(name)
             if forward:

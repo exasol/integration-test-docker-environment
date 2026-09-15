@@ -394,13 +394,13 @@ running the Exasol database. If you do not specify a port then ITDE will
 select a random free port.
 
 
-ConfD JSON-RPC Access
-""""""""""""""""""""""
+ConfD HTTPS Access
+"""""""""""""""""""
 
-Disposable Docker-DB environments expose ConfD JSON-RPC only when explicitly
-requested. ConfD listens at ``https://127.0.0.1:<forwarded-port>/rest`` and
-uses container port ``443/tcp``. This is the HTTPS JSON-RPC endpoint; the
-``XMLRPCPort`` name in EXAConf does not identify its protocol.
+Disposable Docker-DB environments expose the Docker-DB ConfD HTTPS port only
+when explicitly requested. ITDE forwards container port ``443/tcp`` to
+``https://127.0.0.1:<forwarded-port>``. It provides transport reachability,
+while your client selects the ConfD protocol and endpoint path it requires.
 
 Use ``--confd-port-forward <port>`` (or the ``confd_port_forward`` argument of
 ``spawn_test_environment``) to publish it. By default, ITDE binds this mapping
@@ -418,9 +418,15 @@ to every forwarded port, including ConfD.
 
    itde spawn-test-environment --environment-name my_env --confd-port-forward 8443
 
-ConfD uses Basic authentication with a user name and password. See the
+Use a ConfD system user and password with clients that use ConfD Basic
+authentication. ITDE does not create or manage ConfD users, extract a bearer
+token, or parse ``/exa/etc/EXAConf`` for credentials. This lets downstream
+fixtures connect through the explicit, local host boundary without coupling to
+the Docker-DB configuration-file format.
+
+See the
 `ConfD authentication documentation <https://docs.exasol.com/db/latest/confd/confd.htm#Authentication>`_
-for credential management.
+for ConfD user and credential management.
 
 
 Docker Runtimes
