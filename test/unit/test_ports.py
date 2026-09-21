@@ -1,7 +1,7 @@
-from exasol_integration_test_docker_environment.lib.test_environment.ports import Ports
 from exasol_integration_test_docker_environment.lib.test_environment.parameter.docker_db_test_environment_parameter import (
     DbOsAccess,
 )
+from exasol_integration_test_docker_environment.lib.test_environment.ports import Ports
 from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_database import (
     SpawnTestDockerDatabase,
 )
@@ -73,9 +73,7 @@ def _spawn_database_task(db_os_access, ssh_port_forward=None):
         accelerator=(),
         docker_db_image_version="8.29.13",
         db_os_access=db_os_access,
-        ssh_port_forward=(
-            None if ssh_port_forward is None else str(ssh_port_forward)
-        ),
+        ssh_port_forward=(None if ssh_port_forward is None else str(ssh_port_forward)),
     )
 
 
