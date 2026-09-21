@@ -131,8 +131,9 @@ def test_db_os_executor_factory(sshd_container, db_os_access, fabric_stdin):
     public_key = SshKey.from_cache().public_key_as_string()
     with sshd_container(ssh_port_forward, public_key) as container:
         dbinfo = database_info(container.name, ssh_port_forward)
-        factory = get_executor_factory(dbinfo, DbOsAccess.SSH)
+        factory = get_executor_factory(dbinfo, db_os_access)
         with factory.executor() as executor:
+            executor.prepare()
             exit_code, output = executor.exec("ls /keygen.sh")
     output = output.decode("utf-8").strip()
     assert (exit_code, output) == (0, "/keygen.sh")

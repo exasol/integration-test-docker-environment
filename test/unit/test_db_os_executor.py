@@ -127,10 +127,9 @@ def test_ssh_prepare_retries_until_sshd_is_ready(monkeypatch):
 def test_ssh_prepare_requires_an_open_connection():
     executor = SshExecutor("root@127.0.0.1:30123", "fixture-key")
 
-    with pytest.raises(
-        RuntimeError, match=r"^SSH executor must be entered before preparation$"
-    ):
+    with pytest.raises(RuntimeError) as error:
         executor.prepare()
+    assert str(error.value) == "SSH executor must be entered before preparation"
 
 
 def test_ssh_prepare_raises_after_retry_limit(monkeypatch):
