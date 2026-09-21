@@ -145,9 +145,10 @@ The following options are available to customize the test environment.
       --docker-db-image-name TEXT     Docker DB Image Name against which the tests
                                       should run.  [default: exasol/docker-db]
       --db-os-access METHOD           How ITDE accesses the database operating
-                                      system. SSH uses an owner-only generated key
-                                      and a host-forwarded SSH port.  [default:
-                                      DOCKER_EXEC]
+                                      system. Supported values: DOCKER_EXEC
+                                      (Docker exec) and SSH (an owner-only
+                                      generated key and a host-forwarded SSH
+                                      port).  [default: DOCKER_EXEC]
       --create-certificates / --no-create-certificates
                                       Creates and injects SSL certificates to the
                                       Docker DB container.
@@ -376,8 +377,9 @@ database the format of the Docker Containers might change so that
 ``docker_exec`` is no longer possible. Instead ITDE will then need to use SSH
 access.
 
-You can select the access method with command line option
-``--db-os-access``. The default value is ``DOCKER_EXEC``.
+You can select the access method with ``--db-os-access``. Supported values are
+``DOCKER_EXEC`` (the default, which uses Docker exec) and ``SSH`` (which uses
+the forwarded SSH endpoint).
 
 ITDE will create a random SSH key pair and store it to the file
 ``~/.cache/exasol/itde/id_rsa`` with access permissions limited to the current
