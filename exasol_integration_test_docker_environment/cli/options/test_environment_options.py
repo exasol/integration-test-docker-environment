@@ -47,10 +47,8 @@ docker_db_options = [
         metavar="METHOD",
         default="""DOCKER_EXEC""",
         show_default=True,
-        help="""How to access file system and command line of the
-     		 database operating system. Experimental option, will show no
-     		 effect until implementation of feature SSH access is
-     		 completed.""",
+        help="""How ITDE accesses the database operating system. SSH uses
+             an owner-only generated key and a host-forwarded SSH port.""",
     ),
     click.option(
         "--create-certificates/--no-create-certificates",

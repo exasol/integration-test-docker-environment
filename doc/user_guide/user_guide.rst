@@ -121,8 +121,8 @@ The following options are available to customize the test environment.
                                       Host port to which the BucketFS HTTP port
                                       gets forwarded. Deprecated: Use '--
                                       bucketfs-http-port-forward' instead.
-      --ssh-port-forward INTEGER      Host port to which the SSH port gets
-                                      forwarded. If not specified then ITDE
+      --ssh-port-forward INTEGER      Host port to which SSH gets forwarded when
+                                      --db-os-access=SSH. If not specified, ITDE
                                       selects a random free port.
       --db-mem-size TEXT              The main memory used by the database. Format
                                       <number> <unit>, e.g. 1 GiB. The minimum
@@ -144,11 +144,10 @@ The following options are available to customize the test environment.
                                       tests should run.  [default: 2026.1.0]
       --docker-db-image-name TEXT     Docker DB Image Name against which the tests
                                       should run.  [default: exasol/docker-db]
-      --db-os-access METHOD           How to access file system and command line
-                                      of the database operating system.
-                                      Experimental option, will show no effect
-                                      until implementation of feature SSH access
-                                      is completed.  [default: DOCKER_EXEC]
+      --db-os-access METHOD           How ITDE accesses the database operating
+                                      system. SSH uses an owner-only generated key
+                                      and a host-forwarded SSH port.  [default:
+                                      DOCKER_EXEC]
       --create-certificates / --no-create-certificates
                                       Creates and injects SSL certificates to the
                                       Docker DB container.
@@ -391,7 +390,17 @@ Docker Container to enable SSH access with public key authentication.
 You can use command line option ``--ssh-port-forward`` to specify a port on
 your host machine to which ITDE forwards the SSH port of the Docker Container
 running the Exasol database. If you do not specify a port then ITDE will
-select a random free port.
+select a random free port. SSH is published only when ``--db-os-access SSH``
+is selected; Docker-exec environments do not reserve an SSH port.
+
+For example, create an SSH-ready fixture with a known local port:
+
+.. code:: console
+
+   itde spawn-test-environment --environment-name my_ssh_env \
+       --db-os-access SSH --ssh-port-forward 2222
+
+   ssh -i ~/.cache/exasol/itde/id_rsa -p 2222 root@127.0.0.1
 
 
 ConfD HTTPS Access
