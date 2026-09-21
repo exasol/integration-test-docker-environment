@@ -159,6 +159,15 @@ class SshExecFactory(DbOsExecFactory):
     @classmethod
     def from_database_info(cls, info: DatabaseInfo):
         assert info.ssh_info
+        # Docker container addresses are private to the Docker network. They
+        # are not reliably routable from the process running ITDE (notably on
+        # GitHub-hosted runners). Docker-DB SSH access is exposed through a
+        # host port, so prefer that endpoint when available.
+        if info.forwarded_ports is not None and info.forwarded_ports.ssh is not None:
+            return SshExecFactory(
+                f"{info.ssh_info.user}@127.0.0.1:{info.forwarded_ports.ssh}",
+                info.ssh_info.key_file,
+            )
         return SshExecFactory(
             f"{info.ssh_info.user}@{info.host}:{info.ports.ssh}",
             info.ssh_info.key_file,

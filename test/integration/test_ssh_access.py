@@ -9,6 +9,9 @@ import fabric
 import pytest
 from docker.models.containers import Container as DockerContainer
 
+from exasol_integration_test_docker_environment.lib.base.db_os_executor import (
+    SshExecFactory,
+)
 from exasol_integration_test_docker_environment.lib.base.ssh_access import (
     SshKey,
     SshKeyCache,
@@ -55,6 +58,28 @@ def test_ssh_access(api_context, fabric_stdin):
             connect_kwargs={"pkey": key.private},
         ).run("ls /exa/etc/EXAConf")
         assert result.stdout == "/exa/etc/EXAConf\n"
+
+
+def test_ssh_fixture_uses_reachable_forwarded_port(api_context, fabric_stdin):
+    with api_context(additional_parameters={"db_os_access": "SSH"}) as db:
+        database_info = db.environment_info.database_info
+        assert database_info.forwarded_ports is not None
+        assert database_info.forwarded_ports.ssh == db.ports.ssh
+
+        with SshExecFactory.from_database_info(database_info).executor() as executor:
+            exit_code, output = executor.exec("test -f /exa/etc/EXAConf")
+
+    assert exit_code == 0
+    assert output == b""
+
+
+def test_docker_exec_fixture_does_not_publish_ssh_port(api_context):
+    with api_context() as db:
+        container_name = db.environment_info.database_info.container_info.container_name
+        with container_named(container_name) as container:
+            assert container is not None
+            container.reload()
+            assert container.attrs["NetworkSettings"]["Ports"].get("22/tcp") is None
 
 
 @pytest.fixture
@@ -106,7 +131,7 @@ def test_db_os_executor_factory(sshd_container, db_os_access, fabric_stdin):
     public_key = SshKey.from_cache().public_key_as_string()
     with sshd_container(ssh_port_forward, public_key) as container:
         dbinfo = database_info(container.name, ssh_port_forward)
-        factory = get_executor_factory(dbinfo, ssh_port_forward)
+        factory = get_executor_factory(dbinfo, DbOsAccess.SSH)
         with factory.executor() as executor:
             exit_code, output = executor.exec("ls /keygen.sh")
     output = output.decode("utf-8").strip()

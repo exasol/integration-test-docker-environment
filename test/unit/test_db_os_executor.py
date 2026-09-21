@@ -73,3 +73,18 @@ def test_ssh_exec_factory_from_database_info():
     executor = factory.executor()
     assert executor._connect_string == "my_user@my_host:3"
     assert executor._key_file == "my_key_file"
+
+
+def test_ssh_exec_factory_prefers_forwarded_docker_port():
+    dbinfo = DatabaseInfo(
+        "172.18.0.2",
+        Ports(8563, 2580, 22),
+        reused=False,
+        ssh_info=SshInfo("root", "fixture-key"),
+        forwarded_ports=Ports(8563, 2580, 30123),
+    )
+
+    executor = SshExecFactory.from_database_info(dbinfo).executor()
+
+    assert executor._connect_string == "root@127.0.0.1:30123"
+    assert executor._key_file == "fixture-key"
