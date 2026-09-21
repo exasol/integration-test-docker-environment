@@ -5,8 +5,10 @@ from unittest.mock import (
     create_autospec,
 )
 
+import pytest
 from docker import DockerClient
 from docker.models.containers import Container as DockerContainer
+from paramiko.ssh_exception import SSHException
 
 from exasol_integration_test_docker_environment.lib.base.db_os_executor import (
     DbOsExecutor,
@@ -102,3 +104,40 @@ def test_ssh_exec_factory_uses_database_endpoint_without_forwarded_ssh_port():
     executor = SshExecFactory.from_database_info(dbinfo).executor()
 
     assert executor._connect_string == "root@172.18.0.2:22"
+
+
+def test_ssh_prepare_retries_until_sshd_is_ready(monkeypatch):
+    executor = SshExecutor("root@127.0.0.1:30123", "fixture-key")
+    connection = MagicMock()
+    connection.run.side_effect = [SSHException("SSH banner not ready"), None]
+    executor._connection = connection
+    sleep = MagicMock()
+    monkeypatch.setattr(
+        "exasol_integration_test_docker_environment.lib.base.db_os_executor.time.sleep",
+        sleep,
+    )
+
+    executor.prepare()
+
+    assert connection.run.call_count == 2
+    connection.close.assert_called_once()
+    sleep.assert_called_once_with(1)
+
+
+def test_ssh_prepare_raises_after_retry_limit(monkeypatch):
+    executor = SshExecutor("root@127.0.0.1:30123", "fixture-key")
+    connection = MagicMock()
+    connection.run.side_effect = SSHException("SSH banner not ready")
+    executor._connection = connection
+    sleep = MagicMock()
+    monkeypatch.setattr(
+        "exasol_integration_test_docker_environment.lib.base.db_os_executor.time.sleep",
+        sleep,
+    )
+
+    with pytest.raises(SSHException, match="SSH banner not ready"):
+        executor.prepare()
+
+    assert connection.run.call_count == 20
+    assert connection.close.call_count == 20
+    assert sleep.call_count == 19
