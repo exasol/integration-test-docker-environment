@@ -124,6 +124,15 @@ def test_ssh_prepare_retries_until_sshd_is_ready(monkeypatch):
     sleep.assert_called_once_with(1)
 
 
+def test_ssh_prepare_requires_an_open_connection():
+    executor = SshExecutor("root@127.0.0.1:30123", "fixture-key")
+
+    with pytest.raises(
+        RuntimeError, match=r"^SSH executor must be entered before preparation$"
+    ):
+        executor.prepare()
+
+
 def test_ssh_prepare_raises_after_retry_limit(monkeypatch):
     executor = SshExecutor("root@127.0.0.1:30123", "fixture-key")
     connection = MagicMock()

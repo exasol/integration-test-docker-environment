@@ -107,7 +107,8 @@ class SshExecutor(DbOsExecutor):
         return ExecResult(result.exited, output)
 
     def prepare(self):
-        assert self._connection is not None
+        if self._connection is None:
+            raise RuntimeError("SSH executor must be entered before preparation")
         for retry in range(20):
             try:
                 self._connection.run("true", warn=True, hide=True)
