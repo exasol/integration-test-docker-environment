@@ -55,6 +55,7 @@ class DockerDBTestEnvironmentParameter(Config):
     confd_port_forward: str | None = luigi.OptionalParameter(
         default=None, significant=False
     )
+    create_confd_user: bool = luigi.BoolParameter(default=False, significant=False)
     port_bind_address: str | None = luigi.OptionalParameter(
         default=None, significant=False
     )

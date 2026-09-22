@@ -39,6 +39,9 @@ from exasol_integration_test_docker_environment.lib.models.data.environment_info
 from exasol_integration_test_docker_environment.lib.test_environment.create_certificates.create_ssl_certificates_task import (
     CreateSSLCertificatesTask,
 )
+from exasol_integration_test_docker_environment.lib.test_environment.create_confd_credentials import (
+    CreateConfdCredentials,
+)
 from exasol_integration_test_docker_environment.lib.test_environment.database_waiters.wait_for_external_database import (
     WaitForTestExternalDatabase,
 )
@@ -118,6 +121,14 @@ class AbstractSpawnTestEnvironment(
                 f"Maximum attempts {attempt} to start the database reached."
             )
         assert database_info is not None
+        confd_credentials_task = self.create_confd_credentials_task(database_info)
+        if confd_credentials_task is not None:
+            confd_credentials_future = yield from self.run_dependencies(
+                confd_credentials_task
+            )
+            database_info.confd_info = self.get_values_from_future(
+                confd_credentials_future
+            )
         test_environment_info = EnvironmentInfo(
             name=self.environment_name,
             env_type=self.get_environment_type(),
@@ -129,6 +140,11 @@ class AbstractSpawnTestEnvironment(
             test_environment_info
         )
         return test_environment_info
+
+    def create_confd_credentials_task(
+        self, database_info: DatabaseInfo
+    ) -> CreateConfdCredentials | None:
+        return None
 
     def create_test_environment_info_in_test_container(
         self,

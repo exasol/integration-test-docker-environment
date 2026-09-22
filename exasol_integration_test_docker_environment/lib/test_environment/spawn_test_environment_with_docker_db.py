@@ -22,6 +22,9 @@ from exasol_integration_test_docker_environment.lib.test_environment.abstract_sp
 from exasol_integration_test_docker_environment.lib.test_environment.create_certificates.create_ssl_certificates_task import (
     CreateSSLCertificatesTask,
 )
+from exasol_integration_test_docker_environment.lib.test_environment.create_confd_credentials import (
+    CreateConfdCredentials,
+)
 from exasol_integration_test_docker_environment.lib.test_environment.database_waiters.wait_for_test_docker_database import (
     WaitForTestDockerDatabase,
 )
@@ -120,4 +123,16 @@ class SpawnTestEnvironmentWithDockerDB(
             attempt=attempt,
             docker_db_image_version=self.docker_db_image_version,
             executor_factory=self._executor_factory(database_info),
+        )
+
+    def create_confd_credentials_task(
+        self, database_info: DatabaseInfo
+    ) -> CreateConfdCredentials | None:
+        if not self.create_confd_user:
+            return None
+        return self.create_child_task_with_common_params(
+            CreateConfdCredentials,
+            environment_name=self.environment_name,
+            database_info=database_info,
+            port_bind_address=self.port_bind_address,
         )

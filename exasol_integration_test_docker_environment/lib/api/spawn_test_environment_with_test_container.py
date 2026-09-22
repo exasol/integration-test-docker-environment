@@ -1,6 +1,7 @@
 import functools
 import warnings
 from collections.abc import Callable
+from pathlib import Path
 from typing import (
     Any,
 )
@@ -56,15 +57,20 @@ from exasol_integration_test_docker_environment.lib.utils.api_function_decorator
 
 
 def _cleanup(environment_info: EnvironmentInfo) -> None:
-    if test_container_info := environment_info.test_container_info:
-        remove_docker_container([test_container_info.container_name])
+    confd_info = environment_info.database_info.confd_info
+    try:
+        if test_container_info := environment_info.test_container_info:
+            remove_docker_container([test_container_info.container_name])
 
-    if db_container_info := environment_info.database_info.container_info:
-        remove_docker_container([db_container_info.container_name])
-        if name := db_container_info.volume_name:
-            remove_docker_volumes([name])
+        if db_container_info := environment_info.database_info.container_info:
+            remove_docker_container([db_container_info.container_name])
+            if name := db_container_info.volume_name:
+                remove_docker_volumes([name])
 
-    remove_docker_networks([environment_info.network_info.network_name])
+        remove_docker_networks([environment_info.network_info.network_name])
+    finally:
+        if confd_info is not None:
+            Path(confd_info.credentials_file).unlink(missing_ok=True)
 
 
 @no_cli_function
@@ -103,6 +109,7 @@ def spawn_test_environment_with_test_container(
     bucketfs_https_port_forward: int | None = None,
     confd_port_forward: int | None = None,
     port_bind_address: str | None = None,
+    create_confd_user: bool = False,
 ) -> tuple[EnvironmentInfo, Callable[[], None]]:
     """
     This function spawns a test environment with a docker-db container and a connected test-container.
@@ -163,6 +170,7 @@ def spawn_test_environment_with_test_container(
         ssh_port_forward=str_or_none(ssh_port_forward),
         confd_port_forward=str_or_none(confd_port_forward),
         port_bind_address=port_bind_address,
+        create_confd_user=create_confd_user,
         mem_size=db_mem_size,
         disk_size=db_disk_size,
         nameservers=nameserver,
