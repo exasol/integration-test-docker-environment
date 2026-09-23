@@ -427,13 +427,29 @@ to every forwarded port, including ConfD.
 
 .. code:: console
 
-   itde spawn-test-environment --environment-name my_env --confd-port-forward 8443
+   itde spawn-test-environment --environment-name my_env \
+       --confd-port-forward 8443 --create-confd-user
 
-Use a ConfD system user and password with clients that use ConfD Basic
-authentication. ITDE does not create or manage ConfD users, extract a bearer
-token, or parse ``/exa/etc/EXAConf`` for credentials. This lets downstream
-fixtures connect through the explicit, local host boundary without coupling to
-the Docker-DB configuration-file format.
+Use ``--create-confd-user`` to create ITDE's disposable ConfD Basic-auth user.
+ITDE creates it only after database readiness, performs one bounded privileged
+``confd_client`` operation, and records no password in command output, logs,
+or ``environment_info.json``. Instead, ``database_info.confd_info`` exposes
+the username, direct endpoint (when forwarded), SSH-tunnel target, and an
+owner-only ``confd_credentials.json`` path. Consumers obtain the password with
+``database_info.confd_info.read_credentials()``.
+
+This is an explicit test-only lifecycle: it is unsupported with
+``reuse_database`` because a newly generated password cannot safely describe a
+pre-existing user. On provisioning failure ITDE makes one best-effort user
+deletion; normal environment cleanup removes the disposable container and its
+user. The account belongs to ``exaadm`` because ConfD requires that group for
+supported administrative operations. Consumers should use only their intended
+read-only operation.
+
+ITDE does not extract bearer tokens or parse ``/exa/etc/EXAConf``. The API
+does not implement a ConfD client, SSH tunnel, or protocol fallback: consumers
+must use the documented REST endpoint directly or supply their own verified
+tunnel connection.
 
 See the
 `ConfD authentication documentation <https://docs.exasol.com/db/latest/confd/confd.htm#Authentication>`_

@@ -1,4 +1,7 @@
 from exasol_integration_test_docker_environment.lib.base.info import Info
+from exasol_integration_test_docker_environment.lib.models.data.confd_info import (
+    ConfdInfo,
+)
 from exasol_integration_test_docker_environment.lib.models.data.container_info import (
     ContainerInfo,
 )
@@ -15,6 +18,7 @@ class DatabaseInfo(Info):
         container_info: ContainerInfo | None = None,
         ssh_info: SshInfo | None = None,
         forwarded_ports: Ports | None = None,
+        confd_info: ConfdInfo | None = None,
     ) -> None:
         self.container_info = container_info
         self.ports = ports
@@ -22,3 +26,4 @@ class DatabaseInfo(Info):
         self.reused = reused
         self.ssh_info = ssh_info
         self.forwarded_ports = forwarded_ports
+        self.confd_info = confd_info

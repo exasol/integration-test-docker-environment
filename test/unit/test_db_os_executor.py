@@ -31,9 +31,48 @@ def test_executor_closes_client():
     client.containers.get = MagicMock(return_value=container)
     with DockerExecutor(client, "container_name") as executor:
         executor.exec("sample command")
-        container.exec_run.assert_called_with("sample command")
+        container.exec_run.assert_called_with("sample command", environment=None)
         client.close.assert_not_called()
     client.close.assert_called()
+
+
+def test_docker_executor_forwards_command_environment():
+    container = create_autospec(DockerContainer)
+    client: MagicMock | DockerClient = create_autospec(DockerClient)
+    client.containers.get = MagicMock(return_value=container)
+
+    with DockerExecutor(client, "container_name") as executor:
+        executor.exec("sample command", {"SAMPLE_ENV": "sample value"})
+
+    container.exec_run.assert_called_once_with(
+        "sample command", environment={"SAMPLE_ENV": "sample value"}
+    )
+
+
+def test_ssh_executor_prefixes_command_with_environment():
+    executor = SshExecutor("connect_string", "ssh_key_file")
+    executor._connection = MagicMock()
+    executor._connection.run.return_value = MagicMock(exited=0, stdout="sample output")
+
+    result = executor.exec("sample command", {"SAMPLE_ENV": "sample value"})
+
+    executor._connection.run.assert_called_once_with(
+        "env SAMPLE_ENV='sample value' sample command", warn=True, hide=True
+    )
+    assert result.exit_code == 0
+    assert result.output == b"sample output"
+
+
+def test_ssh_executor_runs_command_without_environment():
+    executor = SshExecutor("connect_string", "ssh_key_file")
+    executor._connection = MagicMock()
+    executor._connection.run.return_value = MagicMock(exited=0, stdout="")
+
+    executor.exec("sample command")
+
+    executor._connection.run.assert_called_once_with(
+        "sample command", warn=True, hide=True
+    )
 
 
 def test_ssh_exec_factory():

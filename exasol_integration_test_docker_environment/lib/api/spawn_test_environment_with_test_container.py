@@ -16,18 +16,12 @@ from exasol_integration_test_docker_environment.cli.options.system_options impor
 from exasol_integration_test_docker_environment.cli.options.test_environment_options import (
     LATEST_DB_VERSION,
 )
+from exasol_integration_test_docker_environment.lib.api.cleanup import (
+    cleanup_test_environment as _cleanup,
+)
 from exasol_integration_test_docker_environment.lib.base.run_task import (
     generate_root_task,
     run_task,
-)
-from exasol_integration_test_docker_environment.lib.docker.container.utils import (
-    remove_docker_container,
-)
-from exasol_integration_test_docker_environment.lib.docker.networks.utils import (
-    remove_docker_networks,
-)
-from exasol_integration_test_docker_environment.lib.docker.volumes.utils import (
-    remove_docker_volumes,
 )
 from exasol_integration_test_docker_environment.lib.models.api_errors import (
     ArgumentConstraintError,
@@ -53,18 +47,6 @@ from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_
 from exasol_integration_test_docker_environment.lib.utils.api_function_decorators import (
     no_cli_function,
 )
-
-
-def _cleanup(environment_info: EnvironmentInfo) -> None:
-    if test_container_info := environment_info.test_container_info:
-        remove_docker_container([test_container_info.container_name])
-
-    if db_container_info := environment_info.database_info.container_info:
-        remove_docker_container([db_container_info.container_name])
-        if name := db_container_info.volume_name:
-            remove_docker_volumes([name])
-
-    remove_docker_networks([environment_info.network_info.network_name])
 
 
 @no_cli_function
@@ -103,6 +85,7 @@ def spawn_test_environment_with_test_container(
     bucketfs_https_port_forward: int | None = None,
     confd_port_forward: int | None = None,
     port_bind_address: str | None = None,
+    create_confd_user: bool = False,
 ) -> tuple[EnvironmentInfo, Callable[[], None]]:
     """
     This function spawns a test environment with a docker-db container and a connected test-container.
@@ -163,6 +146,7 @@ def spawn_test_environment_with_test_container(
         ssh_port_forward=str_or_none(ssh_port_forward),
         confd_port_forward=str_or_none(confd_port_forward),
         port_bind_address=port_bind_address,
+        create_confd_user=create_confd_user,
         mem_size=db_mem_size,
         disk_size=db_disk_size,
         nameservers=nameserver,

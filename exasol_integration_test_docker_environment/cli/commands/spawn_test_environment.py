@@ -121,6 +121,12 @@ from exasol_integration_test_docker_environment.lib.utils.cli_function_decorator
     default=None,
     help="Host address to bind all forwarded ports to. Defaults to loopback.",
 )
+@click.option(
+    "--create-confd-user",
+    is_flag=True,
+    default=False,
+    help="Create a disposable ConfD Basic-auth user and owner-only credentials file.",
+)
 def spawn_test_environment(
     environment_name: str,
     database_port_forward: int | None,
@@ -155,6 +161,7 @@ def spawn_test_environment(
     bucketfs_https_port_forward: int | None,
     confd_port_forward: int | None,
     port_bind_address: str | None,
+    create_confd_user: bool,
 ):
     """
     This command spawns a test environment with a docker-db container and a connected test-container.
@@ -170,6 +177,8 @@ def spawn_test_environment(
                 optional_port_forwards["confd_port_forward"] = confd_port_forward
             if port_bind_address is not None:
                 optional_port_forwards["port_bind_address"] = port_bind_address
+            if create_confd_user:
+                optional_port_forwards["create_confd_user"] = True
             api.spawn_test_environment(
                 environment_name,
                 database_port_forward,

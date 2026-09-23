@@ -1,5 +1,7 @@
 import time
 from abc import abstractmethod
+from collections.abc import Mapping
+from shlex import quote
 from typing import (
     Protocol,
     runtime_checkable,
@@ -45,7 +47,13 @@ class DbOsExecutor(Protocol):
     ``SshExecutor``.
     """
 
-    def exec(self, cmd: str) -> ExecResult: ...
+    def exec(
+        self, cmd: str, environment: Mapping[str, str] | None = None
+    ) -> ExecResult: ...
+
+    def __enter__(self) -> "DbOsExecutor": ...
+
+    def __exit__(self, type_: object, value: object, traceback: object) -> None: ...
 
     def prepare(self): ...
 
@@ -66,9 +74,11 @@ class DockerExecutor(DbOsExecutor):
     def __del__(self):
         self.close()
 
-    def exec(self, cmd: str) -> ExecResult:
+    def exec(
+        self, cmd: str, environment: Mapping[str, str] | None = None
+    ) -> ExecResult:
         assert self._container
-        return self._container.exec_run(cmd)
+        return self._container.exec_run(cmd, environment=environment)
 
     def prepare(self):
         pass
@@ -100,8 +110,15 @@ class SshExecutor(DbOsExecutor):
     def __del__(self):
         self.close()
 
-    def exec(self, cmd: str) -> ExecResult:
+    def exec(
+        self, cmd: str, environment: Mapping[str, str] | None = None
+    ) -> ExecResult:
         assert self._connection
+        if environment:
+            assignments = " ".join(
+                f"{name}={quote(value)}" for name, value in environment.items()
+            )
+            cmd = f"env {assignments} {cmd}"
         result = self._connection.run(cmd, warn=True, hide=True)
         output = result.stdout.encode("utf-8")
         return ExecResult(result.exited, output)
