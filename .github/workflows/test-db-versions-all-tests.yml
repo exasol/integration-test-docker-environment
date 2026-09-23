@@ -15,7 +15,7 @@ jobs:
     name: Read all supported Exasol DB versions and test targets
     permissions:
       contents: read
-    uses: ./.github/workflows/matrix.yml
+    uses: $/.github/workflows/matrix.yml
     with:
       matrix_keys_json: '["db_versions", "integration_test_targets"]'
 
