@@ -92,7 +92,8 @@ class CreateConfdCredentials(DependencyLoggerBaseTask):
     def _delete_user(self) -> None:
         try:
             self._run_confd(
-                f'confd_client -c user_delete -A \'{{"username":"{CONFD_USERNAME}"}}\''
+                f'confd_client -c user_delete -A \'{{"username":"{CONFD_USERNAME}"}}\'',
+                {},
             )
         except Exception:
             self.logger.warning("Unable to remove the disposable ConfD user")
@@ -133,28 +134,26 @@ class CreateConfdCredentials(DependencyLoggerBaseTask):
     ) -> None:
         for attempt in range(CONFD_READINESS_ATTEMPTS):
             try:
-                self._run_confd(command, environment)
+                self._run_confd(command, environment or {})
                 return
             except RuntimeError:
                 if attempt == CONFD_READINESS_ATTEMPTS - 1:
                     raise RuntimeError(failure_message)
                 time.sleep(1)
 
-    def _run_confd(
-        self, command: str, environment: dict[str, str] | None = None
-    ) -> None:
+    def _run_confd(self, command: str, environment: dict[str, str]) -> None:
         command = (
             'export COS_DIRECTORY="$(dirname "$(dirname "$(command -v confd_client)")")"; '
             f"{command}"
         )
         command = f"/bin/sh -c {quote(command)}"
-        environment = {
+        local_defaults = {
             "CONFD_HOST": self.database_info.host,
             # Docker-DB 7.1 can fail to resolve its generated container
             # hostname while confd_client locates the single-node master.
             "HOSTNAME": "localhost",
-            **(environment or {}),
         }
+        environment = local_defaults | environment
         with self.executor_factory.executor() as executor:
             result = executor.exec(command, environment)
         if result.exit_code != 0:

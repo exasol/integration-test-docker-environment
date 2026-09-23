@@ -121,7 +121,7 @@ def test_confd_service_readiness_retries_without_credentials(monkeypatch):
 
     assert task._run_confd.call_count == 2
     command, environment = task._run_confd.call_args.args
-    assert environment is None
+    assert environment == {}
     assert "CONFD_PASSWORD" not in command
     assert 'test "$status" = 401' in command
     sleep.assert_called_once_with(1)
