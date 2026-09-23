@@ -7,7 +7,7 @@ jobs:
   build_matrix:
     permissions:
       contents: read
-    uses: ./.github/workflows/matrix.yml
+    uses: $/.github/workflows/matrix.yml
     with:
       matrix_keys_json: '["db_versions_gpu_only"]'
   test-docker-gpu:
