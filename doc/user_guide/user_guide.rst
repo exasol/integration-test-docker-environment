@@ -431,11 +431,14 @@ to every forwarded port, including ConfD.
        --confd-port-forward 8443 --create-confd-user
 
 Use ``--create-confd-user`` to create ITDE's disposable ConfD Basic-auth user.
-ITDE creates it only after database readiness, performs one bounded privileged
-``confd_client`` operation, and records no password in command output, logs,
-or ``environment_info.json``. Instead, ``database_info.confd_info`` exposes
-the username, direct endpoint (when forwarded), SSH-tunnel target, and an
-owner-only ``confd_credentials.json`` path. Consumers obtain the password with
+ITDE creates it only after database readiness and runs ``confd_client`` through
+the selected database OS access method: Docker exec by default or the forwarded
+SSH endpoint with ``--db-os-access SSH``. The SSH executor waits for the SSH
+service to accept connections before running the command. ITDE records no
+password in command output, logs, or ``environment_info.json``. Instead,
+``database_info.confd_info`` exposes the username, direct endpoint (when
+forwarded), SSH-tunnel target, and an owner-only ``confd_credentials.json``
+path. Consumers obtain the password with
 ``database_info.confd_info.read_credentials()``.
 
 This is an explicit test-only lifecycle: it is unsupported with

@@ -1,4 +1,5 @@
 import contextlib
+import stat
 from test.integration.helpers import (
     container_named,
     get_executor_factory,
@@ -10,6 +11,7 @@ import pytest
 from docker.models.containers import Container as DockerContainer
 
 from exasol_integration_test_docker_environment.lib.base.db_os_executor import (
+    DockerExecFactory,
     SshExecFactory,
 )
 from exasol_integration_test_docker_environment.lib.base.ssh_access import (
@@ -43,6 +45,7 @@ def test_generate_ssh_key_file(api_context):
         with container_named(container_name) as container:
             command = container.exec_run("cat /root/.ssh/authorized_keys")
     assert cache.private_key.exists()
+    assert stat.S_IMODE(cache.private_key.stat().st_mode) == 0o600
     assert " itde-ssh-access" in command[1].decode("utf-8")
 
 
@@ -67,6 +70,7 @@ def test_ssh_fixture_uses_reachable_forwarded_port(api_context, fabric_stdin):
         assert database_info.forwarded_ports.ssh == db.ports.ssh
 
         with SshExecFactory.from_database_info(database_info).executor() as executor:
+            executor.prepare()
             exit_code, output = executor.exec("test -f /exa/etc/EXAConf")
 
     assert exit_code == 0
@@ -132,6 +136,10 @@ def test_db_os_executor_factory(sshd_container, db_os_access, fabric_stdin):
     with sshd_container(ssh_port_forward, public_key) as container:
         dbinfo = database_info(container.name, ssh_port_forward)
         factory = get_executor_factory(dbinfo, db_os_access)
+        expected_factory = (
+            SshExecFactory if db_os_access == DbOsAccess.SSH else DockerExecFactory
+        )
+        assert isinstance(factory, expected_factory)
         with factory.executor() as executor:
             executor.prepare()
             exit_code, output = executor.exec("ls /keygen.sh")

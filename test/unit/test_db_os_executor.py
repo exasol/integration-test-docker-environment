@@ -8,7 +8,10 @@ from unittest.mock import (
 import pytest
 from docker import DockerClient
 from docker.models.containers import Container as DockerContainer
-from paramiko.ssh_exception import SSHException
+from paramiko.ssh_exception import (
+    NoValidConnectionsError,
+    SSHException,
+)
 
 from exasol_integration_test_docker_environment.lib.base.db_os_executor import (
     DbOsExecutor,
@@ -163,6 +166,29 @@ def test_ssh_prepare_retries_until_sshd_is_ready(monkeypatch):
     sleep.assert_called_once_with(1)
 
 
+def test_ssh_prepare_retries_connection_refusals(monkeypatch):
+    executor = SshExecutor("root@127.0.0.1:30123", "fixture-key")
+    connection = MagicMock()
+    connection.run.side_effect = [
+        NoValidConnectionsError(
+            {("127.0.0.1", 30123): ConnectionRefusedError("connection refused")}
+        ),
+        None,
+    ]
+    executor._connection = connection
+    sleep = MagicMock()
+    monkeypatch.setattr(
+        "exasol_integration_test_docker_environment.lib.base.db_os_executor.time.sleep",
+        sleep,
+    )
+
+    executor.prepare()
+
+    assert connection.run.call_count == 2
+    connection.close.assert_called_once()
+    sleep.assert_called_once_with(1)
+
+
 def test_ssh_prepare_requires_an_open_connection():
     executor = SshExecutor("root@127.0.0.1:30123", "fixture-key")
 
@@ -185,6 +211,6 @@ def test_ssh_prepare_raises_after_retry_limit(monkeypatch):
     with pytest.raises(SSHException, match="SSH banner not ready"):
         executor.prepare()
 
-    assert connection.run.call_count == 20
-    assert connection.close.call_count == 20
-    assert sleep.call_count == 19
+    assert connection.run.call_count == executor.SSH_READINESS_ATTEMPTS
+    assert connection.close.call_count == executor.SSH_READINESS_ATTEMPTS
+    assert sleep.call_count == executor.SSH_READINESS_ATTEMPTS - 1

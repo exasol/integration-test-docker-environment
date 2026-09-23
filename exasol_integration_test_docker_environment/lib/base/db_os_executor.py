@@ -13,7 +13,10 @@ from docker.models.containers import (
     Container,
     ExecResult,
 )
-from paramiko.ssh_exception import SSHException
+from paramiko.ssh_exception import (
+    NoValidConnectionsError,
+    SSHException,
+)
 
 from exasol_integration_test_docker_environment.lib.base.ssh_access import SshKey
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
@@ -91,6 +94,8 @@ class DockerExecutor(DbOsExecutor):
 
 
 class SshExecutor(DbOsExecutor):
+    SSH_READINESS_ATTEMPTS = 20
+
     def __init__(self, connect_string: str, key_file: str) -> None:
         self._connect_string = connect_string
         self._key_file = key_file
@@ -126,16 +131,16 @@ class SshExecutor(DbOsExecutor):
     def prepare(self):
         if self._connection is None:
             raise RuntimeError("SSH executor must be entered before preparation")
-        for retry in range(20):
+        for retry in range(self.SSH_READINESS_ATTEMPTS):
             try:
                 self._connection.run("true", warn=True, hide=True)
                 return
-            except SSHException:
+            except (NoValidConnectionsError, SSHException):
                 # Docker can expose port 22 before sshd is ready to complete
-                # its protocol banner. Reset Fabric's failed connection and
-                # retry until the Docker-DB SSH service is ready.
+                # its protocol banner or accept connections. Reset Fabric's
+                # failed connection before retrying the Docker-DB SSH service.
                 self._connection.close()
-                if retry == 19:
+                if retry == self.SSH_READINESS_ATTEMPTS - 1:
                     raise
                 time.sleep(1)
 
