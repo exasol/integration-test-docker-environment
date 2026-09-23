@@ -8,10 +8,10 @@ jobs:
     name: Test EXAConf files
     permissions:
       contents: read
-    uses: ./.github/workflows/test-exaconf-files.yml
+    uses: $/.github/workflows/test-exaconf-files.yml
 
   test-shell-scripts:
     name: Test Shell Scripts
     permissions:
       contents: read
-    uses: ./.github/workflows/test-shell-scripts.yml
+    uses: $/.github/workflows/test-shell-scripts.yml
