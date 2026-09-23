@@ -134,5 +134,6 @@ class SpawnTestEnvironmentWithDockerDB(
             CreateConfdCredentials,
             environment_name=self.environment_name,
             database_info=database_info,
+            executor_factory=self._executor_factory(database_info),
             port_bind_address=self.port_bind_address,
         )

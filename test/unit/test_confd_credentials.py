@@ -21,6 +21,9 @@ from exasol_integration_test_docker_environment.lib.test_environment.create_conf
 from exasol_integration_test_docker_environment.lib.test_environment.ports import (
     Ports,
 )
+from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_environment_with_docker_db import (
+    SpawnTestEnvironmentWithDockerDB,
+)
 
 
 def test_confd_credentials_are_not_serialized_or_rendered(tmp_path):
@@ -133,6 +136,7 @@ def _task_for_run() -> CreateConfdCredentials:
         host="172.18.0.2",
     )
     task.port_bind_address = None
+    task.executor_factory = MagicMock()
     task.return_object = Mock()
     return task
 
@@ -236,60 +240,66 @@ def test_run_task_rejects_a_reused_database():
     )
 
 
-def test_run_task_requires_a_docker_container():
-    task = _task_for_run()
-    task.database_info.container_info = None
+def test_docker_database_spawn_passes_its_executor_to_confd_credentials_task():
+    task = object.__new__(SpawnTestEnvironmentWithDockerDB)
+    task.create_confd_user = True
+    task.environment_name = "environment"
+    task.port_bind_address = "127.0.0.1"
+    task._executor_factory = Mock(return_value="executor-factory")
+    task.create_child_task_with_common_params = Mock(return_value="confd-task")
+    database_info = Mock()
 
-    with pytest.raises(RuntimeError) as error:
-        task.run_task()
+    result = task.create_confd_credentials_task(database_info)
 
-    assert str(error.value) == "Docker-DB container information is required for ConfD"
-
-
-def test_run_confd_uses_container_environment_without_logging_output():
-    task = object.__new__(CreateConfdCredentials)
-    container = MagicMock()
-    container.exec_run.return_value = SimpleNamespace(exit_code=0)
-    client = MagicMock()
-    client.containers.get.return_value = container
-    docker_client = MagicMock()
-    docker_client.__enter__.return_value = client
-    task._get_docker_client = Mock(return_value=docker_client)
-    task.database_info = SimpleNamespace(
-        container_info=SimpleNamespace(container_name="database"), host="172.18.0.2"
+    assert result == "confd-task"
+    task.create_child_task_with_common_params.assert_called_once_with(
+        CreateConfdCredentials,
+        environment_name="environment",
+        database_info=database_info,
+        executor_factory="executor-factory",
+        port_bind_address="127.0.0.1",
     )
+
+
+def test_docker_database_spawn_skips_confd_credentials_without_opt_in():
+    task = object.__new__(SpawnTestEnvironmentWithDockerDB)
+    task.create_confd_user = False
+
+    assert task.create_confd_credentials_task(Mock()) is None
+
+
+def test_run_confd_uses_the_configured_executor_without_logging_output():
+    task = object.__new__(CreateConfdCredentials)
+    task.database_info = SimpleNamespace(container_info=None, host="172.18.0.2")
+    executor = MagicMock()
+    executor.exec.return_value = SimpleNamespace(exit_code=0)
+    task.executor_factory = MagicMock()
+    task.executor_factory.executor.return_value.__enter__.return_value = executor
 
     task._run_confd("command", {"CONFD_PASSWORD": "disposable-secret"})
 
-    container.exec_run.assert_called_once_with(
-        cmd=[
-            "/bin/sh",
-            "-c",
-            'export COS_DIRECTORY="$(dirname "$(dirname "$(command -v confd_client)")")"; command',
-        ],
-        user="root",
-        environment={
-            "CONFD_HOST": "172.18.0.2",
-            "HOSTNAME": "localhost",
-            "CONFD_PASSWORD": "disposable-secret",
-        },
-    )
+    command, environment = executor.exec.call_args.args
+    assert command.startswith("/bin/sh -c ")
+    assert "COS_DIRECTORY" in command
+    assert command.endswith(" command'")
+    assert "disposable-secret" not in command
+    assert environment == {
+        "CONFD_HOST": "172.18.0.2",
+        "HOSTNAME": "localhost",
+        "CONFD_PASSWORD": "disposable-secret",
+    }
+    task.executor_factory.executor.assert_called_once_with()
 
 
 def test_run_confd_raises_a_sanitized_error_for_a_failed_command():
     task = object.__new__(CreateConfdCredentials)
-    container = MagicMock()
-    container.exec_run.return_value = SimpleNamespace(
+    task.database_info = SimpleNamespace(container_info=None, host="172.18.0.2")
+    executor = MagicMock()
+    executor.exec.return_value = SimpleNamespace(
         exit_code=1, output=b"The password is disposable-secret"
     )
-    client = MagicMock()
-    client.containers.get.return_value = container
-    docker_client = MagicMock()
-    docker_client.__enter__.return_value = client
-    task._get_docker_client = Mock(return_value=docker_client)
-    task.database_info = SimpleNamespace(
-        container_info=SimpleNamespace(container_name="database"), host="172.18.0.2"
-    )
+    task.executor_factory = MagicMock()
+    task.executor_factory.executor.return_value.__enter__.return_value = executor
 
     with pytest.raises(RuntimeError) as error:
         task._run_confd("command", {"CONFD_PASSWORD": "disposable-secret"})
@@ -299,16 +309,6 @@ def test_run_confd_raises_a_sanitized_error_for_a_failed_command():
         == "Disposable ConfD user operation failed: The password is <redacted>"
     )
     assert "disposable-secret" not in str(error.value)
-
-
-def test_run_confd_requires_a_docker_container():
-    task = object.__new__(CreateConfdCredentials)
-    task.database_info = SimpleNamespace(container_info=None, host="172.18.0.2")
-
-    with pytest.raises(RuntimeError) as error:
-        task._run_confd("command")
-
-    assert str(error.value) == "Docker-DB container information is required for ConfD"
 
 
 def test_delete_user_suppresses_a_sanitized_cleanup_failure():

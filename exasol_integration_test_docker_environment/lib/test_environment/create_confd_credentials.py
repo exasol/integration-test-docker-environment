@@ -3,11 +3,15 @@ import os
 import secrets
 import time
 from pathlib import Path
+from shlex import quote
 
 import luigi
 
-from exasol_integration_test_docker_environment.lib.base.docker_base_task import (
-    DockerBaseTask,
+from exasol_integration_test_docker_environment.lib.base.db_os_executor import (
+    DbOsExecFactory,
+)
+from exasol_integration_test_docker_environment.lib.base.dependency_logger_base_task import (
+    DependencyLoggerBaseTask,
 )
 from exasol_integration_test_docker_environment.lib.base.json_pickle_parameter import (
     JsonPickleParameter,
@@ -25,11 +29,14 @@ CONFD_USER_ID = 20001
 CONFD_READINESS_ATTEMPTS = 12
 
 
-class CreateConfdCredentials(DockerBaseTask):
+class CreateConfdCredentials(DependencyLoggerBaseTask):
     """Create the disposable ConfD account once the database is ready."""
 
     environment_name: str = luigi.Parameter()
     database_info: DatabaseInfo = JsonPickleParameter(DatabaseInfo, significant=False)  # type: ignore
+    executor_factory: DbOsExecFactory = JsonPickleParameter(  # type: ignore
+        DbOsExecFactory, significant=False
+    )
     port_bind_address: str | None = luigi.OptionalParameter(
         default=None, significant=False
     )
@@ -39,9 +46,6 @@ class CreateConfdCredentials(DockerBaseTask):
             raise RuntimeError(
                 "Cannot create disposable ConfD credentials for a reused database"
             )
-        if self.database_info.container_info is None:
-            raise RuntimeError("Docker-DB container information is required for ConfD")
-
         self._wait_for_service_readiness()
         password = secrets.token_urlsafe(32)
         user_created = False
@@ -139,30 +143,23 @@ class CreateConfdCredentials(DockerBaseTask):
     def _run_confd(
         self, command: str, environment: dict[str, str] | None = None
     ) -> None:
-        if self.database_info.container_info is None:
-            raise RuntimeError("Docker-DB container information is required for ConfD")
-        with self._get_docker_client() as docker_client:
-            container = docker_client.containers.get(
-                self.database_info.container_info.container_name
-            )
-            command = (
-                'export COS_DIRECTORY="$(dirname "$(dirname "$(command -v confd_client)")")"; '
-                f"{command}"
-            )
-            result = container.exec_run(
-                cmd=["/bin/sh", "-c", command],
-                user="root",
-                environment={
-                    "CONFD_HOST": self.database_info.host,
-                    # Docker-DB 7.1 can fail to resolve its generated container
-                    # hostname while confd_client locates the single-node master.
-                    "HOSTNAME": "localhost",
-                    **(environment or {}),
-                },
-            )
+        command = (
+            'export COS_DIRECTORY="$(dirname "$(dirname "$(command -v confd_client)")")"; '
+            f"{command}"
+        )
+        command = f"/bin/sh -c {quote(command)}"
+        environment = {
+            "CONFD_HOST": self.database_info.host,
+            # Docker-DB 7.1 can fail to resolve its generated container
+            # hostname while confd_client locates the single-node master.
+            "HOSTNAME": "localhost",
+            **(environment or {}),
+        }
+        with self.executor_factory.executor() as executor:
+            result = executor.exec(command, environment)
         if result.exit_code != 0:
             output = result.output.decode("utf-8", errors="replace").strip()
-            for value in (environment or {}).values():
+            for value in environment.values():
                 output = output.replace(value, "<redacted>")
             raise RuntimeError(f"Disposable ConfD user operation failed: {output}")
 
