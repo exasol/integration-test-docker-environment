@@ -5,11 +5,8 @@ from unittest.mock import Mock
 
 import pytest
 
-SPAWN_TEST_ENVIRONMENT = importlib.import_module(
-    "exasol_integration_test_docker_environment.lib.api.spawn_test_environment"
-)
-SPAWN_TEST_ENVIRONMENT_WITH_TEST_CONTAINER = importlib.import_module(
-    "exasol_integration_test_docker_environment.lib.api.spawn_test_environment_with_test_container"
+CLEANUP = importlib.import_module(
+    "exasol_integration_test_docker_environment.lib.api.cleanup"
 )
 
 
@@ -41,8 +38,8 @@ def _environment_info(
 @pytest.mark.parametrize(
     "module,with_test_container",
     [
-        (SPAWN_TEST_ENVIRONMENT, False),
-        (SPAWN_TEST_ENVIRONMENT_WITH_TEST_CONTAINER, True),
+        (CLEANUP, False),
+        (CLEANUP, True),
     ],
 )
 def test_cleanup_removes_resources_and_confd_credentials(
@@ -58,7 +55,7 @@ def test_cleanup_removes_resources_and_confd_credentials(
     monkeypatch.setattr(module, "remove_docker_volumes", remove_volume)
     monkeypatch.setattr(module, "remove_docker_networks", remove_network)
 
-    module._cleanup(environment_info)
+    module.cleanup_test_environment(environment_info)
 
     expected_containers = [["database"]]
     if with_test_container:
@@ -74,8 +71,8 @@ def test_cleanup_removes_resources_and_confd_credentials(
 @pytest.mark.parametrize(
     "module,with_test_container",
     [
-        (SPAWN_TEST_ENVIRONMENT, False),
-        (SPAWN_TEST_ENVIRONMENT_WITH_TEST_CONTAINER, True),
+        (CLEANUP, False),
+        (CLEANUP, True),
     ],
 )
 def test_cleanup_removes_credentials_even_when_resource_cleanup_fails(
@@ -91,7 +88,7 @@ def test_cleanup_removes_credentials_even_when_resource_cleanup_fails(
     )
 
     with pytest.raises(RuntimeError, match="failed"):
-        module._cleanup(environment_info)
+        module.cleanup_test_environment(environment_info)
 
     assert not credentials_file.exists()
 
@@ -99,8 +96,8 @@ def test_cleanup_removes_credentials_even_when_resource_cleanup_fails(
 @pytest.mark.parametrize(
     "module,with_test_container",
     [
-        (SPAWN_TEST_ENVIRONMENT, False),
-        (SPAWN_TEST_ENVIRONMENT_WITH_TEST_CONTAINER, True),
+        (CLEANUP, False),
+        (CLEANUP, True),
     ],
 )
 def test_cleanup_supports_environments_without_confd_credentials(
@@ -111,4 +108,4 @@ def test_cleanup_supports_environments_without_confd_credentials(
     monkeypatch.setattr(module, "remove_docker_volumes", Mock())
     monkeypatch.setattr(module, "remove_docker_networks", Mock())
 
-    module._cleanup(environment_info)
+    module.cleanup_test_environment(environment_info)

@@ -1,7 +1,6 @@
 import functools
 import warnings
 from collections.abc import Callable
-from pathlib import Path
 from typing import (
     Any,
 )
@@ -17,18 +16,12 @@ from exasol_integration_test_docker_environment.cli.options.system_options impor
 from exasol_integration_test_docker_environment.cli.options.test_environment_options import (
     LATEST_DB_VERSION,
 )
+from exasol_integration_test_docker_environment.lib.api.cleanup import (
+    cleanup_test_environment as _cleanup,
+)
 from exasol_integration_test_docker_environment.lib.base.run_task import (
     generate_root_task,
     run_task,
-)
-from exasol_integration_test_docker_environment.lib.docker.container.utils import (
-    remove_docker_container,
-)
-from exasol_integration_test_docker_environment.lib.docker.networks.utils import (
-    remove_docker_networks,
-)
-from exasol_integration_test_docker_environment.lib.docker.volumes.utils import (
-    remove_docker_volumes,
 )
 from exasol_integration_test_docker_environment.lib.models.api_errors import (
     ArgumentConstraintError,
@@ -51,23 +44,6 @@ from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_
 from exasol_integration_test_docker_environment.lib.utils.api_function_decorators import (
     cli_function,
 )
-
-
-def _cleanup(environment_info: EnvironmentInfo) -> None:
-    confd_info = environment_info.database_info.confd_info
-    try:
-        if environment_info.database_info.container_info is not None:
-            remove_docker_container(
-                [environment_info.database_info.container_info.container_name]
-            )
-            if environment_info.database_info.container_info.volume_name is not None:
-                remove_docker_volumes(
-                    [environment_info.database_info.container_info.volume_name]
-                )
-        remove_docker_networks([environment_info.network_info.network_name])
-    finally:
-        if confd_info is not None:
-            Path(confd_info.credentials_file).unlink(missing_ok=True)
 
 
 @cli_function
