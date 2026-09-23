@@ -129,6 +129,7 @@ def test_confd_service_readiness_retries_without_credentials(monkeypatch):
 
 def _task_for_run() -> CreateConfdCredentials:
     task = cast(Any, object.__new__(CreateConfdCredentials))
+    task.environment_name = "environment"
     task.database_info = SimpleNamespace(
         reused=False,
         container_info=object(),
@@ -228,16 +229,46 @@ def test_run_task_does_not_roll_back_when_service_is_not_ready():
     task._delete_user.assert_not_called()
 
 
-def test_run_task_rejects_a_reused_database():
+def test_run_task_returns_retained_credentials_for_a_reused_database(tmp_path):
     task = _task_for_run()
     task.database_info.reused = True
+    task.get_cache_path = Mock(return_value=tmp_path)
+    credentials_file = task._write_credentials_file("disposable-secret")
+    task._wait_for_service_readiness = Mock()
+    task._create_user = Mock()
 
-    with pytest.raises(RuntimeError) as error:
+    task.run_task()
+
+    info = task.return_object.call_args.args[0]
+    assert info.credentials_file == str(credentials_file)
+    assert info.read_credentials().password == "disposable-secret"
+    task._wait_for_service_readiness.assert_not_called()
+    task._create_user.assert_not_called()
+
+
+def test_run_task_rejects_reuse_when_credentials_file_is_missing(tmp_path):
+    task = _task_for_run()
+    task.database_info.reused = True
+    task.get_cache_path = Mock(return_value=tmp_path)
+
+    with pytest.raises(RuntimeError, match="credentials file .* is missing"):
         task.run_task()
 
-    assert str(error.value) == (
-        "Cannot create disposable ConfD credentials for a reused database"
+
+def test_run_task_rejects_reuse_for_a_different_confd_account(tmp_path):
+    task = _task_for_run()
+    task.database_info.reused = True
+    task.get_cache_path = Mock(return_value=tmp_path)
+    credentials_file = task._credentials_file_path()
+    credentials_file.parent.mkdir(parents=True)
+    credentials_file.write_text(
+        json.dumps({"username": "different-user", "password": "secret"}),
+        encoding="utf-8",
     )
+    credentials_file.chmod(0o600)
+
+    with pytest.raises(RuntimeError, match="different ConfD account"):
+        task.run_task()
 
 
 def test_docker_database_spawn_passes_its_executor_to_confd_credentials_task():

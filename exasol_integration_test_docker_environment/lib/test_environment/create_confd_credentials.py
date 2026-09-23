@@ -30,7 +30,7 @@ CONFD_READINESS_ATTEMPTS = 12
 
 
 class CreateConfdCredentials(DependencyLoggerBaseTask):
-    """Create the disposable ConfD account once the database is ready."""
+    """Create or reuse the disposable ConfD account and its local credentials."""
 
     environment_name: str = luigi.Parameter()
     database_info: DatabaseInfo = JsonPickleParameter(DatabaseInfo, significant=False)  # type: ignore
@@ -43,9 +43,8 @@ class CreateConfdCredentials(DependencyLoggerBaseTask):
 
     def run_task(self) -> None:
         if self.database_info.reused:
-            raise RuntimeError(
-                "Cannot create disposable ConfD credentials for a reused database"
-            )
+            self._return_reused_credentials()
+            return
         self._wait_for_service_readiness()
         password = secrets.token_urlsafe(32)
         user_created = False
@@ -59,6 +58,30 @@ class CreateConfdCredentials(DependencyLoggerBaseTask):
                 self._delete_user()
             raise
 
+        self.return_object(self._confd_info(credentials_file))
+
+    def _return_reused_credentials(self) -> None:
+        """Return retained credentials without changing a reused database.
+
+        Reuse can only work when the original environment was kept alive and
+        its owner-only credentials file still exists. The password is not
+        serialized in ``DatabaseInfo`` and cannot be reconstructed otherwise.
+        """
+        credentials_file = self._credentials_file_path()
+        if not credentials_file.exists():
+            raise RuntimeError(
+                "Cannot reuse ConfD credentials because the owner-only credentials "
+                f"file '{credentials_file}' is missing"
+            )
+        confd_info = self._confd_info(credentials_file)
+        credentials = confd_info.read_credentials()
+        if credentials.username != CONFD_USERNAME:
+            raise RuntimeError(
+                "Cannot reuse ConfD credentials for a different ConfD account"
+            )
+        self.return_object(confd_info)
+
+    def _confd_info(self, credentials_file: Path) -> ConfdInfo:
         forwarded_ports = self.database_info.forwarded_ports
         confd_port = None if forwarded_ports is None else forwarded_ports.confd
         endpoint = None
@@ -66,13 +89,11 @@ class CreateConfdCredentials(DependencyLoggerBaseTask):
             endpoint = (
                 f"https://{self.port_bind_address or '127.0.0.1'}:{confd_port}/RPC2"
             )
-        self.return_object(
-            ConfdInfo(
-                username=CONFD_USERNAME,
-                credentials_file=str(credentials_file),
-                tunnel_target_host=self.database_info.host,
-                endpoint=endpoint,
-            )
+        return ConfdInfo(
+            username=CONFD_USERNAME,
+            credentials_file=str(credentials_file),
+            tunnel_target_host=self.database_info.host,
+            endpoint=endpoint,
         )
 
     def _create_user(self, password: str) -> None:
@@ -149,8 +170,8 @@ class CreateConfdCredentials(DependencyLoggerBaseTask):
         command = f"/bin/sh -c {quote(command)}"
         local_defaults = {
             "CONFD_HOST": self.database_info.host,
-            # Docker-DB 7.1 can fail to resolve its generated container
-            # hostname while confd_client locates the single-node master.
+            # Some Docker-DB versions can fail to resolve their generated
+            # container hostname while confd_client locates the single-node master.
             "HOSTNAME": "localhost",
         }
         environment = local_defaults | environment

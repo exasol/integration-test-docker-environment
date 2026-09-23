@@ -110,7 +110,7 @@ class ReusingTestEnv:
             raise e
         return ids
 
-    def run_spawn_test_env(self, cleanup: bool):
+    def run_spawn_test_env(self, cleanup: bool, create_confd_user: bool = False):
         no_cleanup_after_success = not cleanup
         task = generate_root_task(
             task_class=SpawnTestEnvironment,
@@ -137,6 +137,7 @@ class ReusingTestEnv:
             docker_db_image_version=self.docker_db_version_parameter,
             docker_db_image_name="exasol/docker-db",
             test_container_content=get_test_container_content(),
+            create_confd_user=create_confd_user,
             additional_db_parameter=(),
             docker_environment_variables=(),
             accelerator=(),
@@ -173,3 +174,39 @@ def test_reuse_instances(reusing_test_env: ReusingTestEnv):
     old_ids = reusing_test_env.run(cleanup=False)
     new_ids = reusing_test_env.run(cleanup=True)
     assert new_ids == old_ids
+
+
+def test_reuse_returns_existing_confd_credentials(reusing_test_env: ReusingTestEnv):
+    """Reuse a Docker-DB ConfD account without recreating or changing it."""
+    first_task = reusing_test_env.run_spawn_test_env(
+        cleanup=False, create_confd_user=True
+    )
+    second_task = None
+    try:
+        first_environment = first_task.get_result()
+        first_confd_info = first_environment.database_info.confd_info
+        assert first_confd_info is not None
+        first_credentials_file = Path(first_confd_info.credentials_file)
+        assert first_credentials_file.exists()
+        first_credentials = first_confd_info.read_credentials()
+
+        # Keep the first database and its owner-only credentials file for reuse.
+        first_task.cleanup(True)
+
+        second_task = reusing_test_env.run_spawn_test_env(
+            cleanup=True, create_confd_user=True
+        )
+        second_environment = second_task.get_result()
+        second_confd_info = second_environment.database_info.confd_info
+        assert second_confd_info is not None
+
+        assert second_environment.database_info.reused
+        assert second_confd_info.credentials_file == str(first_credentials_file)
+        assert (
+            second_confd_info.read_credentials().password == first_credentials.password
+        )
+    finally:
+        if second_task is not None:
+            second_task.cleanup(False)
+        else:
+            first_task.cleanup(False)
