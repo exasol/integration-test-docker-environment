@@ -394,7 +394,7 @@ running the Exasol database. If you do not specify a port then ITDE will
 select a random free port.
 
 Docker-DB Environment Readiness
-""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""
 
 While starting a Docker-DB environment, ITDE limits each Docker-client
 readiness probe to 30 seconds. This prevents an unresponsive Docker daemon
