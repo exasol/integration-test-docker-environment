@@ -2,6 +2,7 @@ from pathlib import Path
 from test.integration.get_test_container_content import (
     get_test_container_content,
 )
+from typing import cast
 
 import luigi
 import pytest
@@ -102,37 +103,40 @@ class ReusingTestEnv:
         create_confd_user: bool = False,
         include_test_container: bool = True,
     ) -> SpawnTestEnvironment:
-        task = generate_root_task(
-            task_class=SpawnTestEnvironment,
-            reuse_database_setup=True,
-            reuse_database=True,
-            reuse_test_container=include_test_container,
-            no_test_container_cleanup_after_success=not cleanup,
-            no_database_cleanup_after_success=not cleanup,
-            external_exasol_db_port=self.ports.database,
-            external_exasol_bucketfs_http_port=self.ports.bucketfs_http,
-            external_exasol_bucketfs_https_port=self.ports.bucketfs_https,
-            external_exasol_ssh_port=self.ports.ssh,
-            external_exasol_xmlrpc_host="",
-            external_exasol_db_host="",
-            external_exasol_xmlrpc_port=0,
-            external_exasol_db_user="",
-            external_exasol_db_password="",
-            external_exasol_xmlrpc_user="",
-            external_exasol_xmlrpc_password="",
-            external_exasol_xmlrpc_cluster_name="",
-            external_exasol_bucketfs_write_password="",
-            environment_type=EnvironmentType.docker_db,
-            environment_name=self.env_name,
-            docker_db_image_version=self.docker_db_version_parameter,
-            docker_db_image_name="exasol/docker-db",
-            test_container_content=(
-                get_test_container_content() if include_test_container else None
+        task = cast(
+            SpawnTestEnvironment,
+            generate_root_task(
+                task_class=SpawnTestEnvironment,
+                reuse_database_setup=True,
+                reuse_database=True,
+                reuse_test_container=include_test_container,
+                no_test_container_cleanup_after_success=not cleanup,
+                no_database_cleanup_after_success=not cleanup,
+                external_exasol_db_port=self.ports.database,
+                external_exasol_bucketfs_http_port=self.ports.bucketfs_http,
+                external_exasol_bucketfs_https_port=self.ports.bucketfs_https,
+                external_exasol_ssh_port=self.ports.ssh,
+                external_exasol_xmlrpc_host="",
+                external_exasol_db_host="",
+                external_exasol_xmlrpc_port=0,
+                external_exasol_db_user="",
+                external_exasol_db_password="",
+                external_exasol_xmlrpc_user="",
+                external_exasol_xmlrpc_password="",
+                external_exasol_xmlrpc_cluster_name="",
+                external_exasol_bucketfs_write_password="",
+                environment_type=EnvironmentType.docker_db,
+                environment_name=self.env_name,
+                docker_db_image_version=self.docker_db_version_parameter,
+                docker_db_image_name="exasol/docker-db",
+                test_container_content=(
+                    get_test_container_content() if include_test_container else None
+                ),
+                create_confd_user=create_confd_user,
+                additional_db_parameter=(),
+                docker_environment_variables=(),
+                accelerator=(),
             ),
-            create_confd_user=create_confd_user,
-            additional_db_parameter=(),
-            docker_environment_variables=(),
-            accelerator=(),
         )
         try:
             if not luigi.build(
