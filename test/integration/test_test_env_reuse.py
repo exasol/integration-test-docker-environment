@@ -210,3 +210,75 @@ def test_reuse_returns_existing_confd_credentials(reusing_test_env: ReusingTestE
             second_task.cleanup(False)
         else:
             first_task.cleanup(False)
+
+
+def test_reuse_repairs_missing_confd_credentials(reusing_test_env: ReusingTestEnv):
+    """Reuse repairs a deleted local ConfD credentials file and rotates its secret."""
+    first_task = reusing_test_env.run_spawn_test_env(
+        cleanup=False, create_confd_user=True
+    )
+    second_task = None
+    try:
+        first_environment = first_task.get_result()
+        first_confd_info = first_environment.database_info.confd_info
+        assert first_confd_info is not None
+        credentials_file = Path(first_confd_info.credentials_file)
+        first_password = first_confd_info.read_credentials().password
+
+        # Keep the database but emulate loss of local task-cache state.
+        first_task.cleanup(True)
+        credentials_file.unlink()
+
+        second_task = reusing_test_env.run_spawn_test_env(
+            cleanup=True, create_confd_user=True
+        )
+        second_environment = second_task.get_result()
+        second_confd_info = second_environment.database_info.confd_info
+        assert second_confd_info is not None
+
+        assert second_environment.database_info.reused
+        assert second_confd_info.credentials_file == str(credentials_file)
+        assert credentials_file.exists()
+        assert second_confd_info.read_credentials().password != first_password
+    finally:
+        if second_task is not None:
+            second_task.cleanup(False)
+        else:
+            first_task.cleanup(False)
+
+
+def test_reuse_fails_when_missing_credentials_cannot_be_repaired(
+    reusing_test_env: ReusingTestEnv,
+):
+    """Reuse fails without recreating local credentials when ConfD is unavailable."""
+    first_task = reusing_test_env.run_spawn_test_env(
+        cleanup=False, create_confd_user=True
+    )
+    try:
+        first_environment = first_task.get_result()
+        first_confd_info = first_environment.database_info.confd_info
+        database_container_info = first_environment.database_info.container_info
+        assert first_confd_info is not None
+        assert database_container_info is not None
+        credentials_file = Path(first_confd_info.credentials_file)
+
+        # Keep the database container running but remove the local credentials
+        # and make its ConfD command unavailable. Both repair alternatives must
+        # then fail, without writing a new credentials file.
+        first_task.cleanup(True)
+        credentials_file.unlink()
+        with ContextDockerClient() as docker_client:
+            database_container = docker_client.containers.get(
+                database_container_info.container_name
+            )
+            exit_code, _ = database_container.exec_run(
+                "chmod a-x $(command -v confd_client)"
+            )
+        assert exit_code == 0
+
+        with pytest.raises(RuntimeError, match="Error spawning test environment"):
+            reusing_test_env.run_spawn_test_env(cleanup=True, create_confd_user=True)
+
+        assert not credentials_file.exists()
+    finally:
+        first_task.cleanup(False)

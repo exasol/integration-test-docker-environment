@@ -61,18 +61,24 @@ class CreateConfdCredentials(DependencyLoggerBaseTask):
         self.return_object(self._confd_info(credentials_file))
 
     def _return_reused_credentials(self) -> None:
-        """Return retained credentials without changing a reused database.
-
-        Reuse can only work when the original environment was kept alive and
-        its owner-only credentials file still exists. The password is not
-        serialized in ``DatabaseInfo`` and cannot be reconstructed otherwise.
-        """
+        """Return retained credentials, repairing a missing local file if needed."""
         credentials_file = self._credentials_file_path()
         if not credentials_file.exists():
-            raise RuntimeError(
-                "Cannot reuse ConfD credentials because the owner-only credentials "
-                f"file '{credentials_file}' is missing"
-            )
+            password = secrets.token_urlsafe(32)
+            try:
+                self._change_user_password(password)
+            except RuntimeError:
+                # A reused database may predate this task and therefore not have
+                # the disposable account yet.
+                try:
+                    self._create_user(password)
+                except RuntimeError as user_creation_error:
+                    raise RuntimeError(
+                        "Cannot repair ConfD credentials: changing the existing "
+                        "account password and creating a replacement account failed"
+                    ) from user_creation_error
+            self._wait_for_rest_readiness(password)
+            credentials_file = self._write_credentials_file(password)
         confd_info = self._confd_info(credentials_file)
         credentials = confd_info.read_credentials()
         if credentials.username != CONFD_USERNAME:
@@ -80,6 +86,19 @@ class CreateConfdCredentials(DependencyLoggerBaseTask):
                 "Cannot reuse ConfD credentials for a different ConfD account"
             )
         self.return_object(confd_info)
+
+    def _change_user_password(self, password: str) -> None:
+        command = (
+            "confd_client -c user_passwd -A "
+            f'\'{{"username":"{CONFD_USERNAME}","password":"\''
+            '"$CONFD_PASSWORD"'
+            '\'","encode_passwd":true}\''
+        )
+        self._wait_for_readiness(
+            command,
+            {"CONFD_PASSWORD": password},
+            "Disposable ConfD user password could not be changed",
+        )
 
     def _confd_info(self, credentials_file: Path) -> ConfdInfo:
         forwarded_ports = self.database_info.forwarded_ports

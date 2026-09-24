@@ -77,6 +77,24 @@ def test_create_user_passes_the_password_only_as_container_environment():
     )
 
 
+def test_change_user_password_passes_the_password_only_as_container_environment():
+    task = object.__new__(CreateConfdCredentials)
+    task._wait_for_readiness = Mock()
+
+    task._change_user_password("disposable-secret")
+
+    command, environment, failure_message = task._wait_for_readiness.call_args.args
+    assert "disposable-secret" not in command
+    assert environment == {"CONFD_PASSWORD": "disposable-secret"}
+    assert failure_message == "Disposable ConfD user password could not be changed"
+    assert command == (
+        "confd_client -c user_passwd -A "
+        '\'{"username":"itde_confd","password":"\''
+        '"$CONFD_PASSWORD"'
+        '\'","encode_passwd":true}\''
+    )
+
+
 def test_confd_credentials_file_is_owner_only(tmp_path):
     task = object.__new__(CreateConfdCredentials)
     task.environment_name = "environment"
@@ -246,13 +264,72 @@ def test_run_task_returns_retained_credentials_for_a_reused_database(tmp_path):
     task._create_user.assert_not_called()
 
 
-def test_run_task_rejects_reuse_when_credentials_file_is_missing(tmp_path):
+def test_run_task_repairs_reuse_when_credentials_file_is_missing(monkeypatch, tmp_path):
     task = _task_for_run()
     task.database_info.reused = True
     task.get_cache_path = Mock(return_value=tmp_path)
+    task._change_user_password = Mock()
+    task._create_user = Mock()
+    task._wait_for_rest_readiness = Mock()
+    monkeypatch.setattr(
+        "exasol_integration_test_docker_environment.lib.test_environment.create_confd_credentials.secrets.token_urlsafe",
+        Mock(return_value="replacement-secret"),
+    )
 
-    with pytest.raises(RuntimeError, match="credentials file .* is missing"):
+    task.run_task()
+
+    task._change_user_password.assert_called_once_with("replacement-secret")
+    task._create_user.assert_not_called()
+    task._wait_for_rest_readiness.assert_called_once_with("replacement-secret")
+    credentials_file = task._credentials_file_path()
+    assert task.return_object.call_args.args[0].credentials_file == str(
+        credentials_file
+    )
+    assert task.return_object.call_args.args[0].read_credentials().password == (
+        "replacement-secret"
+    )
+
+
+def test_run_task_creates_missing_confd_account_while_repairing_credentials(
+    monkeypatch, tmp_path
+):
+    task = _task_for_run()
+    task.database_info.reused = True
+    task.get_cache_path = Mock(return_value=tmp_path)
+    task._change_user_password = Mock(side_effect=RuntimeError("user does not exist"))
+    task._create_user = Mock()
+    task._wait_for_rest_readiness = Mock()
+    monkeypatch.setattr(
+        "exasol_integration_test_docker_environment.lib.test_environment.create_confd_credentials.secrets.token_urlsafe",
+        Mock(return_value="replacement-secret"),
+    )
+
+    task.run_task()
+
+    task._create_user.assert_called_once_with("replacement-secret")
+    task._wait_for_rest_readiness.assert_called_once_with("replacement-secret")
+
+
+def test_run_task_fails_without_writing_credentials_when_repair_is_impossible(
+    monkeypatch, tmp_path
+):
+    task = _task_for_run()
+    task.database_info.reused = True
+    task.get_cache_path = Mock(return_value=tmp_path)
+    task._change_user_password = Mock(side_effect=RuntimeError("ConfD unavailable"))
+    task._create_user = Mock(side_effect=RuntimeError("ConfD unavailable"))
+    task._wait_for_rest_readiness = Mock()
+    monkeypatch.setattr(
+        "exasol_integration_test_docker_environment.lib.test_environment.create_confd_credentials.secrets.token_urlsafe",
+        Mock(return_value="replacement-secret"),
+    )
+
+    with pytest.raises(RuntimeError, match="Cannot repair ConfD credentials"):
         task.run_task()
+
+    assert not task._credentials_file_path().exists()
+    task._wait_for_rest_readiness.assert_not_called()
+    task.return_object.assert_not_called()
 
 
 def test_run_task_rejects_reuse_for_a_different_confd_account(tmp_path):
