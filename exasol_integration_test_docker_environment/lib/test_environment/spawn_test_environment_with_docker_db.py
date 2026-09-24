@@ -29,7 +29,7 @@ from exasol_integration_test_docker_environment.lib.test_environment.database_wa
     WaitForTestDockerDatabase,
 )
 
-_READINESS_DOCKER_TIMEOUT_SECONDS = 10
+_READINESS_DOCKER_TIMEOUT_SECONDS = 30
 from exasol_integration_test_docker_environment.lib.test_environment.db_version import (
     db_version_supports_custom_certificates,
 )

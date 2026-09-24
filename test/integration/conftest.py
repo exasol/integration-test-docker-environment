@@ -11,6 +11,8 @@ from test.integration.get_test_container_content import (
 
 import pytest
 
+pytest_plugins = ("test.integration._test_env_reuse_common",)
+
 from exasol_integration_test_docker_environment.lib.docker.images.image_info import (
     Platform,
     current_platform,

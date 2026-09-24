@@ -395,7 +395,7 @@ def test_docker_database_readiness_uses_a_short_docker_timeout():
 
     assert isinstance(factory, DockerExecFactory)
     assert factory._container_name == "database"
-    assert factory._client_factory._timeout == 10
+    assert factory._client_factory._timeout == 30
 
 
 def test_docker_database_readiness_uses_ssh_when_configured(monkeypatch):
