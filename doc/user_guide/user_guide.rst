@@ -393,6 +393,16 @@ your host machine to which ITDE forwards the SSH port of the Docker Container
 running the Exasol database. If you do not specify a port then ITDE will
 select a random free port.
 
+Docker-DB Environment Readiness
+""""""""""""""""""""
+
+While starting a Docker-DB environment, ITDE limits each Docker-client
+readiness probe to 30 seconds. This prevents an unresponsive Docker daemon
+from blocking startup indefinitely. The database startup timeout remains 10
+minutes, and ITDE can retry a failed startup attempt. This limit applies only
+to readiness probes; regular operations, including ConfD credential setup,
+keep their normal Docker-client timeout.
+
 
 ConfD HTTPS Access
 """""""""""""""""""

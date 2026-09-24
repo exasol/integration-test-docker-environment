@@ -53,7 +53,7 @@ def _setup_luigi_config(output_directory: Path, docker_repository_name: str):
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def docker_repository(tmp_path, env_name):
     _setup_luigi_config(
         output_directory=tmp_path / "output",
@@ -149,6 +149,6 @@ class ReusingTestEnv:
         return task
 
 
-@pytest.fixture()
+@pytest.fixture
 def reusing_test_env(docker_repository, env_name) -> ReusingTestEnv:
     return ReusingTestEnv(docker_repository, env_name)
