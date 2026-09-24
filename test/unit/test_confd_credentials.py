@@ -12,11 +12,21 @@ from unittest.mock import (
 
 import pytest
 
+from exasol_integration_test_docker_environment.lib.base.db_os_executor import (
+    DockerExecFactory,
+    SshExecFactory,
+)
 from exasol_integration_test_docker_environment.lib.models.data.confd_info import (
     ConfdInfo,
 )
 from exasol_integration_test_docker_environment.lib.test_environment.create_confd_credentials import (
     CreateConfdCredentials,
+)
+from exasol_integration_test_docker_environment.lib.test_environment.database_waiters.wait_for_test_docker_database import (
+    WaitForTestDockerDatabase,
+)
+from exasol_integration_test_docker_environment.lib.test_environment.parameter.docker_db_test_environment_parameter import (
+    DbOsAccess,
 )
 from exasol_integration_test_docker_environment.lib.test_environment.ports import (
     Ports,
@@ -374,6 +384,47 @@ def test_docker_database_spawn_skips_confd_credentials_without_opt_in():
     task.create_confd_user = False
 
     assert task.create_confd_credentials_task(Mock()) is None
+
+
+def test_docker_database_readiness_uses_a_short_docker_timeout():
+    task = object.__new__(SpawnTestEnvironmentWithDockerDB)
+    task.db_os_access = DbOsAccess.DOCKER_EXEC
+    task.db_container_name = "database"
+
+    factory = task._readiness_executor_factory(Mock())
+
+    assert isinstance(factory, DockerExecFactory)
+    assert factory._container_name == "database"
+    assert factory._client_factory._timeout == 10
+
+
+def test_docker_database_readiness_uses_ssh_when_configured(monkeypatch):
+    task = object.__new__(SpawnTestEnvironmentWithDockerDB)
+    task.db_os_access = DbOsAccess.SSH
+    database_info = Mock()
+    factory = Mock()
+    ssh_factory = Mock(return_value=factory)
+    monkeypatch.setattr(SshExecFactory, "from_database_info", ssh_factory)
+
+    assert task._readiness_executor_factory(database_info) is factory
+    ssh_factory.assert_called_once_with(database_info)
+
+
+def test_docker_database_wait_task_uses_the_readiness_executor():
+    task = object.__new__(SpawnTestEnvironmentWithDockerDB)
+    task.docker_db_image_version = "2026.1.0"
+    task._readiness_executor_factory = Mock(return_value="readiness-executor")
+    task.create_child_task_with_common_params = Mock(return_value="wait-task")
+    database_info = Mock()
+
+    assert task.create_wait_for_database_task(2, database_info) == "wait-task"
+    task.create_child_task_with_common_params.assert_called_once_with(
+        WaitForTestDockerDatabase,
+        database_info=database_info,
+        attempt=2,
+        docker_db_image_version="2026.1.0",
+        executor_factory="readiness-executor",
+    )
 
 
 def test_run_confd_uses_the_configured_executor_without_logging_output():

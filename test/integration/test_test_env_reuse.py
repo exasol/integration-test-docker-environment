@@ -2,7 +2,9 @@ from pathlib import Path
 from test.integration.get_test_container_content import (
     get_test_container_content,
 )
+from uuid import uuid4
 
+import docker
 import luigi
 import pytest
 
@@ -92,6 +94,8 @@ class ReusingTestEnv:
         )
         self.ports = Ports.random_free()
         self.env_name = env_name
+        self._cleanup_owner_task: SpawnTestEnvironment | None = None
+        self.initial_instance_ids: tuple[str, str, str] | None = None
 
     def run(self, cleanup: bool) -> tuple[str, str, str]:
         task = self.run_spawn_test_env(
@@ -101,10 +105,6 @@ class ReusingTestEnv:
             env_info = task.get_result()
 
             ids = _get_instance_ids(env_info)
-            task_success = (
-                not cleanup
-            )  # Calling task.cleanup(False) will remove container/network/volume, while task.cleanup(True) will not
-            task.cleanup(task_success)
         except Exception as e:
             task.cleanup(False)
             raise e
@@ -162,25 +162,96 @@ class ReusingTestEnv:
             raise RuntimeError("Error spawning test environment") from e
         return result
 
+    def set_cleanup_owner(self, task: SpawnTestEnvironment) -> None:
+        """Retain an uncleaned task that owns the shared Docker resources."""
+        self._cleanup_owner_task = task
 
-@pytest.fixture
-def reusing_test_env(docker_repository, env_name) -> ReusingTestEnv:
-    return ReusingTestEnv(docker_repository, env_name)
+    def cleanup(self) -> None:
+        """Remove the shared environment after all reuse scenarios finished."""
+        if self._cleanup_owner_task is None:
+            return
+        self._cleanup_owner_task.cleanup(False)
+        self._assert_resources_removed()
+
+    def _assert_resources_removed(self) -> None:
+        db_container_name = f"db_container_{self.env_name}"
+        resource_getters = {
+            f"container {name}": lambda client, name=name: client.containers.get(name)
+            for name in (
+                f"test_container_{self.env_name}",
+                db_container_name,
+                f"{db_container_name}_preparation",
+            )
+        }
+        resource_getters.update(
+            {
+                f"network db_network_{self.env_name}": lambda client: client.networks.get(
+                    f"db_network_{self.env_name}"
+                ),
+                f"volume {db_container_name}_volume": lambda client: client.volumes.get(
+                    f"{db_container_name}_volume"
+                ),
+                f"volume certificates_{self.env_name}": lambda client: client.volumes.get(
+                    f"certificates_{self.env_name}"
+                ),
+            }
+        )
+        remaining_resources = []
+        with ContextDockerClient() as docker_client:
+            for resource, get_resource in resource_getters.items():
+                try:
+                    get_resource(docker_client)
+                    remaining_resources.append(resource)
+                except docker.errors.NotFound:
+                    pass
+        if remaining_resources:
+            raise RuntimeError(
+                "Shared integration-test environment was not fully cleaned up: "
+                + ", ".join(remaining_resources)
+            )
+
+
+@pytest.fixture(scope="module")
+def reusing_test_env(tmp_path_factory) -> ReusingTestEnv:
+    """Provide one environment for the reuse scenarios in this module.
+
+    Starting a Docker-DB dominates these tests' runtime.  The scenarios are
+    deliberately written to exercise reuse, so keeping one environment alive
+    between them both reflects the intended usage and avoids repeatedly
+    starting the same database.
+    """
+    docker_repository = "test_test_env_reuse"
+    _setup_luigi_config(
+        output_directory=tmp_path_factory.mktemp("test-test-env-reuse") / "output",
+        docker_repository_name=docker_repository,
+    )
+    luigi_utils.clean(docker_repository)
+    environment = ReusingTestEnv(docker_repository, f"test_env_reuse_{uuid4().hex[:8]}")
+    try:
+        initial_task = environment.run_spawn_test_env(
+            cleanup=False, create_confd_user=True
+        )
+        environment.set_cleanup_owner(initial_task)
+        environment.initial_instance_ids = _get_instance_ids(initial_task.get_result())
+        yield environment
+    finally:
+        try:
+            environment.cleanup()
+        finally:
+            luigi_utils.clean(docker_repository)
 
 
 def test_reuse_instances(reusing_test_env: ReusingTestEnv):
     """
     This test uses a test environment, configured to reuse the test
     container, DB setup and the database, see function run_spawn_test_env()
-    above.
-    The test spawns the environment with cleanup=False and extracts the IDs of
-    the environment's elements test container, database, and network.
-    The test then spawns another environment and verifies that the elements
-    have been reused, i.e. their IDs match the save ones from before.
+    above. The module fixture creates a clean environment and saves the IDs of
+    its test container, database, and network. This test then spawns another
+    environment and verifies that it reuses those original instances.
     """
-    old_ids = reusing_test_env.run(cleanup=False)
-    new_ids = reusing_test_env.run(cleanup=True)
-    assert new_ids == old_ids
+    new_ids = reusing_test_env.run(cleanup=False)
+    assert reusing_test_env.initial_instance_ids is not None
+    assert new_ids == reusing_test_env.initial_instance_ids
 
 
 def test_reuse_returns_existing_confd_credentials(reusing_test_env: ReusingTestEnv):
@@ -197,9 +268,6 @@ def test_reuse_returns_existing_confd_credentials(reusing_test_env: ReusingTestE
         assert first_credentials_file.exists()
         first_credentials = first_confd_info.read_credentials()
 
-        # Keep the first database and its owner-only credentials file for reuse.
-        first_task.cleanup(True)
-
         second_task = reusing_test_env.run_spawn_test_env(
             cleanup=True, create_confd_user=True, include_test_container=False
         )
@@ -213,10 +281,7 @@ def test_reuse_returns_existing_confd_credentials(reusing_test_env: ReusingTestE
             second_confd_info.read_credentials().password == first_credentials.password
         )
     finally:
-        if second_task is not None:
-            second_task.cleanup(False)
-        else:
-            first_task.cleanup(False)
+        pass
 
 
 def test_reuse_repairs_missing_confd_credentials(reusing_test_env: ReusingTestEnv):
@@ -232,8 +297,7 @@ def test_reuse_repairs_missing_confd_credentials(reusing_test_env: ReusingTestEn
         credentials_file = Path(first_confd_info.credentials_file)
         first_password = first_confd_info.read_credentials().password
 
-        # Keep the database but emulate loss of local task-cache state.
-        first_task.cleanup(True)
+        # Emulate loss of local task-cache state while keeping the shared database.
         credentials_file.unlink()
 
         second_task = reusing_test_env.run_spawn_test_env(
@@ -248,10 +312,7 @@ def test_reuse_repairs_missing_confd_credentials(reusing_test_env: ReusingTestEn
         assert credentials_file.exists()
         assert second_confd_info.read_credentials().password != first_password
     finally:
-        if second_task is not None:
-            second_task.cleanup(False)
-        else:
-            first_task.cleanup(False)
+        pass
 
 
 def test_reuse_fails_when_missing_credentials_cannot_be_repaired(
@@ -272,7 +333,6 @@ def test_reuse_fails_when_missing_credentials_cannot_be_repaired(
         # Keep the database container running but remove the local credentials
         # and make its ConfD client unavailable. Both repair alternatives must
         # then fail, without writing a new credentials file.
-        first_task.cleanup(True)
         credentials_file.unlink()
         with ContextDockerClient() as docker_client:
             database_container = docker_client.containers.get(
@@ -299,4 +359,4 @@ def test_reuse_fails_when_missing_credentials_cannot_be_repaired(
 
         assert not credentials_file.exists()
     finally:
-        first_task.cleanup(False)
+        pass
