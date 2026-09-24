@@ -263,7 +263,7 @@ def test_reuse_fails_when_missing_credentials_cannot_be_repaired(
         credentials_file = Path(first_confd_info.credentials_file)
 
         # Keep the database container running but remove the local credentials
-        # and make its ConfD command unavailable. Both repair alternatives must
+        # and make its ConfD client unavailable. Both repair alternatives must
         # then fail, without writing a new credentials file.
         first_task.cleanup(True)
         credentials_file.unlink()
@@ -272,7 +272,16 @@ def test_reuse_fails_when_missing_credentials_cannot_be_repaired(
                 database_container_info.container_name
             )
             exit_code, _ = database_container.exec_run(
-                "chmod a-x $(command -v confd_client)"
+                [
+                    "/bin/sh",
+                    "-c",
+                    'confd_client_path="$(command -v confd_client)" || exit 1; '
+                    'chmod a-x "$confd_client_path"',
+                ],
+                environment={
+                    "CONFD_HOST": first_environment.database_info.host,
+                    "HOSTNAME": "localhost",
+                },
             )
         assert exit_code == 0
 
