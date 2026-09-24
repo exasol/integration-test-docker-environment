@@ -110,13 +110,18 @@ class ReusingTestEnv:
             raise e
         return ids
 
-    def run_spawn_test_env(self, cleanup: bool, create_confd_user: bool = False):
+    def run_spawn_test_env(
+        self,
+        cleanup: bool,
+        create_confd_user: bool = False,
+        include_test_container: bool = True,
+    ):
         no_cleanup_after_success = not cleanup
         task = generate_root_task(
             task_class=SpawnTestEnvironment,
             reuse_database_setup=True,
             reuse_database=True,
-            reuse_test_container=True,
+            reuse_test_container=include_test_container,
             no_test_container_cleanup_after_success=no_cleanup_after_success,
             no_database_cleanup_after_success=no_cleanup_after_success,
             external_exasol_db_port=self.ports.database,
@@ -136,7 +141,9 @@ class ReusingTestEnv:
             environment_name=self.env_name,
             docker_db_image_version=self.docker_db_version_parameter,
             docker_db_image_name="exasol/docker-db",
-            test_container_content=get_test_container_content(),
+            test_container_content=(
+                get_test_container_content() if include_test_container else None
+            ),
             create_confd_user=create_confd_user,
             additional_db_parameter=(),
             docker_environment_variables=(),
@@ -179,7 +186,7 @@ def test_reuse_instances(reusing_test_env: ReusingTestEnv):
 def test_reuse_returns_existing_confd_credentials(reusing_test_env: ReusingTestEnv):
     """Reuse a Docker-DB ConfD account without recreating or changing it."""
     first_task = reusing_test_env.run_spawn_test_env(
-        cleanup=False, create_confd_user=True
+        cleanup=False, create_confd_user=True, include_test_container=False
     )
     second_task = None
     try:
@@ -194,7 +201,7 @@ def test_reuse_returns_existing_confd_credentials(reusing_test_env: ReusingTestE
         first_task.cleanup(True)
 
         second_task = reusing_test_env.run_spawn_test_env(
-            cleanup=True, create_confd_user=True
+            cleanup=True, create_confd_user=True, include_test_container=False
         )
         second_environment = second_task.get_result()
         second_confd_info = second_environment.database_info.confd_info
@@ -215,7 +222,7 @@ def test_reuse_returns_existing_confd_credentials(reusing_test_env: ReusingTestE
 def test_reuse_repairs_missing_confd_credentials(reusing_test_env: ReusingTestEnv):
     """Reuse repairs a deleted local ConfD credentials file and rotates its secret."""
     first_task = reusing_test_env.run_spawn_test_env(
-        cleanup=False, create_confd_user=True
+        cleanup=False, create_confd_user=True, include_test_container=False
     )
     second_task = None
     try:
@@ -230,7 +237,7 @@ def test_reuse_repairs_missing_confd_credentials(reusing_test_env: ReusingTestEn
         credentials_file.unlink()
 
         second_task = reusing_test_env.run_spawn_test_env(
-            cleanup=True, create_confd_user=True
+            cleanup=True, create_confd_user=True, include_test_container=False
         )
         second_environment = second_task.get_result()
         second_confd_info = second_environment.database_info.confd_info
@@ -252,7 +259,7 @@ def test_reuse_fails_when_missing_credentials_cannot_be_repaired(
 ):
     """Reuse fails without recreating local credentials when ConfD is unavailable."""
     first_task = reusing_test_env.run_spawn_test_env(
-        cleanup=False, create_confd_user=True
+        cleanup=False, create_confd_user=True, include_test_container=False
     )
     try:
         first_environment = first_task.get_result()
@@ -286,7 +293,9 @@ def test_reuse_fails_when_missing_credentials_cannot_be_repaired(
         assert exit_code == 0
 
         with pytest.raises(RuntimeError, match="Error spawning test environment"):
-            reusing_test_env.run_spawn_test_env(cleanup=True, create_confd_user=True)
+            reusing_test_env.run_spawn_test_env(
+                cleanup=True, create_confd_user=True, include_test_container=False
+            )
 
         assert not credentials_file.exists()
     finally:
