@@ -427,26 +427,16 @@ the username, direct endpoint (when forwarded), SSH-tunnel target, and an
 owner-only ``confd_credentials.json`` path. Consumers obtain the password with
 ``database_info.confd_info.read_credentials()``.
 
-This is an explicit test-only lifecycle. With ``reuse_database``, ITDE reuses
-the account only when the original reusable environment retained its owner-only
-``confd_credentials.json`` file; it returns the existing ``ConfdInfo`` without
-creating or modifying a ConfD user. If that file is missing, reuse fails because
-the password is intentionally neither serialized in ``environment_info.json``
-nor recoverable from the database metadata. On provisioning failure ITDE makes
-one best-effort user deletion; normal environment cleanup removes the
-credentials file together with the disposable environment resources. The
-account belongs to ``exaadm`` because ConfD requires that group for supported
-administrative operations. Consumers should use only their intended read-only
-operation.
+With ``reuse_database``, ITDE returns retained credentials unchanged. If
+``confd_credentials.json`` is missing, it rotates the disposable account
+password (or creates the account if absent) and rewrites the owner-only file.
+Reuse fails without writing credentials if neither operation succeeds. The
+password is never serialized in ``environment_info.json``.
 
 .. note::
 
-   A successful Luigi task keeps ``confd_credentials.json`` so that a retained
-   reusable database can return its existing credentials. Calling the API
-   cleanup callback always removes that file, independently of reuse settings,
-   together with the database resources. Therefore, ConfD credential reuse is
-   possible only while the original environment is retained and its cleanup
-   callback has not been invoked.
+   Cleanup removes ``confd_credentials.json``. A later reuse repairs it if the
+   database and ConfD account remain available.
 
 ITDE does not extract bearer tokens or parse ``/exa/etc/EXAConf``. The API
 does not implement a ConfD client, SSH tunnel, or protocol fallback: consumers
