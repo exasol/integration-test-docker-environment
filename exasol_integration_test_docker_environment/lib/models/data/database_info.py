@@ -18,6 +18,7 @@ class DatabaseInfo(Info):
         container_info: ContainerInfo | None = None,
         ssh_info: SshInfo | None = None,
         forwarded_ports: Ports | None = None,
+        port_bind_address: str | None = None,
         confd_info: ConfdInfo | None = None,
     ) -> None:
         self.container_info = container_info
@@ -26,4 +27,5 @@ class DatabaseInfo(Info):
         self.reused = reused
         self.ssh_info = ssh_info
         self.forwarded_ports = forwarded_ports
+        self.port_bind_address = port_bind_address
         self.confd_info = confd_info

@@ -103,7 +103,12 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         self.db_version = DbVersion.from_db_version_str(self.docker_db_image_version)
         self.docker_db_config_resource_name = f"docker_db_config/{self.db_version}"
         self.internal_ports = Ports.default_ports
-        if self.ssh_port_forward is None:
+        if self.db_os_access != DbOsAccess.SSH:
+            # Do not reserve or publish port 22 for Docker-exec fixtures.
+            # Apart from being unnecessary, doing so can conflict with a
+            # concurrently created Docker-DB environment on CI.
+            self.ssh_port_forward = None
+        elif self.ssh_port_forward is None:
             self.ssh_port_forward = str(find_free_ports(1)[0])
 
         def first_of(*args):
@@ -287,6 +292,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                 container_info=container_info,
                 ssh_info=ssh_info,
                 forwarded_ports=self.forwarded_ports,
+                port_bind_address=self.port_bind_address,
             )
             return database_info
 

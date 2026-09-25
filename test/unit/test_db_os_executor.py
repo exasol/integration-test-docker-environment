@@ -5,8 +5,13 @@ from unittest.mock import (
     create_autospec,
 )
 
+import pytest
 from docker import DockerClient
 from docker.models.containers import Container as DockerContainer
+from paramiko.ssh_exception import (
+    NoValidConnectionsError,
+    SSHException,
+)
 
 from exasol_integration_test_docker_environment.lib.base.db_os_executor import (
     DbOsExecutor,
@@ -73,6 +78,30 @@ def test_ssh_executor_runs_command_without_environment():
     )
 
 
+def test_ssh_executor_creates_a_connection_when_entered(monkeypatch):
+    key = MagicMock()
+    connection = MagicMock()
+    read_key = MagicMock(return_value=key)
+    create_connection = MagicMock(return_value=connection)
+    monkeypatch.setattr(
+        "exasol_integration_test_docker_environment.lib.base.db_os_executor.SshKey.read_from",
+        read_key,
+    )
+    monkeypatch.setattr(
+        "exasol_integration_test_docker_environment.lib.base.db_os_executor.fabric.Connection",
+        create_connection,
+    )
+
+    with SshExecutor("root@127.0.0.1:30123", "fixture-key") as executor:
+        assert executor._connection is connection
+
+    read_key.assert_called_once_with("fixture-key")
+    create_connection.assert_called_once_with(
+        "root@127.0.0.1:30123", connect_kwargs={"pkey": key.private}
+    )
+    connection.close.assert_called_once()
+
+
 def test_ssh_exec_factory():
     factory = SshExecFactory("connect_string", "ssh_key_file")
     executor = factory.executor()
@@ -112,3 +141,127 @@ def test_ssh_exec_factory_from_database_info():
     executor = factory.executor()
     assert executor._connect_string == "my_user@my_host:3"
     assert executor._key_file == "my_key_file"
+
+
+def test_ssh_exec_factory_prefers_forwarded_docker_port():
+    dbinfo = DatabaseInfo(
+        "172.18.0.2",
+        Ports(8563, 2580, 22),
+        reused=False,
+        ssh_info=SshInfo("root", "fixture-key"),
+        forwarded_ports=Ports(8563, 2580, 30123),
+    )
+
+    executor = SshExecFactory.from_database_info(dbinfo).executor()
+
+    assert executor._connect_string == "root@127.0.0.1:30123"
+    assert executor._key_file == "fixture-key"
+
+
+def test_ssh_exec_factory_uses_configured_forwarded_port_bind_address():
+    dbinfo = DatabaseInfo(
+        "172.18.0.2",
+        Ports(8563, 2580, 22),
+        reused=False,
+        ssh_info=SshInfo("root", "fixture-key"),
+        forwarded_ports=Ports(8563, 2580, 30123),
+        port_bind_address="192.0.2.1",
+    )
+
+    executor = SshExecFactory.from_database_info(dbinfo).executor()
+
+    assert executor._connect_string == "root@192.0.2.1:30123"
+
+
+def test_ssh_exec_factory_uses_database_endpoint_without_forwarded_ssh_port():
+    dbinfo = DatabaseInfo(
+        "172.18.0.2",
+        Ports(8563, 2580, 22),
+        reused=False,
+        ssh_info=SshInfo("root", "fixture-key"),
+        forwarded_ports=Ports(8563, 2580),
+    )
+
+    executor = SshExecFactory.from_database_info(dbinfo).executor()
+
+    assert executor._connect_string == "root@172.18.0.2:22"
+
+
+def test_ssh_prepare_retries_until_sshd_is_ready(monkeypatch):
+    executor = SshExecutor("root@127.0.0.1:30123", "fixture-key")
+    failed_connection = MagicMock()
+    failed_connection.run.side_effect = SSHException("SSH banner not ready")
+    ready_connection = MagicMock()
+    executor._connection = failed_connection
+    monkeypatch.setattr(
+        executor,
+        "_create_connection",
+        lambda: setattr(executor, "_connection", ready_connection),
+    )
+    sleep = MagicMock()
+    monkeypatch.setattr(
+        "exasol_integration_test_docker_environment.lib.base.db_os_executor.time.sleep",
+        sleep,
+    )
+
+    executor.prepare()
+
+    failed_connection.close.assert_called_once()
+    ready_connection.run.assert_called_once_with("true", warn=True, hide=True)
+    sleep.assert_called_once_with(1)
+
+
+def test_ssh_prepare_retries_connection_refusals(monkeypatch):
+    executor = SshExecutor("root@127.0.0.1:30123", "fixture-key")
+    failed_connection = MagicMock()
+    failed_connection.run.side_effect = NoValidConnectionsError(
+        {("127.0.0.1", 30123): ConnectionRefusedError("connection refused")}
+    )
+    ready_connection = MagicMock()
+    executor._connection = failed_connection
+    monkeypatch.setattr(
+        executor,
+        "_create_connection",
+        lambda: setattr(executor, "_connection", ready_connection),
+    )
+    sleep = MagicMock()
+    monkeypatch.setattr(
+        "exasol_integration_test_docker_environment.lib.base.db_os_executor.time.sleep",
+        sleep,
+    )
+
+    executor.prepare()
+
+    failed_connection.close.assert_called_once()
+    ready_connection.run.assert_called_once_with("true", warn=True, hide=True)
+    sleep.assert_called_once_with(1)
+
+
+def test_ssh_prepare_requires_an_open_connection():
+    executor = SshExecutor("root@127.0.0.1:30123", "fixture-key")
+
+    with pytest.raises(RuntimeError) as error:
+        executor.prepare()
+    assert str(error.value) == "SSH executor must be entered before preparation"
+
+
+def test_ssh_prepare_raises_after_retry_limit(monkeypatch):
+    executor = SshExecutor("root@127.0.0.1:30123", "fixture-key")
+    connection = MagicMock()
+    connection.run.side_effect = SSHException("SSH banner not ready")
+    executor._connection = connection
+    create_connection = MagicMock()
+    monkeypatch.setattr(executor, "_create_connection", create_connection)
+    sleep = MagicMock()
+    monkeypatch.setattr(
+        "exasol_integration_test_docker_environment.lib.base.db_os_executor.time.sleep",
+        sleep,
+    )
+
+    with pytest.raises(SSHException, match="SSH banner not ready"):
+        executor.prepare()
+
+    assert connection.run.call_count == executor.SSH_READINESS_ATTEMPTS
+    assert connection.close.call_count == executor.SSH_READINESS_ATTEMPTS
+    assert create_connection.call_count == executor.SSH_READINESS_ATTEMPTS
+    assert sleep.call_count == executor.SSH_READINESS_ATTEMPTS - 1

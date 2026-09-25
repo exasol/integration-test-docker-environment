@@ -13,7 +13,10 @@ from docker.models.containers import (
     Container,
     ExecResult,
 )
-from paramiko.ssh_exception import NoValidConnectionsError
+from paramiko.ssh_exception import (
+    NoValidConnectionsError,
+    SSHException,
+)
 
 from exasol_integration_test_docker_environment.lib.base.ssh_access import SshKey
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
@@ -91,18 +94,23 @@ class DockerExecutor(DbOsExecutor):
 
 
 class SshExecutor(DbOsExecutor):
+    SSH_READINESS_ATTEMPTS = 20
+
     def __init__(self, connect_string: str, key_file: str) -> None:
         self._connect_string = connect_string
         self._key_file = key_file
         self._connection: fabric.Connection | None = None
 
     def __enter__(self):
+        self._create_connection()
+        return self
+
+    def _create_connection(self) -> None:
         key = SshKey.read_from(self._key_file)
         self._connection = fabric.Connection(
             self._connect_string,
             connect_kwargs={"pkey": key.private},
         )
-        return self
 
     def __exit__(self, type_, value, traceback):
         self.close()
@@ -124,15 +132,23 @@ class SshExecutor(DbOsExecutor):
         return ExecResult(result.exited, output)
 
     def prepare(self):
-        retry = 0
-        while retry < 20:
+        if self._connection is None:
+            raise RuntimeError("SSH executor must be entered before preparation")
+        for retry in range(self.SSH_READINESS_ATTEMPTS):
             try:
-                retry += 1
                 self._connection.run("true", warn=True, hide=True)
-                break
-            except NoValidConnectionsError as ex:
-                if retry > 20:
-                    raise ex
+                return
+            except (NoValidConnectionsError, SSHException):
+                # Docker can expose port 22 before sshd is ready to complete
+                # its protocol banner or accept connections. Reset Fabric's
+                # failed connection before retrying the Docker-DB SSH service.
+                self._connection.close()
+                # A failed Paramiko/Fabric handshake can leave state on the
+                # connection object. Construct a fresh connection instead of
+                # reusing that object for the next attempt.
+                self._create_connection()
+                if retry == self.SSH_READINESS_ATTEMPTS - 1:
+                    raise
                 time.sleep(1)
 
     def close(self):
@@ -176,9 +192,14 @@ class SshExecFactory(DbOsExecFactory):
     @classmethod
     def from_database_info(cls, info: DatabaseInfo):
         assert info.ssh_info
+        if port := info.forwarded_ports and info.forwarded_ports.ssh:
+            host = info.port_bind_address or "127.0.0.1"
+        else:
+            host = info.host
+            port = info.ports.ssh
+
         return SshExecFactory(
-            f"{info.ssh_info.user}@{info.host}:{info.ports.ssh}",
-            info.ssh_info.key_file,
+            f"{info.ssh_info.user}@{host}:{port}", info.ssh_info.key_file
         )
 
     def __init__(self, connect_string: str, ssh_key_file: str) -> None:

@@ -52,20 +52,21 @@ class IsDatabaseReadyThread(Thread):
             with self.executor_factory.executor() as executor:
                 db_connection_command = ""
                 bucket_fs_connection_command = ""
-                try:
-                    executor.prepare()
-                    exaplus_path = find_exaplus(self._db_container, executor)
-                    db_connection_command = self.create_db_connection_command(
-                        exaplus_path
-                    )
-                    bucket_fs_connection_command = (
-                        self.create_bucketfs_connection_command()
-                    )
-                except RuntimeError as e:
-                    self.logger.exception(
-                        "Caught exception while searching for exaplus."
-                    )
-                    self.finish = True
+                executor.prepare()
+                if not self.finish:
+                    try:
+                        exaplus_path = find_exaplus(self._db_container, executor)
+                        db_connection_command = self.create_db_connection_command(
+                            exaplus_path
+                        )
+                        bucket_fs_connection_command = (
+                            self.create_bucketfs_connection_command()
+                        )
+                    except RuntimeError:
+                        self.logger.exception(
+                            "Caught exception while searching for exaplus."
+                        )
+                        self.finish = True
                 while not self.finish:
                     exit_code_db_connection, self.output_db_connection = executor.exec(
                         db_connection_command
@@ -80,7 +81,7 @@ class IsDatabaseReadyThread(Thread):
                         self.finish = True
                         self.is_ready = True
                     time.sleep(1)
-        except Exception as e:
+        except Exception:
             self.finish = True
             self.logger.exception("Caught exception in IsDatabaseReadyThread.run.")
 
