@@ -292,6 +292,7 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
                 container_info=container_info,
                 ssh_info=ssh_info,
                 forwarded_ports=self.forwarded_ports,
+                port_bind_address=self.port_bind_address,
             )
             return database_info
 

@@ -122,8 +122,10 @@ The following options are available to customize the test environment.
                                       gets forwarded. Deprecated: Use '--
                                       bucketfs-http-port-forward' instead.
       --ssh-port-forward INTEGER      Host port to which SSH gets forwarded when
-                                      --db-os-access=SSH. If not specified, ITDE
-                                      selects a random free port.
+                                      --db-os-access=SSH. ITDE connects through
+                                      --port-bind-address (127.0.0.1 by
+                                      default). If not specified, ITDE selects a
+                                      random free port.
       --db-mem-size TEXT              The main memory used by the database. Format
                                       <number> <unit>, e.g. 1 GiB. The minimum
                                       size is 1 GB, below that the database will
@@ -392,8 +394,11 @@ Docker Container to enable SSH access with public key authentication.
 You can use command line option ``--ssh-port-forward`` to specify a port on
 your host machine to which ITDE forwards the SSH port of the Docker Container
 running the Exasol database. If you do not specify a port then ITDE will
-select a random free port. SSH is published only when ``--db-os-access SSH``
-is selected; Docker-exec environments do not reserve an SSH port.
+select a random free port. When an SSH port is forwarded, ITDE's SSH executor
+connects through the configured ``--port-bind-address`` and that port (or
+``127.0.0.1`` when no bind address is configured). SSH is published only when
+``--db-os-access SSH`` is selected; Docker-exec environments do not reserve an
+SSH port.
 
 For example, create an SSH-ready fixture with a known local port:
 
@@ -423,7 +428,8 @@ self-signed certificate must remain loopback-only.
 To choose a bind address for every forwarded port, use
 ``--port-bind-address <address>`` (or ``port_bind_address`` in the API). By
 default, all forwarded ports bind to loopback. Setting a bind address applies
-to every forwarded port, including ConfD.
+to every forwarded port, including SSH and ConfD. ITDE uses that same address
+when connecting to a forwarded SSH port.
 
 .. code:: console
 
