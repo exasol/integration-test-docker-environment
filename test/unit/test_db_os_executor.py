@@ -78,6 +78,30 @@ def test_ssh_executor_runs_command_without_environment():
     )
 
 
+def test_ssh_executor_creates_a_connection_when_entered(monkeypatch):
+    key = MagicMock()
+    connection = MagicMock()
+    read_key = MagicMock(return_value=key)
+    create_connection = MagicMock(return_value=connection)
+    monkeypatch.setattr(
+        "exasol_integration_test_docker_environment.lib.base.db_os_executor.SshKey.read_from",
+        read_key,
+    )
+    monkeypatch.setattr(
+        "exasol_integration_test_docker_environment.lib.base.db_os_executor.fabric.Connection",
+        create_connection,
+    )
+
+    with SshExecutor("root@127.0.0.1:30123", "fixture-key") as executor:
+        assert executor._connection is connection
+
+    read_key.assert_called_once_with("fixture-key")
+    create_connection.assert_called_once_with(
+        "root@127.0.0.1:30123", connect_kwargs={"pkey": key.private}
+    )
+    connection.close.assert_called_once()
+
+
 def test_ssh_exec_factory():
     factory = SshExecFactory("connect_string", "ssh_key_file")
     executor = factory.executor()

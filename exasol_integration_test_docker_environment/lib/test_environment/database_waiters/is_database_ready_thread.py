@@ -92,7 +92,7 @@ class IsDatabaseReadyThread(Thread):
                         self.finish = True
                         self.is_ready = True
                     time.sleep(1)
-        except Exception as e:
+        except Exception:
             self.finish = True
             self.logger.exception("Caught exception in IsDatabaseReadyThread.run.")
 
