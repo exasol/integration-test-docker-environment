@@ -226,6 +226,8 @@ def test_ssh_prepare_raises_after_retry_limit(monkeypatch):
     connection = MagicMock()
     connection.run.side_effect = SSHException("SSH banner not ready")
     executor._connection = connection
+    create_connection = MagicMock()
+    monkeypatch.setattr(executor, "_create_connection", create_connection)
     sleep = MagicMock()
     monkeypatch.setattr(
         "exasol_integration_test_docker_environment.lib.base.db_os_executor.time.sleep",
@@ -237,4 +239,5 @@ def test_ssh_prepare_raises_after_retry_limit(monkeypatch):
 
     assert connection.run.call_count == executor.SSH_READINESS_ATTEMPTS
     assert connection.close.call_count == executor.SSH_READINESS_ATTEMPTS
+    assert create_connection.call_count == executor.SSH_READINESS_ATTEMPTS
     assert sleep.call_count == executor.SSH_READINESS_ATTEMPTS - 1
