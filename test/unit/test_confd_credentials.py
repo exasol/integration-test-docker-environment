@@ -12,11 +12,21 @@ from unittest.mock import (
 
 import pytest
 
+from exasol_integration_test_docker_environment.lib.base.db_os_executor import (
+    DockerExecFactory,
+    SshExecFactory,
+)
 from exasol_integration_test_docker_environment.lib.models.data.confd_info import (
     ConfdInfo,
 )
 from exasol_integration_test_docker_environment.lib.test_environment.create_confd_credentials import (
     CreateConfdCredentials,
+)
+from exasol_integration_test_docker_environment.lib.test_environment.database_waiters.wait_for_test_docker_database import (
+    WaitForTestDockerDatabase,
+)
+from exasol_integration_test_docker_environment.lib.test_environment.parameter.docker_db_test_environment_parameter import (
+    DbOsAccess,
 )
 from exasol_integration_test_docker_environment.lib.test_environment.ports import (
     Ports,
@@ -77,6 +87,24 @@ def test_create_user_passes_the_password_only_as_container_environment():
     )
 
 
+def test_change_user_password_passes_the_password_only_as_container_environment():
+    task = object.__new__(CreateConfdCredentials)
+    task._wait_for_readiness = Mock()
+
+    task._change_user_password("disposable-secret")
+
+    command, environment, failure_message = task._wait_for_readiness.call_args.args
+    assert "disposable-secret" not in command
+    assert environment == {"CONFD_PASSWORD": "disposable-secret"}
+    assert failure_message == "Disposable ConfD user password could not be changed"
+    assert command == (
+        "confd_client -c user_passwd -A "
+        '\'{"username":"itde_confd","password":"\''
+        '"$CONFD_PASSWORD"'
+        '\'","encode_passwd":true}\''
+    )
+
+
 def test_confd_credentials_file_is_owner_only(tmp_path):
     task = object.__new__(CreateConfdCredentials)
     task.environment_name = "environment"
@@ -129,6 +157,7 @@ def test_confd_service_readiness_retries_without_credentials(monkeypatch):
 
 def _task_for_run() -> CreateConfdCredentials:
     task = cast(Any, object.__new__(CreateConfdCredentials))
+    task.environment_name = "environment"
     task.database_info = SimpleNamespace(
         reused=False,
         container_info=object(),
@@ -228,16 +257,105 @@ def test_run_task_does_not_roll_back_when_service_is_not_ready():
     task._delete_user.assert_not_called()
 
 
-def test_run_task_rejects_a_reused_database():
+def test_run_task_returns_retained_credentials_for_a_reused_database(tmp_path):
     task = _task_for_run()
     task.database_info.reused = True
+    task.get_cache_path = Mock(return_value=tmp_path)
+    credentials_file = task._write_credentials_file("disposable-secret")
+    task._wait_for_service_readiness = Mock()
+    task._create_user = Mock()
 
-    with pytest.raises(RuntimeError) as error:
+    task.run_task()
+
+    info = task.return_object.call_args.args[0]
+    assert info.credentials_file == str(credentials_file)
+    assert info.read_credentials().password == "disposable-secret"
+    task._wait_for_service_readiness.assert_not_called()
+    task._create_user.assert_not_called()
+
+
+def test_run_task_repairs_reuse_when_credentials_file_is_missing(monkeypatch, tmp_path):
+    task = _task_for_run()
+    task.database_info.reused = True
+    task.get_cache_path = Mock(return_value=tmp_path)
+    task._change_user_password = Mock()
+    task._create_user = Mock()
+    task._wait_for_rest_readiness = Mock()
+    monkeypatch.setattr(
+        "exasol_integration_test_docker_environment.lib.test_environment.create_confd_credentials.secrets.token_urlsafe",
+        Mock(return_value="replacement-secret"),
+    )
+
+    task.run_task()
+
+    task._change_user_password.assert_called_once_with("replacement-secret")
+    task._create_user.assert_not_called()
+    task._wait_for_rest_readiness.assert_called_once_with("replacement-secret")
+    credentials_file = task._credentials_file_path()
+    assert task.return_object.call_args.args[0].credentials_file == str(
+        credentials_file
+    )
+    assert task.return_object.call_args.args[0].read_credentials().password == (
+        "replacement-secret"
+    )
+
+
+def test_run_task_creates_missing_confd_account_while_repairing_credentials(
+    monkeypatch, tmp_path
+):
+    task = _task_for_run()
+    task.database_info.reused = True
+    task.get_cache_path = Mock(return_value=tmp_path)
+    task._change_user_password = Mock(side_effect=RuntimeError("user does not exist"))
+    task._create_user = Mock()
+    task._wait_for_rest_readiness = Mock()
+    monkeypatch.setattr(
+        "exasol_integration_test_docker_environment.lib.test_environment.create_confd_credentials.secrets.token_urlsafe",
+        Mock(return_value="replacement-secret"),
+    )
+
+    task.run_task()
+
+    task._create_user.assert_called_once_with("replacement-secret")
+    task._wait_for_rest_readiness.assert_called_once_with("replacement-secret")
+
+
+def test_run_task_fails_without_writing_credentials_when_repair_is_impossible(
+    monkeypatch, tmp_path
+):
+    task = _task_for_run()
+    task.database_info.reused = True
+    task.get_cache_path = Mock(return_value=tmp_path)
+    task._change_user_password = Mock(side_effect=RuntimeError("ConfD unavailable"))
+    task._create_user = Mock(side_effect=RuntimeError("ConfD unavailable"))
+    task._wait_for_rest_readiness = Mock()
+    monkeypatch.setattr(
+        "exasol_integration_test_docker_environment.lib.test_environment.create_confd_credentials.secrets.token_urlsafe",
+        Mock(return_value="replacement-secret"),
+    )
+
+    with pytest.raises(RuntimeError, match="Cannot repair ConfD credentials"):
         task.run_task()
 
-    assert str(error.value) == (
-        "Cannot create disposable ConfD credentials for a reused database"
+    assert not task._credentials_file_path().exists()
+    task._wait_for_rest_readiness.assert_not_called()
+    task.return_object.assert_not_called()
+
+
+def test_run_task_rejects_reuse_for_a_different_confd_account(tmp_path):
+    task = _task_for_run()
+    task.database_info.reused = True
+    task.get_cache_path = Mock(return_value=tmp_path)
+    credentials_file = task._credentials_file_path()
+    credentials_file.parent.mkdir(parents=True)
+    credentials_file.write_text(
+        json.dumps({"username": "different-user", "password": "secret"}),
+        encoding="utf-8",
     )
+    credentials_file.chmod(0o600)
+
+    with pytest.raises(RuntimeError, match="different ConfD account"):
+        task.run_task()
 
 
 def test_docker_database_spawn_passes_its_executor_to_confd_credentials_task():
@@ -266,6 +384,47 @@ def test_docker_database_spawn_skips_confd_credentials_without_opt_in():
     task.create_confd_user = False
 
     assert task.create_confd_credentials_task(Mock()) is None
+
+
+def test_docker_database_readiness_uses_a_short_docker_timeout():
+    task = object.__new__(SpawnTestEnvironmentWithDockerDB)
+    task.db_os_access = DbOsAccess.DOCKER_EXEC
+    task.db_container_name = "database"
+
+    factory = task._readiness_executor_factory(Mock())
+
+    assert isinstance(factory, DockerExecFactory)
+    assert factory._container_name == "database"
+    assert factory._client_factory._timeout == 30
+
+
+def test_docker_database_readiness_uses_ssh_when_configured(monkeypatch):
+    task = object.__new__(SpawnTestEnvironmentWithDockerDB)
+    task.db_os_access = DbOsAccess.SSH
+    database_info = Mock()
+    factory = Mock()
+    ssh_factory = Mock(return_value=factory)
+    monkeypatch.setattr(SshExecFactory, "from_database_info", ssh_factory)
+
+    assert task._readiness_executor_factory(database_info) is factory
+    ssh_factory.assert_called_once_with(database_info)
+
+
+def test_docker_database_wait_task_uses_the_readiness_executor():
+    task = object.__new__(SpawnTestEnvironmentWithDockerDB)
+    task.docker_db_image_version = "2026.1.0"
+    task._readiness_executor_factory = Mock(return_value="readiness-executor")
+    task.create_child_task_with_common_params = Mock(return_value="wait-task")
+    database_info = Mock()
+
+    assert task.create_wait_for_database_task(2, database_info) == "wait-task"
+    task.create_child_task_with_common_params.assert_called_once_with(
+        WaitForTestDockerDatabase,
+        database_info=database_info,
+        attempt=2,
+        docker_db_image_version="2026.1.0",
+        executor_factory="readiness-executor",
+    )
 
 
 def test_run_confd_uses_the_configured_executor_without_logging_output():

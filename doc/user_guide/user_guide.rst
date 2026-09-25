@@ -393,6 +393,16 @@ your host machine to which ITDE forwards the SSH port of the Docker Container
 running the Exasol database. If you do not specify a port then ITDE will
 select a random free port.
 
+Docker-DB Environment Readiness
+""""""""""""""""""""""""""""""""""""""""""
+
+While starting a Docker-DB environment, ITDE limits each Docker-client
+readiness probe to 30 seconds. This prevents an unresponsive Docker daemon
+from blocking startup indefinitely. The database startup timeout remains 10
+minutes, and ITDE can retry a failed startup attempt. This limit applies only
+to readiness probes; regular operations, including ConfD credential setup,
+keep their normal Docker-client timeout.
+
 
 ConfD HTTPS Access
 """""""""""""""""""
@@ -427,13 +437,16 @@ the username, direct endpoint (when forwarded), SSH-tunnel target, and an
 owner-only ``confd_credentials.json`` path. Consumers obtain the password with
 ``database_info.confd_info.read_credentials()``.
 
-This is an explicit test-only lifecycle: it is unsupported with
-``reuse_database`` because a newly generated password cannot safely describe a
-pre-existing user. On provisioning failure ITDE makes one best-effort user
-deletion; normal environment cleanup removes the disposable container and its
-user. The account belongs to ``exaadm`` because ConfD requires that group for
-supported administrative operations. Consumers should use only their intended
-read-only operation.
+With ``reuse_database``, ITDE returns retained credentials unchanged. If
+``confd_credentials.json`` is missing, it rotates the disposable account
+password (or creates the account if absent) and rewrites the owner-only file.
+Reuse fails without writing credentials if neither operation succeeds. The
+password is never serialized in ``environment_info.json``.
+
+.. note::
+
+   Cleanup removes ``confd_credentials.json``. A later reuse repairs it if the
+   database and ConfD account remain available.
 
 ITDE does not extract bearer tokens or parse ``/exa/etc/EXAConf``. The API
 does not implement a ConfD client, SSH tunnel, or protocol fallback: consumers

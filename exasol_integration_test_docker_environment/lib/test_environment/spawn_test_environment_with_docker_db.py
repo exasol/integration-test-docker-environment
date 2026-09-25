@@ -28,6 +28,8 @@ from exasol_integration_test_docker_environment.lib.test_environment.create_conf
 from exasol_integration_test_docker_environment.lib.test_environment.database_waiters.wait_for_test_docker_database import (
     WaitForTestDockerDatabase,
 )
+
+_READINESS_DOCKER_TIMEOUT_SECONDS = 30
 from exasol_integration_test_docker_environment.lib.test_environment.db_version import (
     db_version_supports_custom_certificates,
 )
@@ -94,6 +96,14 @@ class SpawnTestEnvironmentWithDockerDB(
         client_factory = DockerClientFactory(timeout=100000)
         return DockerExecFactory(self.db_container_name, client_factory)
 
+    def _readiness_executor_factory(
+        self, database_info: DatabaseInfo
+    ) -> DbOsExecFactory:
+        if self.db_os_access == DbOsAccess.SSH:
+            return SshExecFactory.from_database_info(database_info)
+        client_factory = DockerClientFactory(timeout=_READINESS_DOCKER_TIMEOUT_SECONDS)
+        return DockerExecFactory(self.db_container_name, client_factory)
+
     def create_spawn_database_task(
         self,
         network_info: DockerNetworkInfo,
@@ -122,7 +132,7 @@ class SpawnTestEnvironmentWithDockerDB(
             database_info=database_info,
             attempt=attempt,
             docker_db_image_version=self.docker_db_image_version,
-            executor_factory=self._executor_factory(database_info),
+            executor_factory=self._readiness_executor_factory(database_info),
         )
 
     def create_confd_credentials_task(
