@@ -102,12 +102,15 @@ class SshExecutor(DbOsExecutor):
         self._connection: fabric.Connection | None = None
 
     def __enter__(self):
+        self._create_connection()
+        return self
+
+    def _create_connection(self) -> None:
         key = SshKey.read_from(self._key_file)
         self._connection = fabric.Connection(
             self._connect_string,
             connect_kwargs={"pkey": key.private},
         )
-        return self
 
     def __exit__(self, type_, value, traceback):
         self.close()
@@ -140,6 +143,10 @@ class SshExecutor(DbOsExecutor):
                 # its protocol banner or accept connections. Reset Fabric's
                 # failed connection before retrying the Docker-DB SSH service.
                 self._connection.close()
+                # A failed Paramiko/Fabric handshake can leave state on the
+                # connection object. Construct a fresh connection instead of
+                # reusing that object for the next attempt.
+                self._create_connection()
                 if retry == self.SSH_READINESS_ATTEMPTS - 1:
                     raise
                 time.sleep(1)

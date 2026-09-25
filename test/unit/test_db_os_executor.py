@@ -165,9 +165,15 @@ def test_ssh_exec_factory_uses_database_endpoint_without_forwarded_ssh_port():
 
 def test_ssh_prepare_retries_until_sshd_is_ready(monkeypatch):
     executor = SshExecutor("root@127.0.0.1:30123", "fixture-key")
-    connection = MagicMock()
-    connection.run.side_effect = [SSHException("SSH banner not ready"), None]
-    executor._connection = connection
+    failed_connection = MagicMock()
+    failed_connection.run.side_effect = SSHException("SSH banner not ready")
+    ready_connection = MagicMock()
+    executor._connection = failed_connection
+    monkeypatch.setattr(
+        executor,
+        "_create_connection",
+        lambda: setattr(executor, "_connection", ready_connection),
+    )
     sleep = MagicMock()
     monkeypatch.setattr(
         "exasol_integration_test_docker_environment.lib.base.db_os_executor.time.sleep",
@@ -176,21 +182,24 @@ def test_ssh_prepare_retries_until_sshd_is_ready(monkeypatch):
 
     executor.prepare()
 
-    assert connection.run.call_count == 2
-    connection.close.assert_called_once()
+    failed_connection.close.assert_called_once()
+    ready_connection.run.assert_called_once_with("true", warn=True, hide=True)
     sleep.assert_called_once_with(1)
 
 
 def test_ssh_prepare_retries_connection_refusals(monkeypatch):
     executor = SshExecutor("root@127.0.0.1:30123", "fixture-key")
-    connection = MagicMock()
-    connection.run.side_effect = [
-        NoValidConnectionsError(
-            {("127.0.0.1", 30123): ConnectionRefusedError("connection refused")}
-        ),
-        None,
-    ]
-    executor._connection = connection
+    failed_connection = MagicMock()
+    failed_connection.run.side_effect = NoValidConnectionsError(
+        {("127.0.0.1", 30123): ConnectionRefusedError("connection refused")}
+    )
+    ready_connection = MagicMock()
+    executor._connection = failed_connection
+    monkeypatch.setattr(
+        executor,
+        "_create_connection",
+        lambda: setattr(executor, "_connection", ready_connection),
+    )
     sleep = MagicMock()
     monkeypatch.setattr(
         "exasol_integration_test_docker_environment.lib.base.db_os_executor.time.sleep",
@@ -199,8 +208,8 @@ def test_ssh_prepare_retries_connection_refusals(monkeypatch):
 
     executor.prepare()
 
-    assert connection.run.call_count == 2
-    connection.close.assert_called_once()
+    failed_connection.close.assert_called_once()
+    ready_connection.run.assert_called_once_with("true", warn=True, hide=True)
     sleep.assert_called_once_with(1)
 
 
