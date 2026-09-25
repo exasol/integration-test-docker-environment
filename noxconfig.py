@@ -13,7 +13,8 @@ from exasol_integration_test_docker_environment.cli.options.test_environment_opt
 
 
 class Config(BaseConfig):
-    _INTEGRATION_TEST_DIRS = ("base_task", "docker_runtime", "test_env_reuse")
+    _INTEGRATION_TEST_DIRS = ("base_task", "docker_runtime")
+    _INTEGRATION_TEST_FILE_DIRS = ("test_env_reuse",)
     _GPU_TEST_FILES = frozenset(("test_gpu.py",))
 
     @computed_field  # type: ignore[misc]
@@ -103,6 +104,11 @@ class Config(BaseConfig):
             str((test_root / directory).relative_to(self.root_path))
             for directory in self._INTEGRATION_TEST_DIRS
         ]
+        targets.extend(
+            str(path.relative_to(self.root_path))
+            for directory in self._INTEGRATION_TEST_FILE_DIRS
+            for path in sorted((test_root / directory).glob("test_*.py"))
+        )
         targets.extend(
             str(path.relative_to(self.root_path))
             for path in sorted(test_root.glob("test_*.py"))
