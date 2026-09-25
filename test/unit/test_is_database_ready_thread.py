@@ -1,8 +1,4 @@
-from pathlib import Path
 from unittest.mock import MagicMock
-
-from docker.models.containers import ExecResult
-from paramiko.ssh_exception import SSHException
 
 from exasol_integration_test_docker_environment.lib.models.data.database_credentials import (
     DatabaseCredentials,
@@ -26,44 +22,6 @@ def _thread(executor: MagicMock) -> IsDatabaseReadyThread:
         docker_db_image_version="7.1.0",
         executor_factory=executor_factory,
     )
-
-
-def test_retries_ssh_readiness_without_failing_database_startup(monkeypatch):
-    executor = MagicMock()
-    executor.prepare.side_effect = [SSHException("SSH banner not ready"), None]
-    executor.exec.side_effect = [ExecResult(0, b""), ExecResult(0, b"")]
-    thread = _thread(executor)
-    sleep = MagicMock()
-    monkeypatch.setattr(
-        "exasol_integration_test_docker_environment.lib.test_environment.database_waiters.is_database_ready_thread.find_exaplus",
-        lambda *_: Path("/exa/bin/exaplus"),
-    )
-    monkeypatch.setattr(
-        "exasol_integration_test_docker_environment.lib.test_environment.database_waiters.is_database_ready_thread.time.sleep",
-        sleep,
-    )
-
-    thread.run()
-
-    assert thread.is_ready
-    assert executor.prepare.call_count == 2
-    assert executor.exec.call_count == 2
-
-
-def test_stops_ssh_readiness_wait_when_database_waiter_stops_thread(monkeypatch):
-    executor = MagicMock()
-    executor.prepare.side_effect = SSHException("SSH banner not ready")
-    thread = _thread(executor)
-
-    monkeypatch.setattr(
-        "exasol_integration_test_docker_environment.lib.test_environment.database_waiters.is_database_ready_thread.time.sleep",
-        lambda _: thread.stop(),
-    )
-
-    thread.run()
-
-    assert not thread.is_ready
-    executor.exec.assert_not_called()
 
 
 def test_stops_when_exaplus_cannot_be_found(monkeypatch):

@@ -3,7 +3,6 @@ from pathlib import PurePath
 from threading import Thread
 
 from docker.models.containers import Container
-from paramiko.ssh_exception import SSHException
 
 from exasol_integration_test_docker_environment.lib.base.db_os_executor import (
     DbOsExecFactory,
@@ -53,17 +52,7 @@ class IsDatabaseReadyThread(Thread):
             with self.executor_factory.executor() as executor:
                 db_connection_command = ""
                 bucket_fs_connection_command = ""
-                while not self.finish:
-                    try:
-                        executor.prepare()
-                        break
-                    except SSHException:
-                        # The published Docker port can accept connections
-                        # before sshd is usable. This is not a database-start
-                        # failure: keep waiting until the task's configured
-                        # database-startup timeout expires.
-                        self.logger.info("Waiting for Docker-DB SSH service")
-                        time.sleep(1)
+                executor.prepare()
                 if not self.finish:
                     try:
                         exaplus_path = find_exaplus(self._db_container, executor)

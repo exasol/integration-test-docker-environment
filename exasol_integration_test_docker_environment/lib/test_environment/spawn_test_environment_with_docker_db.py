@@ -94,14 +94,6 @@ class SpawnTestEnvironmentWithDockerDB(
         client_factory = DockerClientFactory(timeout=100000)
         return DockerExecFactory(self.db_container_name, client_factory)
 
-    def _readiness_executor_factory(self) -> DockerExecFactory:
-        # Docker-DB readiness is an ITDE-internal operation. It must not
-        # depend on the optional SSH access mode, because Docker publishes
-        # the SSH port before sshd is ready.
-        return DockerExecFactory(
-            self.db_container_name, DockerClientFactory(timeout=100000)
-        )
-
     def create_spawn_database_task(
         self,
         network_info: DockerNetworkInfo,
@@ -130,7 +122,7 @@ class SpawnTestEnvironmentWithDockerDB(
             database_info=database_info,
             attempt=attempt,
             docker_db_image_version=self.docker_db_image_version,
-            executor_factory=self._readiness_executor_factory(),
+            executor_factory=self._executor_factory(database_info),
         )
 
     def create_confd_credentials_task(
