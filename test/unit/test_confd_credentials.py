@@ -447,6 +447,7 @@ def test_run_confd_uses_the_configured_executor_without_logging_output():
         "HOSTNAME": "localhost",
         "CONFD_PASSWORD": "disposable-secret",
     }
+    executor.prepare.assert_called_once_with()
     task.executor_factory.executor.assert_called_once_with()
 
 
@@ -468,6 +469,7 @@ def test_run_confd_raises_a_sanitized_error_for_a_failed_command():
         == "Disposable ConfD user operation failed: The password is <redacted>"
     )
     assert "disposable-secret" not in str(error.value)
+    executor.prepare.assert_called_once_with()
 
 
 def test_delete_user_suppresses_a_sanitized_cleanup_failure():

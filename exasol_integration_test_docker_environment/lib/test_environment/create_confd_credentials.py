@@ -30,7 +30,7 @@ CONFD_READINESS_ATTEMPTS = 12
 
 
 class CreateConfdCredentials(DependencyLoggerBaseTask):
-    """Create or reuse the disposable ConfD account and its local credentials."""
+    """Create or reuse the disposable ConfD account and its local credentials through the configured DB-OS executor."""
 
     environment_name: str = luigi.Parameter()
     database_info: DatabaseInfo = JsonPickleParameter(DatabaseInfo, significant=False)  # type: ignore
@@ -195,6 +195,9 @@ class CreateConfdCredentials(DependencyLoggerBaseTask):
         }
         environment = local_defaults | environment
         with self.executor_factory.executor() as executor:
+            # This is required for a newly opened SSH executor and is a no-op
+            # for Docker execution.
+            executor.prepare()
             result = executor.exec(command, environment)
         if result.exit_code != 0:
             output = result.output.decode("utf-8", errors="replace").strip()
