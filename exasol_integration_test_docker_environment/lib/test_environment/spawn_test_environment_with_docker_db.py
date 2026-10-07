@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from exasol_integration_test_docker_environment.lib.base.db_os_executor import (
     DbOsExecFactory,
     DockerClientFactory,
@@ -28,8 +30,6 @@ from exasol_integration_test_docker_environment.lib.test_environment.create_conf
 from exasol_integration_test_docker_environment.lib.test_environment.database_waiters.wait_for_test_docker_database import (
     WaitForTestDockerDatabase,
 )
-
-_READINESS_DOCKER_TIMEOUT_SECONDS = 30
 from exasol_integration_test_docker_environment.lib.test_environment.db_version import (
     db_version_supports_custom_certificates,
 )
@@ -90,18 +90,16 @@ class SpawnTestEnvironmentWithDockerDB(
             attempt=attempt,
         )
 
-    def _executor_factory(self, database_info: DatabaseInfo) -> DbOsExecFactory:
-        if self.db_os_access == DbOsAccess.SSH:
-            return SshExecFactory.from_database_info(database_info)
-        client_factory = DockerClientFactory(timeout=100000)
-        return DockerExecFactory(self.db_container_name, client_factory)
-
-    def _readiness_executor_factory(
-        self, database_info: DatabaseInfo
+    def _executor_factory(
+        self,
+        database_info: DatabaseInfo,
+        docker_client_timeout: timedelta = timedelta(minutes=5),
     ) -> DbOsExecFactory:
         if self.db_os_access == DbOsAccess.SSH:
             return SshExecFactory.from_database_info(database_info)
-        client_factory = DockerClientFactory(timeout=_READINESS_DOCKER_TIMEOUT_SECONDS)
+        client_factory = DockerClientFactory(
+            timeout=docker_client_timeout.total_seconds()
+        )
         return DockerExecFactory(self.db_container_name, client_factory)
 
     def create_spawn_database_task(
@@ -132,7 +130,9 @@ class SpawnTestEnvironmentWithDockerDB(
             database_info=database_info,
             attempt=attempt,
             docker_db_image_version=self.docker_db_image_version,
-            executor_factory=self._readiness_executor_factory(database_info),
+            executor_factory=self._executor_factory(
+                database_info, timedelta(seconds=30)
+            ),
         )
 
     def create_confd_credentials_task(

@@ -1,5 +1,6 @@
 import json
 import stat
+from datetime import timedelta
 from types import SimpleNamespace
 from typing import (
     Any,
@@ -386,19 +387,31 @@ def test_docker_database_spawn_skips_confd_credentials_without_opt_in():
     assert task.create_confd_credentials_task(Mock()) is None
 
 
-def test_docker_database_readiness_uses_a_short_docker_timeout():
+def test_docker_database_executor_uses_a_five_minute_docker_timeout_by_default():
     task = object.__new__(SpawnTestEnvironmentWithDockerDB)
     task.db_os_access = DbOsAccess.DOCKER_EXEC
     task.db_container_name = "database"
 
-    factory = task._readiness_executor_factory(Mock())
+    factory = task._executor_factory(Mock())
+
+    assert isinstance(factory, DockerExecFactory)
+    assert factory._container_name == "database"
+    assert factory._client_factory._timeout == timedelta(minutes=5).total_seconds()
+
+
+def test_docker_database_executor_converts_custom_timeout_to_seconds():
+    task = object.__new__(SpawnTestEnvironmentWithDockerDB)
+    task.db_os_access = DbOsAccess.DOCKER_EXEC
+    task.db_container_name = "database"
+
+    factory = task._executor_factory(Mock(), timedelta(seconds=30))
 
     assert isinstance(factory, DockerExecFactory)
     assert factory._container_name == "database"
     assert factory._client_factory._timeout == 30
 
 
-def test_docker_database_readiness_uses_ssh_when_configured(monkeypatch):
+def test_docker_database_executor_uses_ssh_when_configured(monkeypatch):
     task = object.__new__(SpawnTestEnvironmentWithDockerDB)
     task.db_os_access = DbOsAccess.SSH
     database_info = Mock()
@@ -406,14 +419,14 @@ def test_docker_database_readiness_uses_ssh_when_configured(monkeypatch):
     ssh_factory = Mock(return_value=factory)
     monkeypatch.setattr(SshExecFactory, "from_database_info", ssh_factory)
 
-    assert task._readiness_executor_factory(database_info) is factory
+    assert task._executor_factory(database_info) is factory
     ssh_factory.assert_called_once_with(database_info)
 
 
-def test_docker_database_wait_task_uses_the_readiness_executor():
+def test_docker_database_wait_task_uses_a_short_timeout_executor():
     task = object.__new__(SpawnTestEnvironmentWithDockerDB)
     task.docker_db_image_version = "2026.1.0"
-    task._readiness_executor_factory = Mock(return_value="readiness-executor")
+    task._executor_factory = Mock(return_value="readiness-executor")
     task.create_child_task_with_common_params = Mock(return_value="wait-task")
     database_info = Mock()
 
@@ -424,6 +437,9 @@ def test_docker_database_wait_task_uses_the_readiness_executor():
         attempt=2,
         docker_db_image_version="2026.1.0",
         executor_factory="readiness-executor",
+    )
+    task._executor_factory.assert_called_once_with(
+        database_info, timedelta(seconds=30)
     )
 
 

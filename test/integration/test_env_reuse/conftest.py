@@ -197,6 +197,38 @@ class ReusingTestEnv:
         return task
 
 
+def create_reusable_environment_with_confd_credentials(
+    reusing_test_env: ReusingTestEnv,
+) -> tuple[SpawnTestEnvironment, Path, str]:
+    """Create and preserve an environment with local ConfD credentials."""
+    first_task = reusing_test_env.run_spawn_test_env(
+        cleanup=False, create_confd_user=True, include_test_container=False
+    )
+    first_confd_info = first_task.get_result().database_info.confd_info
+    assert first_confd_info is not None
+    credentials_file = Path(first_confd_info.credentials_file)
+    assert credentials_file.exists()
+    first_password = first_confd_info.read_credentials().password
+    first_task.cleanup(True)
+    return first_task, credentials_file, first_password
+
+
+def reuse_environment_with_confd_credentials(
+    reusing_test_env: ReusingTestEnv, credentials_file: Path
+) -> tuple[SpawnTestEnvironment, str]:
+    """Reuse the preserved environment and return its ConfD password."""
+    second_task = reusing_test_env.run_spawn_test_env(
+        cleanup=True, create_confd_user=True, include_test_container=False
+    )
+    second_environment = second_task.get_result()
+    second_confd_info = second_environment.database_info.confd_info
+    assert second_confd_info is not None
+    assert second_environment.database_info.reused
+    assert second_confd_info.credentials_file == str(credentials_file)
+    assert credentials_file.exists()
+    return second_task, second_confd_info.read_credentials().password
+
+
 @pytest.fixture
 def reusing_test_env(docker_repository, reuse_environment_name):
     environment = ReusingTestEnv(docker_repository, reuse_environment_name)
