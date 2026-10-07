@@ -30,7 +30,7 @@ class DockerClientFactory:
     Create a Docker client.
     """
 
-    def __init__(self, timeout: int = 100000) -> None:
+    def __init__(self, timeout: float = 100000) -> None:
         self._timeout = timeout
 
     def client(self) -> DockerClient:
