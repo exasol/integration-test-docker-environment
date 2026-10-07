@@ -438,9 +438,7 @@ def test_docker_database_wait_task_uses_a_short_timeout_executor():
         docker_db_image_version="2026.1.0",
         executor_factory="readiness-executor",
     )
-    task._executor_factory.assert_called_once_with(
-        database_info, timedelta(seconds=30)
-    )
+    task._executor_factory.assert_called_once_with(database_info, timedelta(seconds=30))
 
 
 def test_run_confd_uses_the_configured_executor_without_logging_output():
