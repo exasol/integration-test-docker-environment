@@ -396,7 +396,7 @@ def test_docker_database_executor_uses_a_five_minute_docker_timeout_by_default()
 
     assert isinstance(factory, DockerExecFactory)
     assert factory._container_name == "database"
-    assert factory._client_factory._timeout == timedelta(minutes=5).total_seconds()
+    assert factory._client_factory._timeout == timedelta(minutes=5)
 
 
 def test_docker_database_executor_converts_custom_timeout_to_seconds():
@@ -408,7 +408,7 @@ def test_docker_database_executor_converts_custom_timeout_to_seconds():
 
     assert isinstance(factory, DockerExecFactory)
     assert factory._container_name == "database"
-    assert factory._client_factory._timeout == 30
+    assert factory._client_factory._timeout == timedelta(seconds=30)
 
 
 def test_docker_database_executor_uses_ssh_when_configured(monkeypatch):

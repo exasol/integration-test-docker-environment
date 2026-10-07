@@ -93,13 +93,15 @@ class SpawnTestEnvironmentWithDockerDB(
     def _executor_factory(
         self,
         database_info: DatabaseInfo,
-        docker_client_timeout: timedelta = timedelta(minutes=5),
+        docker_client_timeout: timedelta | None = None,
     ) -> DbOsExecFactory:
         if self.db_os_access == DbOsAccess.SSH:
             return SshExecFactory.from_database_info(database_info)
-        client_factory = DockerClientFactory(
-            timeout=docker_client_timeout.total_seconds()
-        )
+        if docker_client_timeout is None:
+            # Use the five-minute default defined in DockerClientFactory.__init__.
+            client_factory = DockerClientFactory()
+        else:
+            client_factory = DockerClientFactory(timeout=docker_client_timeout)
         return DockerExecFactory(self.db_container_name, client_factory)
 
     def create_spawn_database_task(
