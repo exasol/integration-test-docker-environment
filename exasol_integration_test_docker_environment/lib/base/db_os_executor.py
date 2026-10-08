@@ -1,6 +1,7 @@
 import time
 from abc import abstractmethod
 from collections.abc import Mapping
+from datetime import timedelta
 from shlex import quote
 from typing import (
     Protocol,
@@ -30,11 +31,11 @@ class DockerClientFactory:
     Create a Docker client.
     """
 
-    def __init__(self, timeout: int = 100000) -> None:
+    def __init__(self, timeout: timedelta = timedelta(minutes=5)) -> None:
         self._timeout = timeout
 
     def client(self) -> DockerClient:
-        with ContextDockerClient(timeout=self._timeout) as client:
+        with ContextDockerClient(timeout=self._timeout.total_seconds()) as client:
             return client
 
 

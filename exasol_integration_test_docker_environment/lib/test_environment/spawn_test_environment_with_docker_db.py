@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from exasol_integration_test_docker_environment.lib.base.db_os_executor import (
     DbOsExecFactory,
     DockerClientFactory,
@@ -88,10 +90,18 @@ class SpawnTestEnvironmentWithDockerDB(
             attempt=attempt,
         )
 
-    def _executor_factory(self, database_info: DatabaseInfo) -> DbOsExecFactory:
+    def _executor_factory(
+        self,
+        database_info: DatabaseInfo,
+        docker_client_timeout: timedelta | None = None,
+    ) -> DbOsExecFactory:
         if self.db_os_access == DbOsAccess.SSH:
             return SshExecFactory.from_database_info(database_info)
-        client_factory = DockerClientFactory(timeout=100000)
+        if docker_client_timeout is None:
+            # Use the five-minute default defined in DockerClientFactory.__init__.
+            client_factory = DockerClientFactory()
+        else:
+            client_factory = DockerClientFactory(timeout=docker_client_timeout)
         return DockerExecFactory(self.db_container_name, client_factory)
 
     def create_spawn_database_task(
@@ -122,7 +132,9 @@ class SpawnTestEnvironmentWithDockerDB(
             database_info=database_info,
             attempt=attempt,
             docker_db_image_version=self.docker_db_image_version,
-            executor_factory=self._executor_factory(database_info),
+            executor_factory=self._executor_factory(
+                database_info, timedelta(seconds=30)
+            ),
         )
 
     def create_confd_credentials_task(

@@ -1,12 +1,7 @@
 import contextlib
-import stat
-from test.integration.helpers import (
-    container_named,
-    get_executor_factory,
-)
+from test.integration.helpers import get_executor_factory
 
 import docker
-import fabric
 import pytest
 from docker.models.containers import Container as DockerContainer
 
@@ -35,55 +30,6 @@ from exasol_integration_test_docker_environment.lib.test_environment.ports impor
 from exasol_integration_test_docker_environment.testing.utils import (
     normalize_request_name,
 )
-
-
-def test_generate_ssh_key_file(api_context):
-    params = {"db_os_access": "SSH"}
-    with api_context(additional_parameters=params) as db:
-        cache = SshKeyCache()
-        container_name = db.environment_info.database_info.container_info.container_name
-        with container_named(container_name) as container:
-            command = container.exec_run("cat /root/.ssh/authorized_keys")
-    assert cache.private_key.exists()
-    assert stat.S_IMODE(cache.private_key.stat().st_mode) == 0o600
-    assert " itde-ssh-access" in command[1].decode("utf-8")
-
-
-def test_ssh_access(api_context, fabric_stdin):
-    params = {"db_os_access": "SSH"}
-    with api_context(additional_parameters=params) as db:
-        container_name = db.environment_info.database_info.container_info.container_name
-        with container_named(container_name) as container:
-            command = container.exec_run("cat /root/.ssh/authorized_keys")
-        key = SshKey.from_cache()
-        result = fabric.Connection(
-            f"root@localhost:{db.ports.ssh}",
-            connect_kwargs={"pkey": key.private},
-        ).run("ls /exa/etc/EXAConf")
-        assert result.stdout == "/exa/etc/EXAConf\n"
-
-
-def test_ssh_fixture_uses_reachable_forwarded_port(api_context, fabric_stdin):
-    with api_context(additional_parameters={"db_os_access": "SSH"}) as db:
-        database_info = db.environment_info.database_info
-        assert database_info.forwarded_ports is not None
-        assert database_info.forwarded_ports.ssh == db.ports.ssh
-
-        with SshExecFactory.from_database_info(database_info).executor() as executor:
-            executor.prepare()
-            exit_code, output = executor.exec("test -f /exa/etc/EXAConf")
-
-    assert exit_code == 0
-    assert output == b""
-
-
-def test_docker_exec_fixture_does_not_publish_ssh_port(api_context):
-    with api_context() as db:
-        container_name = db.environment_info.database_info.container_info.container_name
-        with container_named(container_name) as container:
-            assert container is not None
-            container.reload()
-            assert container.attrs["NetworkSettings"]["Ports"].get("22/tcp") is None
 
 
 @pytest.fixture

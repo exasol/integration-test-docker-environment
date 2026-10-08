@@ -1,3 +1,4 @@
+from datetime import timedelta
 from test.integration.helpers import mock_cast
 from unittest.mock import (
     MagicMock,
@@ -124,6 +125,21 @@ def test_docker_client_factory_usage():
     assert executor._client == client and mock_cast(factory.client).mock_calls == [
         call()
     ]
+
+
+def test_docker_client_factory_converts_timedelta_to_seconds(monkeypatch):
+    context_client = MagicMock()
+    docker_client = create_autospec(DockerClient)
+    context_client.return_value.__enter__.return_value = docker_client
+    monkeypatch.setattr(
+        "exasol_integration_test_docker_environment.lib.base.db_os_executor.ContextDockerClient",
+        context_client,
+    )
+
+    factory = DockerClientFactory(timedelta(seconds=30))
+
+    assert factory.client() is docker_client
+    context_client.assert_called_once_with(timeout=30.0)
 
 
 def test_ssh_exec_factory_from_database_info():
