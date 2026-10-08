@@ -10,7 +10,8 @@ import luigi
 from docker.models.containers import Container
 
 from exasol_integration_test_docker_environment.lib.base.db_os_executor import (
-    DbOsExecFactory,
+    DockerClientFactory,
+    DockerExecFactory,
 )
 from exasol_integration_test_docker_environment.lib.base.docker_base_task import (
     DockerBaseTask,
@@ -40,7 +41,6 @@ class WaitForTestDockerDatabase(DockerBaseTask, DatabaseCredentialsParameter):
     )
     attempt: int = luigi.IntParameter(default=1)
     docker_db_image_version: str = luigi.Parameter()
-    executor_factory: DbOsExecFactory = JsonPickleParameter(DbOsExecFactory, significant=False)  # type: ignore
 
     def run_task(self) -> None:
         with self._get_docker_client() as docker_client:
@@ -81,7 +81,9 @@ class WaitForTestDockerDatabase(DockerBaseTask, DatabaseCredentialsParameter):
             db_container,
             self.get_database_credentials(),
             self.docker_db_image_version,
-            self.executor_factory,
+            DockerExecFactory(
+                db_container.name, DockerClientFactory(timeout=timedelta(seconds=30))
+            ),
         )
         is_database_ready_thread.start()
         return container_log_thread, is_database_ready_thread

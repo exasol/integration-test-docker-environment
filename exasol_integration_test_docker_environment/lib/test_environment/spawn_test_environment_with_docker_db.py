@@ -96,7 +96,7 @@ class SpawnTestEnvironmentWithDockerDB(
         docker_client_timeout: timedelta | None = None,
     ) -> DbOsExecFactory:
         if self.db_os_access == DbOsAccess.SSH:
-            return SshExecFactory.from_database_info(database_info)
+            return SshExecFactory.for_host(database_info)
         if docker_client_timeout is None:
             # Use the five-minute default defined in DockerClientFactory.__init__.
             client_factory = DockerClientFactory()
@@ -132,9 +132,6 @@ class SpawnTestEnvironmentWithDockerDB(
             database_info=database_info,
             attempt=attempt,
             docker_db_image_version=self.docker_db_image_version,
-            executor_factory=self._executor_factory(
-                database_info, timedelta(seconds=30)
-            ),
         )
 
     def create_confd_credentials_task(
@@ -147,5 +144,4 @@ class SpawnTestEnvironmentWithDockerDB(
             environment_name=self.environment_name,
             database_info=database_info,
             executor_factory=self._executor_factory(database_info),
-            port_bind_address=self.port_bind_address,
         )

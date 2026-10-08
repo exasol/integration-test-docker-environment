@@ -9,7 +9,7 @@ def test_ssh_fixture_uses_reachable_forwarded_port(api_context, fabric_stdin):
         assert database_info.forwarded_ports is not None
         assert database_info.forwarded_ports.ssh == db.ports.ssh
 
-        with SshExecFactory.from_database_info(database_info).executor() as executor:
+        with SshExecFactory.for_host(database_info).executor() as executor:
             executor.prepare()
             exit_code, output = executor.exec("test -f /exa/etc/EXAConf")
 

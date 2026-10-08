@@ -142,7 +142,7 @@ def test_docker_client_factory_converts_timedelta_to_seconds(monkeypatch):
     context_client.assert_called_once_with(timeout=30.0)
 
 
-def test_ssh_exec_factory_from_database_info():
+def test_ssh_exec_factory_for_docker_network():
     ports = Ports(1, 2, 3)
     ssh_info = SshInfo("my_user", "my_key_file")
     dbinfo = DatabaseInfo(
@@ -153,7 +153,7 @@ def test_ssh_exec_factory_from_database_info():
         ssh_info=ssh_info,
         forwarded_ports=None,
     )
-    factory = SshExecFactory.from_database_info(dbinfo)
+    factory = SshExecFactory.for_docker_network(dbinfo)
     executor = factory.executor()
     assert executor._connect_string == "my_user@my_host:3"
     assert executor._key_file == "my_key_file"
@@ -168,7 +168,7 @@ def test_ssh_exec_factory_prefers_forwarded_docker_port():
         forwarded_ports=Ports(8563, 2580, 30123),
     )
 
-    executor = SshExecFactory.from_database_info(dbinfo).executor()
+    executor = SshExecFactory.for_host(dbinfo).executor()
 
     assert executor._connect_string == "root@127.0.0.1:30123"
     assert executor._key_file == "fixture-key"
@@ -184,12 +184,12 @@ def test_ssh_exec_factory_uses_configured_forwarded_port_bind_address():
         port_bind_address="192.0.2.1",
     )
 
-    executor = SshExecFactory.from_database_info(dbinfo).executor()
+    executor = SshExecFactory.for_host(dbinfo).executor()
 
     assert executor._connect_string == "root@192.0.2.1:30123"
 
 
-def test_ssh_exec_factory_uses_database_endpoint_without_forwarded_ssh_port():
+def test_ssh_exec_factory_for_docker_network_does_not_need_a_publication():
     dbinfo = DatabaseInfo(
         "172.18.0.2",
         Ports(8563, 2580, 22),
@@ -198,9 +198,27 @@ def test_ssh_exec_factory_uses_database_endpoint_without_forwarded_ssh_port():
         forwarded_ports=Ports(8563, 2580),
     )
 
-    executor = SshExecFactory.from_database_info(dbinfo).executor()
+    executor = SshExecFactory.for_docker_network(dbinfo).executor()
 
     assert executor._connect_string == "root@172.18.0.2:22"
+
+
+@pytest.mark.parametrize(
+    ("bind_address", "host"), [("0.0.0.0", "127.0.0.1"), ("::", "::1")]
+)
+def test_ssh_host_endpoint_normalizes_wildcard_docker_bindings(bind_address, host):
+    dbinfo = DatabaseInfo(
+        "172.18.0.2",
+        Ports(8563, 2580, 22),
+        reused=False,
+        ssh_info=SshInfo("root", "fixture-key"),
+        forwarded_ports=Ports(8563, 2580, 30123),
+        port_bind_address=bind_address,
+    )
+
+    executor = SshExecFactory.for_host(dbinfo).executor()
+
+    assert executor._connect_string == f"root@{host}:30123"
 
 
 def test_ssh_prepare_retries_until_sshd_is_ready(monkeypatch):
