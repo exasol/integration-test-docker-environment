@@ -1,10 +1,10 @@
 from pathlib import Path
+from test.integration.env_reuse.environment import ReusingTestEnv
 
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_environment import (
     SpawnTestEnvironment,
 )
-from test.integration.env_reuse.environment import ReusingTestEnv
 
 
 def create_reusable_environment(

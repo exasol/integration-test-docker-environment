@@ -1,4 +1,5 @@
 from pathlib import Path
+from test.integration.env_reuse.environment import ReusingTestEnv
 from uuid import uuid4
 
 import pytest
@@ -10,7 +11,6 @@ from exasol_integration_test_docker_environment.lib.models.config.docker_config 
     set_docker_repository_config,
 )
 from exasol_integration_test_docker_environment.testing import luigi_utils
-from test.integration.env_reuse.environment import ReusingTestEnv
 
 
 def _setup_luigi_config(output_directory: Path, docker_repository_name: str):

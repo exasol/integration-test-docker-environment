@@ -1,3 +1,4 @@
+from test.integration.get_test_container_content import get_test_container_content
 from typing import cast
 
 import luigi
@@ -19,7 +20,6 @@ from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_
 from exasol_integration_test_docker_environment.testing.utils import (
     check_db_version_from_env,
 )
-from test.integration.get_test_container_content import get_test_container_content
 
 
 def get_instance_ids(test_environment_info) -> tuple[str, str, str]:

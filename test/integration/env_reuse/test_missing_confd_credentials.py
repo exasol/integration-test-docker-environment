@@ -1,9 +1,8 @@
 from pathlib import Path
-
-import pytest
-
 from test.integration.env_reuse import confd_credentials
 from test.integration.env_reuse.environment import ReusingTestEnv
+
+import pytest
 
 
 def test_reuse_fails_when_missing_credentials_cannot_be_repaired(
