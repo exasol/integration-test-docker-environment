@@ -56,9 +56,8 @@ from exasol_integration_test_docker_environment.lib.utils.cli_function_decorator
     default=None,
     show_default=True,
     help=(
-        "Host port to which SSH gets forwarded when --db-os-access=SSH; "
-        "it has no effect with DOCKER_EXEC. If not specified, ITDE selects "
-        "a random free port."
+        "Host port to which SSH gets forwarded. Requires --db-os-access=SSH. "
+        "If omitted, ITDE selects a random free port."
     ),
 )
 @click.option(

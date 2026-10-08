@@ -104,9 +104,9 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         self.docker_db_config_resource_name = f"docker_db_config/{self.db_version}"
         self.internal_ports = Ports.default_ports
         if self.db_os_access != DbOsAccess.SSH:
+            if self.ssh_port_forward is not None:
+                raise ValueError("--ssh-port-forward requires --db-os-access SSH")
             # Do not reserve or publish port 22 for Docker-exec fixtures.
-            # Apart from being unnecessary, doing so can conflict with a
-            # concurrently created Docker-DB environment on CI.
             self.ssh_port_forward = None
         elif self.ssh_port_forward is None:
             self.ssh_port_forward = str(find_free_ports(1)[0])
