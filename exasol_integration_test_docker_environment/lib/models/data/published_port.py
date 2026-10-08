@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from ipaddress import ip_address
 
 
 @dataclass(frozen=True)
@@ -16,7 +17,12 @@ class PublishedPort:
         destination a client should dial. Use the corresponding loopback
         address when the client runs on the Docker host.
         """
-        host = {"0.0.0.0": "127.0.0.1", "::": "::1"}.get(
-            self.bind_address, self.bind_address
-        )
+        try:
+            address = ip_address(self.bind_address)
+        except ValueError:
+            return self.bind_address, self.host_port
+        if address.is_unspecified:
+            host = "::1" if address.version == 6 else "127.0.0.1"
+            return host, self.host_port
+        host = self.bind_address
         return host, self.host_port

@@ -192,22 +192,26 @@ class DockerExecFactory(DbOsExecFactory):
 class SshExecFactory(DbOsExecFactory):
     @classmethod
     def for_host(cls, info: DatabaseInfo):
-        assert info.ssh_info
+        ssh_info = info.ssh_info
+        if ssh_info is None:
+            raise ValueError("Database does not have SSH connection information")
         published_port = info.published_port("ssh")
         if published_port is None:
             raise ValueError("SSH is not published for host-side access")
         host, port = published_port.local_endpoint()
 
-        return cls(f"{info.ssh_info.user}@{host}:{port}", info.ssh_info.key_file)
+        return cls(f"{ssh_info.user}@{host}:{port}", ssh_info.key_file)
 
     @classmethod
     def for_docker_network(cls, info: DatabaseInfo):
-        assert info.ssh_info
+        ssh_info = info.ssh_info
+        if ssh_info is None:
+            raise ValueError("Database does not have SSH connection information")
         if info.ports.ssh is None:
             raise ValueError("Database does not expose an internal SSH port")
         return cls(
-            f"{info.ssh_info.user}@{info.host}:{info.ports.ssh}",
-            info.ssh_info.key_file,
+            f"{ssh_info.user}@{info.host}:{info.ports.ssh}",
+            ssh_info.key_file,
         )
 
     def __init__(self, connect_string: str, ssh_key_file: str) -> None:

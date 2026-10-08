@@ -12,6 +12,9 @@ from exasol_integration_test_docker_environment.lib.api import (
 from exasol_integration_test_docker_environment.lib.models.data.test_container_content_description import (
     TestContainerContentDescription,
 )
+from exasol_integration_test_docker_environment.lib.test_environment.parameter.docker_db_test_environment_parameter import (
+    DbOsAccess,
+)
 from exasol_integration_test_docker_environment.lib.test_environment.ports import Ports
 from exasol_integration_test_docker_environment.testing.docker_registry import (
     default_docker_repository_name,
@@ -60,6 +63,13 @@ class ApiTestEnvironment:
             ports=ports,
         )
 
+    @staticmethod
+    def _ssh_port_forward(
+        additional_parameter: dict[str, Any], ports: Ports
+    ) -> int | None:
+        db_os_access = additional_parameter.get("db_os_access", DbOsAccess.DOCKER_EXEC)
+        return ports.ssh if db_os_access in (DbOsAccess.SSH, "SSH") else None
+
     def spawn_docker_test_environment_with_test_container(
         self,
         name: str,
@@ -77,7 +87,7 @@ class ApiTestEnvironment:
                 database_port_forward=ports.database,
                 bucketfs_http_port_forward=ports.bucketfs_http,
                 bucketfs_https_port_forward=ports.bucketfs_https,
-                ssh_port_forward=ports.ssh,
+                ssh_port_forward=self._ssh_port_forward(additional_parameter, ports),
                 docker_db_image_version=docker_db_image_version,
                 test_container_content=test_container_content,
                 output_directory=self.output_dir,
@@ -108,7 +118,9 @@ class ApiTestEnvironment:
             database_port_forward=on_host.ports.database,
             bucketfs_port_forward=on_host.ports.bucketfs_http,
             bucketfs_https_port_forward=on_host.ports.bucketfs_https,
-            ssh_port_forward=on_host.ports.ssh,
+            ssh_port_forward=self._ssh_port_forward(
+                additional_parameter, on_host.ports
+            ),
             docker_db_image_version=on_host.docker_db_image_version,
             output_directory=self.output_dir,
             **additional_parameter,

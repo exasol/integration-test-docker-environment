@@ -1,0 +1,14 @@
+"""Published-port ConfD JSON-RPC bearer-token integration scenario."""
+
+from test.integration.confd_access.json_rpc import (
+    assert_db_list_response,
+    bearer_token_db_list_request,
+)
+
+
+def test_published_json_rpc_token(confd_published_json_rpc_token_access):
+    """The published localhost route accepts the EXAConf bearer token."""
+    with confd_published_json_rpc_token_access() as access:
+        assert_db_list_response(
+            bearer_token_db_list_request(access.endpoint, access.token)
+        )
