@@ -1,12 +1,6 @@
-from pathlib import Path
-from test.integration.get_test_container_content import (
-    get_test_container_content,
-)
 from typing import cast
-from uuid import uuid4
 
 import luigi
-import pytest
 
 from exasol_integration_test_docker_environment.cli.options import (
     test_environment_options,
@@ -15,12 +9,6 @@ from exasol_integration_test_docker_environment.lib.base.run_task import (
     generate_root_task,
 )
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
-from exasol_integration_test_docker_environment.lib.models.config.build_config import (
-    set_build_config,
-)
-from exasol_integration_test_docker_environment.lib.models.config.docker_config import (
-    set_docker_repository_config,
-)
 from exasol_integration_test_docker_environment.lib.models.data.environment_type import (
     EnvironmentType,
 )
@@ -28,46 +16,10 @@ from exasol_integration_test_docker_environment.lib.test_environment.ports impor
 from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_environment import (
     SpawnTestEnvironment,
 )
-from exasol_integration_test_docker_environment.testing import luigi_utils
 from exasol_integration_test_docker_environment.testing.utils import (
     check_db_version_from_env,
 )
-
-
-def _setup_luigi_config(output_directory: Path, docker_repository_name: str):
-    set_build_config(
-        force_rebuild=False,
-        force_pull=False,
-        force_rebuild_from=(),
-        log_build_context_content=False,
-        output_directory=str(output_directory),
-        cache_directory="",
-        build_name="",
-        temporary_base_directory="/tmp",
-    )
-    set_docker_repository_config(
-        docker_password=None,
-        docker_repository_name=docker_repository_name,
-        docker_username=None,
-        tag_prefix="",
-        kind="target",
-    )
-
-
-@pytest.fixture
-def reuse_environment_name(env_name: str) -> str:
-    return f"{env_name}_{uuid4().hex[:8]}"
-
-
-@pytest.fixture
-def docker_repository(tmp_path, reuse_environment_name):
-    _setup_luigi_config(
-        output_directory=tmp_path / "output",
-        docker_repository_name=reuse_environment_name,
-    )
-    luigi_utils.clean(reuse_environment_name)
-    yield reuse_environment_name
-    luigi_utils.clean(reuse_environment_name)
+from test.integration.get_test_container_content import get_test_container_content
 
 
 def get_instance_ids(test_environment_info) -> tuple[str, str, str]:
@@ -85,8 +37,7 @@ def get_instance_ids(test_environment_info) -> tuple[str, str, str]:
 
 
 class ReusingTestEnv:
-    def __init__(self, docker_repository: str, env_name: str):
-        self.docker_repository = docker_repository
+    def __init__(self, env_name: str):
         self.docker_db_version_parameter = (
             check_db_version_from_env() or test_environment_options.LATEST_DB_VERSION
         )
@@ -195,44 +146,3 @@ class ReusingTestEnv:
             task.cleanup(False)
             raise RuntimeError("Error spawning test environment") from error
         return task
-
-
-def create_reusable_environment_with_confd_credentials(
-    reusing_test_env: ReusingTestEnv,
-) -> tuple[SpawnTestEnvironment, Path, str]:
-    """Create and preserve an environment with local ConfD credentials."""
-    first_task = reusing_test_env.run_spawn_test_env(
-        cleanup=False, create_confd_user=True, include_test_container=False
-    )
-    first_confd_info = first_task.get_result().database_info.confd_info
-    assert first_confd_info is not None
-    credentials_file = Path(first_confd_info.credentials_file)
-    assert credentials_file.exists()
-    first_password = first_confd_info.read_credentials().password
-    first_task.cleanup(True)
-    return first_task, credentials_file, first_password
-
-
-def reuse_environment_with_confd_credentials(
-    reusing_test_env: ReusingTestEnv, credentials_file: Path
-) -> tuple[SpawnTestEnvironment, str]:
-    """Reuse the preserved environment and return its ConfD password."""
-    second_task = reusing_test_env.run_spawn_test_env(
-        cleanup=True, create_confd_user=True, include_test_container=False
-    )
-    second_environment = second_task.get_result()
-    second_confd_info = second_environment.database_info.confd_info
-    assert second_confd_info is not None
-    assert second_environment.database_info.reused
-    assert second_confd_info.credentials_file == str(credentials_file)
-    assert credentials_file.exists()
-    return second_task, second_confd_info.read_credentials().password
-
-
-@pytest.fixture
-def reusing_test_env(docker_repository, reuse_environment_name):
-    environment = ReusingTestEnv(docker_repository, reuse_environment_name)
-    try:
-        yield environment
-    finally:
-        environment.cleanup()

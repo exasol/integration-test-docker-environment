@@ -1,30 +1,9 @@
 from pathlib import Path
-from test.integration.test_env_reuse.conftest import ReusingTestEnv
 
 import pytest
 
-from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
-
-
-def remove_confd_client_executable_permission(
-    container_name: str, database_host: str
-) -> None:
-    """Make ConfD unavailable by removing execute permissions from its client."""
-    with ContextDockerClient() as docker_client:
-        database_container = docker_client.containers.get(container_name)
-        exit_code, _ = database_container.exec_run(
-            [
-                "/bin/sh",
-                "-c",
-                'confd_client_path="$(command -v confd_client)" || exit 1; '
-                'chmod a-x "$confd_client_path"',
-            ],
-            environment={
-                "CONFD_HOST": database_host,
-                "HOSTNAME": "localhost",
-            },
-        )
-    assert exit_code == 0
+from test.integration.env_reuse import confd_credentials
+from test.integration.env_reuse.environment import ReusingTestEnv
 
 
 def test_reuse_fails_when_missing_credentials_cannot_be_repaired(
@@ -44,7 +23,7 @@ def test_reuse_fails_when_missing_credentials_cannot_be_repaired(
 
         first_task.cleanup(True)
         credentials_file.unlink()
-        remove_confd_client_executable_permission(
+        confd_credentials.remove_client_executable_permission(
             database_container_info.container_name,
             first_environment.database_info.host,
         )
