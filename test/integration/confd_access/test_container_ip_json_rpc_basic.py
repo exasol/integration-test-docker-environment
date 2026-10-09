@@ -17,13 +17,12 @@ def test_container_ip_json_rpc_basic(confd_container_ip_json_rpc_basic_access):
         assert_db_list_response(
             basic_db_list_request(endpoint, access.username, access.password)
         )
+        invalid_password_request = basic_db_list_request(
+            endpoint,
+            access.username,
+            access.password + "invalid",
+        )
         with pytest.raises(HTTPError) as error:
-            json_rpc_response(
-                basic_db_list_request(
-                    endpoint,
-                    access.username,
-                    access.password + "invalid",
-                )
-            )
+            json_rpc_response(invalid_password_request)
 
     assert error.value.code in {401, 403}

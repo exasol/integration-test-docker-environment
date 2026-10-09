@@ -1,5 +1,3 @@
-import pytest
-
 from exasol_integration_test_docker_environment.lib.test_environment.parameter.docker_db_test_environment_parameter import (
     DbOsAccess,
 )
@@ -79,11 +77,11 @@ def _spawn_database_task(db_os_access, ssh_port_forward=None):
     )
 
 
-def test_docker_exec_rejects_an_explicit_ssh_port():
-    with pytest.raises(
-        ValueError, match="--ssh-port-forward requires --db-os-access SSH"
-    ):
-        _spawn_database_task(DbOsAccess.DOCKER_EXEC, ssh_port_forward=30123)
+def test_docker_exec_does_not_forward_an_explicit_ssh_port():
+    task = _spawn_database_task(DbOsAccess.DOCKER_EXEC, ssh_port_forward=30123)
+
+    assert task.ssh_port_forward is None
+    assert task.forwarded_ports.ssh is None
 
 
 def test_ssh_uses_explicit_port_forward():

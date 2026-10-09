@@ -76,7 +76,9 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
     environment_name: str = luigi.Parameter()
     db_container_name: str = luigi.Parameter()
     attempt: int = luigi.IntParameter(default=1)
-    network_info: DockerNetworkInfo = JsonPickleParameter(DockerNetworkInfo, significant=False)  # type: ignore
+    network_info: DockerNetworkInfo = JsonPickleParameter(
+        DockerNetworkInfo, significant=False
+    )  # type: ignore
     ip_address_index_in_subnet: int = luigi.IntParameter(significant=False)
     docker_runtime: str | None = luigi.OptionalParameter(
         default=None, significant=False
@@ -104,9 +106,9 @@ class SpawnTestDockerDatabase(DockerBaseTask, DockerDBTestEnvironmentParameter):
         self.docker_db_config_resource_name = f"docker_db_config/{self.db_version}"
         self.internal_ports = Ports.default_ports
         if self.db_os_access != DbOsAccess.SSH:
-            if self.ssh_port_forward is not None:
-                raise ValueError("--ssh-port-forward requires --db-os-access SSH")
             # Do not reserve or publish port 22 for Docker-exec fixtures.
+            # Apart from being unnecessary, doing so can conflict with a
+            # concurrently created Docker-DB environment on CI.
             self.ssh_port_forward = None
         elif self.ssh_port_forward is None:
             self.ssh_port_forward = str(find_free_ports(1)[0])
