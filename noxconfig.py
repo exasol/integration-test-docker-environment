@@ -13,8 +13,10 @@ from exasol_integration_test_docker_environment.cli.options.test_environment_opt
 
 
 class Config(BaseConfig):
+    _TEST_TARGET_SEPARATOR = ","
     _INTEGRATION_TEST_DIRS = ("base_task", "docker_runtime")
-    _INTEGRATION_TEST_FILE_DIRS = ("confd_access", "env_reuse", "ssh_access")
+    _INTEGRATION_TEST_FILE_DIRS = ("env_reuse", "ssh_access")
+    _INTEGRATION_TEST_FILE_GROUPS = {"confd_access": 6}
     _GPU_TEST_FILES = frozenset(("test_gpu.py",))
 
     @computed_field  # type: ignore[misc]
@@ -109,12 +111,24 @@ class Config(BaseConfig):
             for directory in self._INTEGRATION_TEST_FILE_DIRS
             for path in sorted((test_root / directory).glob("test_*.py"))
         )
+        for directory, group_count in self._INTEGRATION_TEST_FILE_GROUPS.items():
+            test_files = [
+                str(path.relative_to(self.root_path))
+                for path in sorted((test_root / directory).glob("test_*.py"))
+            ]
+            targets.extend(self._group_test_targets(test_files, group_count))
         targets.extend(
             str(path.relative_to(self.root_path))
             for path in sorted(test_root.glob("test_*.py"))
             if path.name not in self._GPU_TEST_FILES
         )
         return sorted(targets)
+
+    def _group_test_targets(self, test_files: list[str], group_count: int) -> list[str]:
+        return [
+            self._TEST_TARGET_SEPARATOR.join(test_files[index::group_count])
+            for index in range(min(len(test_files), group_count))
+        ]
 
     @staticmethod
     def _normalize_default_version(db_versions: list[str]) -> list[str]:
