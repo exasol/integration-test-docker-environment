@@ -132,6 +132,9 @@ class SpawnTestEnvironmentWithDockerDB(
             database_info=database_info,
             attempt=attempt,
             docker_db_image_version=self.docker_db_image_version,
+            executor_factory=self._executor_factory(
+                database_info, timedelta(seconds=30)
+            ),
         )
 
     def create_confd_credentials_task(

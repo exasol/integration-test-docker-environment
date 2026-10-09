@@ -423,10 +423,10 @@ def test_docker_database_executor_uses_ssh_when_configured(monkeypatch):
     ssh_factory.assert_called_once_with(database_info)
 
 
-def test_docker_database_wait_task_does_not_use_the_selected_db_os_executor():
+def test_docker_database_wait_task_uses_a_short_timeout_executor():
     task = object.__new__(SpawnTestEnvironmentWithDockerDB)
     task.docker_db_image_version = "2026.1.0"
-    task._executor_factory = Mock(return_value="selected-executor")
+    task._executor_factory = Mock(return_value="readiness-executor")
     task.create_child_task_with_common_params = Mock(return_value="wait-task")
     database_info = Mock()
 
@@ -436,8 +436,9 @@ def test_docker_database_wait_task_does_not_use_the_selected_db_os_executor():
         database_info=database_info,
         attempt=2,
         docker_db_image_version="2026.1.0",
+        executor_factory="readiness-executor",
     )
-    task._executor_factory.assert_not_called()
+    task._executor_factory.assert_called_once_with(database_info, timedelta(seconds=30))
 
 
 def test_run_confd_uses_the_configured_executor_without_logging_output():
