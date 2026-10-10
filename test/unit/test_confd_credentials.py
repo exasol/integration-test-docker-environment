@@ -20,6 +20,9 @@ from exasol_integration_test_docker_environment.lib.base.db_os_executor import (
 from exasol_integration_test_docker_environment.lib.models.data.confd_info import (
     ConfdInfo,
 )
+from exasol_integration_test_docker_environment.lib.models.data.database_info import (
+    DatabaseInfo,
+)
 from exasol_integration_test_docker_environment.lib.test_environment.create_confd_credentials import (
     CreateConfdCredentials,
 )
@@ -159,13 +162,12 @@ def test_confd_service_readiness_retries_without_credentials(monkeypatch):
 def _task_for_run() -> CreateConfdCredentials:
     task = cast(Any, object.__new__(CreateConfdCredentials))
     task.environment_name = "environment"
-    task.database_info = SimpleNamespace(
-        reused=False,
-        container_info=object(),
-        forwarded_ports=Ports(8563, 2580, confd=8443),
+    task.database_info = DatabaseInfo(
         host="172.18.0.2",
+        ports=Ports.default_ports,
+        reused=False,
+        forwarded_ports=Ports(8563, 2580, confd=8443),
     )
-    task.port_bind_address = None
     task.executor_factory = MagicMock()
     task.return_object = Mock()
     return task
@@ -194,7 +196,7 @@ def test_run_task_provisions_credentials_after_service_readiness(monkeypatch, tm
 
 def test_run_task_omits_endpoint_without_a_forwarded_confd_port(monkeypatch, tmp_path):
     task = _task_for_run()
-    task.database_info.forwarded_ports = None
+    task.database_info.published_ports = {}
     task._wait_for_service_readiness = Mock()
     task._create_user = Mock()
     task._wait_for_rest_readiness = Mock()
@@ -363,7 +365,6 @@ def test_docker_database_spawn_passes_its_executor_to_confd_credentials_task():
     task = object.__new__(SpawnTestEnvironmentWithDockerDB)
     task.create_confd_user = True
     task.environment_name = "environment"
-    task.port_bind_address = "127.0.0.1"
     task._executor_factory = Mock(return_value="executor-factory")
     task.create_child_task_with_common_params = Mock(return_value="confd-task")
     database_info = Mock()
@@ -376,7 +377,6 @@ def test_docker_database_spawn_passes_its_executor_to_confd_credentials_task():
         environment_name="environment",
         database_info=database_info,
         executor_factory="executor-factory",
-        port_bind_address="127.0.0.1",
     )
 
 
@@ -417,16 +417,16 @@ def test_docker_database_executor_uses_ssh_when_configured(monkeypatch):
     database_info = Mock()
     factory = Mock()
     ssh_factory = Mock(return_value=factory)
-    monkeypatch.setattr(SshExecFactory, "from_database_info", ssh_factory)
+    monkeypatch.setattr(SshExecFactory, "for_host", ssh_factory)
 
     assert task._executor_factory(database_info) is factory
     ssh_factory.assert_called_once_with(database_info)
 
 
-def test_docker_database_wait_task_uses_a_short_timeout_executor():
+def test_docker_database_wait_task_uses_the_readiness_executor():
     task = object.__new__(SpawnTestEnvironmentWithDockerDB)
     task.docker_db_image_version = "2026.1.0"
-    task._executor_factory = Mock(return_value="readiness-executor")
+    task._readiness_executor_factory = Mock(return_value="readiness-executor")
     task.create_child_task_with_common_params = Mock(return_value="wait-task")
     database_info = Mock()
 
@@ -438,7 +438,7 @@ def test_docker_database_wait_task_uses_a_short_timeout_executor():
         docker_db_image_version="2026.1.0",
         executor_factory="readiness-executor",
     )
-    task._executor_factory.assert_called_once_with(database_info, timedelta(seconds=30))
+    task._readiness_executor_factory.assert_called_once_with(database_info)
 
 
 def test_run_confd_uses_the_configured_executor_without_logging_output():

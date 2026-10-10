@@ -393,12 +393,10 @@ Docker Container to enable SSH access with public key authentication.
 
 You can use command line option ``--ssh-port-forward`` to specify a port on
 your host machine to which ITDE forwards the SSH port of the Docker Container
-running the Exasol database. If you do not specify a port then ITDE will
-select a random free port. When an SSH port is forwarded, ITDE's SSH executor
-connects through the configured ``--port-bind-address`` and that port (or
-``127.0.0.1`` when no bind address is configured). SSH is published only when
-``--db-os-access SSH`` is selected; Docker-exec environments do not reserve an
-SSH port.
+running the Exasol database. The option requires ``--db-os-access SSH``; ITDE
+rejects it for other access modes. If no host port is supplied, ITDE selects a
+free one. The SSH executor connects through the host endpoint represented by
+that Docker port publication.
 
 For example, create an SSH-ready fixture with a known local port:
 
@@ -438,8 +436,9 @@ self-signed certificate must remain loopback-only.
 To choose a bind address for every forwarded port, use
 ``--port-bind-address <address>`` (or ``port_bind_address`` in the API). By
 default, all forwarded ports bind to loopback. Setting a bind address applies
-to every forwarded port, including SSH and ConfD. ITDE uses that same address
-when connecting to a forwarded SSH port.
+to every forwarded port, including SSH and ConfD. It describes where Docker
+listens, not a client destination: when Docker binds to ``0.0.0.0`` or ``::``,
+ITDE connects from the host through ``127.0.0.1`` or ``::1`` respectively.
 
 .. code:: console
 
@@ -448,9 +447,10 @@ when connecting to a forwarded SSH port.
 
 Use ``--create-confd-user`` to create ITDE's disposable ConfD Basic-auth user.
 ITDE creates it only after database readiness and runs ``confd_client`` through
-the selected database OS access method: Docker exec by default or the forwarded
-SSH endpoint with ``--db-os-access SSH``. The SSH executor waits for the SSH
-service to accept connections before running the command. ITDE records no
+the selected database OS access method: Docker exec by default or the published
+SSH endpoint with ``--db-os-access SSH``. Database readiness itself always uses
+Docker exec. The SSH executor waits for the SSH service to accept connections
+before running the command. ITDE records no
 password in command output, logs, or ``environment_info.json``. Instead,
 ``database_info.confd_info`` exposes the username, direct endpoint (when
 forwarded), SSH-tunnel target, and an owner-only ``confd_credentials.json``

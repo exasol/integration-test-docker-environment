@@ -75,6 +75,7 @@ def run_integration_tests(session: nox.Session):
     valid_targets = set(PROJECT_CONFIG.integration_test_targets)
     if test_target not in valid_targets:
         session.error(f"test-target must be one of {sorted(valid_targets)}")
+    test_targets = test_target.split(PROJECT_CONFIG._TEST_TARGET_SEPARATOR)
     env = {"EXASOL_VERSION": db_version}
     if collect_coverage:
         session.run("coverage", "erase", env=env)
@@ -86,11 +87,11 @@ def run_integration_tests(session: nox.Session):
             "pytest",
             "-m",
             "not gpu",
-            test_target,
+            *test_targets,
             env=env,
         )
     else:
-        session.run("pytest", "-m", "not gpu", test_target, env=env)
+        session.run("pytest", "-m", "not gpu", *test_targets, env=env)
 
 
 @nox.session(name="run-gpu-tests", python=False)
