@@ -121,7 +121,7 @@ def confd_published_json_rpc_basic_access(api_context):
             assert confd_info is not None
             credentials = confd_info.read_credentials()
             yield ConfdJsonRpcAccess(
-                endpoint=f"https://127.0.0.1:{confd_port}/rest",
+                endpoint=f"https://127.0.0.1:{confd_port}/RPC2",
                 username=credentials.username,
                 password=credentials.password,
             )
@@ -143,7 +143,7 @@ def confd_container_ip_json_rpc_token_access(api_context):
                 container = docker_client.containers.get(container_info.container_name)
                 token = _read_authentication_token(container)
             yield ConfdJsonRpcTokenAccess(
-                endpoint=f"https://{database_info.host}:443/rest",
+                endpoint=f"https://{database_info.host}:443/RPC2",
                 token=token,
             )
 
@@ -167,7 +167,7 @@ def confd_published_json_rpc_token_access(api_context):
                 container = docker_client.containers.get(container_info.container_name)
                 token = _read_authentication_token(container)
             yield ConfdJsonRpcTokenAccess(
-                endpoint=f"https://127.0.0.1:{confd_port}/rest",
+                endpoint=f"https://127.0.0.1:{confd_port}/RPC2",
                 token=token,
             )
 
@@ -286,4 +286,4 @@ def _ssh_tunnel(
         remote_host=database_info.host,
         remote_port=443,
     ):
-        yield f"https://127.0.0.1:{local_port}/rest"
+        yield f"https://127.0.0.1:{local_port}/RPC2"

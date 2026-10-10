@@ -13,7 +13,7 @@ import pytest
 def test_container_ip_json_rpc_basic(confd_container_ip_json_rpc_basic_access):
     """A disposable Basic user can read, but not with an invalid password."""
     with confd_container_ip_json_rpc_basic_access() as access:
-        endpoint = f"https://{access.host}:443/rest"
+        endpoint = f"https://{access.host}:443/RPC2"
         assert_db_list_response(
             basic_db_list_request(endpoint, access.username, access.password)
         )
