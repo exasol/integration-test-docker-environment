@@ -1,5 +1,8 @@
 import importlib.resources
-from pathlib import Path
+from pathlib import (
+    Path,
+    PurePosixPath,
+)
 
 import luigi
 import netaddr
@@ -181,6 +184,17 @@ class SpawnTestContainer(DockerBaseTask, TestContainerParameter):
             ]
             if len(docker_unix_sockets) > 0:
                 host_docker_socker_path = docker_unix_sockets[0].socket_path
+                # A client-side Unix socket can be outside the Docker daemon's
+                # mount namespace (for example, when Docker is reached through
+                # a VM-forwarded socket). Only the daemon's standard socket can
+                # safely be passed through to a test container.
+                if PurePosixPath(host_docker_socker_path) != PurePosixPath(
+                    "/var/run/docker.sock"
+                ):
+                    host_docker_socker_path = None
+            else:
+                host_docker_socker_path = None
+            if host_docker_socker_path is not None:
                 volumes[host_docker_socker_path] = {
                     "bind": "/var/run/docker.sock",
                     "mode": "rw",

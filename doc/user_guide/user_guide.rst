@@ -393,12 +393,11 @@ Docker Container to enable SSH access with public key authentication.
 
 You can use command line option ``--ssh-port-forward`` to specify a port on
 your host machine to which ITDE forwards the SSH port of the Docker Container
-running the Exasol database. If you do not specify a port then ITDE will
-select a random free port. When an SSH port is forwarded, ITDE's SSH executor
-connects through the configured ``--port-bind-address`` and that port (or
-``127.0.0.1`` when no bind address is configured). SSH is published only when
-``--db-os-access SSH`` is selected; Docker-exec environments do not reserve an
-SSH port.
+running the Exasol database. SSH is published only with ``--db-os-access SSH``;
+Docker-exec environments do not reserve an SSH port. If no host port is supplied
+for SSH access, ITDE selects a free one. The SSH executor connects through the
+configured ``--port-bind-address`` and that port (or ``127.0.0.1`` when no bind
+address is configured).
 
 For example, create an SSH-ready fixture with a known local port:
 
@@ -438,8 +437,9 @@ self-signed certificate must remain loopback-only.
 To choose a bind address for every forwarded port, use
 ``--port-bind-address <address>`` (or ``port_bind_address`` in the API). By
 default, all forwarded ports bind to loopback. Setting a bind address applies
-to every forwarded port, including SSH and ConfD. ITDE uses that same address
-when connecting to a forwarded SSH port.
+to every forwarded port, including SSH and ConfD. It describes where Docker
+listens, not a client destination: when Docker binds to ``0.0.0.0`` or ``::``,
+ITDE connects from the host through ``127.0.0.1`` or ``::1`` respectively.
 
 .. code:: console
 
@@ -448,9 +448,10 @@ when connecting to a forwarded SSH port.
 
 Use ``--create-confd-user`` to create ITDE's disposable ConfD Basic-auth user.
 ITDE creates it only after database readiness and runs ``confd_client`` through
-the selected database OS access method: Docker exec by default or the forwarded
-SSH endpoint with ``--db-os-access SSH``. The SSH executor waits for the SSH
-service to accept connections before running the command. ITDE records no
+selected database OS access method: ``DOCKER_EXEC`` (the default) or the
+published SSH endpoint with ``--db-os-access SSH``. Database readiness itself
+always uses ``DOCKER_EXEC``. The SSH executor waits for the SSH service to
+accept connections before running the command. ITDE records no
 password in command output, logs, or ``environment_info.json``. Instead,
 ``database_info.confd_info`` exposes the username, direct endpoint (when
 forwarded), SSH-tunnel target, and an owner-only ``confd_credentials.json``
@@ -472,6 +473,48 @@ ITDE does not extract bearer tokens or parse ``/exa/etc/EXAConf``. The API
 does not implement a ConfD client, SSH tunnel, or protocol fallback: consumers
 must use the documented REST endpoint directly or supply their own verified
 tunnel connection.
+
+ConfD access scenarios
+~~~~~~~~~~~~~~~~~~~~~~
+
+The integration tests cover the following supported access paths. They are
+also useful examples when adding a consumer integration test:
+
+* **Published HTTPS endpoint:** request ``--confd-port-forward`` and use
+  ``https://127.0.0.1:<forwarded-port>/rest`` for JSON-RPC or
+  ``https://127.0.0.1:<forwarded-port>/RPC2`` for XML-RPC. This is the normal
+  host-side route. It supports the disposable ConfD user created by
+  ``--create-confd-user`` with HTTP Basic authentication, for both JSON-RPC
+  and XML-RPC requests.
+* **SSH tunnel:** request ``--db-os-access SSH`` and create a local tunnel to
+  the database's internal ConfD port (``<database-host>:443``). JSON-RPC with
+  the disposable ConfD user's HTTP Basic authentication is covered through
+  this route.
+* **Docker exec and SSH command execution:** run ``confd_client`` in the
+  database OS through ITDE's Docker-exec or SSH executor. Both paths cover the
+  read-only ``db_list`` operation.
+* **Direct container address:** Docker environments expose ConfD internally at
+  ``https://<database-host>:443/rest`` for JSON-RPC. JSON-RPC Basic-auth tests
+  cover this route where the Docker host can reach container addresses. This reachability
+  depends on the Docker implementation; use the published endpoint when the
+  host cannot route to the container network.
+
+The JSON-RPC token scenarios send the database's configured EXAConf
+``AuthenticationToken`` unchanged in an ``Authorization: Bearer <token>``
+header. This token is distinct from the disposable Basic-auth user. Do not
+base64-decode, re-encode, or use it as a Basic-auth password. Token scenarios
+cover direct-container, published-port, and SSH-tunnel routes.
+For the read-only database-list example, start the ``db_list`` job through
+``/rest`` with ``method: job_start`` and ``job: db_list``, then query
+``job_result`` until its ``result_code`` is no longer ``5`` (running).
+
+When adding a ConfD integration test, choose the path and authentication method
+it represents, request only the required ITDE options, and keep the test
+read-only where possible. Use ``--create-confd-user`` only for a Basic-auth
+scenario. For a host-side test prefer a forwarded port and leave
+``port_bind_address`` at its secure loopback default unless external exposure
+is explicitly required. Add the scenario to the list above so the documented
+behaviour and integration coverage remain aligned.
 
 See the
 `ConfD authentication documentation <https://docs.exasol.com/db/latest/confd/confd.htm#Authentication>`_

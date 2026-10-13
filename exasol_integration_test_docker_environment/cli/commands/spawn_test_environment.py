@@ -56,9 +56,8 @@ from exasol_integration_test_docker_environment.lib.utils.cli_function_decorator
     default=None,
     show_default=True,
     help=(
-        "Host port to which SSH gets forwarded when --db-os-access=SSH; "
-        "ITDE connects through the configured port-bind-address (127.0.0.1 "
-        "by default). If not specified, ITDE selects a random free port."
+        "Host port to which SSH gets forwarded. Requires --db-os-access=SSH. "
+        "If omitted, ITDE selects a random free port."
     ),
 )
 @click.option(
@@ -120,7 +119,10 @@ from exasol_integration_test_docker_environment.lib.utils.cli_function_decorator
     "--port-bind-address",
     type=str,
     default=None,
-    help="Host address to bind all forwarded ports to. Defaults to loopback.",
+    help=(
+        "Docker address to bind all forwarded ports to. Defaults to loopback; "
+        "it is not an ITDE client destination."
+    ),
 )
 @click.option(
     "--create-confd-user",

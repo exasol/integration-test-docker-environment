@@ -33,12 +33,10 @@ class CreateConfdCredentials(DependencyLoggerBaseTask):
     """Create or reuse the disposable ConfD account and its local credentials through the configured DB-OS executor."""
 
     environment_name: str = luigi.Parameter()
+    docker_db_image_version: str = luigi.Parameter()
     database_info: DatabaseInfo = JsonPickleParameter(DatabaseInfo, significant=False)  # type: ignore
     executor_factory: DbOsExecFactory = JsonPickleParameter(  # type: ignore
         DbOsExecFactory, significant=False
-    )
-    port_bind_address: str | None = luigi.OptionalParameter(
-        default=None, significant=False
     )
 
     def run_task(self) -> None:
@@ -101,13 +99,12 @@ class CreateConfdCredentials(DependencyLoggerBaseTask):
         )
 
     def _confd_info(self, credentials_file: Path) -> ConfdInfo:
-        forwarded_ports = self.database_info.forwarded_ports
-        confd_port = None if forwarded_ports is None else forwarded_ports.confd
+        published_port = self.database_info.published_port("confd")
         endpoint = None
-        if confd_port is not None:
-            endpoint = (
-                f"https://{self.port_bind_address or '127.0.0.1'}:{confd_port}/RPC2"
-            )
+        if published_port is not None:
+            host, port = published_port.local_endpoint()
+            formatted_host = f"[{host}]" if ":" in host else host
+            endpoint = f"https://{formatted_host}:{port}/RPC2"
         return ConfdInfo(
             username=CONFD_USERNAME,
             credentials_file=str(credentials_file),
@@ -123,11 +120,18 @@ class CreateConfdCredentials(DependencyLoggerBaseTask):
             '"$CONFD_PASSWORD"'
             '\'","encode_passwd":true}\''
         )
-        self._wait_for_readiness(
-            command,
-            {"CONFD_PASSWORD": password},
-            "Disposable ConfD user could not be created",
-        )
+        try:
+            self._run_confd(command, {"CONFD_PASSWORD": password})
+        except RuntimeError as error:
+            if self.docker_db_image_version == "7.1.30" and any(
+                response in str(error) for response in ("HTTP 599", "JSONDecodeError")
+            ):
+                # On 7.1.30, ConfD may create the user before confd_client
+                # fails with HTTP 599 or malformed JSON. Retrying user_create
+                # would then fail because the user already exists. The caller
+                # then verifies the credentials with _wait_for_rest_readiness.
+                return
+            raise
 
     def _delete_user(self) -> None:
         try:
@@ -189,9 +193,9 @@ class CreateConfdCredentials(DependencyLoggerBaseTask):
         command = f"/bin/sh -c {quote(command)}"
         local_defaults = {
             "CONFD_HOST": self.database_info.host,
-            # Some Docker-DB versions can fail to resolve their generated
-            # container hostname while confd_client locates the single-node master.
-            "HOSTNAME": "localhost",
+            # confd_client discovers the master through $HOSTNAME. Use the
+            # database IP already verified by the readiness probe.
+            "HOSTNAME": self.database_info.host,
         }
         environment = local_defaults | environment
         with self.executor_factory.executor() as executor:
