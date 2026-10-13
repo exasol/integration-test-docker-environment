@@ -135,7 +135,9 @@ def confd_container_ip_json_rpc_token_access(api_context):
 
     @contextlib.contextmanager
     def create_context() -> Generator[ConfdJsonRpcTokenAccess, None, None]:
-        with api_context(additional_parameters={"create_confd_user": True}) as environment:
+        with api_context(
+            additional_parameters={"create_confd_user": True}
+        ) as environment:
             database_info = environment.environment_info.database_info
             container_info = database_info.container_info
             assert container_info is not None
