@@ -473,6 +473,48 @@ does not implement a ConfD client, SSH tunnel, or protocol fallback: consumers
 must use the documented REST endpoint directly or supply their own verified
 tunnel connection.
 
+ConfD access scenarios
+~~~~~~~~~~~~~~~~~~~~~~
+
+The integration tests cover the following supported access paths. They are
+also useful examples when adding a consumer integration test:
+
+* **Published HTTPS endpoint:** request ``--confd-port-forward`` and use
+  ``https://127.0.0.1:<forwarded-port>/rest`` for JSON-RPC or
+  ``https://127.0.0.1:<forwarded-port>/RPC2`` for XML-RPC. This is the normal
+  host-side route. It supports the disposable ConfD user created by
+  ``--create-confd-user`` with HTTP Basic authentication, for both JSON-RPC
+  and XML-RPC requests.
+* **SSH tunnel:** request ``--db-os-access SSH`` and create a local tunnel to
+  the database's internal ConfD port (``<database-host>:443``). JSON-RPC with
+  the disposable ConfD user's HTTP Basic authentication is covered through
+  this route.
+* **Docker exec and SSH command execution:** run ``confd_client`` in the
+  database OS through ITDE's Docker-exec or SSH executor. Both paths cover the
+  read-only ``db_list`` operation.
+* **Direct container address:** Docker environments expose ConfD internally at
+  ``https://<database-host>:443/rest`` for JSON-RPC. JSON-RPC Basic-auth tests
+  cover this route where the Docker host can reach container addresses. This reachability
+  depends on the Docker implementation; use the published endpoint when the
+  host cannot route to the container network.
+
+The JSON-RPC token scenarios send the database's configured EXAConf
+``AuthenticationToken`` unchanged in an ``Authorization: Bearer <token>``
+header. This token is distinct from the disposable Basic-auth user. Do not
+base64-decode, re-encode, or use it as a Basic-auth password. Token scenarios
+cover direct-container, published-port, and SSH-tunnel routes.
+For the read-only database-list example, start the ``db_list`` job through
+``/rest`` with ``method: job_start`` and ``job: db_list``, then query
+``job_result`` until its ``result_code`` is no longer ``5`` (running).
+
+When adding a ConfD integration test, choose the path and authentication method
+it represents, request only the required ITDE options, and keep the test
+read-only where possible. Use ``--create-confd-user`` only for a Basic-auth
+scenario. For a host-side test prefer a forwarded port and leave
+``port_bind_address`` at its secure loopback default unless external exposure
+is explicitly required. Add the scenario to the list above so the documented
+behaviour and integration coverage remain aligned.
+
 See the
 `ConfD authentication documentation <https://docs.exasol.com/db/latest/confd/confd.htm#Authentication>`_
 for ConfD user and credential management.
