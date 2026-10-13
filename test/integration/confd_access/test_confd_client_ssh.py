@@ -1,7 +1,7 @@
 """Explicit ConfD-client execution through SSH integration scenario."""
 
 
-def test_confd_client_ssh(confd_client_ssh_executor):
+def test_confd_client_ssh(confd_client_ssh_executor, fabric_stdin):
     """The SSH command executor runs the read-only ConfD operation."""
     with confd_client_ssh_executor() as executor:
         _assert_confd_client_db_list(executor)
