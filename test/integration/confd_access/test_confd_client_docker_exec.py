@@ -10,7 +10,9 @@ def test_confd_client_docker_exec(confd_client_docker_exec_executor):
         "exec confd_client -c db_list -j"
     )
     with confd_client_docker_exec_executor() as executor:
-        result = executor.exec(f"/bin/sh -c {quote(command)}")
+        result = executor.exec(
+            f"/bin/sh -c {quote(command)}", {"HOSTNAME": "localhost"}
+        )
 
     assert result.exit_code == 0
     assert result.output

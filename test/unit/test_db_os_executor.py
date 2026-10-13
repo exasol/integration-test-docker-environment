@@ -25,6 +25,9 @@ from exasol_integration_test_docker_environment.lib.base.db_os_executor import (
 from exasol_integration_test_docker_environment.lib.models.data.database_info import (
     DatabaseInfo,
 )
+from exasol_integration_test_docker_environment.lib.models.data.published_port import (
+    PublishedPort,
+)
 from exasol_integration_test_docker_environment.lib.models.data.ssh_info import SshInfo
 from exasol_integration_test_docker_environment.lib.test_environment.ports import Ports
 
@@ -51,6 +54,12 @@ def test_docker_executor_forwards_command_environment():
     container.exec_run.assert_called_once_with(
         "sample command", environment={"SAMPLE_ENV": "sample value"}
     )
+
+
+def test_docker_executor_prepare_is_a_no_op():
+    executor = DockerExecutor(MagicMock(), "container_name")
+
+    assert executor.prepare() is None
 
 
 def test_ssh_executor_prefixes_command_with_environment():
@@ -201,6 +210,63 @@ def test_ssh_exec_factory_for_docker_network_does_not_need_a_publication():
     executor = SshExecFactory.for_docker_network(dbinfo).executor()
 
     assert executor._connect_string == "root@172.18.0.2:22"
+
+
+def test_ssh_exec_factory_for_host_requires_ssh_credentials():
+    dbinfo = DatabaseInfo("172.18.0.2", Ports(8563, 2580, 22), reused=False)
+
+    with pytest.raises(ValueError, match="does not have SSH connection information"):
+        SshExecFactory.for_host(dbinfo)
+
+
+def test_ssh_exec_factory_for_docker_network_requires_ssh_credentials():
+    dbinfo = DatabaseInfo("172.18.0.2", Ports(8563, 2580, 22), reused=False)
+
+    with pytest.raises(ValueError, match="does not have SSH connection information"):
+        SshExecFactory.for_docker_network(dbinfo)
+
+
+def test_ssh_exec_factory_for_host_requires_a_published_port():
+    dbinfo = DatabaseInfo(
+        "172.18.0.2",
+        Ports(8563, 2580, 22),
+        reused=False,
+        ssh_info=SshInfo("root", "fixture-key"),
+    )
+
+    with pytest.raises(ValueError, match="SSH is not published"):
+        SshExecFactory.for_host(dbinfo)
+
+
+def test_ssh_exec_factory_for_docker_network_requires_an_ssh_port():
+    dbinfo = DatabaseInfo(
+        "172.18.0.2",
+        Ports(8563, 2580, None),
+        reused=False,
+        ssh_info=SshInfo("root", "fixture-key"),
+    )
+
+    with pytest.raises(ValueError, match="does not expose an internal SSH port"):
+        SshExecFactory.for_docker_network(dbinfo)
+
+
+def test_published_port_preserves_a_hostname_endpoint():
+    assert PublishedPort(22, 30123, "docker-host").local_endpoint() == (
+        "docker-host",
+        30123,
+    )
+
+
+def test_database_info_reconstructs_publications_for_legacy_state():
+    dbinfo = DatabaseInfo(
+        "172.18.0.2",
+        Ports(8563, 2580, 22),
+        reused=True,
+        forwarded_ports=Ports(8563, 2580, 30123),
+    )
+    del dbinfo.published_ports
+
+    assert dbinfo.published_port("ssh") == PublishedPort(22, 30123)
 
 
 @pytest.mark.parametrize(
