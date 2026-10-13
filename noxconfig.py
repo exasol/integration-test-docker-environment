@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
+from typing import ClassVar
 
 from exasol.toolbox.config import BaseConfig
 from packaging.version import Version
@@ -13,10 +14,11 @@ from exasol_integration_test_docker_environment.cli.options.test_environment_opt
 
 
 class Config(BaseConfig):
+    _MAX_CI_MATRIX_JOBS: ClassVar[int] = 256
     _TEST_TARGET_SEPARATOR = ","
     _INTEGRATION_TEST_DIRS = ("base_task", "docker_runtime")
     _INTEGRATION_TEST_FILE_DIRS = ("env_reuse", "ssh_access")
-    _INTEGRATION_TEST_FILE_GROUPS = {"confd_access": 6}
+    _INTEGRATION_TEST_FILE_GROUPS = {"confd_access": 4}
     _GPU_TEST_FILES = frozenset(("test_gpu.py",))
 
     @computed_field  # type: ignore[misc]
@@ -77,6 +79,21 @@ class Config(BaseConfig):
 
     @computed_field  # type: ignore[misc]
     @property
+    def db_versions_integration_test_matrix(self) -> list[dict[str, str]]:
+        """Return the validated database-version integration-test matrix."""
+        rows = [
+            {
+                "db_versions": db_version,
+                "integration_test_targets": test_target,
+            }
+            for db_version in self.db_versions
+            for test_target in self.integration_test_targets
+        ]
+        self._validate_ci_matrix_size("database-version integration tests", len(rows))
+        return rows
+
+    @computed_field  # type: ignore[misc]
+    @property
     def slow_python_test_matrix(self) -> list[dict[str, str | bool]]:
         """
         Return the expanded matrix rows for the slow Python-version workflow.
@@ -98,6 +115,7 @@ class Config(BaseConfig):
                         ),
                     }
                 )
+        self._validate_ci_matrix_size("Python-version integration tests", len(rows))
         return rows
 
     def _discover_integration_test_targets(self) -> list[str]:
@@ -129,6 +147,16 @@ class Config(BaseConfig):
             self._TEST_TARGET_SEPARATOR.join(test_files[index::group_count])
             for index in range(min(len(test_files), group_count))
         ]
+
+    @classmethod
+    def _validate_ci_matrix_size(cls, matrix_name: str, job_count: int) -> None:
+        if job_count > cls._MAX_CI_MATRIX_JOBS:
+            raise ValueError(
+                f"{matrix_name} matrix would create {job_count} jobs, exceeding "
+                f"GitHub Actions' limit of {cls._MAX_CI_MATRIX_JOBS}. "
+                "Batch integration test files or reduce a matrix dimension before "
+                "pushing this change."
+            )
 
     @staticmethod
     def _normalize_default_version(db_versions: list[str]) -> list[str]:
