@@ -27,13 +27,13 @@ CONFD_USERNAME = "itde_confd"
 # 1000-range UIDs are commonly already used by container images.
 CONFD_USER_ID = 20001
 CONFD_READINESS_ATTEMPTS = 12
-CONFD_CLIENT_AMBIGUOUS_RESPONSES = ("HTTP 599", "JSONDecodeError")
 
 
 class CreateConfdCredentials(DependencyLoggerBaseTask):
     """Create or reuse the disposable ConfD account and its local credentials through the configured DB-OS executor."""
 
     environment_name: str = luigi.Parameter()
+    docker_db_image_version: str = luigi.Parameter()
     database_info: DatabaseInfo = JsonPickleParameter(DatabaseInfo, significant=False)  # type: ignore
     executor_factory: DbOsExecFactory = JsonPickleParameter(  # type: ignore
         DbOsExecFactory, significant=False
@@ -123,11 +123,15 @@ class CreateConfdCredentials(DependencyLoggerBaseTask):
         try:
             self._run_confd(command, {"CONFD_PASSWORD": password})
         except RuntimeError as error:
-            if not any(
-                response in str(error)
-                for response in CONFD_CLIENT_AMBIGUOUS_RESPONSES
+            if self.docker_db_image_version == "7.1.30" and any(
+                response in str(error) for response in ("HTTP 599", "JSONDecodeError")
             ):
-                raise
+                # On 7.1.30, ConfD may create the user before confd_client
+                # fails with HTTP 599 or malformed JSON. Retrying user_create
+                # would then fail because the user already exists. The caller
+                # then verifies the credentials with _wait_for_rest_readiness.
+                return
+            raise
 
     def _delete_user(self) -> None:
         try:
