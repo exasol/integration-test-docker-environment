@@ -43,7 +43,7 @@ class CreateConfdCredentials(DependencyLoggerBaseTask):
             self._return_reused_credentials()
             return
         self._wait_for_service_readiness()
-        self._wait_for_command_readiness()
+        self._wait_for_permission_management_readiness()
         password = secrets.token_urlsafe(32)
         user_created = False
         try:
@@ -163,12 +163,12 @@ class CreateConfdCredentials(DependencyLoggerBaseTask):
             "ConfD REST endpoint did not become ready",
         )
 
-    def _wait_for_command_readiness(self) -> None:
-        """Wait until ConfD can process a read-only management command."""
+    def _wait_for_permission_management_readiness(self) -> None:
+        """Wait until the ConfD user-management jobs are available."""
         self._wait_for_readiness(
-            "confd_client -c db_list -j",
+            "confd_client -c user_list -j",
             None,
-            "ConfD command endpoint did not become ready",
+            "ConfD permission management did not become ready",
         )
 
     def _wait_for_readiness(
