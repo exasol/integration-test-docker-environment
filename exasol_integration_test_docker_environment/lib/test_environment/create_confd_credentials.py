@@ -43,7 +43,6 @@ class CreateConfdCredentials(DependencyLoggerBaseTask):
             self._return_reused_credentials()
             return
         self._wait_for_service_readiness()
-        self._wait_for_permission_management_readiness()
         password = secrets.token_urlsafe(32)
         user_created = False
         try:
@@ -163,14 +162,6 @@ class CreateConfdCredentials(DependencyLoggerBaseTask):
             "ConfD REST endpoint did not become ready",
         )
 
-    def _wait_for_permission_management_readiness(self) -> None:
-        """Wait until the ConfD user-management jobs are available."""
-        self._wait_for_readiness(
-            "confd_client -c user_list -j",
-            None,
-            "ConfD permission management did not become ready",
-        )
-
     def _wait_for_readiness(
         self,
         command: str,
@@ -194,9 +185,9 @@ class CreateConfdCredentials(DependencyLoggerBaseTask):
         command = f"/bin/sh -c {quote(command)}"
         local_defaults = {
             "CONFD_HOST": self.database_info.host,
-            # Some Docker-DB versions can fail to resolve their generated
-            # container hostname while confd_client locates the single-node master.
-            "HOSTNAME": "localhost",
+            # confd_client discovers the master through $HOSTNAME. Use the
+            # database IP already verified by the readiness probe.
+            "HOSTNAME": self.database_info.host,
         }
         environment = local_defaults | environment
         with self.executor_factory.executor() as executor:

@@ -159,24 +159,6 @@ def test_confd_service_readiness_retries_without_credentials(monkeypatch):
     sleep.assert_called_once_with(1)
 
 
-def test_permission_management_readiness_retries_without_credentials(monkeypatch):
-    task = object.__new__(CreateConfdCredentials)
-    task._run_confd = Mock(side_effect=[RuntimeError("not ready"), None])
-    sleep = Mock()
-    monkeypatch.setattr(
-        "exasol_integration_test_docker_environment.lib.test_environment.create_confd_credentials.time.sleep",
-        sleep,
-    )
-
-    task._wait_for_permission_management_readiness()
-
-    assert task._run_confd.call_count == 2
-    command, environment = task._run_confd.call_args.args
-    assert command == "confd_client -c user_list -j"
-    assert environment == {}
-    sleep.assert_called_once_with(1)
-
-
 def _task_for_run() -> CreateConfdCredentials:
     task = cast(Any, object.__new__(CreateConfdCredentials))
     task.environment_name = "environment"
@@ -188,7 +170,6 @@ def _task_for_run() -> CreateConfdCredentials:
     )
     task.executor_factory = MagicMock()
     task.return_object = Mock()
-    task._wait_for_permission_management_readiness = Mock()
     return task
 
 
@@ -206,7 +187,6 @@ def test_run_task_provisions_credentials_after_service_readiness(monkeypatch, tm
     task.run_task()
 
     task._wait_for_service_readiness.assert_called_once_with()
-    task._wait_for_permission_management_readiness.assert_called_once_with()
     task._create_user.assert_called_once_with("disposable-secret")
     task._wait_for_rest_readiness.assert_called_once_with("disposable-secret")
     info = task.return_object.call_args.args[0]
@@ -478,7 +458,7 @@ def test_run_confd_uses_the_configured_executor_without_logging_output():
     assert "disposable-secret" not in command
     assert environment == {
         "CONFD_HOST": "172.18.0.2",
-        "HOSTNAME": "localhost",
+        "HOSTNAME": "172.18.0.2",
         "CONFD_PASSWORD": "disposable-secret",
     }
     executor.prepare.assert_called_once_with()
