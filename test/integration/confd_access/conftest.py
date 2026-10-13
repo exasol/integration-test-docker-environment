@@ -295,5 +295,6 @@ def _ssh_tunnel(
         local_port,
         remote_host=database_info.host,
         remote_port=443,
+        local_host="127.0.0.1",
     ):
         yield f"https://127.0.0.1:{local_port}/rest"

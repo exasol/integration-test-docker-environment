@@ -6,7 +6,9 @@ from test.integration.confd_access.json_rpc import (
 )
 
 
-def test_ssh_tunnel_json_rpc_basic(confd_ssh_tunnel_json_rpc_basic_access):
+def test_ssh_tunnel_json_rpc_basic(
+    confd_ssh_tunnel_json_rpc_basic_access, fabric_stdin
+):
     """The SSH tunnel reaches the internal HTTPS endpoint with Basic auth."""
     with confd_ssh_tunnel_json_rpc_basic_access() as access:
         assert_db_list_response(
