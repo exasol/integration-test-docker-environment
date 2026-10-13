@@ -74,14 +74,13 @@ def test_confd_credentials_rejects_a_non_owner_only_file(tmp_path):
 
 def test_create_user_passes_the_password_only_as_container_environment():
     task = object.__new__(CreateConfdCredentials)
-    task._wait_for_readiness = Mock()
+    task._run_confd = Mock()
 
     task._create_user("disposable-secret")
 
-    command, environment, failure_message = task._wait_for_readiness.call_args.args
+    command, environment = task._run_confd.call_args.args
     assert "disposable-secret" not in command
     assert environment == {"CONFD_PASSWORD": "disposable-secret"}
-    assert failure_message == "Disposable ConfD user could not be created"
     assert command == (
         "confd_client -c user_create -A "
         '\'{"username":"itde_confd","userid":20001,'
@@ -89,6 +88,24 @@ def test_create_user_passes_the_password_only_as_container_environment():
         '"$CONFD_PASSWORD"'
         '\'","encode_passwd":true}\''
     )
+
+
+@pytest.mark.parametrize("response", ["HTTP 599", "JSONDecodeError"])
+def test_create_user_defers_an_ambiguous_client_response_to_rest_readiness(response):
+    task = object.__new__(CreateConfdCredentials)
+    task._run_confd = Mock(side_effect=RuntimeError(response))
+
+    task._create_user("disposable-secret")
+
+    task._run_confd.assert_called_once()
+
+
+def test_create_user_raises_a_non_ambiguous_client_error():
+    task = object.__new__(CreateConfdCredentials)
+    task._run_confd = Mock(side_effect=RuntimeError("permission denied"))
+
+    with pytest.raises(RuntimeError, match="permission denied"):
+        task._create_user("disposable-secret")
 
 
 def test_change_user_password_passes_the_password_only_as_container_environment():

@@ -27,6 +27,7 @@ CONFD_USERNAME = "itde_confd"
 # 1000-range UIDs are commonly already used by container images.
 CONFD_USER_ID = 20001
 CONFD_READINESS_ATTEMPTS = 12
+CONFD_CLIENT_AMBIGUOUS_RESPONSES = ("HTTP 599", "JSONDecodeError")
 
 
 class CreateConfdCredentials(DependencyLoggerBaseTask):
@@ -119,11 +120,14 @@ class CreateConfdCredentials(DependencyLoggerBaseTask):
             '"$CONFD_PASSWORD"'
             '\'","encode_passwd":true}\''
         )
-        self._wait_for_readiness(
-            command,
-            {"CONFD_PASSWORD": password},
-            "Disposable ConfD user could not be created",
-        )
+        try:
+            self._run_confd(command, {"CONFD_PASSWORD": password})
+        except RuntimeError as error:
+            if not any(
+                response in str(error)
+                for response in CONFD_CLIENT_AMBIGUOUS_RESPONSES
+            ):
+                raise
 
     def _delete_user(self) -> None:
         try:
