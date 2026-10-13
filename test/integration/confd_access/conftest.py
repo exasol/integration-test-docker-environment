@@ -47,7 +47,7 @@ class ConfdJsonRpcAccess:
 
 @dataclass(frozen=True)
 class ConfdJsonRpcTokenAccess:
-    """A container-IP JSON-RPC endpoint and its disposable bearer token."""
+    """A JSON-RPC endpoint and its EXAConf authentication token."""
 
     endpoint: str
     token: str
@@ -131,11 +131,11 @@ def confd_published_json_rpc_basic_access(api_context):
 
 @pytest.fixture
 def confd_container_ip_json_rpc_token_access(api_context):
-    """Direct container-IP JSON-RPC endpoint with the EXAConf bearer token."""
+    """Direct container-IP JSON-RPC endpoint with the EXAConf authentication token."""
 
     @contextlib.contextmanager
     def create_context() -> Generator[ConfdJsonRpcTokenAccess, None, None]:
-        with api_context() as environment:
+        with api_context(additional_parameters={"create_confd_user": True}) as environment:
             database_info = environment.environment_info.database_info
             container_info = database_info.container_info
             assert container_info is not None
@@ -152,13 +152,16 @@ def confd_container_ip_json_rpc_token_access(api_context):
 
 @pytest.fixture
 def confd_published_json_rpc_token_access(api_context):
-    """ITDE-published localhost JSON-RPC endpoint with the EXAConf token."""
+    """ITDE-published localhost JSON-RPC endpoint with the EXAConf authentication token."""
 
     @contextlib.contextmanager
     def create_context() -> Generator[ConfdJsonRpcTokenAccess, None, None]:
         confd_port = find_free_ports(1)[0]
         with api_context(
-            additional_parameters={"confd_port_forward": confd_port}
+            additional_parameters={
+                "confd_port_forward": confd_port,
+                "create_confd_user": True,
+            }
         ) as environment:
             database_info = environment.environment_info.database_info
             container_info = database_info.container_info
@@ -203,12 +206,17 @@ def confd_ssh_tunnel_json_rpc_basic_access(api_context):
 
 @pytest.fixture
 def confd_ssh_tunnel_json_rpc_token_access(api_context):
-    """SSH-tunneled JSON-RPC endpoint with the EXAConf bearer token."""
+    """SSH-tunneled JSON-RPC endpoint with the EXAConf authentication token."""
 
     @contextlib.contextmanager
     def create_context() -> Generator[ConfdJsonRpcTokenAccess, None, None]:
         local_port = find_free_ports(1)[0]
-        with api_context(additional_parameters={"db_os_access": "SSH"}) as environment:
+        with api_context(
+            additional_parameters={
+                "db_os_access": "SSH",
+                "create_confd_user": True,
+            }
+        ) as environment:
             database_info = environment.environment_info.database_info
             container_info = database_info.container_info
             assert container_info is not None

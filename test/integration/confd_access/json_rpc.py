@@ -18,9 +18,9 @@ def basic_db_list_request(endpoint: str, username: str, password: str) -> Reques
     return _db_list_request(endpoint, f"Basic {credentials}")
 
 
-def bearer_token_db_list_request(endpoint: str, token: str) -> Request:
-    """Create a bearer-token request for the legacy container-IP experiment."""
-    return _db_list_request(endpoint, f"Bearer {token}")
+def authentication_token_db_list_request(endpoint: str, token: str) -> Request:
+    """Create a request using EXAConf's pre-encoded Basic-auth token."""
+    return _db_list_request(endpoint, f"Basic {token}")
 
 
 def assert_db_list_response(request: Request) -> None:
