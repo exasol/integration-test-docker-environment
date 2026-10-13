@@ -19,8 +19,8 @@ def basic_db_list_request(endpoint: str, username: str, password: str) -> Reques
 
 
 def authentication_token_db_list_request(endpoint: str, token: str) -> Request:
-    """Create a request using EXAConf's pre-encoded Basic-auth token."""
-    return _db_list_request(endpoint, f"Basic {token}")
+    """Create a request using the decoded EXAConf bearer token."""
+    return _db_list_request(endpoint, f"Bearer {token}")
 
 
 def assert_db_list_response(request: Request) -> None:

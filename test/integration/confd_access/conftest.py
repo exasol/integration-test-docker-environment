@@ -1,5 +1,6 @@
 """Fixtures for raw ConfD access integration scenarios."""
 
+import base64
 import contextlib
 import secrets
 from collections.abc import Generator
@@ -275,7 +276,7 @@ def _read_authentication_token(container: Container) -> str:
     )
     if result.exit_code != 0 or not result.output.strip():
         pytest.fail("ConfD bearer-token test setup failed")
-    return result.output.decode().strip()
+    return base64.b64decode(result.output.strip()).decode()
 
 
 @contextlib.contextmanager
