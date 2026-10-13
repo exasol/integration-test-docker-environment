@@ -1,10 +1,10 @@
 """Fixtures for raw ConfD access integration scenarios."""
 
 import contextlib
-import secrets
+import socket
+import time
 from collections.abc import Generator
 from dataclasses import dataclass
-from shlex import quote
 
 import fabric
 import pytest
@@ -54,71 +54,22 @@ class ConfdJsonRpcTokenAccess:
     token: str
 
 
-def _run_confd(container: Container, command: str, password: str | None = None) -> None:
-    command = (
-        'export COS_DIRECTORY="$(dirname "$(dirname "$(command -v confd_client)")")"; '
-        f"{command}"
-    )
-    command = f"/bin/sh -c {quote(command)}"
-    environment = {"HOSTNAME": "localhost"}
-    if password is not None:
-        environment["CONFD_PASSWORD"] = password
-    result = container.exec_run(command, environment=environment)
-    if result.exit_code != 0:
-        output = result.output.decode("utf-8", errors="replace").strip()
-        if password is not None:
-            output = output.replace(password, "<redacted>")
-        pytest.fail(
-            "ConfD test-user setup or cleanup failed "
-            f"(exit code {result.exit_code}): {output}"
-        )
-
-
-def _create_user(
-    container: Container, username: str, user_id: int, password: str
-) -> None:
-    command = (
-        "confd_client -c user_create -A "
-        f'\'{{"username":"{username}","userid":{user_id},'
-        '"group":"exaadm","login_enabled":true,"password":"\''
-        '"$CONFD_PASSWORD"'
-        '\'","encode_passwd":true}\''
-    )
-    _run_confd(container, command, password)
-
-
-def _delete_user(container: Container, username: str) -> None:
-    _run_confd(
-        container,
-        f'confd_client -c user_delete -A \'{{"username":"{username}"}}\'',
-    )
-
-
 @pytest.fixture
 def confd_container_ip_json_rpc_basic_access(api_context):
-    """Direct container-IP JSON-RPC endpoint with a disposable Basic user."""
+    """Direct container-IP JSON-RPC endpoint with the ready Basic account."""
 
     @contextlib.contextmanager
     def create_context() -> Generator[ConfdContainerAccess, None, None]:
-        username = f"itde_spike_{secrets.token_hex(8)}"
-        password = secrets.token_urlsafe(32)
-        user_id = 30000 + secrets.randbelow(10000)
-        # The disposable account setup invokes confd_client directly.  Reuse
-        # the established credential setup so ConfD has completed its service
-        # readiness check before that command is run.
         with api_context(
             additional_parameters={"create_confd_user": True}
         ) as environment:
             database_info = environment.environment_info.database_info
-            container_info = database_info.container_info
-            assert container_info is not None
-            with ContextDockerClient() as docker_client:
-                container = docker_client.containers.get(container_info.container_name)
-                _create_user(container, username, user_id, password)
-                try:
-                    yield ConfdContainerAccess(database_info.host, username, password)
-                finally:
-                    _delete_user(container, username)
+            confd_info = database_info.confd_info
+            assert confd_info is not None
+            credentials = confd_info.read_credentials()
+            yield ConfdContainerAccess(
+                database_info.host, credentials.username, credentials.password
+            )
 
     return create_context
 
@@ -320,4 +271,17 @@ def _ssh_tunnel(
         remote_port=443,
         local_host="127.0.0.1",
     ):
+        _wait_for_local_tunnel(local_port)
         yield f"https://127.0.0.1:{local_port}/rest"
+
+
+def _wait_for_local_tunnel(local_port: int) -> None:
+    deadline = time.monotonic() + 5
+    while True:
+        try:
+            with socket.create_connection(("127.0.0.1", local_port), timeout=1):
+                return
+        except OSError:
+            if time.monotonic() >= deadline:
+                pytest.fail("SSH tunnel did not start listening on the local port")
+            time.sleep(0.1)

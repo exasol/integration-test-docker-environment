@@ -393,10 +393,11 @@ Docker Container to enable SSH access with public key authentication.
 
 You can use command line option ``--ssh-port-forward`` to specify a port on
 your host machine to which ITDE forwards the SSH port of the Docker Container
-running the Exasol database. The option requires ``--db-os-access SSH``; ITDE
-rejects it for other access modes. If no host port is supplied, ITDE selects a
-free one. The SSH executor connects through the host endpoint represented by
-that Docker port publication.
+running the Exasol database. SSH is published only with ``--db-os-access SSH``;
+Docker-exec environments do not reserve an SSH port. If no host port is supplied
+for SSH access, ITDE selects a free one. The SSH executor connects through the
+configured ``--port-bind-address`` and that port (or ``127.0.0.1`` when no bind
+address is configured).
 
 For example, create an SSH-ready fixture with a known local port:
 
