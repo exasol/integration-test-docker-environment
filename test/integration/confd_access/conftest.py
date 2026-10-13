@@ -4,6 +4,7 @@ import contextlib
 import secrets
 from collections.abc import Generator
 from dataclasses import dataclass
+from shlex import quote
 
 import fabric
 import pytest
@@ -54,10 +55,23 @@ class ConfdJsonRpcTokenAccess:
 
 
 def _run_confd(container: Container, command: str, password: str | None = None) -> None:
-    environment = {} if password is None else {"CONFD_PASSWORD": password}
+    command = (
+        'export COS_DIRECTORY="$(dirname "$(dirname "$(command -v confd_client)")")"; '
+        f"{command}"
+    )
+    command = f"/bin/sh -c {quote(command)}"
+    environment = {"HOSTNAME": "localhost"}
+    if password is not None:
+        environment["CONFD_PASSWORD"] = password
     result = container.exec_run(command, environment=environment)
     if result.exit_code != 0:
-        pytest.fail("ConfD test-user setup or cleanup failed")
+        output = result.output.decode("utf-8", errors="replace").strip()
+        if password is not None:
+            output = output.replace(password, "<redacted>")
+        pytest.fail(
+            "ConfD test-user setup or cleanup failed "
+            f"(exit code {result.exit_code}): {output}"
+        )
 
 
 def _create_user(
@@ -89,7 +103,12 @@ def confd_container_ip_json_rpc_basic_access(api_context):
         username = f"itde_spike_{secrets.token_hex(8)}"
         password = secrets.token_urlsafe(32)
         user_id = 30000 + secrets.randbelow(10000)
-        with api_context() as environment:
+        # The disposable account setup invokes confd_client directly.  Reuse
+        # the established credential setup so ConfD has completed its service
+        # readiness check before that command is run.
+        with api_context(
+            additional_parameters={"create_confd_user": True}
+        ) as environment:
             database_info = environment.environment_info.database_info
             container_info = database_info.container_info
             assert container_info is not None
@@ -255,7 +274,11 @@ def confd_client_docker_exec_executor(api_context):
 
     @contextlib.contextmanager
     def create_context() -> Generator[DbOsExecutor, None, None]:
-        with api_context() as environment:
+        # CreateConfdCredentials waits for ConfD before invoking confd_client.
+        # Without it this direct client scenario can race the service startup.
+        with api_context(
+            additional_parameters={"create_confd_user": True}
+        ) as environment:
             container_info = environment.environment_info.database_info.container_info
             assert container_info is not None
             factory = DockerExecFactory(
