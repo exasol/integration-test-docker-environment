@@ -183,7 +183,7 @@ so adding a target can exceed that limit. ITDE validates the generated matrix
 before it is passed to GitHub Actions and fails with an actionable error instead
 of leaving a workflow queued.
 
-Tests in ``test/integration/confd_access`` are batched into four matrix targets.
+Tests in ``test/integration/confd_access`` are batched into 6 matrix targets.
 Add a new ConfD test as a ``test_*.py`` file in that directory; it will be added
 to an existing batch and will not increase the number of parallel CI jobs. For a
 test in another integration-test location, run the matrix generation locally:
@@ -192,6 +192,10 @@ test in another integration-test location, run the matrix generation locally:
 
    poetry run -- nox -s matrix:generate -- slow_python_test_matrix db_versions_integration_test_matrix
 
-If the command reports that the matrix is too large, batch related tests by
-extending the configured file groups in ``noxconfig.py`` or reduce another
-matrix dimension. Do not remove the matrix-size validation.
+If the command reports that the matrix is too large, batch related test files by
+extending ``_INTEGRATION_TEST_FILE_GROUPS`` in ``noxconfig.py`` or reduce a
+matrix dimension. Do not remove the matrix-size validation or add an unbatched
+integration-test target while the matrix remains at this limit: one unbatched
+target consumes the final slot, and the next makes the workflow invalid.
+Keeping the validation produces this actionable error before GitHub Actions
+attempts to schedule an oversized matrix.

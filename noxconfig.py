@@ -18,7 +18,7 @@ class Config(BaseConfig):
     _TEST_TARGET_SEPARATOR = ","
     _INTEGRATION_TEST_DIRS = ("base_task", "docker_runtime")
     _INTEGRATION_TEST_FILE_DIRS = ("env_reuse", "ssh_access")
-    _INTEGRATION_TEST_FILE_GROUPS = {"confd_access": 7}
+    _INTEGRATION_TEST_FILE_GROUPS = {"confd_access": 6}
     _GPU_TEST_FILES = frozenset(("test_gpu.py",))
 
     @computed_field  # type: ignore[misc]

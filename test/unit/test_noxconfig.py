@@ -26,14 +26,10 @@ def test_integration_targets_group_confd_access_files(tmp_path):
     targets = _config(tmp_path).integration_test_targets
 
     assert (
-        "test/integration/confd_access/test_0.py,test/integration/confd_access/test_4.py"
+        "test/integration/confd_access/test_0.py,test/integration/confd_access/test_6.py"
         in targets
     )
-    assert (
-        "test/integration/confd_access/test_1.py,test/integration/confd_access/test_5.py"
-        in targets
-    )
-    assert len([target for target in targets if "confd_access" in target]) == 4
+    assert len([target for target in targets if "confd_access" in target]) == 6
 
 
 def test_group_test_targets_distributes_files_round_robin(tmp_path):
