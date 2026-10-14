@@ -48,6 +48,7 @@ from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_
 class SpawnTestEnvironmentWithDockerDB(
     AbstractSpawnTestEnvironment, DockerDBTestEnvironmentParameter
 ):
+    _READINESS_DOCKER_CLIENT_TIMEOUT = timedelta(seconds=30)
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
@@ -96,13 +97,20 @@ class SpawnTestEnvironmentWithDockerDB(
         docker_client_timeout: timedelta | None = None,
     ) -> DbOsExecFactory:
         if self.db_os_access == DbOsAccess.SSH:
-            return SshExecFactory.from_database_info(database_info)
+            return SshExecFactory.for_host(database_info)
         if docker_client_timeout is None:
             # Use the five-minute default defined in DockerClientFactory.__init__.
             client_factory = DockerClientFactory()
         else:
             client_factory = DockerClientFactory(timeout=docker_client_timeout)
         return DockerExecFactory(self.db_container_name, client_factory)
+
+    def _readiness_executor_factory(
+        self, database_info: DatabaseInfo
+    ) -> DbOsExecFactory:
+        return self._executor_factory(
+            database_info, self._READINESS_DOCKER_CLIENT_TIMEOUT
+        )
 
     def create_spawn_database_task(
         self,
@@ -132,9 +140,7 @@ class SpawnTestEnvironmentWithDockerDB(
             database_info=database_info,
             attempt=attempt,
             docker_db_image_version=self.docker_db_image_version,
-            executor_factory=self._executor_factory(
-                database_info, timedelta(seconds=30)
-            ),
+            executor_factory=self._readiness_executor_factory(database_info),
         )
 
     def create_confd_credentials_task(
@@ -147,5 +153,4 @@ class SpawnTestEnvironmentWithDockerDB(
             environment_name=self.environment_name,
             database_info=database_info,
             executor_factory=self._executor_factory(database_info),
-            port_bind_address=self.port_bind_address,
         )

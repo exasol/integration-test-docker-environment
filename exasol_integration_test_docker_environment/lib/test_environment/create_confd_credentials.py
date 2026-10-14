@@ -37,9 +37,6 @@ class CreateConfdCredentials(DependencyLoggerBaseTask):
     executor_factory: DbOsExecFactory = JsonPickleParameter(  # type: ignore
         DbOsExecFactory, significant=False
     )
-    port_bind_address: str | None = luigi.OptionalParameter(
-        default=None, significant=False
-    )
 
     def run_task(self) -> None:
         if self.database_info.reused:
@@ -101,13 +98,12 @@ class CreateConfdCredentials(DependencyLoggerBaseTask):
         )
 
     def _confd_info(self, credentials_file: Path) -> ConfdInfo:
-        forwarded_ports = self.database_info.forwarded_ports
-        confd_port = None if forwarded_ports is None else forwarded_ports.confd
+        published_port = self.database_info.published_port("confd")
         endpoint = None
-        if confd_port is not None:
-            endpoint = (
-                f"https://{self.port_bind_address or '127.0.0.1'}:{confd_port}/RPC2"
-            )
+        if published_port is not None:
+            host, port = published_port.local_endpoint()
+            formatted_host = f"[{host}]" if ":" in host else host
+            endpoint = f"https://{formatted_host}:{port}/RPC2"
         return ConfdInfo(
             username=CONFD_USERNAME,
             credentials_file=str(credentials_file),

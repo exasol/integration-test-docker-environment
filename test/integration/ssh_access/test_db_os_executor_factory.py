@@ -75,6 +75,7 @@ def test_db_os_executor_factory(sshd_container, db_os_access, fabric_stdin):
                 network_info=None,
             ),
             ssh_info=ssh_info,
+            forwarded_ports=Ports(-1, -1, ssh_port_forward),
         )
 
     ssh_port_forward = find_free_ports(1)[0]
