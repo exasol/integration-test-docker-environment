@@ -4,207 +4,63 @@ import contextlib
 import socket
 import time
 from collections.abc import Generator
-from dataclasses import dataclass
+from test.integration.confd_access.json_rpc import create_json_rpc_access
 
 import fabric
 import pytest
-from docker.models.containers import Container
 
 from exasol_integration_test_docker_environment.lib.base.ssh_access import (
     SshKey,
 )
-from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.lib.models.data.database_info import (
     DatabaseInfo,
 )
 from exasol_integration_test_docker_environment.lib.test_environment.ports import (
     find_free_ports,
 )
+from exasol_integration_test_docker_environment.testing.api_test_environment_context_provider import (
+    build_api_context_provider,
+)
 
 
-@dataclass(frozen=True)
-class ConfdContainerAccess:
-    """Temporary ConfD credentials and the database container endpoint."""
-
-    host: str
-    username: str
-    password: str
-
-
-@dataclass(frozen=True)
-class ConfdJsonRpcAccess:
-    """A ready-to-use HTTPS JSON-RPC endpoint and disposable credentials."""
-
-    endpoint: str
-    username: str
-    password: str
+@pytest.fixture(scope="module")
+def confd_container_ip_json_rpc_access(api_isolation_module):
+    """One direct container-IP environment shared by Basic and token checks."""
+    env_context = build_api_context_provider(api_isolation_module)
+    with env_context(additional_parameters={"create_confd_user": True}) as environment:
+        database_info = environment.environment_info.database_info
+        yield create_json_rpc_access(
+            environment, f"https://{database_info.host}:443/rest"
+        )
 
 
-@dataclass(frozen=True)
-class ConfdJsonRpcTokenAccess:
-    """A JSON-RPC endpoint and its EXAConf authentication token."""
-
-    endpoint: str
-    token: str
-
-
-@pytest.fixture
-def confd_container_ip_json_rpc_basic_access(api_context):
-    """Direct container-IP JSON-RPC endpoint with the ready Basic account."""
-
-    @contextlib.contextmanager
-    def create_context() -> Generator[ConfdContainerAccess, None, None]:
-        with api_context(
-            additional_parameters={"create_confd_user": True}
-        ) as environment:
-            database_info = environment.environment_info.database_info
-            confd_info = database_info.confd_info
-            assert confd_info is not None
-            credentials = confd_info.read_credentials()
-            yield ConfdContainerAccess(
-                database_info.host, credentials.username, credentials.password
-            )
-
-    return create_context
+@pytest.fixture(scope="module")
+def confd_published_json_rpc_access(api_isolation_module):
+    """One published environment shared by Basic and token checks."""
+    confd_port = find_free_ports(1)[0]
+    env_context = build_api_context_provider(api_isolation_module)
+    with env_context(
+        additional_parameters={
+            "confd_port_forward": confd_port,
+            "create_confd_user": True,
+        }
+    ) as environment:
+        yield create_json_rpc_access(
+            environment, f"https://127.0.0.1:{confd_port}/rest"
+        )
 
 
-@pytest.fixture
-def confd_published_json_rpc_basic_access(api_context):
-    """ITDE-published localhost JSON-RPC endpoint with Basic credentials."""
-
-    @contextlib.contextmanager
-    def create_context() -> Generator[ConfdJsonRpcAccess, None, None]:
-        confd_port = find_free_ports(1)[0]
-        with api_context(
-            additional_parameters={
-                "confd_port_forward": confd_port,
-                "create_confd_user": True,
-            }
-        ) as environment:
-            confd_info = environment.environment_info.database_info.confd_info
-            assert confd_info is not None
-            credentials = confd_info.read_credentials()
-            yield ConfdJsonRpcAccess(
-                endpoint=f"https://127.0.0.1:{confd_port}/rest",
-                username=credentials.username,
-                password=credentials.password,
-            )
-
-    return create_context
-
-
-@pytest.fixture
-def confd_container_ip_json_rpc_token_access(api_context):
-    """Direct container-IP JSON-RPC endpoint with the EXAConf authentication token."""
-
-    @contextlib.contextmanager
-    def create_context() -> Generator[ConfdJsonRpcTokenAccess, None, None]:
-        with api_context(
-            additional_parameters={"create_confd_user": True}
-        ) as environment:
-            database_info = environment.environment_info.database_info
-            container_info = database_info.container_info
-            assert container_info is not None
-            with ContextDockerClient() as docker_client:
-                container = docker_client.containers.get(container_info.container_name)
-                token = _read_authentication_token(container)
-            yield ConfdJsonRpcTokenAccess(
-                endpoint=f"https://{database_info.host}:443/rest",
-                token=token,
-            )
-
-    return create_context
-
-
-@pytest.fixture
-def confd_published_json_rpc_token_access(api_context):
-    """ITDE-published localhost JSON-RPC endpoint with the EXAConf authentication token."""
-
-    @contextlib.contextmanager
-    def create_context() -> Generator[ConfdJsonRpcTokenAccess, None, None]:
-        confd_port = find_free_ports(1)[0]
-        with api_context(
-            additional_parameters={
-                "confd_port_forward": confd_port,
-                "create_confd_user": True,
-            }
-        ) as environment:
-            database_info = environment.environment_info.database_info
-            container_info = database_info.container_info
-            assert container_info is not None
-            with ContextDockerClient() as docker_client:
-                container = docker_client.containers.get(container_info.container_name)
-                token = _read_authentication_token(container)
-            yield ConfdJsonRpcTokenAccess(
-                endpoint=f"https://127.0.0.1:{confd_port}/rest",
-                token=token,
-            )
-
-    return create_context
-
-
-@pytest.fixture
-def confd_ssh_tunnel_json_rpc_basic_access(api_context):
-    """SSH-tunneled JSON-RPC endpoint with disposable Basic credentials."""
-
-    @contextlib.contextmanager
-    def create_context() -> Generator[ConfdJsonRpcAccess, None, None]:
-        local_port = find_free_ports(1)[0]
-        with api_context(
-            additional_parameters={
-                "db_os_access": "SSH",
-                "create_confd_user": True,
-            }
-        ) as environment:
-            database_info = environment.environment_info.database_info
-            confd_info = database_info.confd_info
-            assert confd_info is not None
-            credentials = confd_info.read_credentials()
-            with _ssh_tunnel(database_info, local_port) as endpoint:
-                yield ConfdJsonRpcAccess(
-                    endpoint=endpoint,
-                    username=credentials.username,
-                    password=credentials.password,
-                )
-
-    return create_context
-
-
-@pytest.fixture
-def confd_ssh_tunnel_json_rpc_token_access(api_context):
-    """SSH-tunneled JSON-RPC endpoint with the EXAConf authentication token."""
-
-    @contextlib.contextmanager
-    def create_context() -> Generator[ConfdJsonRpcTokenAccess, None, None]:
-        local_port = find_free_ports(1)[0]
-        with api_context(
-            additional_parameters={
-                "db_os_access": "SSH",
-                "create_confd_user": True,
-            }
-        ) as environment:
-            database_info = environment.environment_info.database_info
-            container_info = database_info.container_info
-            assert container_info is not None
-            with ContextDockerClient() as docker_client:
-                container = docker_client.containers.get(container_info.container_name)
-                token = _read_authentication_token(container)
-            with _ssh_tunnel(database_info, local_port) as endpoint:
-                yield ConfdJsonRpcTokenAccess(
-                    endpoint=endpoint,
-                    token=token,
-                )
-
-    return create_context
-
-
-def _read_authentication_token(container: Container) -> str:
-    result = container.exec_run(
-        "awk -F' = ' '/AuthenticationToken/ {print $2; exit}' /exa/etc/EXAConf"
-    )
-    if result.exit_code != 0 or not result.output.strip():
-        pytest.fail("ConfD bearer-token test setup failed")
-    return result.output.decode().strip()
+@pytest.fixture(scope="module")
+def confd_ssh_tunnel_json_rpc_access(api_isolation_module):
+    """One SSH environment and tunnel shared by Basic and token checks."""
+    local_port = find_free_ports(1)[0]
+    env_context = build_api_context_provider(api_isolation_module)
+    with env_context(
+        additional_parameters={"db_os_access": "SSH", "create_confd_user": True}
+    ) as environment:
+        database_info = environment.environment_info.database_info
+        with _ssh_tunnel(database_info, local_port) as endpoint:
+            yield create_json_rpc_access(environment, endpoint)
 
 
 @contextlib.contextmanager

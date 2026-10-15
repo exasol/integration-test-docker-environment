@@ -4,12 +4,47 @@ import base64
 import json
 import ssl
 import time
+from dataclasses import dataclass
 from urllib.request import (
     Request,
     urlopen,
 )
 
+import pytest
+from docker.models.containers import Container
+
+from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
+
 _UNVERIFIED_TLS_CONTEXT = ssl._create_unverified_context()  # noqa: SLF001
+
+
+@dataclass(frozen=True)
+class ConfdJsonRpcAccess:
+    """A ready-to-use JSON-RPC endpoint with both supported credentials."""
+
+    endpoint: str
+    username: str
+    password: str
+    token: str
+
+
+def create_json_rpc_access(environment, endpoint: str) -> ConfdJsonRpcAccess:
+    """Read both credentials for a JSON-RPC endpoint from an environment."""
+    database_info = environment.environment_info.database_info
+    confd_info = database_info.confd_info
+    container_info = database_info.container_info
+    assert confd_info is not None
+    assert container_info is not None
+    credentials = confd_info.read_credentials()
+    with ContextDockerClient() as docker_client:
+        container = docker_client.containers.get(container_info.container_name)
+        token = _read_authentication_token(container)
+    return ConfdJsonRpcAccess(
+        endpoint=endpoint,
+        username=credentials.username,
+        password=credentials.password,
+        token=token,
+    )
 
 
 def basic_db_list_request(endpoint: str, username: str, password: str) -> Request:
@@ -45,6 +80,15 @@ def json_rpc_response(request: Request) -> object:
     with urlopen(request, context=_UNVERIFIED_TLS_CONTEXT, timeout=10) as response:
         assert response.status == 200
         return json.load(response)
+
+
+def _read_authentication_token(container: Container) -> str:
+    result = container.exec_run(
+        "awk -F' = ' '/AuthenticationToken/ {print $2; exit}' /exa/etc/EXAConf"
+    )
+    if result.exit_code != 0 or not result.output.strip():
+        pytest.fail("ConfD bearer-token test setup failed")
+    return result.output.decode().strip()
 
 
 def _db_list_request(endpoint: str, authorization: str) -> Request:
