@@ -24,7 +24,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.build_matrix.outputs.matrix) }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     name: Run tests for Exasol ${{ matrix.db_versions }} - ${{ matrix.integration_test_targets }}
