@@ -145,6 +145,7 @@ class SpawnTestEnvironmentWithDockerDB(
         return self.create_child_task_with_common_params(
             CreateConfdCredentials,
             environment_name=self.environment_name,
+            docker_db_image_version=self.docker_db_image_version,
             database_info=database_info,
             executor_factory=self._executor_factory(database_info),
             port_bind_address=self.port_bind_address,

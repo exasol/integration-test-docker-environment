@@ -473,6 +473,19 @@ does not implement a ConfD client, SSH tunnel, or protocol fallback: consumers
 must use the documented REST endpoint directly or supply their own verified
 tunnel connection.
 
+ConfD access scenarios
+~~~~~~~~~~~~~~~~~~~~~~
+
+The integration tests cover JSON-RPC ``db_list`` through the published HTTPS
+endpoint, a direct container address, and an SSH tunnel. Each route is tested
+with ITDE's disposable Basic-auth user and the database's EXAConf
+``AuthenticationToken`` bearer token. The token is distinct from the
+disposable user and is sent unchanged as ``Authorization: Bearer <token>``.
+
+For a read-only JSON-RPC request, start ``db_list`` through ``/rest`` with
+``method: job_start`` and ``job: db_list``, then query ``job_result`` until its
+``result_code`` is no longer ``5`` (running).
+
 See the
 `ConfD authentication documentation <https://docs.exasol.com/db/latest/confd/confd.htm#Authentication>`_
 for ConfD user and credential management.

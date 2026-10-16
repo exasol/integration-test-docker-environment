@@ -33,6 +33,7 @@ class CreateConfdCredentials(DependencyLoggerBaseTask):
     """Create or reuse the disposable ConfD account and its local credentials through the configured DB-OS executor."""
 
     environment_name: str = luigi.Parameter()
+    docker_db_image_version: str = luigi.Parameter()
     database_info: DatabaseInfo = JsonPickleParameter(DatabaseInfo, significant=False)  # type: ignore
     executor_factory: DbOsExecFactory = JsonPickleParameter(  # type: ignore
         DbOsExecFactory, significant=False
@@ -123,11 +124,18 @@ class CreateConfdCredentials(DependencyLoggerBaseTask):
             '"$CONFD_PASSWORD"'
             '\'","encode_passwd":true}\''
         )
-        self._wait_for_readiness(
-            command,
-            {"CONFD_PASSWORD": password},
-            "Disposable ConfD user could not be created",
-        )
+        try:
+            self._run_confd(command, {"CONFD_PASSWORD": password})
+        except RuntimeError as error:
+            if self.docker_db_image_version == "7.1.30" and any(
+                response in str(error) for response in ("HTTP 599", "JSONDecodeError")
+            ):
+                # On 7.1.30, ConfD may create the user before confd_client
+                # fails with HTTP 599 or malformed JSON. Retrying user_create
+                # would then fail because the user already exists. The caller
+                # then verifies the credentials with _wait_for_rest_readiness.
+                return
+            raise
 
     def _delete_user(self) -> None:
         try:
