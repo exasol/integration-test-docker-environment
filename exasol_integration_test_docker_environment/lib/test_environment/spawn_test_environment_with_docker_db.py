@@ -103,13 +103,6 @@ class SpawnTestEnvironmentWithDockerDB(
             client_factory = DockerClientFactory(timeout=docker_client_timeout)
         return DockerExecFactory(self.db_container_name, client_factory)
 
-    def _readiness_executor_factory(self) -> DockerExecFactory:
-        """Use Docker exec for readiness of the Docker-DB container only."""
-        return DockerExecFactory(
-            self.db_container_name,
-            DockerClientFactory(timeout=timedelta(seconds=30)),
-        )
-
     def create_spawn_database_task(
         self,
         network_info: DockerNetworkInfo,
@@ -138,7 +131,9 @@ class SpawnTestEnvironmentWithDockerDB(
             database_info=database_info,
             attempt=attempt,
             docker_db_image_version=self.docker_db_image_version,
-            executor_factory=self._readiness_executor_factory(),
+            executor_factory=self._executor_factory(
+                database_info, timedelta(seconds=30)
+            ),
         )
 
     def create_confd_credentials_task(
