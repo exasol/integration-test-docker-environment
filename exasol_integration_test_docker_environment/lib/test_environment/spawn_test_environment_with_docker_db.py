@@ -48,8 +48,6 @@ from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_
 class SpawnTestEnvironmentWithDockerDB(
     AbstractSpawnTestEnvironment, DockerDBTestEnvironmentParameter
 ):
-    _READINESS_DOCKER_CLIENT_TIMEOUT = timedelta(seconds=30)
-
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.db_container_name = f"""db_container_{self.environment_name}"""
@@ -105,13 +103,6 @@ class SpawnTestEnvironmentWithDockerDB(
             client_factory = DockerClientFactory(timeout=docker_client_timeout)
         return DockerExecFactory(self.db_container_name, client_factory)
 
-    def _readiness_executor_factory(
-        self, database_info: DatabaseInfo
-    ) -> DbOsExecFactory:
-        return self._executor_factory(
-            database_info, self._READINESS_DOCKER_CLIENT_TIMEOUT
-        )
-
     def create_spawn_database_task(
         self,
         network_info: DockerNetworkInfo,
@@ -140,7 +131,9 @@ class SpawnTestEnvironmentWithDockerDB(
             database_info=database_info,
             attempt=attempt,
             docker_db_image_version=self.docker_db_image_version,
-            executor_factory=self._readiness_executor_factory(database_info),
+            executor_factory=self._executor_factory(
+                database_info, timedelta(seconds=30)
+            ),
         )
 
     def create_confd_credentials_task(

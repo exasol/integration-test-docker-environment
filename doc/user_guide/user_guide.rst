@@ -449,9 +449,8 @@ ITDE connects from the host through ``127.0.0.1`` or ``::1`` respectively.
 Use ``--create-confd-user`` to create ITDE's disposable ConfD Basic-auth user.
 ITDE creates it only after database readiness and runs ``confd_client`` through
 selected database OS access method: ``DOCKER_EXEC`` (the default) or the
-published SSH endpoint with ``--db-os-access SSH``. Database readiness itself
-always uses ``DOCKER_EXEC``. The SSH executor waits for the SSH service to
-accept connections before running the command. ITDE records no
+published SSH endpoint with ``--db-os-access SSH``. The SSH executor waits for
+the SSH service to accept connections before running the command. ITDE records no
 password in command output, logs, or ``environment_info.json``. Instead,
 ``database_info.confd_info`` exposes the username, direct endpoint (when
 forwarded), SSH-tunnel target, and an owner-only ``confd_credentials.json``
