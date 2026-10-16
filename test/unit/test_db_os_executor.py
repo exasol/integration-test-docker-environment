@@ -162,22 +162,41 @@ def test_ssh_exec_factory_for_docker_network():
     assert executor._key_file == "my_key_file"
 
 
-def test_ssh_exec_factory_from_database_info_uses_docker_network_endpoint():
-    ports = Ports(1, 2, 3)
-    ssh_info = SshInfo("my_user", "my_key_file")
-    dbinfo = DatabaseInfo(
-        "my_host",
-        ports,
-        reused=False,
-        ssh_info=ssh_info,
-        forwarded_ports=None,
-    )
-
+@pytest.mark.parametrize(
+    ("dbinfo", "connect_string", "key_file"),
+    [
+        (
+            DatabaseInfo(
+                "my_host",
+                Ports(1, 2, 3),
+                reused=False,
+                ssh_info=SshInfo("my_user", "my_key_file"),
+            ),
+            "my_user@my_host:3",
+            "my_key_file",
+        ),
+        (
+            DatabaseInfo(
+                "172.18.0.2",
+                Ports(8563, 2580, 22),
+                reused=False,
+                ssh_info=SshInfo("root", "fixture-key"),
+                forwarded_ports=Ports(8563, 2580, 30123),
+            ),
+            "root@127.0.0.1:30123",
+            "fixture-key",
+        ),
+    ],
+)
+def test_ssh_exec_factory_from_database_info_uses_legacy_endpoint_selection(
+    dbinfo, connect_string, key_file
+):
     with pytest.warns(DeprecationWarning, match="from_database_info"):
-        executor = SshExecFactory.from_database_info(dbinfo).executor()
+        factory = SshExecFactory.from_database_info(dbinfo)
+    executor = factory.executor()
 
-    assert executor._connect_string == "my_user@my_host:3"
-    assert executor._key_file == "my_key_file"
+    assert executor._connect_string == connect_string
+    assert executor._key_file == key_file
 
 
 def test_ssh_exec_factory_prefers_forwarded_docker_port():
@@ -193,21 +212,6 @@ def test_ssh_exec_factory_prefers_forwarded_docker_port():
 
     assert executor._connect_string == "root@127.0.0.1:30123"
     assert executor._key_file == "fixture-key"
-
-
-def test_ssh_exec_factory_from_database_info_uses_published_host_endpoint():
-    dbinfo = DatabaseInfo(
-        "172.18.0.2",
-        Ports(8563, 2580, 22),
-        reused=False,
-        ssh_info=SshInfo("root", "fixture-key"),
-        forwarded_ports=Ports(8563, 2580, 30123),
-    )
-
-    with pytest.warns(DeprecationWarning, match="from_database_info"):
-        executor = SshExecFactory.from_database_info(dbinfo).executor()
-
-    assert executor._connect_string == "root@127.0.0.1:30123"
 
 
 def test_ssh_exec_factory_uses_configured_forwarded_port_bind_address():

@@ -74,14 +74,13 @@ def test_confd_credentials_rejects_a_non_owner_only_file(tmp_path):
 
 def test_create_user_passes_the_password_only_as_container_environment():
     task = object.__new__(CreateConfdCredentials)
-    task._wait_for_readiness = Mock()
+    task._run_confd = Mock()
 
     task._create_user("disposable-secret")
 
-    command, environment, failure_message = task._wait_for_readiness.call_args.args
+    command, environment = task._run_confd.call_args.args
     assert "disposable-secret" not in command
     assert environment == {"CONFD_PASSWORD": "disposable-secret"}
-    assert failure_message == "Disposable ConfD user could not be created"
     assert command == (
         "confd_client -c user_create -A "
         '\'{"username":"itde_confd","userid":20001,'
@@ -89,6 +88,35 @@ def test_create_user_passes_the_password_only_as_container_environment():
         '"$CONFD_PASSWORD"'
         '\'","encode_passwd":true}\''
     )
+
+
+@pytest.mark.parametrize("response", ["HTTP 599", "JSONDecodeError"])
+def test_create_user_defers_known_7_1_30_client_responses(response):
+    task = object.__new__(CreateConfdCredentials)
+    task.docker_db_image_version = "7.1.30"
+    task._run_confd = Mock(side_effect=RuntimeError(response))
+
+    task._create_user("disposable-secret")
+
+    task._run_confd.assert_called_once()
+
+
+def test_create_user_raises_a_non_ambiguous_client_error():
+    task = object.__new__(CreateConfdCredentials)
+    task.docker_db_image_version = "7.1.30"
+    task._run_confd = Mock(side_effect=RuntimeError("permission denied"))
+
+    with pytest.raises(RuntimeError, match="permission denied"):
+        task._create_user("disposable-secret")
+
+
+def test_create_user_raises_known_client_responses_on_other_database_versions():
+    task = object.__new__(CreateConfdCredentials)
+    task.docker_db_image_version = "8.0.0"
+    task._run_confd = Mock(side_effect=RuntimeError("HTTP 599"))
+
+    with pytest.raises(RuntimeError, match="HTTP 599"):
+        task._create_user("disposable-secret")
 
 
 def test_change_user_password_passes_the_password_only_as_container_environment():
@@ -162,6 +190,7 @@ def test_confd_service_readiness_retries_without_credentials(monkeypatch):
 def _task_for_run() -> CreateConfdCredentials:
     task = cast(Any, object.__new__(CreateConfdCredentials))
     task.environment_name = "environment"
+    task.docker_db_image_version = "7.1.30"
     task.database_info = DatabaseInfo(
         host="172.18.0.2",
         ports=Ports.default_ports,
@@ -365,6 +394,7 @@ def test_docker_database_spawn_passes_its_executor_to_confd_credentials_task():
     task = object.__new__(SpawnTestEnvironmentWithDockerDB)
     task.create_confd_user = True
     task.environment_name = "environment"
+    task.docker_db_image_version = "7.1.30"
     task._executor_factory = Mock(return_value="executor-factory")
     task.create_child_task_with_common_params = Mock(return_value="confd-task")
     database_info = Mock()
@@ -375,6 +405,7 @@ def test_docker_database_spawn_passes_its_executor_to_confd_credentials_task():
     task.create_child_task_with_common_params.assert_called_once_with(
         CreateConfdCredentials,
         environment_name="environment",
+        docker_db_image_version="7.1.30",
         database_info=database_info,
         executor_factory="executor-factory",
     )

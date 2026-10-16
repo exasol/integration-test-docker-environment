@@ -191,6 +191,8 @@ class DockerExecFactory(DbOsExecFactory):
 
 
 class SshExecFactory(DbOsExecFactory):
+    """Create SSH executors for either host-side or Docker-network callers."""
+
     @classmethod
     def from_database_info(cls, info: DatabaseInfo):
         """Create an SSH executor using the legacy implicit endpoint choice.
@@ -210,6 +212,11 @@ class SshExecFactory(DbOsExecFactory):
 
     @classmethod
     def for_host(cls, info: DatabaseInfo):
+        """Create an executor for ITDE code running on the Docker host.
+
+        Requires a published SSH port. Its endpoint is derived from the Docker
+        publication, converting wildcard bind addresses to loopback addresses.
+        """
         ssh_info = info.ssh_info
         if ssh_info is None:
             raise ValueError("Database does not have SSH connection information")
@@ -222,6 +229,12 @@ class SshExecFactory(DbOsExecFactory):
 
     @classmethod
     def for_docker_network(cls, info: DatabaseInfo):
+        """Create an executor for a caller already on the Docker network.
+
+        Connects to the database container's internal host and SSH port. It
+        does not require or use a Docker-published host port; host-side ITDE
+        code must use :meth:`for_host` instead.
+        """
         ssh_info = info.ssh_info
         if ssh_info is None:
             raise ValueError("Database does not have SSH connection information")
