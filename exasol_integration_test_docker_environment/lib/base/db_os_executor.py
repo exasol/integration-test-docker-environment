@@ -1,4 +1,5 @@
 import time
+import warnings
 from abc import abstractmethod
 from collections.abc import Mapping
 from datetime import timedelta
@@ -190,6 +191,23 @@ class DockerExecFactory(DbOsExecFactory):
 
 
 class SshExecFactory(DbOsExecFactory):
+    @classmethod
+    def from_database_info(cls, info: DatabaseInfo):
+        """Create an SSH executor using the legacy implicit endpoint choice.
+
+        Deprecated: callers should choose :meth:`for_host` or
+        :meth:`for_docker_network` explicitly.
+        """
+        warnings.warn(
+            "SshExecFactory.from_database_info() is deprecated; use "
+            "for_host() or for_docker_network() explicitly.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        if info.published_port("ssh") is not None:
+            return cls.for_host(info)
+        return cls.for_docker_network(info)
+
     @classmethod
     def for_host(cls, info: DatabaseInfo):
         ssh_info = info.ssh_info

@@ -37,6 +37,11 @@ class CreateConfdCredentials(DependencyLoggerBaseTask):
     executor_factory: DbOsExecFactory = JsonPickleParameter(  # type: ignore
         DbOsExecFactory, significant=False
     )
+    # Deprecated compatibility parameter. The endpoint is now derived from
+    # database_info.published_port("confd"), which includes the bind address.
+    port_bind_address: str | None = luigi.OptionalParameter(
+        default=None, significant=False
+    )
 
     def run_task(self) -> None:
         if self.database_info.reused:

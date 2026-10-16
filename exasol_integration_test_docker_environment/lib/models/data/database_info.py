@@ -32,8 +32,13 @@ class DatabaseInfo(Info):
         self.ssh_info = ssh_info
         self.forwarded_ports = forwarded_ports
         self.port_bind_address = port_bind_address
-        # The former fields are retained as compatibility metadata. New
-        # clients use this mapping so they never reconstruct a publication.
+        # This supplements, rather than replaces, forwarded_ports. It was
+        # introduced for host-side SSH access and the returned ConfD endpoint,
+        # particularly when Docker publishes a port using the wildcard bind
+        # address 0.0.0.0 or ::. Those addresses describe where Docker listens;
+        # ITDE must connect through 127.0.0.1 or ::1 instead. A published port
+        # keeps the container port, host port, and bind address together so
+        # clients can derive that connectable endpoint consistently.
         self.published_ports = (
             self._published_ports(ports, forwarded_ports, port_bind_address)
             if published_ports is None
