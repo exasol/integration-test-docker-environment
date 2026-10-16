@@ -154,9 +154,9 @@ Docker bridge:
        cd /home/mykhailo.skliar/github/exasol/integration-test-docker-environment && \
        .venv/bin/pytest -xvv test/integration/confd_access/test_container_ip_json_rpc.py'
 
-Replace the path with your checkout path. Do not diagnose a host-side timeout
-to a container private IP as a ConfD authentication failure: use a forwarded
-ConfD port, an SSH tunnel, or run the direct-IP test on the Docker host.
+Replace the path with your checkout path. Run this direct-IP test on the Docker
+VM host. Requests from the outer host to a container private bridge IP time out
+because that address is not host-routable.
 
 
 Configuring Tests
