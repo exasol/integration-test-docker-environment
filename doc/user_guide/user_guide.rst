@@ -476,11 +476,30 @@ tunnel connection.
 ConfD access scenarios
 ~~~~~~~~~~~~~~~~~~~~~~
 
-The integration tests cover JSON-RPC ``db_list`` through the published HTTPS
-endpoint, a direct container address, and an SSH tunnel. Each route is tested
-with ITDE's disposable Basic-auth user and the database's EXAConf
-``AuthenticationToken`` bearer token. The token is distinct from the
-disposable user and is sent unchanged as ``Authorization: Bearer <token>``.
+Choose an access path according to where the client runs and how it connects
+to the database:
+
+* **Published HTTPS endpoint:** Request ``--confd-port-forward`` and use
+  ``https://127.0.0.1:<forwarded-port>/rest`` for JSON-RPC or
+  ``https://127.0.0.1:<forwarded-port>/RPC2`` for XML-RPC. This is the normal
+  host-side route. Authenticate with the disposable ConfD user created by
+  ``--create-confd-user`` using HTTP Basic authentication.
+* **SSH tunnel:** Request ``--db-os-access SSH`` and create a local tunnel to
+  the database's internal ConfD port (``<database-host>:443``). Use the
+  disposable ConfD user's HTTP Basic authentication for requests through the
+  tunnel.
+* **Docker-exec or SSH command execution:** Run ``confd_client`` in the
+  database OS through ITDE's Docker-exec or SSH executor.
+* **Direct container address:** When the Docker host can route to the
+  container network, use ``https://<database-host>:443/rest`` for JSON-RPC.
+  This reachability depends on the Docker implementation; use the published
+  endpoint when the host cannot route to the container network.
+
+For JSON-RPC bearer-token authentication, send the database's configured
+EXAConf ``AuthenticationToken`` unchanged as
+``Authorization: Bearer <token>``. This token is distinct from the disposable
+Basic-auth user; do not base64-decode, re-encode, or use it as a Basic-auth
+password.
 
 For a read-only JSON-RPC request, start ``db_list`` through ``/rest`` with
 ``method: job_start`` and ``job: db_list``, then query ``job_result`` until its
