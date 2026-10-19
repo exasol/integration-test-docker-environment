@@ -48,7 +48,6 @@ from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_
 class SpawnTestEnvironmentWithDockerDB(
     AbstractSpawnTestEnvironment, DockerDBTestEnvironmentParameter
 ):
-
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.db_container_name = f"""db_container_{self.environment_name}"""
@@ -96,7 +95,7 @@ class SpawnTestEnvironmentWithDockerDB(
         docker_client_timeout: timedelta | None = None,
     ) -> DbOsExecFactory:
         if self.db_os_access == DbOsAccess.SSH:
-            return SshExecFactory.from_database_info(database_info)
+            return SshExecFactory.for_host(database_info)
         if docker_client_timeout is None:
             # Use the five-minute default defined in DockerClientFactory.__init__.
             client_factory = DockerClientFactory()
@@ -148,5 +147,4 @@ class SpawnTestEnvironmentWithDockerDB(
             docker_db_image_version=self.docker_db_image_version,
             database_info=database_info,
             executor_factory=self._executor_factory(database_info),
-            port_bind_address=self.port_bind_address,
         )

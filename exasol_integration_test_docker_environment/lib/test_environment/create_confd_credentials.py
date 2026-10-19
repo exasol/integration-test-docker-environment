@@ -33,11 +33,13 @@ class CreateConfdCredentials(DependencyLoggerBaseTask):
     """Create or reuse the disposable ConfD account and its local credentials through the configured DB-OS executor."""
 
     environment_name: str = luigi.Parameter()
-    docker_db_image_version: str = luigi.Parameter()
+    docker_db_image_version: str | None = luigi.OptionalParameter(default=None)
     database_info: DatabaseInfo = JsonPickleParameter(DatabaseInfo, significant=False)  # type: ignore
     executor_factory: DbOsExecFactory = JsonPickleParameter(  # type: ignore
         DbOsExecFactory, significant=False
     )
+    # Deprecated compatibility parameter. The endpoint is now derived from
+    # database_info.published_port("confd"), which includes the bind address.
     port_bind_address: str | None = luigi.OptionalParameter(
         default=None, significant=False
     )
@@ -102,13 +104,12 @@ class CreateConfdCredentials(DependencyLoggerBaseTask):
         )
 
     def _confd_info(self, credentials_file: Path) -> ConfdInfo:
-        forwarded_ports = self.database_info.forwarded_ports
-        confd_port = None if forwarded_ports is None else forwarded_ports.confd
+        published_port = self.database_info.published_port("confd")
         endpoint = None
-        if confd_port is not None:
-            endpoint = (
-                f"https://{self.port_bind_address or '127.0.0.1'}:{confd_port}/RPC2"
-            )
+        if published_port is not None:
+            host, port = published_port.local_endpoint()
+            formatted_host = f"[{host}]" if ":" in host else host
+            endpoint = f"https://{formatted_host}:{port}/RPC2"
         return ConfdInfo(
             username=CONFD_USERNAME,
             credentials_file=str(credentials_file),
@@ -133,7 +134,7 @@ class CreateConfdCredentials(DependencyLoggerBaseTask):
                 # On 7.1.30, ConfD may create the user before confd_client
                 # fails with HTTP 599 or malformed JSON. Retrying user_create
                 # would then fail because the user already exists. The caller
-                # then verifies the credentials with _wait_for_rest_readiness.
+                # verifies the credentials with _wait_for_rest_readiness.
                 return
             raise
 
