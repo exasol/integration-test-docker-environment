@@ -473,6 +473,38 @@ does not implement a ConfD client, SSH tunnel, or protocol fallback: consumers
 must use the documented REST endpoint directly or supply their own verified
 tunnel connection.
 
+ConfD access scenarios
+~~~~~~~~~~~~~~~~~~~~~~
+
+Choose an access path according to where the client runs and how it connects
+to the database:
+
+* **Published HTTPS endpoint:** Request ``--confd-port-forward`` and use
+  ``https://127.0.0.1:<forwarded-port>/rest`` for JSON-RPC or
+  ``https://127.0.0.1:<forwarded-port>/RPC2`` for XML-RPC. This is the normal
+  host-side route. Authenticate with the disposable ConfD user created by
+  ``--create-confd-user`` using HTTP Basic authentication.
+* **SSH tunnel:** Request ``--db-os-access SSH`` and create a local tunnel to
+  the database's internal ConfD port (``<database-host>:443``). Use the
+  disposable ConfD user's HTTP Basic authentication for requests through the
+  tunnel.
+* **Docker-exec or SSH command execution:** Run ``confd_client`` in the
+  database OS through ITDE's Docker-exec or SSH executor.
+* **Direct container address:** When the Docker host can route to the
+  container network, use ``https://<database-host>:443/rest`` for JSON-RPC.
+  This reachability depends on the Docker implementation; use the published
+  endpoint when the host cannot route to the container network.
+
+For JSON-RPC bearer-token authentication, send the database's configured
+EXAConf ``AuthenticationToken`` unchanged as
+``Authorization: Bearer <token>``. This token is distinct from the disposable
+Basic-auth user; do not base64-decode, re-encode, or use it as a Basic-auth
+password.
+
+For a read-only JSON-RPC request, start ``db_list`` through ``/rest`` with
+``method: job_start`` and ``job: db_list``, then query ``job_result`` until its
+``result_code`` is no longer ``5`` (running).
+
 See the
 `ConfD authentication documentation <https://docs.exasol.com/db/latest/confd/confd.htm#Authentication>`_
 for ConfD user and credential management.
