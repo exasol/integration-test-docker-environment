@@ -6,7 +6,7 @@ on:
 jobs:
   standalone-executable:
     name: Create a standalone linux executable
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: write
     steps:

@@ -135,4 +135,5 @@ PROJECT_CONFIG = Config(
     project_name="exasol_integration_test_docker_environment",
     python_versions=("3.10", "3.11", "3.12", "3.13", "3.14"),
     add_to_excluded_python_paths=("resources",),
+    os_version="ubuntu-26.04",
 )
