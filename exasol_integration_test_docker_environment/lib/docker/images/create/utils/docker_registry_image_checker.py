@@ -12,7 +12,10 @@ class DockerRegistryImageCheckerPullLogHandler:
     def handle_log_line(self, log_line: str) -> bool:
         json_output = json.loads(log_line)
         # TODO logging
-        if "status" in json_output and json_output["status"].startswith("Pulling"):
+        if "status" in json_output and (
+            json_output["status"].startswith("Pulling")
+            or json_output["status"] == "Already exists"
+        ):
             return True
         elif "errorDetail" in json_output:
             return False
