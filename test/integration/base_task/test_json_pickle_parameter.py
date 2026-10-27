@@ -1,5 +1,4 @@
 import time
-from test.integration.base_task.base_task import BaseTestTask
 
 import luigi
 import pytest
@@ -10,6 +9,7 @@ from exasol_integration_test_docker_environment.lib.base.json_pickle_parameter i
 from exasol_integration_test_docker_environment.lib.base.run_task import (
     generate_root_task,
 )
+from test.integration.base_task.base_task import BaseTestTask
 
 
 class Data1:

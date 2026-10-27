@@ -1,11 +1,10 @@
-from test.integration.get_test_container_content import (
-    get_test_container_content,
-)
-
 from exasol_integration_test_docker_environment.lib import api
 from exasol_integration_test_docker_environment.testing import luigi_utils
 from exasol_integration_test_docker_environment.testing.docker_registry import (
     LocalDockerRegistryContextManager,
+)
+from test.integration.get_test_container_content import (
+    get_test_container_content,
 )
 
 

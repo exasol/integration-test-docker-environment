@@ -1,7 +1,3 @@
-from test.integration.get_test_container_content import (
-    get_test_container_content,
-)
-
 import pytest
 
 from exasol_integration_test_docker_environment.lib.base.run_task import (
@@ -23,6 +19,9 @@ from exasol_integration_test_docker_environment.lib.test_environment.spawn_test_
 )
 from exasol_integration_test_docker_environment.testing.utils import (
     find_docker_container_names,
+)
+from test.integration.get_test_container_content import (
+    get_test_container_content,
 )
 
 

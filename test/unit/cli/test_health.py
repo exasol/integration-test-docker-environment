@@ -1,4 +1,3 @@
-from test.unit.cli.cli_runner import CliRunner
 from unittest.mock import (
     MagicMock,
     call,
@@ -11,6 +10,7 @@ import exasol_integration_test_docker_environment.lib.api as api
 from exasol_integration_test_docker_environment.cli.commands.health import (
     health as health_command,
 )
+from test.unit.cli.cli_runner import CliRunner
 
 
 @pytest.fixture

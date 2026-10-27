@@ -1,5 +1,4 @@
 import itertools
-from test.unit.cli.cli_runner import CliRunner
 from typing import (
     Any,
     Union,
@@ -23,6 +22,7 @@ from exasol_integration_test_docker_environment.lib.test_environment.parameter.d
 from exasol_integration_test_docker_environment.testing.api_consistency_utils import (
     defaults_of_click_call,
 )
+from test.unit.cli.cli_runner import CliRunner
 
 
 @pytest.fixture

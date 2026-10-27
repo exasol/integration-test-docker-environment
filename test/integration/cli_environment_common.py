@@ -1,5 +1,4 @@
 from inspect import cleandoc
-from test.integration.helpers import get_executor_factory
 from typing import (
     Any,
     cast,
@@ -21,6 +20,7 @@ from exasol_integration_test_docker_environment.testing.exaslct_docker_test_envi
 from exasol_integration_test_docker_environment.testing.spawned_test_environments import (
     SpawnedTestEnvironments,
 )
+from test.integration.helpers import get_executor_factory
 
 
 class NumberCheck:

@@ -1,5 +1,4 @@
 import contextlib
-from test.integration.helpers import get_executor_factory
 
 import docker
 import pytest
@@ -30,6 +29,7 @@ from exasol_integration_test_docker_environment.lib.test_environment.ports impor
 from exasol_integration_test_docker_environment.testing.utils import (
     normalize_request_name,
 )
+from test.integration.helpers import get_executor_factory
 
 
 @pytest.fixture

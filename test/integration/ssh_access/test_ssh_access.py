@@ -1,8 +1,7 @@
-from test.integration.helpers import container_named
-
 import fabric
 
 from exasol_integration_test_docker_environment.lib.base.ssh_access import SshKey
+from test.integration.helpers import container_named
 
 
 def test_ssh_access(api_context, fabric_stdin):

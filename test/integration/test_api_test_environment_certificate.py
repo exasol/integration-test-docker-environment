@@ -1,7 +1,3 @@
-from test.integration.get_test_container_content import (
-    get_test_container_content,
-)
-
 import pytest
 
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
@@ -16,6 +12,9 @@ from exasol_integration_test_docker_environment.testing.api_test_environment_con
 )
 from exasol_integration_test_docker_environment.testing.utils import (
     check_db_version_from_env,
+)
+from test.integration.get_test_container_content import (
+    get_test_container_content,
 )
 
 
