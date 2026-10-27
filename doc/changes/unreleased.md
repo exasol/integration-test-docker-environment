@@ -17,6 +17,7 @@ Added secure ConfD RPC port exposure and disposable Basic-auth credentials for D
 * #685: Refactor Docker-DB SSH and ConfD Endpoint Handling
 * #687: Add json-rpc basic confd integration tests
 * #689: Refactor Docker-DB SSH and ConfD Endpoint Handling Part 2
+* #695: Removed support for Python 3.10 and updated to exasol-toolbox version 12.0.0
 
 ## Bugs
 
