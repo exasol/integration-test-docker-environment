@@ -10,7 +10,7 @@ def _bucketfs_access(protocol: str, port: int, verify: str | None = None):
     CREDENTIALS = {"default": {"username": "w", "password": "write"}}
 
     bucketfs = Service(URL, CREDENTIALS, verify=False if verify is None else verify)
-    buckets = [bucket for bucket in bucketfs]
+    buckets = [*bucketfs]
     assert len(buckets) > 0
 
 

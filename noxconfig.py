@@ -79,7 +79,7 @@ class Config(BaseConfig):
         """
         Return the expanded matrix rows for the slow Python-version workflow.
 
-        Coverage is enabled only for Python 3.10 rows, and every row includes the
+        Coverage is enabled only for Python 3.11 rows, and every row includes the
         precomputed artifact name the workflow should use when coverage is collected.
         """
         rows: list[dict[str, str | bool]] = []
@@ -89,7 +89,7 @@ class Config(BaseConfig):
                     {
                         "python_versions": python_version,
                         "integration_test_targets": test_target,
-                        "collect_coverage": python_version == "3.10",
+                        "collect_coverage": python_version == "3.11",
                         "coverage_artifact_name": (
                             f"coverage-python{python_version}-slow-"
                             f"{self._sanitize_artifact_name(test_target)}"
@@ -133,6 +133,5 @@ class Config(BaseConfig):
 PROJECT_CONFIG = Config(
     root_path=Path(__file__).parent,
     project_name="exasol_integration_test_docker_environment",
-    python_versions=("3.10", "3.11", "3.12", "3.13", "3.14"),
     add_to_excluded_python_paths=("resources",),
 )
