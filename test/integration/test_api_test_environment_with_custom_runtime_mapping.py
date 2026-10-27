@@ -1,7 +1,4 @@
 from pathlib import Path
-from test.integration.get_test_container_content import (
-    get_test_container_content,
-)
 
 import pytest
 
@@ -11,6 +8,9 @@ from exasol_integration_test_docker_environment.lib.models.data.environment_info
 )
 from exasol_integration_test_docker_environment.lib.models.data.test_container_content_description import (
     TestContainerRuntimeMapping,
+)
+from test.integration.get_test_container_content import (
+    get_test_container_content,
 )
 
 

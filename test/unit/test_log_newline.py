@@ -1,9 +1,9 @@
 from pathlib import Path
-from test.matchers import regex_matcher
 
 from exasol_integration_test_docker_environment.lib.logging.command_log_handler import (
     CommandLogHandler,
 )
+from test.matchers import regex_matcher
 
 
 def test_new_line(tmp_path):

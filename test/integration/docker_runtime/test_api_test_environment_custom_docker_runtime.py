@@ -4,12 +4,6 @@
 # to work, but unfortunately, some auto-formatting tools may want to remove it, as they
 # interpret as standard Python, meaning that its usage is interpreted as only a
 # parameter, not a fixture. Thus, we needed to add # noqa: F401.
-from test.integration.docker_runtime.common import default_docker_runtime  # noqa: F401
-from test.integration.docker_runtime.common import assert_container_runtime
-from test.integration.get_test_container_content import (
-    get_test_container_content,
-)
-
 import pytest
 
 from exasol_integration_test_docker_environment.testing.api_test_environment import (
@@ -17,6 +11,11 @@ from exasol_integration_test_docker_environment.testing.api_test_environment imp
 )
 from exasol_integration_test_docker_environment.testing.api_test_environment_context_provider import (
     build_api_context_provider_with_test_container,
+)
+from test.integration.docker_runtime.common import default_docker_runtime  # noqa: F401
+from test.integration.docker_runtime.common import assert_container_runtime
+from test.integration.get_test_container_content import (
+    get_test_container_content,
 )
 
 

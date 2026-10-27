@@ -24,7 +24,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.build_matrix.outputs.matrix) }}
-    runs-on: ubuntu-24.04
+    runs-on: "ubuntu-26.04"
     permissions:
       contents: read
     name: Run tests for Exasol ${{ matrix.db_versions }} - ${{ matrix.integration_test_targets }}
@@ -36,7 +36,7 @@ jobs:
           persist-credentials: false
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@v10
+        uses: exasol/python-toolbox/.github/actions/python-environment@v12
         with:
           python-version: "3.14"
           poetry-version: "2.3.0"

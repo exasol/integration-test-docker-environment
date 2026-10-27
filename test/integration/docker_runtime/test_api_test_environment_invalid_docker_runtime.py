@@ -1,11 +1,10 @@
-from test.integration.get_test_container_content import (
-    get_test_container_content,
-)
-
 from exasol_integration_test_docker_environment.lib.models import api_errors
 from exasol_integration_test_docker_environment.testing import utils
 from exasol_integration_test_docker_environment.testing.api_test_environment import (
     ApiTestEnvironment,
+)
+from test.integration.get_test_container_content import (
+    get_test_container_content,
 )
 
 

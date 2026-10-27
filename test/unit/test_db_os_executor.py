@@ -1,5 +1,4 @@
 from datetime import timedelta
-from test.integration.helpers import mock_cast
 from unittest.mock import (
     MagicMock,
     call,
@@ -30,6 +29,7 @@ from exasol_integration_test_docker_environment.lib.models.data.published_port i
 )
 from exasol_integration_test_docker_environment.lib.models.data.ssh_info import SshInfo
 from exasol_integration_test_docker_environment.lib.test_environment.ports import Ports
+from test.integration.helpers import mock_cast
 
 
 def test_executor_closes_client():

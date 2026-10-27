@@ -1,14 +1,15 @@
 """Container-IP ConfD JSON-RPC integration scenarios."""
 
+from urllib.error import HTTPError
+
+import pytest
+
 from test.integration.confd_access.json_rpc import (
     assert_db_list_response,
     authentication_token_db_list_request,
     basic_db_list_request,
     json_rpc_response,
 )
-from urllib.error import HTTPError
-
-import pytest
 
 
 def test_container_ip_json_rpc_basic(confd_container_ip_json_rpc_access):

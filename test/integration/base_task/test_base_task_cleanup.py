@@ -1,5 +1,3 @@
-from test.integration.base_task.base_task import BaseTestTask
-
 import luigi
 from luigi import (
     BoolParameter,
@@ -9,6 +7,7 @@ from luigi import (
 from exasol_integration_test_docker_environment.lib.base.run_task import (
     generate_root_task,
 )
+from test.integration.base_task.base_task import BaseTestTask
 
 
 class RootTestTask(BaseTestTask):

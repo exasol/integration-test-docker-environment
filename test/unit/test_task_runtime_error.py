@@ -1,7 +1,6 @@
 import re
 import time
 import traceback
-from test.matchers import regex_matcher
 
 import pytest
 
@@ -16,6 +15,7 @@ from exasol_integration_test_docker_environment.lib.models.api_errors import (
     TaskFailures,
     TaskRuntimeError,
 )
+from test.matchers import regex_matcher
 
 
 class CompositeFailingTask(DependencyLoggerBaseTask):

@@ -2,7 +2,6 @@ import contextlib
 import logging
 import re
 import warnings
-from test.matchers import regex_matcher
 from typing import (
     Any,
 )
@@ -13,6 +12,7 @@ from exasol_integration_test_docker_environment.lib.base.run_task import (
     generate_root_task,
     run_task,
 )
+from test.matchers import regex_matcher
 
 LOGGER_STR = "logger_str"
 

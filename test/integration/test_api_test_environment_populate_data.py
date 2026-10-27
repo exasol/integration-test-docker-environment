@@ -1,10 +1,5 @@
 from collections.abc import Iterator
 from pathlib import PurePath
-from test.integration.get_test_container_content import (
-    FULL_TEST_CONTAINER_PATH,
-    TEST_DATA_ROOT_PATH,
-    get_test_container_content,
-)
 
 import luigi
 import pytest
@@ -29,6 +24,11 @@ from exasol_integration_test_docker_environment.testing.api_test_environment_con
 )
 from exasol_integration_test_docker_environment.testing.exaslct_docker_test_environment import (
     ExaslctDockerTestEnvironment,
+)
+from test.integration.get_test_container_content import (
+    FULL_TEST_CONTAINER_PATH,
+    TEST_DATA_ROOT_PATH,
+    get_test_container_content,
 )
 
 

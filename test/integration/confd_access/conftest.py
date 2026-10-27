@@ -4,7 +4,6 @@ import contextlib
 import socket
 import time
 from collections.abc import Generator
-from test.integration.confd_access.json_rpc import create_json_rpc_access
 
 import fabric
 import pytest
@@ -21,6 +20,7 @@ from exasol_integration_test_docker_environment.lib.test_environment.ports impor
 from exasol_integration_test_docker_environment.testing.api_test_environment_context_provider import (
     build_api_context_provider,
 )
+from test.integration.confd_access.json_rpc import create_json_rpc_access
 
 
 @pytest.fixture(scope="module")

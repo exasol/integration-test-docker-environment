@@ -5,9 +5,6 @@ import subprocess
 import sys
 from collections.abc import Iterator
 from pathlib import Path
-from test.integration.get_test_container_content import (
-    get_test_container_content,
-)
 
 import pytest
 
@@ -38,6 +35,9 @@ from exasol_integration_test_docker_environment.testing.exaslct_docker_test_envi
 )
 from exasol_integration_test_docker_environment.testing.exaslct_test_environment import (
     ExaslctTestEnvironment,
+)
+from test.integration.get_test_container_content import (
+    get_test_container_content,
 )
 
 CLI_ENVIRONMENT_TEST_PREFIX = "test_cli_environment_"
